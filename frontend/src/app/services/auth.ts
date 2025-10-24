@@ -10,7 +10,9 @@ import { map } from 'rxjs/operators';
 })
 export class AuthService {
   private jwtHelper = new JwtHelperService();
-  private authUrl = '/api/auth';
+  // During local dev we call backend directly (dev server proxy was inconsistent),
+  // backend listens on http://localhost:4000 and exposes /auth endpoints.
+  private authUrl = 'http://localhost:4000/auth';
   private currentTokenSubject = new BehaviorSubject<string | null>(this.getToken());
   public currentToken$ = this.currentTokenSubject.asObservable();
 
@@ -19,8 +21,10 @@ export class AuthService {
   login(email: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.authUrl}/login`, { email, password }).pipe(
       map(res => {
-        if (res && res.token) {
-          this.setToken(res.token);
+        // backend returns { user, tokens: { accessToken, refreshToken } }
+        const token = res?.tokens?.accessToken || res?.token || res?.accessToken;
+        if (token) {
+          this.setToken(token);
         }
         return res;
       })
@@ -28,7 +32,14 @@ export class AuthService {
   }
 
   register(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.authUrl}/register`, { email, password });
+    return this.http.post<any>(`${this.authUrl}/register`, { email, password }).pipe(
+      map(res => {
+        // mirror login behavior: store token when provided
+        const token = res?.tokens?.accessToken || res?.token || res?.accessToken;
+        if (token) this.setToken(token);
+        return res;
+      })
+    );
   }
 
   logout(): void {
