@@ -1,0 +1,29 @@
+## Node.js
+/backend/node_modules/
+/frontend/node_modules/
+
+## Build output
+/frontend/www/
+
+## Logs and pids
+/logs/
+/.pids/
+*.log
+
+## Environment
+.env
+
+## macOS
+.DS_Store
+
+## IDEs
+.vscode/
+.idea/
+
+## Test/coverage
+/coverage/
+
+# Dependency directories
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
