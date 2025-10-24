@@ -1,0 +1,275 @@
+
+Warning: This is a simple server for use in testing or debugging Angular applications
+locally. It hasn't been reviewed for security issues.
+
+Binding this server to an open connection can result in compromising your application or
+computer. Using a different host than the one passed to the "--host" flag might result in
+websocket connection issues. You might need to use "--disable-host-check" if that's the
+case.
+    
+❯ Building...
+✔ Building...
+Initial chunk files   | Names         |  Raw size
+styles.css            | styles        |  57.08 kB | 
+main.js               | main          |   5.27 kB | 
+polyfills.js          | polyfills     | 143 bytes | 
+
+                      | Initial total |  62.49 kB
+
+Lazy chunk files      | Names         |  Raw size
+home.page-PYVTOO6J.js | home-page     |   4.44 kB | 
+
+Application bundle generation complete. [15.989 seconds] - 2025-10-24T08:54:44.580Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4200/
+  ➜  Network: http://192.168.1.125:4200/
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [2.714 seconds] - 2025-10-24T17:36:02.868Z
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' since it isn't a known property of 'ion-input'.
+1. If 'ion-input' is an Angular component and it has 'ngModel' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'ion-input' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.page.html:11:17:
+[37m      11 │       <ion-input [32m[(ngModel)]="email"[37m type="email"></ion-input>
+         ╵                  [32m~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LoginPage.
+
+    src/app/login/login.page.ts:6:15:
+[37m      6 │   templateUrl: [32m'login.page.html'[37m,
+        ╵                [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' since it isn't a known property of 'ion-input'.
+1. If 'ion-input' is an Angular component and it has 'ngModel' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'ion-input' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.page.html:15:17:
+[37m      15 │       <ion-input [32m[(ngModel)]="password"[37m type="password"></ion-input>
+         ╵                  [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LoginPage.
+
+    src/app/login/login.page.ts:6:15:
+[37m      6 │   templateUrl: [32m'login.page.html'[37m,
+        ╵                [32m~~~~~~~~~~~~~~~~~[0m
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [0.667 seconds] - 2025-10-24T17:36:52.027Z
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' since it isn't a known property of 'ion-input'.
+1. If 'ion-input' is an Angular component and it has 'ngModel' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'ion-input' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.page.html:11:17:
+[37m      11 │       <ion-input [32m[(ngModel)]="email"[37m type="email"></ion-input>
+         ╵                  [32m~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LoginPage.
+
+    src/app/login/login.page.ts:6:15:
+[37m      6 │   templateUrl: [32m'login.page.html'[37m,
+        ╵                [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' since it isn't a known property of 'ion-input'.
+1. If 'ion-input' is an Angular component and it has 'ngModel' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'ion-input' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.page.html:15:17:
+[37m      15 │       <ion-input [32m[(ngModel)]="password"[37m type="password"></ion-input>
+         ╵                  [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component LoginPage.
+
+    src/app/login/login.page.ts:6:15:
+[37m      6 │   templateUrl: [32m'login.page.html'[37m,
+        ╵                [32m~~~~~~~~~~~~~~~~~[0m
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   5.38 kB | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  62.60 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-4SOWBQ2E.js | login-page    |   5.67 kB | 
+home.page-PYVTOO6J.js  | home-page     |   4.44 kB | 
+
+Application bundle generation complete. [0.533 seconds] - 2025-10-24T17:37:27.413Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   5.38 kB | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  62.60 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-4SOWBQ2E.js | login-page    |   5.67 kB | 
+home.page-PYVTOO6J.js  | home-page     |   4.44 kB | 
+
+Application bundle generation complete. [0.191 seconds] - 2025-10-24T17:37:32.335Z
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names      | Raw size
+main.js                | main       |  5.38 kB | 
+
+Lazy chunk files       | Names      | Raw size
+login.page-EZ55ARZQ.js | login-page |  5.68 kB | 
+
+Application bundle generation complete. [7.240 seconds] - 2025-10-24T20:34:18.485Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   5.38 kB | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  62.60 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-EZ55ARZQ.js | login-page    |   5.68 kB | 
+home.page-PYVTOO6J.js  | home-page     |   4.44 kB | 
+
+Application bundle generation complete. [1.476 seconds] - 2025-10-24T20:54:31.565Z
+
+10:01:16 PM [vite] (client) ✨ new dependencies optimized: @angular/forms
+10:01:16 PM [vite] (client) ✨ optimized dependencies changed. reloading
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [0.532 seconds] - 2025-10-24T21:21:17.050Z
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 't' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.page.ts:41:16:
+[37m      41 │         }).then([32mt[37m => t.present());
+         ╵                 [32m^[0m
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Application bundle generation failed. [0.138 seconds] - 2025-10-24T21:21:24.595Z
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 't' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/login/login.page.ts:41:16:
+[37m      41 │         }).then([32mt[37m => t.present());
+         ╵                 [32m^[0m
+
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   3.47 kB | 
+chunk-HI22XGPB.js      | -             |   2.17 kB | 
+chunk-PZ5AY32C.js      | -             | 234 bytes | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  63.09 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-ZB3GOUHU.js | login-page    |   6.70 kB | 
+home.page-U6GPZHO5.js  | home-page     |   4.47 kB | 
+
+Application bundle generation complete. [0.934 seconds] - 2025-10-24T21:22:19.265Z
+
+Page reload sent to client(s).
+10:22:29 PM [vite] (client) ✨ new dependencies optimized: @ionic/angular
+10:22:29 PM [vite] (client) ✨ optimized dependencies changed. reloading
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   3.47 kB | 
+chunk-HI22XGPB.js      | -             |   2.17 kB | 
+chunk-PZ5AY32C.js      | -             | 234 bytes | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  63.09 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-ZB3GOUHU.js | login-page    |   6.70 kB | 
+home.page-U6GPZHO5.js  | home-page     |   4.47 kB | 
+
+Application bundle generation complete. [0.366 seconds] - 2025-10-24T21:22:33.008Z
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names      | Raw size
+main.js                | main       |  3.47 kB | 
+chunk-G65K6F3L.js      | -          |  2.40 kB | 
+
+Lazy chunk files       | Names      | Raw size
+login.page-UEQ7FD7L.js | login-page |  6.70 kB | 
+
+Application bundle generation complete. [0.769 seconds] - 2025-10-24T21:27:20.815Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   3.47 kB | 
+chunk-G65K6F3L.js      | -             |   2.40 kB | 
+chunk-PZ5AY32C.js      | -             | 234 bytes | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  63.33 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-UEQ7FD7L.js | login-page    |   6.70 kB | 
+home.page-U6GPZHO5.js  | home-page     |   4.47 kB | 
+
+Application bundle generation complete. [1.106 seconds] - 2025-10-24T21:27:51.341Z
+
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names      | Raw size
+main.js                | main       |  3.47 kB | 
+chunk-ZF3MPL4B.js      | -          |  2.41 kB | 
+
+Lazy chunk files       | Names      | Raw size
+login.page-IMBRVEFN.js | login-page |  6.70 kB | 
+
+Application bundle generation complete. [0.310 seconds] - 2025-10-24T21:32:39.853Z
+
+Page reload sent to client(s).
+❯ Changes detected. Rebuilding...
+✔ Changes detected. Rebuilding...
+Initial chunk files    | Names         |  Raw size
+styles.css             | styles        |  57.08 kB | 
+main.js                | main          |   3.47 kB | 
+chunk-ZF3MPL4B.js      | -             |   2.41 kB | 
+chunk-PZ5AY32C.js      | -             | 234 bytes | 
+polyfills.js           | polyfills     | 143 bytes | 
+
+                       | Initial total |  63.33 kB
+
+Lazy chunk files       | Names         |  Raw size
+login.page-IMBRVEFN.js | login-page    |   6.70 kB | 
+home.page-U6GPZHO5.js  | home-page     |   4.47 kB | 
+
+Application bundle generation complete. [0.266 seconds] - 2025-10-24T21:32:50.243Z
+
