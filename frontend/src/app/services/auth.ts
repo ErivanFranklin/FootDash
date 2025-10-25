@@ -4,15 +4,16 @@ import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private jwtHelper = new JwtHelperService();
-  // During local dev we call backend directly (dev server proxy was inconsistent),
-  // backend listens on http://localhost:4000 and exposes /auth endpoints.
-  private authUrl = 'http://localhost:4000/auth';
+  // During local dev we call backend directly (dev server proxy was inconsistent).
+  // The base URL + auth path now come from Angular environment configuration.
+  private authUrl = buildAuthUrl();
   private currentTokenSubject = new BehaviorSubject<string | null>(this.getToken());
   public currentToken$ = this.currentTokenSubject.asObservable();
 
@@ -64,4 +65,10 @@ export class AuthService {
     localStorage.removeItem('access_token');
     this.currentTokenSubject.next(null);
   }
+}
+
+function buildAuthUrl(): string {
+  const base = environment.apiBaseUrl?.replace(/\/$/, '') || '';
+  const path = environment.authPath?.startsWith('/') ? environment.authPath : `/${environment.authPath || ''}`;
+  return `${base}${path}` || '/auth';
 }

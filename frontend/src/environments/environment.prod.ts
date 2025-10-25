@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  apiBaseUrl: 'https://api.yourdomain.com',
+  authPath: '/auth'
 };
