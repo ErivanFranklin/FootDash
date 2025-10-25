@@ -1,24 +1,31 @@
 
-> frontend@0.0.1 start
-> ng serve
+Warning: This is a simple server for use in testing or debugging Angular applications
+locally. It hasn't been reviewed for security issues.
 
+Binding this server to an open connection can result in compromising your application or
+computer. Using a different host than the one passed to the "--host" flag might result in
+websocket connection issues. You might need to use "--disable-host-check" if that's the
+case.
+    
 ❯ Building...
 ✔ Building...
 Initial chunk files    | Names         |  Raw size
 styles.css             | styles        |  57.08 kB | 
 main.js                | main          |   3.47 kB | 
-chunk-ZF3MPL4B.js      | -             |   2.41 kB | 
+chunk-FRZJZOM7.js      | -             |   2.43 kB | 
 chunk-PZ5AY32C.js      | -             | 234 bytes | 
 polyfills.js           | polyfills     | 143 bytes | 
 
-                       | Initial total |  63.33 kB
+                       | Initial total |  63.35 kB
 
 Lazy chunk files       | Names         |  Raw size
-login.page-IMBRVEFN.js | login-page    |   6.70 kB | 
+login.page-Q344K2N5.js | login-page    |   6.70 kB | 
 home.page-U6GPZHO5.js  | home-page     |   4.47 kB | 
 
-Application bundle generation complete. [4.565 seconds] - 2025-10-24T21:33:28.080Z
+Application bundle generation complete. [8.742 seconds] - 2025-10-25T06:53:56.578Z
 
 Watch mode enabled. Watching for file changes...
 NOTE: Raw file sizes do not reflect development server per-request transformations.
   ➜  Local:   http://localhost:4200/
+  ➜  Network: http://192.168.1.125:4200/
+  ➜  press h + enter to show help

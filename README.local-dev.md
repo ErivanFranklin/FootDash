@@ -23,11 +23,9 @@ node -v
 # from project root
 cd /Users/erivansilva/Documents/FootDash/backend
 npm ci
-# create a minimal .env if you don't have one
-cat > .env <<EOF
-PORT=3001
-JWT_SECRET=your_secret_here
-EOF
+# copy the sample env file if you don't have one yet
+cp .env.example .env
+# edit .env to set a secure JWT_SECRET and any other overrides
 
 # development with auto-restart
 npm run dev
@@ -36,7 +34,7 @@ npm run dev
 ```
 Notes:
 - Backend `package.json` already contains `dev` (nodemon) and `start` scripts.
-- Default port used here is `3001`; change via `.env` as needed.
+- Default port is `4000`; change via `.env` if the port is occupied.
 
 2) Start frontend (dev server, live reload)
 ```bash
@@ -50,7 +48,10 @@ npx ionic serve --host=0.0.0.0 --port=8100
 # OR use Angular CLI directly:
 # npx ng serve --host 0.0.0.0 --port 4200 --proxy-config proxy.conf.json
 ```
-Use the project's `proxy.conf.json` so API calls to `/api` are proxied to the backend port (e.g. http://localhost:3001).
+Use the project's `proxy.conf.json` so API calls to `/api` are proxied to the backend port (defaults to http://localhost:4000). Update `src/environments/*.ts` or `.env` values if you point the frontend at a different backend host.
+
+If you need to track custom frontend API settings, copy `frontend/.env.example` to `frontend/.env` and keep the values aligned with `src/environments/environment*.ts`.
+Run `node scripts/sync-frontend-env.mjs` whenever you update `.env` so the Angular environment files stay in sync automatically.
 
 3) Quick production preview (static build + tiny static server)
 ```bash
