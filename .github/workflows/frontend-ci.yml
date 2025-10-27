@@ -62,6 +62,48 @@ jobs:
         run: npm test -- --watch=false --browsers=ChromeHeadless
         working-directory: frontend
 
+      - name: Upload frontend coverage/artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+
+      - name: Upload frontend junit test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: frontend/test-results/frontend-junit.xml
+
+      - name: Annotate frontend test results in PR
+        if: always() && github.event_name == 'pull_request'
+        uses: dorny/test-reporter@v1
+        with:
+          name: frontend-junit
+          path: frontend/test-results/frontend-junit.xml
+          reporter: junit
+          fail_on_error: false
+
+      - name: Debug frontend test-results directory on failure
+        if: failure()
+        run: |
+          echo "--- frontend test-results dir ---"
+          ls -la frontend/test-results || true
+          if [ -f frontend/test-results/frontend-junit.xml ]; then
+            echo "--- head of frontend/test-results/frontend-junit.xml ---"
+            head -n 200 frontend/test-results/frontend-junit.xml || true
+          else
+            echo "frontend-junit.xml not present"
+          fi
+
+      - name: Upload frontend test-results directory on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results-dir
+          path: frontend/test-results
+
       - name: Build frontend
         run: npm run build --silent
         working-directory: frontend

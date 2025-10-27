@@ -64,7 +64,8 @@
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.3",
+    "jest-junit": "^13.2.0"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -81,6 +82,16 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "../test-results",
+          "outputName": "backend-junit.xml"
+        }
+      ]
+    ]
   }
 }

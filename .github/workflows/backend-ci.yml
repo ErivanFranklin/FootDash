@@ -68,3 +68,45 @@ jobs:
       - name: Run backend tests
         run: npm test --silent
         working-directory: backend-nest
+
+      - name: Upload backend coverage/artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend-nest/coverage
+
+      - name: Upload backend junit test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend-nest/test-results/backend-junit.xml
+
+      - name: Annotate backend test results in PR
+        if: always() && github.event_name == 'pull_request'
+        uses: dorny/test-reporter@v1
+        with:
+          name: backend-junit
+          path: backend-nest/test-results/backend-junit.xml
+          reporter: junit
+          fail_on_error: false
+
+      - name: Debug backend test-results directory on failure
+        if: failure()
+        run: |
+          echo "--- backend test-results dir ---"
+          ls -la backend-nest/test-results || true
+          if [ -f backend-nest/test-results/backend-junit.xml ]; then
+            echo "--- head of backend-nest/test-results/backend-junit.xml ---"
+            head -n 200 backend-nest/test-results/backend-junit.xml || true
+          else
+            echo "backend-junit.xml not present"
+          fi
+
+      - name: Upload backend test-results directory on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results-dir
+          path: backend-nest/test-results

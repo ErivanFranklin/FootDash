@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: footdash
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - postgres-data-ci:/var/lib/postgresql/data
+
+  ci:
+    build:
+      context: ../../
+      dockerfile: scripts/ci/Dockerfile
+    environment:
+      CI: 'true'
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: footdash
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ..:/workspace:cached
+    tty: true
+
+volumes:
+  postgres-data-ci:
+    driver: local

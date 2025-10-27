@@ -32,6 +32,25 @@ Both workflows run on pushes to `main` and branches matching `migration/**`, and
     npm run build
     ```
 
+### Run full CI container + Postgres with Docker Compose
+
+You can reproduce the CI environment (the same image used by the `scripts/run-local-ci.sh` helper) using the provided compose file. It builds the CI image from `scripts/ci/Dockerfile` and brings up a Postgres service for end-to-end reproduction.
+
+From repo root:
+
+```bash
+# build & bring up both CI image (service) and Postgres
+docker compose -f scripts/ci/docker-compose.ci.yml up --build
+
+# open a shell into the CI container (named <project>_ci_1 by compose) or run commands directly
+docker compose -f scripts/ci/docker-compose.ci.yml exec ci bash -lc "cd backend-nest && npm ci && npm run migrate:run && npm test"
+
+# or run frontend from the CI container
+docker compose -f scripts/ci/docker-compose.ci.yml exec ci bash -lc "cd frontend && npm ci && npm run lint && npm test -- --watch=false && npm run build"
+```
+
+The compose setup waits for Postgres to become healthy before starting the CI container (uses a healthcheck). This is a convenience for local debugging – CI runners use a service container and similar health checks.
+
 ## Common CI failures and fixes
 
 ### Frontend: Karma tests fail in CI (Chrome not found)
