@@ -1,5 +1,8 @@
 # FootDash (Scaffold)
 
+[![Backend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
+[![Frontend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
+
 This repository contains initial scaffold for the Football Dashboard project.
 
 Services

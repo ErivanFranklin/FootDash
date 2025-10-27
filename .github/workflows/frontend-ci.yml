@@ -50,6 +50,10 @@ jobs:
             echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
           fi
 
+      - name: Print detected CHROME_BIN
+        run: |
+          echo "Detected CHROME_BIN: $CHROME_BIN"
+
       - name: Run frontend lint
         run: npm run lint
         working-directory: frontend
