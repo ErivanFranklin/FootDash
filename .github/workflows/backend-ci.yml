@@ -34,14 +34,17 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install backend dependencies
+      - name: Cache backend node modules
         uses: actions/cache@v4
         with:
           path: backend-nest/node_modules
           key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}
 
-      - name: Install backend dependencies
-        run: npm ci
+      - name: Install backend dependencies (capture logs)
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm ci 2>&1 | tee backend-nest/test-results/npm-ci.log
         working-directory: backend-nest
 
       - name: Run backend lint
@@ -54,7 +57,7 @@ jobs:
             pg_isready -h localhost -p 5432 -U postgres -d footdash && break || sleep 1;
           done
 
-      - name: Run migrations
+      - name: Run migrations (capture logs)
         env:
           DB_HOST: localhost
           DB_PORT: 5432
@@ -62,11 +65,17 @@ jobs:
           DB_PASSWORD: postgres
           DB_NAME: footdash
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash
-        run: npm run migrate:run
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm run migrate:run 2>&1 | tee backend-nest/test-results/migrate.log
         working-directory: backend-nest
 
-      - name: Run backend tests
-        run: npm test --silent
+      - name: Run backend tests (capture logs)
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm test --silent 2>&1 | tee backend-nest/test-results/npm-test.log
         working-directory: backend-nest
 
       - name: Upload backend coverage/artifacts on failure
@@ -89,8 +98,8 @@ jobs:
         with:
           name: backend-junit
           path: backend-nest/test-results/backend-junit.xml
-          reporter: junit
-          fail_on_error: false
+          fail-on-error: false
+          fail-on-empty: false
 
       - name: Debug backend test-results directory on failure
         if: failure()

@@ -25,8 +25,11 @@ jobs:
           path: frontend/node_modules
           key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Install frontend dependencies (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm ci 2>&1 | tee frontend/test-results/npm-ci.log
         working-directory: frontend
 
       - name: Install Chromium for headless tests
@@ -54,12 +57,18 @@ jobs:
         run: |
           echo "Detected CHROME_BIN: $CHROME_BIN"
 
-      - name: Run frontend lint
-        run: npm run lint
+      - name: Run frontend lint (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm run lint 2>&1 | tee frontend/test-results/npm-lint.log
         working-directory: frontend
 
-      - name: Run frontend tests
-        run: npm test -- --watch=false --browsers=ChromeHeadless
+      - name: Run frontend tests (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm test -- --watch=false --browsers=ChromeHeadless 2>&1 | tee frontend/test-results/npm-test.log
         working-directory: frontend
 
       - name: Upload frontend coverage/artifacts on failure
@@ -82,8 +91,8 @@ jobs:
         with:
           name: frontend-junit
           path: frontend/test-results/frontend-junit.xml
-          reporter: junit
-          fail_on_error: false
+          fail-on-error: false
+          fail-on-empty: false
 
       - name: Debug frontend test-results directory on failure
         if: failure()
@@ -104,6 +113,9 @@ jobs:
           name: frontend-test-results-dir
           path: frontend/test-results
 
-      - name: Build frontend
-        run: npm run build --silent
+      - name: Build frontend (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm run build --silent 2>&1 | tee frontend/test-results/build.log
         working-directory: frontend
