@@ -29,12 +29,17 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Run frontend lint (optional)
-        run: npm run lint || true
+      - name: Install Chromium for headless tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
+      - name: Run frontend lint
+        run: npm run lint
         working-directory: frontend
 
       - name: Run frontend tests
-        run: npm test -- --watch=false || true
+        run: npm test -- --watch=false --browsers=ChromeHeadless
         working-directory: frontend
 
       - name: Build frontend

@@ -35,7 +35,17 @@ jobs:
           node-version: '20'
 
       - name: Install backend dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend-nest/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}
+
+      - name: Install backend dependencies
         run: npm ci
+        working-directory: backend-nest
+
+      - name: Run backend lint
+        run: npm run lint
         working-directory: backend-nest
 
       - name: Wait for Postgres
