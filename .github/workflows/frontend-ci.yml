@@ -85,14 +85,9 @@ jobs:
           name: frontend-test-results
           path: frontend/test-results/frontend-junit.xml
 
-      - name: Annotate frontend test results in PR
-        if: always() && github.event_name == 'pull_request'
-        uses: dorny/test-reporter@v1
-        with:
-          name: frontend-junit
-          path: frontend/test-results/frontend-junit.xml
-          fail-on-error: false
-          fail-on-empty: false
+      # PR annotation step removed: dorny/test-reporter caused runtime errors in the runner
+      # If you want PR annotations, we can re-add a compatible reporter after confirming
+      # the 'reporter' input accepted value (or switch to an alternative action).
 
       - name: Debug frontend test-results directory on failure
         if: failure()

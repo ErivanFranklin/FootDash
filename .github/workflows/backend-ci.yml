@@ -92,14 +92,9 @@ jobs:
           name: backend-test-results
           path: backend-nest/test-results/backend-junit.xml
 
-      - name: Annotate backend test results in PR
-        if: always() && github.event_name == 'pull_request'
-        uses: dorny/test-reporter@v1
-        with:
-          name: backend-junit
-          path: backend-nest/test-results/backend-junit.xml
-          fail-on-error: false
-          fail-on-empty: false
+      # PR annotation step removed: dorny/test-reporter caused runtime errors in the runner
+      # If you want PR annotations, we can re-add a compatible reporter after confirming
+      # the 'reporter' input accepted value (or switch to an alternative action).
 
       - name: Debug backend test-results directory on failure
         if: failure()
