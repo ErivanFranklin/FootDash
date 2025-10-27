@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
@@ -16,7 +16,10 @@ export class LoginPage {
   email = '';
   password = '';
   loading = false;
-  constructor(private auth: AuthService, private router: Router, private toast: ToastController) {}
+  // use functional inject() to satisfy @angular-eslint/prefer-inject
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private toast = inject(ToastController);
 
   submit() {
     // call the AuthService to login and redirect on success

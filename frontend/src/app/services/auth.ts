@@ -1,5 +1,5 @@
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable, BehaviorSubject } from 'rxjs';
@@ -17,7 +17,8 @@ export class AuthService {
   private currentTokenSubject = new BehaviorSubject<string | null>(this.getToken());
   public currentToken$ = this.currentTokenSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  // prefer functional inject() per angular-eslint/prefer-inject
+  private http = inject(HttpClient);
 
   login(email: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.authUrl}/login`, { email, password }).pipe(
