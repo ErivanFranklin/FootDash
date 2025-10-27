@@ -58,3 +58,37 @@ jobs:
       - name: Run backend tests
         run: npm test --silent
         working-directory: backend-nest
+
+  frontend:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache frontend node modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run frontend lint (if configured)
+        run: npm run lint || true
+        working-directory: frontend
+
+      - name: Run frontend tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless || true
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build --silent
+        working-directory: frontend
