@@ -36,7 +36,19 @@ jobs:
 
       - name: Set CHROME_BIN env
         run: |
-          echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+          # Prefer common chromium binary locations on ubuntu runners
+          if command -v chromium-browser >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v chromium-browser)" >> $GITHUB_ENV
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v chromium)" >> $GITHUB_ENV
+          elif command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v google-chrome)" >> $GITHUB_ENV
+          elif command -v google-chrome-stable >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v google-chrome-stable)" >> $GITHUB_ENV
+          else
+            # fallback to common path
+            echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+          fi
 
       - name: Run frontend lint
         run: npm run lint

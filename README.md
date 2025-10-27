@@ -27,3 +27,8 @@ Docker
 ```bash
 docker-compose up --build
 ```
+
+CI / Troubleshooting
+
+We added CI workflows for backend and frontend under `.github/workflows/`. For troubleshooting and local reproduction steps, see `.github/CI-README.md`.
+
