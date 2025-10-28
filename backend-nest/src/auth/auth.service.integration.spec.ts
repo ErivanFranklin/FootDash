@@ -27,7 +27,10 @@ describe('AuthService (TypeORM integration)', () => {
   });
 
   it('registers a user and persists to DB', async () => {
-    const res = await service.register({ email: 'test@example.com', password: 'password123' });
+    const res = await service.register({
+      email: 'test@example.com',
+      password: 'password123',
+    });
     expect(res).toBeDefined();
     expect(res.user.email).toBe('test@example.com');
     expect(res.tokens.accessToken).toBeDefined();

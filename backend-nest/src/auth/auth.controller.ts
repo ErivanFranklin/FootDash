@@ -6,25 +6,25 @@ import { RefreshAuthDto } from './dto/refresh-auth.dto';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-	@Post('register')
-	register(@Body() dto: RegisterAuthDto): Promise<AuthResult> {
-		return this.authService.register(dto);
-	}
+  @Post('register')
+  register(@Body() dto: RegisterAuthDto): Promise<AuthResult> {
+    return this.authService.register(dto);
+  }
 
-	@Post('login')
-	login(@Body() dto: LoginAuthDto): Promise<AuthResult> {
-		return this.authService.login(dto);
-	}
+  @Post('login')
+  login(@Body() dto: LoginAuthDto): Promise<AuthResult> {
+    return this.authService.login(dto);
+  }
 
-	@Post('refresh')
-	refresh(@Body() dto: RefreshAuthDto): Promise<AuthResult> {
-		return this.authService.refresh(dto.refreshToken);
-	}
+  @Post('refresh')
+  refresh(@Body() dto: RefreshAuthDto): Promise<AuthResult> {
+    return this.authService.refresh(dto.refreshToken);
+  }
 
-	@Post('revoke')
-	async revoke(@Body() dto: RefreshAuthDto): Promise<void> {
-		await this.authService.revoke(dto.refreshToken);
-	}
+  @Post('revoke')
+  async revoke(@Body() dto: RefreshAuthDto): Promise<void> {
+    await this.authService.revoke(dto.refreshToken);
+  }
 }
