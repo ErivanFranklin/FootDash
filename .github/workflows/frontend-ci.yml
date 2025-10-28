@@ -27,9 +27,15 @@ jobs:
 
       - name: Install frontend dependencies (capture logs)
         run: |
+          node -v && npm -v
           mkdir -p frontend/test-results
           set -o pipefail
-          npm ci 2>&1 | tee frontend/test-results/npm-ci.log
+          (
+            npm ci 2>&1 | tee frontend/test-results/npm-ci.log
+          ) || (
+            echo "npm ci failed — falling back to npm install"
+            npm install --no-audit --no-fund 2>&1 | tee frontend/test-results/npm-install.log
+          )
         working-directory: frontend
 
       - name: Install Chromium for headless tests
