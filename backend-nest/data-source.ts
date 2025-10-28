@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
+// Use namespace import to ensure compatibility when running under ts-node/commonjs
 dotenv.config();
 
 const databaseUrl = process.env.DATABASE_URL;
