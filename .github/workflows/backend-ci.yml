@@ -63,6 +63,23 @@ jobs:
             pg_isready -h localhost -p 5432 -U postgres -d footdash && break || sleep 1;
           done
 
+      - name: Ensure database exists (psql)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+          # wait until psql is able to connect
+          for i in {1..10}; do
+            psql -h localhost -p 5432 -U postgres -c '\q' && break || sleep 1
+          done
+          exists=$(psql -h localhost -p 5432 -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='footdash'") || true
+          if [ "${exists}" != '1' ]; then
+            psql -h localhost -p 5432 -U postgres -c "CREATE DATABASE footdash;"
+          else
+            echo "Database 'footdash' already exists"
+          fi
+
       - name: Run migrations (capture logs)
         env:
           DB_HOST: localhost
@@ -83,6 +100,124 @@ jobs:
           set -o pipefail
           npm test --silent 2>&1 | tee backend-nest/test-results/npm-test.log
         working-directory: backend-nest
+
+      - name: Run backend e2e tests (capture logs)
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm run test:e2e --silent 2>&1 | tee backend-nest/test-results/npm-test-e2e.log
+        working-directory: backend-nest
+
+  backend-e2e-postgres:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        postgres-version: [15]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_DB: "footdash_${{ github.run_id }}"
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d footdash_${{ github.run_id }}"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_NAME: "footdash_${{ github.run_id }}"
+      DB_PORT: 5433
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache backend node modules
+        uses: actions/cache@v4
+        with:
+          path: backend-nest/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}-e2e-pg
+
+      - name: Install backend dependencies (capture logs)
+        run: |
+          node -v && npm -v
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          (
+            npm ci 2>&1 | tee backend-nest/test-results/npm-ci-e2e-pg.log
+          ) || (
+            echo "npm ci failed — falling back to npm install"
+            npm install --no-audit --no-fund 2>&1 | tee backend-nest/test-results/npm-install-e2e-pg.log
+          )
+        working-directory: backend-nest
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..60}; do
+            pg_isready -h localhost -p 5433 -U postgres -d footdash_${{ github.run_id }} && break || sleep 1;
+          done
+
+      - name: Ensure database exists (psql)
+        env:
+          PGPASSWORD: postgres
+          DB_NAME: "footdash_${{ github.run_id }}"
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+          # wait until psql is able to connect
+          for i in {1..10}; do
+            psql -h localhost -p 5433 -U postgres -c '\q' && break || sleep 1
+          done
+          exists=$(psql -h localhost -p 5433 -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'") || true
+          if [ "${exists}" != '1' ]; then
+            psql -h localhost -p 5433 -U postgres -c "CREATE DATABASE \"${DB_NAME}\";"
+          else
+            echo "Database '${DB_NAME}' already exists"
+          fi
+
+      - name: Run migrations (capture logs)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5433
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: "footdash_${{ github.run_id }}"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/footdash_${{ github.run_id }}
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm run migrate:run 2>&1 | tee backend-nest/test-results/migrate-e2e-pg.log
+        working-directory: backend-nest
+
+      - name: Run postgres-backed e2e tests (capture logs)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5433
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: "footdash_${{ github.run_id }}"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/footdash_${{ github.run_id }}
+          JWT_SECRET: test-secret
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm run test:e2e -- test/auth.postgres.e2e-spec.ts --silent 2>&1 | tee backend-nest/test-results/npm-test-e2e-pg.log
+        working-directory: backend-nest
+
+      - name: Upload postgres e2e logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-e2e-postgres-logs
+          path: backend-nest/test-results
 
       - name: Upload backend coverage/artifacts on failure
         if: failure()
