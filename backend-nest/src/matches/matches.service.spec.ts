@@ -2,9 +2,24 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MatchesService } from './matches.service';
 import { FootballApiService } from '../football-api/football-api.service';
 import { MatchRangeType } from './dto/matches-query.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Match } from './entities/match.entity';
+import { Team } from '../teams/entities/team.entity';
 
 const footballApiMock = {
   getTeamFixtures: jest.fn(),
+};
+
+const mockMatchRepo = {
+  create: jest.fn((v) => v),
+  save: jest.fn((v) => Promise.resolve(v)),
+  findOne: jest.fn(() => undefined),
+};
+
+const mockTeamRepo = {
+  create: jest.fn((v) => v),
+  save: jest.fn((v) => Promise.resolve({ id: 100, ...v })),
+  findOne: jest.fn(() => undefined),
 };
 
 describe('MatchesService', () => {
@@ -15,6 +30,8 @@ describe('MatchesService', () => {
       providers: [
         MatchesService,
         { provide: FootballApiService, useValue: footballApiMock },
+        { provide: getRepositoryToken(Match), useValue: mockMatchRepo },
+        { provide: getRepositoryToken(Team), useValue: mockTeamRepo },
       ],
     }).compile();
 

@@ -6,6 +6,9 @@ export class Match {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'int', nullable: true, unique: true })
+  externalId?: number;
+
   @ManyToOne(() => Team, (t) => t.homeMatches, { eager: true })
   homeTeam: Team;
 

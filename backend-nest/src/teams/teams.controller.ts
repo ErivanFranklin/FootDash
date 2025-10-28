@@ -1,8 +1,9 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Post, Body } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { TeamIdParamDto } from './dto/team-id-param.dto';
 import { TeamStatsQueryDto } from './dto/team-stats-query.dto';
 import { TeamMatchesQueryDto } from './dto/team-matches-query.dto';
+import { CreateTeamDto } from './dto/create-team.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -27,5 +28,15 @@ export class TeamsController {
     @Query() query: TeamMatchesQueryDto,
   ) {
     return this.teamsService.getTeamFixtures(params.teamId, query);
+  }
+
+  @Post()
+  createTeam(@Body() body: CreateTeamDto) {
+    return this.teamsService.createTeam(body);
+  }
+
+  @Get(':teamId/db')
+  getPersistedTeam(@Param() params: TeamIdParamDto) {
+    return this.teamsService.findTeamById(params.teamId);
   }
 }

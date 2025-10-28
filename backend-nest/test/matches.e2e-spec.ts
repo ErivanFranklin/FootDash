@@ -46,4 +46,13 @@ describe('Matches (e2e)', () => {
     expect(mockApi.getTeamFixtures).toHaveBeenCalled();
     expect(Array.isArray(res.body)).toBe(true);
   });
+
+  it('POST /matches/team/:teamId/sync persists fixtures and returns saved matches', async () => {
+    const res = await request(app.getHttpServer()).post('/matches/team/10/sync').expect(201);
+    expect(mockApi.getTeamFixtures).toHaveBeenCalled();
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThanOrEqual(1);
+    expect(res.body[0]).toHaveProperty('homeTeam');
+    expect(res.body[0]).toHaveProperty('awayTeam');
+  });
 });

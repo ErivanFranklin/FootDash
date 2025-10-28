@@ -6,6 +6,9 @@ export class Team {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'int', nullable: true, unique: true })
+  externalId?: number;
+
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
