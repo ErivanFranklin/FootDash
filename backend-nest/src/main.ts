@@ -16,10 +16,5 @@ async function bootstrap() {
   );
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port);
-  // Helpful runtime log for local testing to verify which port the app bound to
-  // and to make it easier to debug port conflicts in developer environments.
-  // This is intentionally small and safe to keep in place.
-  // eslint-disable-next-line no-console
-  console.log(`Nest listening on http://localhost:${port}`);
 }
 bootstrap();
