@@ -4,6 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './db/database.module';
+import { FootballApiModule } from './football-api/football-api.module';
+import { TeamsModule } from './teams/teams.module';
+import { MatchesModule } from './matches/matches.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -19,10 +22,16 @@ import * as Joi from 'joi';
         DB_PASSWORD: Joi.string().allow('').default(''),
         DB_NAME: Joi.string().default('footdash'),
         JWT_SECRET: Joi.string().default('change-me'),
+  FOOTBALL_API_URL: Joi.string().uri().required(),
+  FOOTBALL_API_KEY: Joi.string().required(),
+  FOOTBALL_API_TIMEOUT_MS: Joi.number().default(5000),
       }),
     }),
     DatabaseModule,
     AuthModule,
+    FootballApiModule,
+    TeamsModule,
+    MatchesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
