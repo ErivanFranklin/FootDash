@@ -1,0 +1,68 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from '../src/auth/auth.module';
+import { User } from '../src/users/user.entity';
+import { RefreshToken } from '../src/auth/refresh-token.entity';
+
+describe('Auth e2e (auth workflow)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          entities: [User, RefreshToken],
+          synchronize: true,
+        }),
+        ConfigModule.forRoot({ isGlobal: true }),
+        TypeOrmModule.forFeature([User, RefreshToken]),
+        AuthModule,
+      ],
+    }).compile();
+
+    app = module.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+  });
+
+  it('register -> refresh -> revoke -> refresh(fails)', async () => {
+    const email = `e2e-${Date.now()}@example.com`;
+    const password = 'password123';
+
+    const reg = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ email, password })
+      .expect(201);
+
+    const refreshToken = reg.body?.tokens?.refreshToken;
+    expect(refreshToken).toBeDefined();
+
+    const refreshed = await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .send({ refreshToken })
+      .expect(201);
+
+    expect(refreshed.body?.tokens?.accessToken).toBeDefined();
+
+    await request(app.getHttpServer())
+      .post('/auth/revoke')
+      .send({ refreshToken })
+      .expect(201);
+
+    // now the same refresh should be rejected
+    await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .send({ refreshToken })
+      .expect(401);
+  }, 20000);
+});

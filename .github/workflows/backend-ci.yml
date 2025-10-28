@@ -84,6 +84,13 @@ jobs:
           npm test --silent 2>&1 | tee backend-nest/test-results/npm-test.log
         working-directory: backend-nest
 
+      - name: Run backend e2e tests (capture logs)
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm run test:e2e --silent 2>&1 | tee backend-nest/test-results/npm-test-e2e.log
+        working-directory: backend-nest
+
       - name: Upload backend coverage/artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
