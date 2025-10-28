@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AxiosError, AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { ApiResponse, FootballFixture, FootballTeamInfo, FootballTeamStats } from './football-api.interface';
+import { normalizeTeamInfo, normalizeFixtures, normalizeTeamStats } from './football-api.adapter';
 
 interface TeamStatsParams {
   leagueId: number;
@@ -34,17 +35,19 @@ export class FootballApiService {
   }
 
   async getTeamInfo(teamId: number) {
-    return this.makeRequest<ApiResponse<FootballTeamInfo[]>>('teams', {
+    const resp = await this.makeRequest<ApiResponse<FootballTeamInfo[]>>('teams', {
       team: teamId,
     });
+    return normalizeTeamInfo(resp as ApiResponse<FootballTeamInfo[]>);
   }
 
   async getTeamStats(params: TeamStatsParams) {
-    return this.makeRequest<ApiResponse<FootballTeamStats>>('teams/statistics', {
+    const resp = await this.makeRequest<ApiResponse<FootballTeamStats>>('teams/statistics', {
       league: params.leagueId,
       season: params.season,
       team: params.teamId,
     });
+    return normalizeTeamStats(resp as ApiResponse<FootballTeamStats>);
   }
 
   async getTeamFixtures(params: TeamFixturesParams) {
@@ -55,7 +58,8 @@ export class FootballApiService {
     if (params.last) query.last = params.last;
     if (params.next) query.next = params.next;
     if (params.status) query.status = params.status;
-    return this.makeRequest<ApiResponse<FootballFixture[]>>('fixtures', query);
+    const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>('fixtures', query);
+    return normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
   }
 
   private async makeRequest<T>(path: string, params?: Record<string, number | string>) {
