@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="7" failures="0" errors="0" time="10.859">
+  <testsuite name="AppController" errors="0" failures="0" skipped="0" timestamp="2025-10-28T19:06:23" time="6.977" tests="1">
+    <testcase classname="AppController root should return &quot;Hello World!&quot;" name="AppController root should return &quot;Hello World!&quot;" time="0.02">
+    </testcase>
+  </testsuite>
+  <testsuite name="AuthService" errors="0" failures="0" skipped="0" timestamp="2025-10-28T19:06:23" time="9.64" tests="5">
+    <testcase classname="AuthService registers a new user and returns tokens" name="AuthService registers a new user and returns tokens" time="0.096">
+    </testcase>
+    <testcase classname="AuthService throws on register when email exists" name="AuthService throws on register when email exists" time="0.003">
+    </testcase>
+    <testcase classname="AuthService throws on invalid refresh token" name="AuthService throws on invalid refresh token" time="0.002">
+    </testcase>
+    <testcase classname="AuthService refreshes tokens for valid refresh token" name="AuthService refreshes tokens for valid refresh token" time="0.002">
+    </testcase>
+    <testcase classname="AuthService revokes a refresh token" name="AuthService revokes a refresh token" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="AuthService (TypeORM integration)" errors="0" failures="0" skipped="0" timestamp="2025-10-28T19:06:23" time="9.717" tests="1">
+    <testcase classname="AuthService (TypeORM integration) registers a user and persists to DB" name="AuthService (TypeORM integration) registers a user and persists to DB" time="0.103">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -4,7 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './db/database.module';
-import Joi from 'joi';
+// Use namespace import to avoid default-import interop issues when compiled to CommonJS
+import * as Joi from 'joi';
 
 @Module({
   imports: [
