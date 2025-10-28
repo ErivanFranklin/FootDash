@@ -7,3 +7,6 @@
 - [x] Wire Angular `ng test` command into CI guidance or scripts.
 - [x] Enable branch protection rules for `main` once ready.
 - [x] Open GitHub issues for each Phase A task to track ownership.
+
+- [ ] Scaffold NestJS backend: `backend-nest/` (completed)
+- [ ] Configure database & ORM: TypeORM + Postgres (in-progress)

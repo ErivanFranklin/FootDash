@@ -1,0 +1,122 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, 'migration/**' ]
+  pull_request:
+    paths:
+      - 'backend-nest/**'
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: footdash
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d footdash"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache backend node modules
+        uses: actions/cache@v4
+        with:
+          path: backend-nest/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}
+
+      - name: Install backend dependencies (capture logs)
+        run: |
+          node -v && npm -v
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          (
+            npm ci 2>&1 | tee backend-nest/test-results/npm-ci.log
+          ) || (
+            echo "npm ci failed — falling back to npm install"
+            npm install --no-audit --no-fund 2>&1 | tee backend-nest/test-results/npm-install.log
+          )
+        working-directory: backend-nest
+
+      - name: Run backend lint
+        run: npm run lint
+        working-directory: backend-nest
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres -d footdash && break || sleep 1;
+          done
+
+      - name: Run migrations (capture logs)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm run migrate:run 2>&1 | tee backend-nest/test-results/migrate.log
+        working-directory: backend-nest
+
+      - name: Run backend tests (capture logs)
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          npm test --silent 2>&1 | tee backend-nest/test-results/npm-test.log
+        working-directory: backend-nest
+
+      - name: Upload backend coverage/artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend-nest/coverage
+
+      - name: Upload backend junit test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend-nest/test-results/backend-junit.xml
+
+      # PR annotation step removed: dorny/test-reporter caused runtime errors in the runner
+      # If you want PR annotations, we can re-add a compatible reporter after confirming
+      # the 'reporter' input accepted value (or switch to an alternative action).
+
+      - name: Debug backend test-results directory on failure
+        if: failure()
+        run: |
+          echo "--- backend test-results dir ---"
+          ls -la backend-nest/test-results || true
+          if [ -f backend-nest/test-results/backend-junit.xml ]; then
+            echo "--- head of backend-nest/test-results/backend-junit.xml ---"
+            head -n 200 backend-nest/test-results/backend-junit.xml || true
+          else
+            echo "backend-junit.xml not present"
+          fi
+
+      - name: Upload backend test-results directory on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results-dir
+          path: backend-nest/test-results

@@ -1,0 +1,122 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main, 'migration/**' ]
+  pull_request:
+    paths:
+      - 'frontend/**'
+
+jobs:
+  frontend-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache frontend node modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install frontend dependencies (capture logs)
+        run: |
+          node -v && npm -v
+          mkdir -p frontend/test-results
+          set -o pipefail
+          (
+            npm ci 2>&1 | tee frontend/test-results/npm-ci.log
+          ) || (
+            echo "npm ci failed — falling back to npm install"
+            npm install --no-audit --no-fund 2>&1 | tee frontend/test-results/npm-install.log
+          )
+        working-directory: frontend
+
+      - name: Install Chromium for headless tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
+      - name: Set CHROME_BIN env
+        run: |
+          # Prefer common chromium binary locations on ubuntu runners
+          if command -v chromium-browser >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v chromium-browser)" >> $GITHUB_ENV
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v chromium)" >> $GITHUB_ENV
+          elif command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v google-chrome)" >> $GITHUB_ENV
+          elif command -v google-chrome-stable >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v google-chrome-stable)" >> $GITHUB_ENV
+          else
+            # fallback to common path
+            echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+          fi
+
+      - name: Print detected CHROME_BIN
+        run: |
+          echo "Detected CHROME_BIN: $CHROME_BIN"
+
+      - name: Run frontend lint (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm run lint 2>&1 | tee frontend/test-results/npm-lint.log
+        working-directory: frontend
+
+      - name: Run frontend tests (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm test -- --watch=false --browsers=ChromeHeadless 2>&1 | tee frontend/test-results/npm-test.log
+        working-directory: frontend
+
+      - name: Upload frontend coverage/artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+
+      - name: Upload frontend junit test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: frontend/test-results/frontend-junit.xml
+
+      # PR annotation step removed: dorny/test-reporter caused runtime errors in the runner
+      # If you want PR annotations, we can re-add a compatible reporter after confirming
+      # the 'reporter' input accepted value (or switch to an alternative action).
+
+      - name: Debug frontend test-results directory on failure
+        if: failure()
+        run: |
+          echo "--- frontend test-results dir ---"
+          ls -la frontend/test-results || true
+          if [ -f frontend/test-results/frontend-junit.xml ]; then
+            echo "--- head of frontend/test-results/frontend-junit.xml ---"
+            head -n 200 frontend/test-results/frontend-junit.xml || true
+          else
+            echo "frontend-junit.xml not present"
+          fi
+
+      - name: Upload frontend test-results directory on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results-dir
+          path: frontend/test-results
+
+      - name: Build frontend (capture logs)
+        run: |
+          mkdir -p frontend/test-results
+          set -o pipefail
+          npm run build --silent 2>&1 | tee frontend/test-results/build.log
+        working-directory: frontend
