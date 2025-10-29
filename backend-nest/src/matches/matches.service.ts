@@ -66,11 +66,15 @@ export class MatchesService {
         ? await this.matchRepository.findOne({ where: { externalId: externalMatchId } })
         : undefined;
 
-      const kickOffRaw = f?.date ?? f?.fixture?.date ?? f?.kickoff ?? f?.utcDate;
-      const kickOff = kickOffRaw ? new Date(kickOffRaw) : undefined;
-      const status = f?.status ?? f?.fixture?.status?.short ?? f?.status?.long;
-      const homeScore = f?.score?.fulltime?.home ?? f?.goals?.home ?? f?.result?.home;
-      const awayScore = f?.score?.fulltime?.away ?? f?.goals?.away ?? f?.result?.away;
+  // Normalized adapter provides consistent fields when available
+  const kickOffRaw = f?.date ?? f?.fixture?.date ?? f?.kickoff ?? f?.utcDate;
+  const kickOff = kickOffRaw ? new Date(kickOffRaw) : undefined;
+  const status = (f as any)?.status?.short ?? (f as any)?.status ?? (f as any)?.status?.long ?? null;
+  const homeScore = (f as any)?.goals?.home ?? (f as any)?.score?.fulltime?.home ?? null;
+  const awayScore = (f as any)?.goals?.away ?? (f as any)?.score?.fulltime?.away ?? null;
+  const referee = (f as any)?.referee ?? null;
+  const venue = (f as any)?.venue ?? null;
+  const league = (f as any)?.league ?? null;
 
       if (!existing) {
         existing = this.matchRepository.create({
@@ -81,6 +85,9 @@ export class MatchesService {
           status,
           homeScore,
           awayScore,
+          referee,
+          venue,
+          league,
         } as Partial<Match>);
       } else {
         existing.homeTeam = home;
@@ -89,6 +96,9 @@ export class MatchesService {
         existing.status = status;
         existing.homeScore = homeScore;
         existing.awayScore = awayScore;
+        existing.referee = referee;
+        existing.venue = venue;
+        existing.league = league;
       }
 
       const saved = await this.matchRepository.save(existing);

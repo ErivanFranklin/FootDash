@@ -11,7 +11,17 @@ import { FootballApiService } from '../src/football-api/football-api.service';
 describe('Matches (e2e)', () => {
   let app: INestApplication;
   const mockApi = {
-    getTeamFixtures: jest.fn().mockResolvedValue([{ id: 1, home: { id: 10, name: 'Home' }, away: { id: 11, name: 'Away' } }]),
+    getTeamFixtures: jest.fn().mockResolvedValue([
+      {
+        id: 1,
+        date: new Date().toISOString(),
+        referee: 'Ref Name',
+        venue: { id: 555, name: 'Stadium', city: 'City', capacity: 20000 },
+        league: { id: 100, name: 'Premier', country: 'Country', season: 2025 },
+        home: { id: 10, name: 'Home' },
+        away: { id: 11, name: 'Away' },
+      },
+    ]),
   } as Partial<FootballApiService>;
 
   beforeAll(async () => {
@@ -51,8 +61,12 @@ describe('Matches (e2e)', () => {
     const res = await request(app.getHttpServer()).post('/matches/team/10/sync').expect(201);
     expect(mockApi.getTeamFixtures).toHaveBeenCalled();
     expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThanOrEqual(1);
-    expect(res.body[0]).toHaveProperty('homeTeam');
-    expect(res.body[0]).toHaveProperty('awayTeam');
+  expect(res.body.length).toBeGreaterThanOrEqual(1);
+  expect(res.body[0]).toHaveProperty('homeTeam');
+  expect(res.body[0]).toHaveProperty('awayTeam');
+  // new metadata persisted
+  expect(res.body[0]).toHaveProperty('referee');
+  expect(res.body[0]).toHaveProperty('venue');
+  expect(res.body[0]).toHaveProperty('league');
   });
 });
