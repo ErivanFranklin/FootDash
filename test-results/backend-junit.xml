@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="19" failures="0" errors="0" time="97.382">
-  <testsuite name="AppController" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:34:52" time="8.21" tests="1">
-    <testcase classname="AppController root should return &quot;Hello World!&quot;" name="AppController root should return &quot;Hello World!&quot;" time="0.028">
+<testsuites name="jest tests" tests="19" failures="0" errors="0" time="181.536">
+  <testsuite name="AuthService" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:49:02" time="89.287" tests="5">
+    <testcase classname="AuthService registers a new user and returns tokens" name="AuthService registers a new user and returns tokens" time="0.588">
+    </testcase>
+    <testcase classname="AuthService throws on register when email exists" name="AuthService throws on register when email exists" time="0.005">
+    </testcase>
+    <testcase classname="AuthService throws on invalid refresh token" name="AuthService throws on invalid refresh token" time="0.005">
+    </testcase>
+    <testcase classname="AuthService refreshes tokens for valid refresh token" name="AuthService refreshes tokens for valid refresh token" time="0.007">
+    </testcase>
+    <testcase classname="AuthService revokes a refresh token" name="AuthService revokes a refresh token" time="0.005">
     </testcase>
   </testsuite>
-  <testsuite name="AuthService" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:34:52" time="32.312" tests="5">
-    <testcase classname="AuthService registers a new user and returns tokens" name="AuthService registers a new user and returns tokens" time="0.617">
+  <testsuite name="TeamsService" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:49:02" time="89.608" tests="5">
+    <testcase classname="TeamsService delegates getTeamOverview to FootballApiService" name="TeamsService delegates getTeamOverview to FootballApiService" time="0.111">
     </testcase>
-    <testcase classname="AuthService throws on register when email exists" name="AuthService throws on register when email exists" time="0.003">
+    <testcase classname="TeamsService throws when stats query params missing" name="TeamsService throws when stats query params missing" time="0.622">
     </testcase>
-    <testcase classname="AuthService throws on invalid refresh token" name="AuthService throws on invalid refresh token" time="0.003">
-    </testcase>
-    <testcase classname="AuthService refreshes tokens for valid refresh token" name="AuthService refreshes tokens for valid refresh token" time="0.002">
-    </testcase>
-    <testcase classname="AuthService revokes a refresh token" name="AuthService revokes a refresh token" time="0.003">
-    </testcase>
-  </testsuite>
-  <testsuite name="TeamsService" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:34:52" time="33.121" tests="5">
-    <testcase classname="TeamsService delegates getTeamOverview to FootballApiService" name="TeamsService delegates getTeamOverview to FootballApiService" time="0.564">
-    </testcase>
-    <testcase classname="TeamsService throws when stats query params missing" name="TeamsService throws when stats query params missing" time="0.89">
-    </testcase>
-    <testcase classname="TeamsService delegates getTeamStats when params provided" name="TeamsService delegates getTeamStats when params provided" time="0.002">
+    <testcase classname="TeamsService delegates getTeamStats when params provided" name="TeamsService delegates getTeamStats when params provided" time="0.003">
     </testcase>
     <testcase classname="TeamsService delegates getTeamFixtures" name="TeamsService delegates getTeamFixtures" time="0.002">
     </testcase>
-    <testcase classname="TeamsService creates and finds persisted team via repository" name="TeamsService creates and finds persisted team via repository" time="0.003">
+    <testcase classname="TeamsService creates and finds persisted team via repository" name="TeamsService creates and finds persisted team via repository" time="0.004">
     </testcase>
   </testsuite>
-  <testsuite name="AuthService (TypeORM integration)" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:34:52" time="34.508" tests="1">
-    <testcase classname="AuthService (TypeORM integration) registers a user and persists to DB" name="AuthService (TypeORM integration) registers a user and persists to DB" time="0.103">
+  <testsuite name="AuthService (TypeORM integration)" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:49:02" time="92.865" tests="1">
+    <testcase classname="AuthService (TypeORM integration) registers a user and persists to DB" name="AuthService (TypeORM integration) registers a user and persists to DB" time="1.57">
     </testcase>
   </testsuite>
-  <testsuite name="MatchesService" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:35:00" time="29.318" tests="3">
-    <testcase classname="MatchesService requests recent matches with last parameter" name="MatchesService requests recent matches with last parameter" time="0.005">
+  <testsuite name="TeamsController" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:49:02" time="114.633" tests="3">
+    <testcase classname="TeamsController returns team overview" name="TeamsController returns team overview" time="0.549">
+    </testcase>
+    <testcase classname="TeamsController returns team stats" name="TeamsController returns team stats" time="0.003">
+    </testcase>
+    <testcase classname="TeamsController returns team fixtures" name="TeamsController returns team fixtures" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="MatchesController" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:49:02" time="128.643" tests="1">
+    <testcase classname="MatchesController delegates to MatchesService with validated params" name="MatchesController delegates to MatchesService with validated params" time="0.27">
+    </testcase>
+  </testsuite>
+  <testsuite name="AppController" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:50:32" time="47.086" tests="1">
+    <testcase classname="AppController root should return &quot;Hello World!&quot;" name="AppController root should return &quot;Hello World!&quot;" time="0.008">
+    </testcase>
+  </testsuite>
+  <testsuite name="MatchesService" errors="0" failures="0" skipped="0" timestamp="2025-10-29T06:50:31" time="84.484" tests="3">
+    <testcase classname="MatchesService requests recent matches with last parameter" name="MatchesService requests recent matches with last parameter" time="0.011">
     </testcase>
     <testcase classname="MatchesService requests upcoming matches with next parameter and default limit" name="MatchesService requests upcoming matches with next parameter and default limit" time="0.002">
     </testcase>
     <testcase classname="MatchesService passes through when no range provided" name="MatchesService passes through when no range provided" time="0.002">
-    </testcase>
-  </testsuite>
-  <testsuite name="TeamsController" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:34:52" time="39.771" tests="3">
-    <testcase classname="TeamsController returns team overview" name="TeamsController returns team overview" time="0.018">
-    </testcase>
-    <testcase classname="TeamsController returns team stats" name="TeamsController returns team stats" time="0.002">
-    </testcase>
-    <testcase classname="TeamsController returns team fixtures" name="TeamsController returns team fixtures" time="0.002">
-    </testcase>
-  </testsuite>
-  <testsuite name="MatchesController" errors="0" failures="0" skipped="0" timestamp="2025-10-28T22:35:24" time="63.809" tests="1">
-    <testcase classname="MatchesController delegates to MatchesService with validated params" name="MatchesController delegates to MatchesService with validated params" time="0.004">
     </testcase>
   </testsuite>
 </testsuites>

@@ -15,8 +15,8 @@ export class Match {
   @ManyToOne(() => Team, (t) => t.awayMatches, { eager: true })
   awayTeam: Team;
 
-  // Use a sqlite-compatible column type for in-memory tests
-  @Column({ type: 'datetime', nullable: true })
+  // Let TypeORM pick a DB-appropriate date/time column type (sqlite -> datetime, postgres -> timestamp)
+  @Column({ nullable: true })
   kickOff?: Date;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
