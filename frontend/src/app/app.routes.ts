@@ -10,6 +10,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'teams',
+    loadComponent: () => import('./teams/teams.page').then((m) => m.TeamsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'matches/:teamId',
+    loadComponent: () => import('./matches/matches.page').then((m) => m.MatchesPage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'login',
     loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
   },

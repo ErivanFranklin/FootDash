@@ -17,14 +17,16 @@ export class MatchesService {
   ) {}
 
   getTeamMatches(teamId: number, query: MatchesQueryDto) {
-    const { range, limit, season } = query;
+    const { range, limit, season, from, to } = query;
 
-    const request = {
+    const request: any = {
       teamId,
       season,
       last: range === MatchRangeType.RECENT ? limit ?? 5 : undefined,
       next: range === MatchRangeType.UPCOMING ? limit ?? 5 : undefined,
     };
+    if (from) request.from = from;
+    if (to) request.to = to;
 
     return this.footballApi.getTeamFixtures(request);
   }

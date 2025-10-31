@@ -1,17 +1,5 @@
 version: '3.8'
 services:
-  backend:
-    build: ./backend
-    ports:
-      - "4000:4000"
-    environment:
-      - JWT_SECRET=change-me
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
   db:
     image: postgres:15
     environment:
@@ -20,3 +8,31 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
+
+  backend:
+    build: ./backend-nest
+    environment:
+      - PORT=4000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=footdash
+      - JWT_SECRET=change-me
+      # Optional Football API config (leave empty for local dev without external calls)
+      - FOOTBALL_API_URL=https://v3.football.api-sports.io
+      - FOOTBALL_API_KEY=86fab59f8a111466351853e50973561c
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend

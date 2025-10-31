@@ -1,0 +1,66 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Matches</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div style="padding: 12px;">
+    <ion-item>
+      <ion-label position="stacked">Season</ion-label>
+      <ion-input type="number" [(ngModel)]="season"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Range</ion-label>
+      <ion-input [(ngModel)]="range" placeholder="recent|upcoming|all"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Limit</ion-label>
+      <ion-input type="number" [(ngModel)]="limit"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">From (YYYY-MM-DD)</ion-label>
+      <ion-input [(ngModel)]="from" placeholder="2025-01-01"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">To (YYYY-MM-DD)</ion-label>
+      <ion-input [(ngModel)]="to" placeholder="2025-12-31"></ion-input>
+    </ion-item>
+    <ion-button size="small" (click)="loadMatches()" [disabled]="loading">
+      <ng-container *ngIf="!loading; else fetching">Fetch</ng-container>
+      <ng-template #fetching>
+        <ion-spinner name="dots"></ion-spinner>
+      </ng-template>
+    </ion-button>
+    <ion-button size="small" color="medium" (click)="syncFixtures()" [disabled]="loading">
+      <ng-container *ngIf="!loading; else syncing">
+        Sync Fixtures
+      </ng-container>
+      <ng-template #syncing>
+        <ion-spinner name="lines-small"></ion-spinner>
+      </ng-template>
+    </ion-button>
+  </div>
+
+  <div style="padding: 12px;" *ngIf="!fixtures.length && !loading">No fixtures loaded yet.</div>
+  <div style="padding: 12px;" *ngIf="loading">Loading fixtures…</div>
+
+  <div style="padding: 12px;">
+    <ion-card *ngFor="let m of fixtures">
+      <ion-card-header>
+        <ion-card-title>
+          {{ m?.homeTeam?.name || m?.home?.name || m?.homeTeamName }}
+          vs
+          {{ m?.awayTeam?.name || m?.away?.name || m?.awayTeamName }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div>Date: {{ (m?.kickOff || m?.date || m?.fixtureDate) | date:'medium' }}</div>
+        <div>Status: {{ m?.status }}</div>
+        <div *ngIf="m?.league?.name">League: {{ m.league.name }}</div>
+        <div *ngIf="m?.venue?.name">Venue: {{ m.venue.name }}</div>
+        <div *ngIf="m?.referee">Referee: {{ m.referee }}</div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
