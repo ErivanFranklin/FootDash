@@ -1,0 +1,43 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Teams</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item lines="full">
+      <ion-label>All Teams</ion-label>
+      <ion-button slot="end" size="small" (click)="loadTeams()" [disabled]="loading">
+        <ng-container *ngIf="!loading; else refreshing">Refresh</ng-container>
+        <ng-template #refreshing>
+          <ion-spinner name="dots"></ion-spinner>
+        </ng-template>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <div style="padding: 12px;" *ngIf="!teams.length && !loading">
+    No teams found.
+  </div>
+
+  <div style="padding: 12px;" *ngIf="loading">Loading teams…</div>
+
+  <div style="padding: 12px;">
+    <ion-card *ngFor="let t of teams">
+      <ion-card-header>
+        <ion-card-title>{{ t?.name || t?.team?.name || ('Team #' + (t?.id ?? t?.teamId)) }}</ion-card-title>
+        <ion-card-subtitle *ngIf="t?.code">{{ t.code }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button size="small" (click)="viewMatches(t)" [disabled]="loading">View Matches</ion-button>
+        <ion-button size="small" color="medium" (click)="syncTeam(t)" [disabled]="loading">
+          <ng-container *ngIf="!loading; else syncing">Sync Team</ng-container>
+          <ng-template #syncing>
+            <ion-spinner name="lines-small"></ion-spinner>
+          </ng-template>
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

@@ -46,4 +46,26 @@ export class LoginPage {
       }
     });
   }
+
+  register() {
+    if (!this.email || !this.password) {
+      console.log('register: missing credentials');
+      return;
+    }
+    this.loading = true;
+    this.auth.register(this.email, this.password).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/home']);
+      },
+      error: (err: any) => {
+        this.loading = false;
+        console.error('Register failed', err);
+        this.toast.create({
+          message: 'Register failed',
+          duration: 2000,
+        }).then((toastEl: any) => toastEl.present());
+      }
+    });
+  }
 }

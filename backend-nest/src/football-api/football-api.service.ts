@@ -18,6 +18,8 @@ interface TeamFixturesParams {
   last?: number;
   next?: number;
   status?: string;
+  from?: string; // YYYY-MM-DD
+  to?: string;   // YYYY-MM-DD
 }
 
 @Injectable()
@@ -58,6 +60,8 @@ export class FootballApiService {
     if (params.last) query.last = params.last;
     if (params.next) query.next = params.next;
     if (params.status) query.status = params.status;
+    if (params.from) query.from = params.from;
+    if (params.to) query.to = params.to;
     const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>('fixtures', query);
     return normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
   }

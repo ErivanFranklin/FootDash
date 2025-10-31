@@ -4,14 +4,22 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
+import { authInterceptor } from './app/services/auth-interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    // Ensure HttpClient is provided before other framework providers that may
+    // instantiate services which depend on it (Ionic/router can create
+    // components early). Placing provideHttpClient before provideIonicAngular
+    // avoids `NG0201: No provider found for _HttpClient` in some setups.
+    provideHttpClient(
+      withInterceptors([authInterceptor]),
+      withInterceptorsFromDi()
+    ),
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withInterceptorsFromDi()),
   ],
 }).catch(err => {
   console.error("ERROR-> ", err);

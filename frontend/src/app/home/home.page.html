@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      FootDash
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,12 +9,47 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">Dashboard</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div id="container" style="padding: 12px;">
+    <ion-button (click)="pingBackend()" size="small">Ping API</ion-button>
+    <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+
+    <div style="margin-top: 12px;">
+      <ion-item>
+        <ion-label position="stacked">Team ID</ion-label>
+        <ion-input type="number" [(ngModel)]="teamId"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Season</ion-label>
+        <ion-input type="number" [(ngModel)]="season"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Limit</ion-label>
+        <ion-input type="number" [(ngModel)]="limit"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Range</ion-label>
+        <ion-input [(ngModel)]="range" placeholder="recent|upcoming|all"></ion-input>
+      </ion-item>
+      <ion-button (click)="fetchMatches()" expand="block" style="margin-top: 12px;">Fetch Matches</ion-button>
+    </div>
+
+    <ion-list style="margin-top: 16px;">
+      <ion-item lines="full"><ion-label>Ping Result</ion-label></ion-item>
+      <pre style="white-space: pre-wrap;">{{ pingResult | json }}</pre>
+    </ion-list>
+
+    <ion-list style="margin-top: 16px;">
+      <ion-item lines="full"><ion-label>Fixtures ({{ fixtures.length || 0 }})</ion-label></ion-item>
+      <div *ngIf="!fixtures.length" style="padding: 8px; color: var(--ion-color-medium);">No fixtures loaded yet.</div>
+      <div *ngFor="let m of fixtures" style="padding: 8px; border-bottom: 1px solid var(--ion-color-step-150);">
+        <div><strong>{{ m?.homeTeam?.name || m?.home?.name || m?.homeTeamName }}</strong> vs <strong>{{ m?.awayTeam?.name || m?.away?.name || m?.awayTeamName }}</strong></div>
+        <div>{{ (m?.kickOff || m?.date || m?.fixtureDate) | date:'medium' }}</div>
+        <div>Status: {{ m?.status }}</div>
+      </div>
+    </ion-list>
   </div>
 </ion-content>

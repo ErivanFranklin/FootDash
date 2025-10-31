@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsDateString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum MatchRangeType {
@@ -22,4 +22,12 @@ export class MatchesQueryDto {
   @IsOptional()
   @IsEnum(MatchRangeType)
   range?: MatchRangeType;
+
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
 }
