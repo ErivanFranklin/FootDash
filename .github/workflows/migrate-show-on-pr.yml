@@ -1,0 +1,48 @@
+name: PR: migrate-show
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  migrate-show:
+    name: Migration dry-run (show:full)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: footdash
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Wait for Postgres
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "Waiting for postgres..."; sleep 1
+          done
+
+      - name: Install backend deps
+        run: npm --prefix backend-nest ci
+
+      - name: Run migrate:show:full
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash
+        run: npm --prefix backend-nest run migrate:show:full

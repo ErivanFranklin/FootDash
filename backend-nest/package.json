@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
   "migrate:run": "node -r ts-node/register scripts/run-migrations.ts",
   "migrate:show": "node -r ts-node/register -e \"require('./scripts/run-migrations').show()\" || true",
+  "migrate:show:full": "node -r ts-node/register -e \"require('./scripts/run-migrations').showFull()\" || true",
     "seed:dev": "node -r ts-node/register scripts/seed-dev.ts"
   },
   "dependencies": {
