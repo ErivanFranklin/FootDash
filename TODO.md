@@ -8,5 +8,10 @@
 - [x] Enable branch protection rules for `main` once ready.
 - [x] Open GitHub issues for each Phase A task to track ownership.
 
-- [ ] Scaffold NestJS backend: `backend-nest/` (completed)
-- [ ] Configure database & ORM: TypeORM + Postgres (in-progress)
+- [x] Scaffold NestJS backend: `backend-nest/` (completed)
+- [ ] Configure database & ORM: TypeORM + Postgres
+	- [x] TypeORM DataSource configured in `backend-nest/data-source.ts` (supports `DATABASE_URL` or `DB_*` vars)
+	- [ ] Add `backend-nest/.env.example` with DB env vars
+	- [x] Migration scripts available: `migrate:run`, `migrate:show`, `migrate:show:full`
+	- [x] Docs added: `backend-nest/MIGRATIONS.md`
+	- [x] CI dry-run on PRs: `.github/workflows/migrate-show-on-pr.yml`
