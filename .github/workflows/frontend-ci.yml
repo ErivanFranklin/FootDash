@@ -4,144 +4,125 @@ on:
   push:
     paths:
       - 'frontend/**'
-  pull_request:
-    paths:
-      - 'frontend/**'
+  name: Frontend CI
 
-jobs:
-  ng-test:
-    name: Frontend ng test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  on:
+    push:
+      branches: [ main, 'migration/**' ]
+      paths:
+        - 'frontend/**'
+    pull_request:
+      paths:
+        - 'frontend/**'
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+  jobs:
+    frontend-build-test:
+      name: Frontend CI (lint, test, build)
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
 
-      - name: Install frontend dependencies
-        name: Frontend CI
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20'
 
-        on:
-          push:
-            branches: [ main, 'migration/**' ]
-            paths:
-              - 'frontend/**'
-          pull_request:
-            paths:
-              - 'frontend/**'
+        - name: Cache frontend node modules
+          uses: actions/cache@v4
+          with:
+            path: frontend/node_modules
+            key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
 
-        jobs:
-          frontend-build-test:
-            name: Frontend CI (lint, test, build)
-            runs-on: ubuntu-latest
-            steps:
-              - name: Checkout
-                uses: actions/checkout@v4
+        - name: Install frontend dependencies (capture logs)
+          run: |
+            node -v && npm -v
+            mkdir -p frontend/test-results
+            set -o pipefail
+            (
+              npm ci 2>&1 | tee frontend/test-results/npm-ci.log
+            ) || (
+              echo "npm ci failed — falling back to npm install"
+              npm install --no-audit --no-fund 2>&1 | tee frontend/test-results/npm-install.log
+            )
+          working-directory: frontend
 
-              - name: Setup Node.js
-                uses: actions/setup-node@v4
-                with:
-                  node-version: '20'
+        - name: Install Chromium for headless tests
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y chromium-browser
 
-              - name: Cache frontend node modules
-                uses: actions/cache@v4
-                with:
-                  path: frontend/node_modules
-                  key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+        - name: Set CHROME_BIN env
+          run: |
+            # Prefer common chromium binary locations on ubuntu runners
+            if command -v chromium-browser >/dev/null 2>&1; then
+              echo "CHROME_BIN=$(command -v chromium-browser)" >> $GITHUB_ENV
+            elif command -v chromium >/dev/null 2>&1; then
+              echo "CHROME_BIN=$(command -v chromium)" >> $GITHUB_ENV
+            elif command -v google-chrome >/dev/null 2>&1; then
+              echo "CHROME_BIN=$(command -v google-chrome)" >> $GITHUB_ENV
+            elif command -v google-chrome-stable >/dev/null 2>&1; then
+              echo "CHROME_BIN=$(command -v google-chrome-stable)" >> $GITHUB_ENV
+            else
+              # fallback to common path
+              echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+            fi
 
-              - name: Install frontend dependencies (capture logs)
-                run: |
-                  node -v && npm -v
-                  mkdir -p frontend/test-results
-                  set -o pipefail
-                  (
-                    npm ci 2>&1 | tee frontend/test-results/npm-ci.log
-                  ) || (
-                    echo "npm ci failed — falling back to npm install"
-                    npm install --no-audit --no-fund 2>&1 | tee frontend/test-results/npm-install.log
-                  )
-                working-directory: frontend
+        - name: Print detected CHROME_BIN
+          run: |
+            echo "Detected CHROME_BIN: $CHROME_BIN"
 
-              - name: Install Chromium for headless tests
-                run: |
-                  sudo apt-get update
-                  sudo apt-get install -y chromium-browser
+        - name: Run frontend lint (capture logs)
+          run: |
+            mkdir -p frontend/test-results
+            set -o pipefail
+            npm run lint 2>&1 | tee frontend/test-results/npm-lint.log
+          working-directory: frontend
 
-              - name: Set CHROME_BIN env
-                run: |
-                  # Prefer common chromium binary locations on ubuntu runners
-                  if command -v chromium-browser >/dev/null 2>&1; then
-                    echo "CHROME_BIN=$(command -v chromium-browser)" >> $GITHUB_ENV
-                  elif command -v chromium >/dev/null 2>&1; then
-                    echo "CHROME_BIN=$(command -v chromium)" >> $GITHUB_ENV
-                  elif command -v google-chrome >/dev/null 2>&1; then
-                    echo "CHROME_BIN=$(command -v google-chrome)" >> $GITHUB_ENV
-                  elif command -v google-chrome-stable >/dev/null 2>&1; then
-                    echo "CHROME_BIN=$(command -v google-chrome-stable)" >> $GITHUB_ENV
-                  else
-                    # fallback to common path
-                    echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
-                  fi
+        - name: Run frontend tests (capture logs)
+          run: |
+            mkdir -p frontend/test-results
+            set -o pipefail
+            npm test -- --watch=false --browsers=ChromeHeadless 2>&1 | tee frontend/test-results/npm-test.log
+          working-directory: frontend
 
-              - name: Print detected CHROME_BIN
-                run: |
-                  echo "Detected CHROME_BIN: $CHROME_BIN"
+        - name: Upload frontend coverage/artifacts on failure
+          if: failure()
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-coverage
+            path: frontend/coverage
 
-              - name: Run frontend lint (capture logs)
-                run: |
-                  mkdir -p frontend/test-results
-                  set -o pipefail
-                  npm run lint 2>&1 | tee frontend/test-results/npm-lint.log
-                working-directory: frontend
+        - name: Upload frontend junit test report on failure
+          if: failure()
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-test-results
+            path: frontend/test-results/frontend-junit.xml
 
-              - name: Run frontend tests (capture logs)
-                run: |
-                  mkdir -p frontend/test-results
-                  set -o pipefail
-                  npm test -- --watch=false --browsers=ChromeHeadless 2>&1 | tee frontend/test-results/npm-test.log
-                working-directory: frontend
+        - name: Debug frontend test-results directory on failure
+          if: failure()
+          run: |
+            echo "--- frontend test-results dir ---"
+            ls -la frontend/test-results || true
+            if [ -f frontend/test-results/frontend-junit.xml ]; then
+              echo "--- head of frontend/test-results/frontend-junit.xml ---"
+              head -n 200 frontend/test-results/frontend-junit.xml || true
+            else
+              echo "frontend-junit.xml not present"
+            fi
 
-              - name: Upload frontend coverage/artifacts on failure
-                if: failure()
-                uses: actions/upload-artifact@v4
-                with:
-                  name: frontend-coverage
-                  path: frontend/coverage
+        - name: Upload frontend test-results directory on failure
+          if: failure()
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-test-results-dir
+            path: frontend/test-results
 
-              - name: Upload frontend junit test report on failure
-                if: failure()
-                uses: actions/upload-artifact@v4
-                with:
-                  name: frontend-test-results
-                  path: frontend/test-results/frontend-junit.xml
-
-              - name: Debug frontend test-results directory on failure
-                if: failure()
-                run: |
-                  echo "--- frontend test-results dir ---"
-                  ls -la frontend/test-results || true
-                  if [ -f frontend/test-results/frontend-junit.xml ]; then
+        - name: Build frontend (capture logs)
+          run: |
+            mkdir -p frontend/test-results
+            set -o pipefail
+            npm run build --silent 2>&1 | tee frontend/test-results/build.log
+          working-directory: frontend
                     echo "--- head of frontend/test-results/frontend-junit.xml ---"
-                    head -n 200 frontend/test-results/frontend-junit.xml || true
-                  else
-                    echo "frontend-junit.xml not present"
-                  fi
-
-              - name: Upload frontend test-results directory on failure
-                if: failure()
-                uses: actions/upload-artifact@v4
-                with:
-                  name: frontend-test-results-dir
-                  path: frontend/test-results
-
-              - name: Build frontend (capture logs)
-                run: |
-                  mkdir -p frontend/test-results
-                  set -o pipefail
-                  npm run build --silent 2>&1 | tee frontend/test-results/build.log
-                working-directory: frontend
-          path: frontend/test-results
