@@ -1,12 +1,10 @@
 const request = require('supertest');
-const http = require('http');
 
 // We require the app by modifying index.js slightly to export app for tests.
 // Since index.js starts the server immediately, we'll spin an ephemeral server using express app setup here.
 
 describe('Express backend smoke', () => {
   let app;
-  let server;
 
   beforeAll(() => {
     // Build an app instance replicating index.js wiring without listening on a fixed port.
@@ -69,16 +67,15 @@ describe('Express backend smoke', () => {
       res.json({ id: user.id, email: user.email });
     });
 
-    server = http.createServer(app);
+    // No need to start an HTTP server; supertest can use the app directly.
   });
 
-  afterAll((done) => {
-    if (server) server.close(done);
-    else done();
+  afterAll(() => {
+    // nothing to cleanup
   });
 
   test('GET / returns ok', async () => {
-    await request(server).get('/').expect(200).expect(res => {
+    await request(app).get('/').expect(200).expect(res => {
       expect(res.body.ok).toBe(true);
     });
   });
@@ -87,7 +84,7 @@ describe('Express backend smoke', () => {
     const email = 'user@example.com';
     const password = 'pw123456';
 
-    const reg = await request(server)
+    const reg = await request(app)
       .post('/auth/register')
       .send({ email, password })
       .expect(200);
@@ -96,7 +93,7 @@ describe('Express backend smoke', () => {
     expect(reg.body.tokens).toBeDefined();
     const token = reg.body.tokens.accessToken;
 
-    await request(server)
+    await request(app)
       .get('/api/profile')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
