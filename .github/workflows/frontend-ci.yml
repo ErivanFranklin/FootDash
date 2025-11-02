@@ -28,12 +28,15 @@ jobs:
         on:
           push:
             branches: [ main, 'migration/**' ]
+            paths:
+              - 'frontend/**'
           pull_request:
             paths:
               - 'frontend/**'
 
         jobs:
           frontend-build-test:
+            name: Frontend CI (lint, test, build)
             runs-on: ubuntu-latest
             steps:
               - name: Checkout
@@ -115,10 +118,6 @@ jobs:
                 with:
                   name: frontend-test-results
                   path: frontend/test-results/frontend-junit.xml
-
-              # PR annotation step removed: dorny/test-reporter caused runtime errors in the runner
-              # If you want PR annotations, we can re-add a compatible reporter after confirming
-              # the 'reporter' input accepted value (or switch to an alternative action).
 
               - name: Debug frontend test-results directory on failure
                 if: failure()
