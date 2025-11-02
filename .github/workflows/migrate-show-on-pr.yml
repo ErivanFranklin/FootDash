@@ -1,4 +1,4 @@
-name: PR: migrate-show
+name: "PR: migrate-show"
 
 on:
   pull_request:
