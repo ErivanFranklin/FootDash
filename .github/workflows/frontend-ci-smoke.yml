@@ -1,0 +1,17 @@
+name: Frontend CI Smoke
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Echo
+        run: echo "frontend smoke workflow running"
