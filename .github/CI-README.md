@@ -21,6 +21,12 @@ Both workflows run on pushes to `main` and branches matching `migration/**`, and
     npm run migrate:run
     npm test
     ```
+  - Express smoke tests (no DB required):
+    ```bash
+    cd backend
+    npm ci
+    npm test
+    ```
 
 - Frontend:
   - Install deps and run tests locally:

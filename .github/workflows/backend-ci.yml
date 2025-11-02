@@ -255,3 +255,51 @@ jobs:
         with:
           name: backend-test-results-dir
           path: backend-nest/test-results
+
+  express-smoke:
+    name: Backend (Express) smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache backend (Express) node modules
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-express-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install backend (Express) dependencies
+        run: |
+          node -v && npm -v
+          mkdir -p backend/test-results
+          set -o pipefail
+          (
+            npm ci 2>&1 | tee backend/test-results/npm-ci.log
+          ) || (
+            echo "npm ci failed — falling back to npm install"
+            npm install --no-audit --no-fund 2>&1 | tee backend/test-results/npm-install.log
+          )
+        working-directory: backend
+
+      - name: Run backend (Express) tests
+        env:
+          JWT_SECRET: test-secret
+          PORT: 0
+        run: |
+          mkdir -p backend/test-results
+          set -o pipefail
+          npm test --silent 2>&1 | tee backend/test-results/npm-test.log
+        working-directory: backend
+
+      - name: Upload backend (Express) junit on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-express-test-results
+          path: backend/test-results/backend-express-junit.xml
