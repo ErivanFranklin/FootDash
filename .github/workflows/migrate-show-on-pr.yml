@@ -1,4 +1,4 @@
-name: PR: migrate-show
+name: "PR: migrate-show"
 
 on:
   pull_request:
@@ -40,7 +40,7 @@ jobs:
           done
 
       - name: Install backend deps
-        run: npm --prefix backend-nest ci
+        run: npm --prefix backend-nest install --no-audit --no-fund
 
       - name: Run migrate:show:full
         env:
