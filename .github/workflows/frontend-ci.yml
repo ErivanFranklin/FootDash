@@ -39,7 +39,8 @@ jobs:
       - name: Install Chromium for headless tests
         run: |
           sudo apt-get update
-          sudo apt-get install -y chromium-browser
+          # Install Chromium and common fonts used by headless browsers in CI
+          sudo apt-get install -y --no-install-recommends chromium-browser fonts-liberation fonts-roboto-fontface
 
       - name: Detect and export CHROME_BIN
         run: |
@@ -65,6 +66,8 @@ jobs:
         run: |
           mkdir -p test-results
           set -o pipefail
+          # Ensure CHROME_BIN is exported for Karma/Headless browsers
+          echo "Using CHROME_BIN=$CHROME_BIN"
           npm test -- --watch=false --browsers=ChromeHeadless 2>&1 | tee test-results/npm-test.log
 
       - name: Upload frontend test artifacts on failure
