@@ -303,3 +303,109 @@ jobs:
         with:
           name: backend-express-test-results
           path: backend/test-results/backend-express-junit.xml
+
+  migration-dry-run:
+    name: Backend migration dry-run
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: footdash_dryrun
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d footdash_dryrun"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache backend node modules
+        uses: actions/cache@v4
+        with:
+          path: backend-nest/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}-dryrun
+
+      - name: Install backend dependencies
+        run: |
+          node -v && npm -v
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          (
+            npm ci 2>&1 | tee backend-nest/test-results/npm-ci-dryrun.log
+          ) || (
+            echo "npm ci failed — falling back to npm install"
+            npm install --no-audit --no-fund 2>&1 | tee backend-nest/test-results/npm-install-dryrun.log
+          )
+        working-directory: backend-nest
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5434 -U postgres -d footdash_dryrun && break || sleep 1;
+          done
+
+      - name: Ensure database exists (psql)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+          # wait until psql is able to connect
+          for i in {1..10}; do
+            psql -h localhost -p 5434 -U postgres -c '\q' && break || sleep 1
+          done
+          exists=$(psql -h localhost -p 5434 -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='footdash_dryrun'") || true
+          if [ "${exists}" != '1' ]; then
+            psql -h localhost -p 5434 -U postgres -c "CREATE DATABASE footdash_dryrun;"
+          else
+            echo "Database 'footdash_dryrun' already exists"
+          fi
+
+      - name: Run migration dry-run (show pending)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5434
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_dryrun
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5434/footdash_dryrun
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          echo "Running migration dry-run (show pending migrations)..."
+          npm run migrate:show 2>&1 | tee backend-nest/test-results/migrate-dryrun.log
+        working-directory: backend-nest
+
+      - name: Run migration dry-run (show full)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5434
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_dryrun
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5434/footdash_dryrun
+        run: |
+          mkdir -p backend-nest/test-results
+          set -o pipefail
+          echo "Running migration dry-run (show full migration status)..."
+          npm run migrate:show:full 2>&1 | tee backend-nest/test-results/migrate-dryrun-full.log
+        working-directory: backend-nest
+
+      - name: Upload migration dry-run logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-dry-run-logs
+          path: backend-nest/test-results
