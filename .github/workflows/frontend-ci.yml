@@ -65,7 +65,7 @@ jobs:
         run: |
           mkdir -p test-results
           set -o pipefail
-          npm test -- --watch=false --browsers=ChromeHeadless 2>&1 | tee test-results/npm-test.log
+          npm test -- --watch=false --browsers=ChromeHeadless --single-run 2>&1 | tee test-results/npm-test.log
 
       - name: Upload frontend test artifacts on failure
         if: failure()
