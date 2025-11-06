@@ -18,7 +18,31 @@ nvm use 20
 node -v
 ```
 
-1) Start backend (dev)
+1) Start backend (NestJS, dev)
+```bash
+# from project root
+cd /Users/erivansilva/Documents/FootDash/backend-nest
+npm ci
+
+# copy the sample env if present or create one
+# cp .env.example .env
+
+# ensure mock mode is enabled for local dev without real API keys
+# in .env set:
+# FOOTBALL_API_MOCK=true
+
+# development with auto-restart
+npm run start:dev
+# or use root helper script
+# npm run --workspace-root start:dev:api
+```
+Notes:
+- Swagger UI: http://localhost:3000/api (OpenAPI JSON at /api-json)
+- Health check: http://localhost:3000/health
+- If you see a 503 from team endpoints without real API creds, enable FOOTBALL_API_MOCK=true.
+- DB: For local DB via Colima, run `./scripts/start-db.sh` from project root first.
+
+1a) Start legacy backend (if needed)
 ```bash
 # from project root
 cd /Users/erivansilva/Documents/FootDash/backend
@@ -33,8 +57,7 @@ npm run dev
 # npm start
 ```
 Notes:
-- Backend `package.json` already contains `dev` (nodemon) and `start` scripts.
-- Default port is `4000`; change via `.env` if the port is occupied.
+- This legacy backend runs on port `4000` by default. Prefer the NestJS backend (`backend-nest`) for new work.
 
 2) Start frontend (dev server, live reload)
 ```bash

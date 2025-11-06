@@ -10,6 +10,8 @@ import { MatchesModule } from './matches/matches.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,9 +24,20 @@ import * as Joi from 'joi';
         DB_PASSWORD: Joi.string().allow('').default(''),
         DB_NAME: Joi.string().default('footdash'),
         JWT_SECRET: Joi.string().default('change-me'),
-  FOOTBALL_API_URL: Joi.string().uri().required(),
-  FOOTBALL_API_KEY: Joi.string().required(),
-  FOOTBALL_API_TIMEOUT_MS: Joi.number().default(5000),
+        FOOTBALL_API_MOCK: Joi.boolean().default(!isProd),
+        FOOTBALL_API_URL: Joi.string()
+          .uri()
+          .when('FOOTBALL_API_MOCK', {
+            is: true,
+            then: Joi.optional(),
+            otherwise: Joi.required(),
+          }),
+        FOOTBALL_API_KEY: Joi.string().when('FOOTBALL_API_MOCK', {
+          is: true,
+          then: Joi.optional(),
+          otherwise: Joi.required(),
+        }),
+        FOOTBALL_API_TIMEOUT_MS: Joi.number().default(5000),
       }),
     }),
     DatabaseModule,

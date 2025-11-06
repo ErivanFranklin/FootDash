@@ -1,0 +1,13 @@
+{
+  "name": "footdash",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start:dev": "npm run start:dev:db && npm run start:dev:api",
+    "start:dev:db": "bash ./scripts/start-db.sh",
+    "start:dev:api": "npm run start:dev --prefix backend-nest",
+    "start:api": "npm run start --prefix backend-nest",
+    "build:api": "npm run build --prefix backend-nest",
+    "open:swagger": "node -e \"require('child_process').exec('open http://localhost:3000/api')\""
+  }
+}
