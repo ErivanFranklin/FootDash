@@ -29,7 +29,9 @@ async function bootstrap() {
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('FootDash API')
-    .setDescription('Football/soccer dashboard API for teams, matches, and statistics')
+    .setDescription(
+      'Football/soccer dashboard API for teams, matches, and statistics',
+    )
     .setVersion('1.0')
     .addTag('Authentication', 'User authentication endpoints')
     .addTag('Teams', 'Team management endpoints')
@@ -59,6 +61,8 @@ async function bootstrap() {
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
-  console.log(`Swagger documentation available at: http://localhost:${port}/api`);
+  console.log(
+    `Swagger documentation available at: http://localhost:${port}/api`,
+  );
 }
 bootstrap();

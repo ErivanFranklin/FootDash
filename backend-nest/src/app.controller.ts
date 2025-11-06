@@ -15,9 +15,9 @@ export class AppController {
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'FootDash API is running!' }
-      }
-    }
+        message: { type: 'string', example: 'FootDash API is running!' },
+      },
+    },
   })
   getHello(): string {
     return this.appService.getHello();
@@ -32,18 +32,22 @@ export class AppController {
       type: 'object',
       properties: {
         status: { type: 'string', example: 'ok' },
-        timestamp: { type: 'string', format: 'date-time', example: '2025-11-05T10:30:00Z' },
+        timestamp: {
+          type: 'string',
+          format: 'date-time',
+          example: '2025-11-05T10:30:00Z',
+        },
         version: { type: 'string', example: '1.0.0' },
-        uptime: { type: 'integer', example: 3600 }
-      }
-    }
+        uptime: { type: 'integer', example: 3600 },
+      },
+    },
   })
   getHealth() {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
       version: '1.0.0',
-      uptime: process.uptime()
+      uptime: process.uptime(),
     };
   }
 }
