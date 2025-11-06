@@ -62,14 +62,21 @@ export class TeamsService {
     const apiData = await this.footballApi.getTeamInfo(externalTeamId);
 
     // apiData shape may vary; try to read common fields
-  const d: any = apiData as any;
-  const name = d?.name || d?.team?.name || d?.team?.fullName || d?.team?.shortName;
-  const shortCode = d?.code || d?.team?.shortCode || d?.team?.abbr;
+    const d: any = apiData as any;
+    const name =
+      d?.name || d?.team?.name || d?.team?.fullName || d?.team?.shortName;
+    const shortCode = d?.code || d?.team?.shortCode || d?.team?.abbr;
 
     // Try find existing by externalId
-    let existing = await this.teamRepository.findOne({ where: { externalId: externalTeamId } });
+    let existing = await this.teamRepository.findOne({
+      where: { externalId: externalTeamId },
+    });
     if (!existing) {
-      existing = this.teamRepository.create({ externalId: externalTeamId, name: name ?? 'Unknown', shortCode });
+      existing = this.teamRepository.create({
+        externalId: externalTeamId,
+        name: name ?? 'Unknown',
+        shortCode,
+      });
     } else {
       existing.name = name ?? existing.name;
       existing.shortCode = shortCode ?? existing.shortCode;

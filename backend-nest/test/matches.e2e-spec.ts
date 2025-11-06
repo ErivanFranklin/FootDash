@@ -52,21 +52,25 @@ describe('Matches (e2e)', () => {
   });
 
   it('/matches/team/:teamId (GET) returns fixtures (mocked)', async () => {
-    const res = await request(app.getHttpServer()).get('/matches/team/10').expect(200);
+    const res = await request(app.getHttpServer())
+      .get('/matches/team/10')
+      .expect(200);
     expect(mockApi.getTeamFixtures).toHaveBeenCalled();
     expect(Array.isArray(res.body)).toBe(true);
   });
 
   it('POST /matches/team/:teamId/sync persists fixtures and returns saved matches', async () => {
-    const res = await request(app.getHttpServer()).post('/matches/team/10/sync').expect(201);
+    const res = await request(app.getHttpServer())
+      .post('/matches/team/10/sync')
+      .expect(201);
     expect(mockApi.getTeamFixtures).toHaveBeenCalled();
     expect(Array.isArray(res.body)).toBe(true);
-  expect(res.body.length).toBeGreaterThanOrEqual(1);
-  expect(res.body[0]).toHaveProperty('homeTeam');
-  expect(res.body[0]).toHaveProperty('awayTeam');
-  // new metadata persisted
-  expect(res.body[0]).toHaveProperty('referee');
-  expect(res.body[0]).toHaveProperty('venue');
-  expect(res.body[0]).toHaveProperty('league');
+    expect(res.body.length).toBeGreaterThanOrEqual(1);
+    expect(res.body[0]).toHaveProperty('homeTeam');
+    expect(res.body[0]).toHaveProperty('awayTeam');
+    // new metadata persisted
+    expect(res.body[0]).toHaveProperty('referee');
+    expect(res.body[0]).toHaveProperty('venue');
+    expect(res.body[0]).toHaveProperty('league');
   });
 });

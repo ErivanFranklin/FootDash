@@ -24,7 +24,7 @@
     "seed:dev": "node -r ts-node/register scripts/seed-dev.ts"
   },
   "dependencies": {
-    "@nestjs/axios": "^3.0.0",
+  "@nestjs/axios": "^4.0.0",
   "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.2",
   "@nestjs/core": "^11.0.0",

@@ -1,5 +1,12 @@
 import { Controller, Get, Param, Query, Post, Body } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { TeamsService } from './teams.service';
 import { TeamIdParamDto } from './dto/team-id-param.dto';
 import { TeamStatsQueryDto } from './dto/team-stats-query.dto';
@@ -13,7 +20,12 @@ export class TeamsController {
 
   @Get(':teamId')
   @ApiOperation({ summary: 'Get team details by ID' })
-  @ApiParam({ name: 'teamId', description: 'Team ID', type: 'integer', example: 33 })
+  @ApiParam({
+    name: 'teamId',
+    description: 'Team ID',
+    type: 'integer',
+    example: 33,
+  })
   @ApiResponse({
     status: 200,
     description: 'Team details',
@@ -27,11 +39,11 @@ export class TeamsController {
           type: 'object',
           properties: {
             primary: { type: 'string', example: '#0044cc' },
-            secondary: { type: 'string', example: '#ffffff' }
-          }
-        }
-      }
-    }
+            secondary: { type: 'string', example: '#ffffff' },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Team not found' })
   getTeamOverview(@Param() params: TeamIdParamDto) {
@@ -40,8 +52,18 @@ export class TeamsController {
 
   @Get(':teamId/stats')
   @ApiOperation({ summary: 'Get team statistics' })
-  @ApiParam({ name: 'teamId', description: 'Team ID', type: 'integer', example: 33 })
-  @ApiQuery({ name: 'season', description: 'Season filter', required: false, type: 'string' })
+  @ApiParam({
+    name: 'teamId',
+    description: 'Team ID',
+    type: 'integer',
+    example: 33,
+  })
+  @ApiQuery({
+    name: 'season',
+    description: 'Season filter',
+    required: false,
+    type: 'string',
+  })
   @ApiResponse({
     status: 200,
     description: 'Team statistics',
@@ -53,9 +75,9 @@ export class TeamsController {
         draws: { type: 'integer', example: 5 },
         losses: { type: 'integer', example: 3 },
         goalsFor: { type: 'integer', example: 36 },
-        goalsAgainst: { type: 'integer', example: 18 }
-      }
-    }
+        goalsAgainst: { type: 'integer', example: 18 },
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Team not found' })
   getTeamStats(
@@ -67,9 +89,26 @@ export class TeamsController {
 
   @Get(':teamId/matches')
   @ApiOperation({ summary: 'Get team matches' })
-  @ApiParam({ name: 'teamId', description: 'Team ID', type: 'integer', example: 33 })
-  @ApiQuery({ name: 'limit', description: 'Maximum number of matches', required: false, type: 'integer', example: 20 })
-  @ApiQuery({ name: 'offset', description: 'Number of matches to skip', required: false, type: 'integer', example: 0 })
+  @ApiParam({
+    name: 'teamId',
+    description: 'Team ID',
+    type: 'integer',
+    example: 33,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Maximum number of matches',
+    required: false,
+    type: 'integer',
+    example: 20,
+  })
+  @ApiQuery({
+    name: 'offset',
+    description: 'Number of matches to skip',
+    required: false,
+    type: 'integer',
+    example: 0,
+  })
   @ApiResponse({
     status: 200,
     description: 'List of matches',
@@ -83,28 +122,32 @@ export class TeamsController {
             type: 'object',
             properties: {
               id: { type: 'integer', example: 33 },
-              name: { type: 'string', example: 'FC Example' }
-            }
+              name: { type: 'string', example: 'FC Example' },
+            },
           },
           awayTeam: {
             type: 'object',
             properties: {
               id: { type: 'integer', example: 44 },
-              name: { type: 'string', example: 'Rivals FC' }
-            }
+              name: { type: 'string', example: 'Rivals FC' },
+            },
           },
-          kickoff: { type: 'string', format: 'date-time', example: '2025-11-10T19:45:00Z' },
+          kickoff: {
+            type: 'string',
+            format: 'date-time',
+            example: '2025-11-10T19:45:00Z',
+          },
           score: {
             type: 'object',
             properties: {
               home: { type: 'integer', example: 2 },
-              away: { type: 'integer', example: 1 }
+              away: { type: 'integer', example: 1 },
             },
-            nullable: true
-          }
-        }
-      }
-    }
+            nullable: true,
+          },
+        },
+      },
+    },
   })
   getTeamFixtures(
     @Param() params: TeamIdParamDto,
@@ -125,7 +168,12 @@ export class TeamsController {
 
   @Get(':teamId/db')
   @ApiOperation({ summary: 'Get persisted team data' })
-  @ApiParam({ name: 'teamId', description: 'Team ID', type: 'integer', example: 33 })
+  @ApiParam({
+    name: 'teamId',
+    description: 'Team ID',
+    type: 'integer',
+    example: 33,
+  })
   @ApiResponse({ status: 200, description: 'Persisted team data' })
   @ApiResponse({ status: 404, description: 'Team not found' })
   getPersistedTeam(@Param() params: TeamIdParamDto) {

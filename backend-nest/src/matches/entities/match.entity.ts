@@ -33,8 +33,20 @@ export class Match {
 
   // Store venue and league as JSON so we can persist structured metadata
   @Column({ type: 'simple-json', nullable: true })
-  venue?: { id?: number | null; name?: string | null; city?: string | null; capacity?: number | null; image?: string | null } | null;
+  venue?: {
+    id?: number | null;
+    name?: string | null;
+    city?: string | null;
+    capacity?: number | null;
+    image?: string | null;
+  } | null;
 
   @Column({ type: 'simple-json', nullable: true })
-  league?: { id?: number | null; name?: string | null; country?: string | null; logo?: string | null; season?: number | null } | null;
+  league?: {
+    id?: number | null;
+    name?: string | null;
+    country?: string | null;
+    logo?: string | null;
+    season?: number | null;
+  } | null;
 }

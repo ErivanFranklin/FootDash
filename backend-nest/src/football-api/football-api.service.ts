@@ -1,10 +1,23 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError, AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
-import { ApiResponse, FootballFixture, FootballTeamInfo, FootballTeamStats } from './football-api.interface';
-import { normalizeTeamInfo, normalizeFixtures, normalizeTeamStats } from './football-api.adapter';
+import {
+  ApiResponse,
+  FootballFixture,
+  FootballTeamInfo,
+  FootballTeamStats,
+} from './football-api.interface';
+import {
+  normalizeTeamInfo,
+  normalizeFixtures,
+  normalizeTeamStats,
+} from './football-api.adapter';
 
 interface TeamStatsParams {
   leagueId: number;
@@ -19,7 +32,7 @@ interface TeamFixturesParams {
   next?: number;
   status?: string;
   from?: string; // YYYY-MM-DD
-  to?: string;   // YYYY-MM-DD
+  to?: string; // YYYY-MM-DD
 }
 
 @Injectable()
@@ -46,29 +59,46 @@ export class FootballApiService {
         country: 'Mockland',
         founded: 1900,
         logo: null,
-        venue: { id: 1, name: 'Mock Arena', city: 'Mock City', capacity: 40000, image: null },
+        venue: {
+          id: 1,
+          name: 'Mock Arena',
+          city: 'Mock City',
+          capacity: 40000,
+          image: null,
+        },
       };
     }
-    const resp = await this.makeRequest<ApiResponse<FootballTeamInfo[]>>('teams', {
-      team: teamId,
-    });
+    const resp = await this.makeRequest<ApiResponse<FootballTeamInfo[]>>(
+      'teams',
+      {
+        team: teamId,
+      },
+    );
     return normalizeTeamInfo(resp as ApiResponse<FootballTeamInfo[]>);
   }
 
   async getTeamStats(params: TeamStatsParams) {
     if (this.mock) {
       return {
-        fixtures: { played: { total: 20 }, wins: { total: 12 }, draws: { total: 5 }, loses: { total: 3 } },
+        fixtures: {
+          played: { total: 20 },
+          wins: { total: 12 },
+          draws: { total: 5 },
+          loses: { total: 3 },
+        },
         goals: { for: { total: 36 }, against: { total: 18 } },
         biggest: {},
         lineups: [],
       } as any;
     }
-    const resp = await this.makeRequest<ApiResponse<FootballTeamStats>>('teams/statistics', {
-      league: params.leagueId,
-      season: params.season,
-      team: params.teamId,
-    });
+    const resp = await this.makeRequest<ApiResponse<FootballTeamStats>>(
+      'teams/statistics',
+      {
+        league: params.leagueId,
+        season: params.season,
+        team: params.teamId,
+      },
+    );
     return normalizeTeamStats(resp as ApiResponse<FootballTeamStats>);
   }
 
@@ -79,12 +109,28 @@ export class FootballApiService {
           id: 1001,
           date: new Date().toISOString(),
           status: { short: 'FT', long: 'Full Time' },
-          home: { id: params.teamId, name: `Mock Team ${params.teamId}`, logo: null },
+          home: {
+            id: params.teamId,
+            name: `Mock Team ${params.teamId}`,
+            logo: null,
+          },
           away: { id: 44, name: 'Mock Rivals', logo: null },
           goals: { home: 2, away: 1 },
           referee: null,
-          venue: { id: 1, name: 'Mock Arena', city: 'Mock City', capacity: 40000, image: null },
-          league: { id: 999, name: 'Mock League', country: 'Mockland', logo: null, season: params.season ?? 2025 },
+          venue: {
+            id: 1,
+            name: 'Mock Arena',
+            city: 'Mock City',
+            capacity: 40000,
+            image: null,
+          },
+          league: {
+            id: 999,
+            name: 'Mock League',
+            country: 'Mockland',
+            logo: null,
+            season: params.season ?? 2025,
+          },
           raw: {},
         },
       ];
@@ -98,13 +144,21 @@ export class FootballApiService {
     if (params.status) query.status = params.status;
     if (params.from) query.from = params.from;
     if (params.to) query.to = params.to;
-    const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>('fixtures', query);
+    const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
+      'fixtures',
+      query,
+    );
     return normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
   }
 
-  private async makeRequest<T>(path: string, params?: Record<string, number | string>) {
+  private async makeRequest<T>(
+    path: string,
+    params?: Record<string, number | string>,
+  ) {
     if (!this.isConfigured) {
-      throw new ServiceUnavailableException('Football API credentials are not configured');
+      throw new ServiceUnavailableException(
+        'Football API credentials are not configured',
+      );
     }
 
     try {
@@ -114,7 +168,10 @@ export class FootballApiService {
       return response.data;
     } catch (error) {
       const err = error as AxiosError;
-      this.logger.error(`Football API request failed: ${err.message}`, err.stack);
+      this.logger.error(
+        `Football API request failed: ${err.message}`,
+        err.stack,
+      );
       throw new ServiceUnavailableException('Failed to reach Football API');
     }
   }

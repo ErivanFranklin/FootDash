@@ -22,8 +22,8 @@ export class MatchesService {
     const request: any = {
       teamId,
       season,
-      last: range === MatchRangeType.RECENT ? limit ?? 5 : undefined,
-      next: range === MatchRangeType.UPCOMING ? limit ?? 5 : undefined,
+      last: range === MatchRangeType.RECENT ? (limit ?? 5) : undefined,
+      next: range === MatchRangeType.UPCOMING ? (limit ?? 5) : undefined,
     };
     if (from) request.from = from;
     if (to) request.to = to;
@@ -35,7 +35,10 @@ export class MatchesService {
    * Fetch fixtures from Football API and persist teams and matches into DB.
    */
   async syncFixturesFromApi(teamId: number, query: MatchesQueryDto) {
-  const fixtures = (await this.getTeamMatches(teamId, query)) as unknown as any[];
+    const fixtures = (await this.getTeamMatches(
+      teamId,
+      query,
+    )) as unknown as any[];
 
     const savedMatches: Match[] = [];
 
@@ -50,33 +53,52 @@ export class MatchesService {
       const awayExternalId = awayApi?.id ?? awayApi?.team?.id;
 
       // Upsert home team
-      let home = await this.teamRepository.findOne({ where: { externalId: homeExternalId } });
+      let home = await this.teamRepository.findOne({
+        where: { externalId: homeExternalId },
+      });
       if (!home) {
-        home = this.teamRepository.create({ externalId: homeExternalId, name: homeApi?.name ?? homeApi?.team?.name });
+        home = this.teamRepository.create({
+          externalId: homeExternalId,
+          name: homeApi?.name ?? homeApi?.team?.name,
+        });
         home = await this.teamRepository.save(home);
       }
 
       // Upsert away team
-      let away = await this.teamRepository.findOne({ where: { externalId: awayExternalId } });
+      let away = await this.teamRepository.findOne({
+        where: { externalId: awayExternalId },
+      });
       if (!away) {
-        away = this.teamRepository.create({ externalId: awayExternalId, name: awayApi?.name ?? awayApi?.team?.name });
+        away = this.teamRepository.create({
+          externalId: awayExternalId,
+          name: awayApi?.name ?? awayApi?.team?.name,
+        });
         away = await this.teamRepository.save(away);
       }
 
       // Upsert match
       let existing = externalMatchId
-        ? await this.matchRepository.findOne({ where: { externalId: externalMatchId } })
+        ? await this.matchRepository.findOne({
+            where: { externalId: externalMatchId },
+          })
         : undefined;
 
-  // Normalized adapter provides consistent fields when available
-  const kickOffRaw = f?.date ?? f?.fixture?.date ?? f?.kickoff ?? f?.utcDate;
-  const kickOff = kickOffRaw ? new Date(kickOffRaw) : undefined;
-  const status = (f as any)?.status?.short ?? (f as any)?.status ?? (f as any)?.status?.long ?? null;
-  const homeScore = (f as any)?.goals?.home ?? (f as any)?.score?.fulltime?.home ?? null;
-  const awayScore = (f as any)?.goals?.away ?? (f as any)?.score?.fulltime?.away ?? null;
-  const referee = (f as any)?.referee ?? null;
-  const venue = (f as any)?.venue ?? null;
-  const league = (f as any)?.league ?? null;
+      // Normalized adapter provides consistent fields when available
+      const kickOffRaw =
+        f?.date ?? f?.fixture?.date ?? f?.kickoff ?? f?.utcDate;
+      const kickOff = kickOffRaw ? new Date(kickOffRaw) : undefined;
+      const status =
+        (f as any)?.status?.short ??
+        (f as any)?.status ??
+        (f as any)?.status?.long ??
+        null;
+      const homeScore =
+        (f as any)?.goals?.home ?? (f as any)?.score?.fulltime?.home ?? null;
+      const awayScore =
+        (f as any)?.goals?.away ?? (f as any)?.score?.fulltime?.away ?? null;
+      const referee = (f as any)?.referee ?? null;
+      const venue = (f as any)?.venue ?? null;
+      const league = (f as any)?.league ?? null;
 
       if (!existing) {
         existing = this.matchRepository.create({
