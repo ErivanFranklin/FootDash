@@ -11,7 +11,13 @@ export interface NormalizedTeam {
   country?: string;
   founded?: number;
   logo?: string;
-  venue?: { id?: number; name?: string; city?: string; capacity?: number; image?: string } | null;
+  venue?: {
+    id?: number;
+    name?: string;
+    city?: string;
+    capacity?: number;
+    image?: string;
+  } | null;
 }
 
 export interface NormalizedFixture {
@@ -55,14 +61,17 @@ export const normalizeTeamInfo = (
   resp: ApiResponse<FootballTeamInfo[]>,
 ): NormalizedTeam | NormalizedTeam[] => {
   const list = (resp?.response as FootballTeamInfo[]) || [];
-  const mapped = list.map((t) => ({
-    id: t.team.id,
-    name: t.team.name,
-    country: t.team.country,
-    founded: t.team.founded,
-    logo: t.team.logo,
-    venue: t.venue ?? null,
-  } as NormalizedTeam));
+  const mapped = list.map(
+    (t) =>
+      ({
+        id: t.team.id,
+        name: t.team.name,
+        country: t.team.country,
+        founded: t.team.founded,
+        logo: t.team.logo,
+        venue: t.venue ?? null,
+      }) as NormalizedTeam,
+  );
 
   // If single element, return single object to be convenient
   return mapped.length === 1 ? mapped[0] : mapped;
@@ -73,11 +82,23 @@ export const normalizeFixtures = (
 ): NormalizedFixture[] => {
   const list = (resp?.response as FootballFixture[]) || [];
   return list.map((f) => ({
-    id: f.fixture?.id ?? (() => { throw new Error('fixture id missing'); })(),
+    id:
+      f.fixture?.id ??
+      (() => {
+        throw new Error('fixture id missing');
+      })(),
     date: f.fixture?.date,
     status: f.fixture?.status ?? null,
-    home: { id: f.teams.home.id, name: f.teams.home.name, logo: f.teams.home.logo ?? null },
-    away: { id: f.teams.away.id, name: f.teams.away.name, logo: f.teams.away.logo ?? null },
+    home: {
+      id: f.teams.home.id,
+      name: f.teams.home.name,
+      logo: f.teams.home.logo ?? null,
+    },
+    away: {
+      id: f.teams.away.id,
+      name: f.teams.away.name,
+      logo: f.teams.away.logo ?? null,
+    },
     goals: f.goals ?? null,
 
     // referee: may be present under fixture.referee or top-level

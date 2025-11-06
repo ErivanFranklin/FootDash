@@ -30,10 +30,13 @@ describe('TeamsController', () => {
 
   it('returns team stats', async () => {
     mockTeamsService.getTeamStats.mockResolvedValue('stats');
-    const result = await controller.getTeamStats({ teamId: 7 }, {
-      leagueId: 39,
-      season: 2024,
-    });
+    const result = await controller.getTeamStats(
+      { teamId: 7 },
+      {
+        leagueId: 39,
+        season: 2024,
+      },
+    );
     expect(mockTeamsService.getTeamStats).toHaveBeenCalledWith(7, {
       leagueId: 39,
       season: 2024,
@@ -44,7 +47,9 @@ describe('TeamsController', () => {
   it('returns team fixtures', async () => {
     mockTeamsService.getTeamFixtures.mockResolvedValue('fixtures');
     const result = await controller.getTeamFixtures({ teamId: 7 }, { next: 5 });
-    expect(mockTeamsService.getTeamFixtures).toHaveBeenCalledWith(7, { next: 5 });
+    expect(mockTeamsService.getTeamFixtures).toHaveBeenCalledWith(7, {
+      next: 5,
+    });
     expect(result).toBe('fixtures');
   });
 });

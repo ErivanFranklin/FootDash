@@ -45,7 +45,9 @@ describe('Teams (e2e)', () => {
     expect(createRes.body).toHaveProperty('id');
     const id = createRes.body.id;
 
-    const getRes = await request(app.getHttpServer()).get(`/teams/${id}/db`).expect(200);
+    const getRes = await request(app.getHttpServer())
+      .get(`/teams/${id}/db`)
+      .expect(200);
     expect(getRes.body).toMatchObject({ id, name: 'Persisted FC' });
   });
 });

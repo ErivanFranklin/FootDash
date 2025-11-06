@@ -25,13 +25,11 @@ const isProd = process.env.NODE_ENV === 'production';
         DB_NAME: Joi.string().default('footdash'),
         JWT_SECRET: Joi.string().default('change-me'),
         FOOTBALL_API_MOCK: Joi.boolean().default(!isProd),
-        FOOTBALL_API_URL: Joi.string()
-          .uri()
-          .when('FOOTBALL_API_MOCK', {
-            is: true,
-            then: Joi.optional(),
-            otherwise: Joi.required(),
-          }),
+        FOOTBALL_API_URL: Joi.string().uri().when('FOOTBALL_API_MOCK', {
+          is: true,
+          then: Joi.optional(),
+          otherwise: Joi.required(),
+        }),
         FOOTBALL_API_KEY: Joi.string().when('FOOTBALL_API_MOCK', {
           is: true,
           then: Joi.optional(),

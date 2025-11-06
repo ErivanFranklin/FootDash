@@ -1,5 +1,10 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthResult, AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -18,10 +23,14 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        id: { type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000' },
-        email: { type: 'string', format: 'email', example: 'user@example.com' }
-      }
-    }
+        id: {
+          type: 'string',
+          format: 'uuid',
+          example: '550e8400-e29b-41d4-a716-446655440000',
+        },
+        email: { type: 'string', format: 'email', example: 'user@example.com' },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 409, description: 'User already exists' })
@@ -37,11 +46,17 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
-        refreshToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
-        expiresIn: { type: 'integer', example: 3600 }
-      }
-    }
+        accessToken: {
+          type: 'string',
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+        refreshToken: {
+          type: 'string',
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+        expiresIn: { type: 'integer', example: 3600 },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   login(@Body() dto: LoginAuthDto): Promise<AuthResult> {
@@ -56,10 +71,13 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
-        expiresIn: { type: 'integer', example: 3600 }
-      }
-    }
+        accessToken: {
+          type: 'string',
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+        expiresIn: { type: 'integer', example: 3600 },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   refresh(@Body() dto: RefreshAuthDto): Promise<AuthResult> {
