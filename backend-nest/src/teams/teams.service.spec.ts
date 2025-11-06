@@ -14,7 +14,9 @@ const mockFootballApi = {
 const mockRepo = {
   create: jest.fn((v) => v),
   save: jest.fn((v) => Promise.resolve({ id: 1, ...v })),
-  findOne: jest.fn((opts) => Promise.resolve({ id: opts.where.id, name: 'Saved' })),
+  findOne: jest.fn((opts) =>
+    Promise.resolve({ id: opts.where.id, name: 'Saved' }),
+  ),
 };
 
 describe('TeamsService', () => {
@@ -41,12 +43,17 @@ describe('TeamsService', () => {
   });
 
   it('throws when stats query params missing', async () => {
-    expect(() => service.getTeamStats(1, {} as any)).toThrow(BadRequestException);
+    expect(() => service.getTeamStats(1, {} as any)).toThrow(
+      BadRequestException,
+    );
   });
 
   it('delegates getTeamStats when params provided', async () => {
     mockFootballApi.getTeamStats.mockResolvedValue('stats');
-    const result = await service.getTeamStats(10, { leagueId: 39, season: 2024 });
+    const result = await service.getTeamStats(10, {
+      leagueId: 39,
+      season: 2024,
+    });
     expect(mockFootballApi.getTeamStats).toHaveBeenCalledWith({
       leagueId: 39,
       season: 2024,
@@ -69,7 +76,10 @@ describe('TeamsService', () => {
   });
 
   it('creates and finds persisted team via repository', async () => {
-    const created = await service.createTeam({ name: 'X', shortCode: 'X1' } as any);
+    const created = await service.createTeam({
+      name: 'X',
+      shortCode: 'X1',
+    } as any);
     expect(mockRepo.create).toHaveBeenCalled();
     expect(mockRepo.save).toHaveBeenCalled();
     expect(created.id).toBe(1);
