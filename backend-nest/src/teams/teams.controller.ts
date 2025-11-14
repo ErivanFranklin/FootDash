@@ -59,6 +59,14 @@ export class TeamsController {
     example: 33,
   })
   @ApiQuery({
+    name: 'leagueId',
+    description:
+      'League identifier (optional). If not provided, the server may use the environment variable FOOTBALL_API_DEFAULT_LEAGUE or allow the call in mock mode (FOOTBALL_API_MOCK=true).',
+    required: false,
+    type: 'integer',
+    example: 999,
+  })
+  @ApiQuery({
     name: 'season',
     description: 'Season filter',
     required: false,

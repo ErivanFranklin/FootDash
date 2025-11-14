@@ -75,6 +75,21 @@ describe('TeamsService', () => {
     expect(result).toBe('fixtures');
   });
 
+  it('allows getTeamStats when mock mode and missing leagueId', async () => {
+  // Simulate FootballApiService running in mock mode
+  (mockFootballApi as any).isMockMode = jest.fn(() => true);
+    mockFootballApi.getTeamStats.mockResolvedValue('mock-stats');
+
+    const result = await service.getTeamStats(10, { season: 2024 } as any);
+
+    expect(mockFootballApi.getTeamStats).toHaveBeenCalledWith({
+      leagueId: 999,
+      season: 2024,
+      teamId: 10,
+    });
+    expect(result).toBe('mock-stats');
+  });
+
   it('creates and finds persisted team via repository', async () => {
     const created = await service.createTeam({
       name: 'X',

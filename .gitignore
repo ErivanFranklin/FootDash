@@ -29,3 +29,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local test and runtime artifacts
+/backend-nest/logs/
+/test-results/

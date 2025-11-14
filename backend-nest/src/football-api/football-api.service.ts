@@ -51,6 +51,14 @@ export class FootballApiService {
     this.mock = this.config.get<boolean>('FOOTBALL_API_MOCK', false);
   }
 
+  /**
+   * Public accessor to check whether the service is running in mock mode.
+   * Useful so other services do not need to reach into private fields.
+   */
+  public isMockMode(): boolean {
+    return this.mock === true;
+  }
+
   async getTeamInfo(teamId: number) {
     if (this.mock) {
       return {
