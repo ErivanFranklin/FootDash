@@ -23,7 +23,9 @@ export class TeamsService {
 
   getTeamStats(teamId: number, query: TeamStatsQueryDto) {
     // Read default league from config (env vars may be strings or numbers)
-    const defaultLeagueRaw = this.config?.get<string | number>('FOOTBALL_API_DEFAULT_LEAGUE');
+    const defaultLeagueRaw = this.config?.get<string | number>(
+      'FOOTBALL_API_DEFAULT_LEAGUE',
+    );
     const defaultLeague =
       typeof defaultLeagueRaw === 'string'
         ? Number(defaultLeagueRaw) || undefined

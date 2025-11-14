@@ -13,6 +13,7 @@ import {
   FootballTeamInfo,
   FootballTeamStats,
 } from './football-api.interface';
+import { FootballApiAdapter } from './football-api-adapter.interface';
 import {
   normalizeTeamInfo,
   normalizeFixtures,
@@ -36,7 +37,7 @@ interface TeamFixturesParams {
 }
 
 @Injectable()
-export class FootballApiService {
+export class FootballApiService implements FootballApiAdapter {
   private readonly logger = new Logger(FootballApiService.name);
   private readonly isConfigured: boolean;
   private readonly mock: boolean;

@@ -12,5 +12,7 @@ export function createMockedFootballApi(): jest.Mocked<FootballApiAdapter> {
 export const createMockRepo = () => ({
   create: jest.fn((v) => v),
   save: jest.fn((v) => Promise.resolve({ id: 1, ...v })),
-  findOne: jest.fn((opts) => Promise.resolve({ id: opts.where.id, name: 'Saved' })),
+  findOne: jest.fn((opts) =>
+    Promise.resolve({ id: opts.where.id, name: 'Saved' }),
+  ),
 });
