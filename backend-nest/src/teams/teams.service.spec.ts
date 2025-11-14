@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamsService } from './teams.service';
 import { FootballApiService } from '../football-api/football-api.service';
-import { createMockedFootballApi, createMockRepo } from '../../test/utils/mocks';
-import { FootballApiAdapter } from '../football-api/football-api-adapter.interface';
+import {
+  createMockedFootballApi,
+  createMockRepo,
+} from '../../test/utils/mocks';
 import { BadRequestException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Team } from './entities/team.entity';
@@ -71,8 +73,8 @@ describe('TeamsService', () => {
   });
 
   it('allows getTeamStats when mock mode and missing leagueId', async () => {
-  // Simulate FootballApiService running in mock mode
-  (mockFootballApi as any).isMockMode = jest.fn(() => true);
+    // Simulate FootballApiService running in mock mode
+    (mockFootballApi as any).isMockMode = jest.fn(() => true);
     mockFootballApi.getTeamStats.mockResolvedValue('mock-stats');
 
     const result = await service.getTeamStats(10, { season: 2024 } as any);
