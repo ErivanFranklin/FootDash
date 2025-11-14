@@ -1,23 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamsService } from './teams.service';
 import { FootballApiService } from '../football-api/football-api.service';
+import { createMockedFootballApi, createMockRepo } from '../../test/utils/mocks';
+import { FootballApiAdapter } from '../football-api/football-api-adapter.interface';
 import { BadRequestException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Team } from './entities/team.entity';
 
-const mockFootballApi = {
-  getTeamInfo: jest.fn(),
-  getTeamStats: jest.fn(),
-  getTeamFixtures: jest.fn(),
-};
-
-const mockRepo = {
-  create: jest.fn((v) => v),
-  save: jest.fn((v) => Promise.resolve({ id: 1, ...v })),
-  findOne: jest.fn((opts) =>
-    Promise.resolve({ id: opts.where.id, name: 'Saved' }),
-  ),
-};
+// Keep the mock flexible for Jest helpers; the adapter interface exists in
+// src/football-api/football-api-adapter.interface.ts for stricter typing
+// elsewhere. Here we use `any` to simplify mocking helpers like
+// `mockResolvedValue` without verbose casts.
+const mockFootballApi = createMockedFootballApi();
+const mockRepo = createMockRepo();
 
 describe('TeamsService', () => {
   let service: TeamsService;
