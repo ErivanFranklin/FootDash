@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../services/api';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-home',

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
-import { AuthService } from '../services/auth';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-login',

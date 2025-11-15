@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonList, IonItem, IonLabel, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
-import { ApiService } from '../services/api';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-teams',

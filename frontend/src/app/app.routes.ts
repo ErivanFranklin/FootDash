@@ -1,27 +1,27 @@
 
 
 import { Routes } from '@angular/router';
-import { authGuard } from './services/auth-guard';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    loadComponent: () => import('./features/dashboard/pages/home.page').then((m) => m.HomePage),
     canActivate: [authGuard],
   },
   {
     path: 'teams',
-    loadComponent: () => import('./teams/teams.page').then((m) => m.TeamsPage),
+    loadComponent: () => import('./features/teams/pages/teams.page').then((m) => m.TeamsPage),
     canActivate: [authGuard],
   },
   {
     path: 'matches/:teamId',
-    loadComponent: () => import('./matches/matches.page').then((m) => m.MatchesPage),
+    loadComponent: () => import('./features/matches/pages/matches.page').then((m) => m.MatchesPage),
     canActivate: [authGuard],
   },
   {
     path: 'login',
-    loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
+    loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },
   {
     path: '',

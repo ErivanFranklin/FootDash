@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
-import { ApiService } from '../services/api';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-matches',
