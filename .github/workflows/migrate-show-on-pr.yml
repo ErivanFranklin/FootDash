@@ -40,9 +40,9 @@ jobs:
           done
 
       - name: Install backend deps
-        run: npm --prefix backend-nest install --no-audit --no-fund
+        run: npm --prefix backend install --no-audit --no-fund
 
       - name: Run migrate:show:full
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash
-        run: npm --prefix backend-nest run migrate:show:full
+        run: npm --prefix backend run migrate:show:full

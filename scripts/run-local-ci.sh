@@ -16,7 +16,7 @@ case "$MODE" in
     ;;
   backend)
     echo "Running backend tests inside container..."
-    docker run --rm -v "$(pwd)":/workspace -w /workspace/backend-nest -e CI=true ${IMAGE_TAG} bash -lc "npm ci && npm run lint && npm run migrate:run || true && npm test --silent"
+    docker run --rm -v "$(pwd)":/workspace -w /workspace/backend -e CI=true ${IMAGE_TAG} bash -lc "npm ci && npm run lint && npm run migrate:run || true && npm test --silent"
     ;;
   all)
     echo "Running both frontend and backend tests"

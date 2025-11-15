@@ -1,10 +1,9 @@
 ## Node.js
 /backend/node_modules/
-/backend-nest/node_modules/
 /frontend/node_modules/
 
 ## Build output
-/backend-nest/dist/
+/backend/dist/
 /frontend/www/
 
 ## Logs and pids
@@ -31,5 +30,5 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local test and runtime artifacts
-/backend-nest/logs/
+/backend/logs/
 /test-results/
