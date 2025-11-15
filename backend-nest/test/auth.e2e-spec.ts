@@ -65,4 +65,38 @@ describe('Auth e2e (auth workflow)', () => {
       .send({ refreshToken })
       .expect(401);
   }, 20000);
+
+  it('register -> login -> profile', async () => {
+    const email = `e2e-profile-${Date.now()}@example.com`;
+    const password = 'password123';
+
+    // Register a new user
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ email, password })
+      .expect(201);
+
+    // Login to get an access token
+    const loginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email, password })
+      .expect(201);
+
+    const accessToken = loginRes.body?.tokens?.accessToken;
+    expect(accessToken).toBeDefined();
+
+    // Get profile with the access token
+    const profileRes = await request(app.getHttpServer())
+      .get('/auth/profile')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(profileRes.body).toBeDefined();
+    expect(profileRes.body.email).toEqual(email);
+    expect(profileRes.body.id).toBeDefined();
+    expect(profileRes.body.passwordHash).toBeUndefined();
+
+    // Try to get profile without a token
+    await request(app.getHttpServer()).get('/auth/profile').expect(401);
+  }, 20000);
 });

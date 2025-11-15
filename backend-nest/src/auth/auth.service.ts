@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { ProfileDto } from './dto/profile.dto';
 
 export interface AuthUser {
   id: number;
@@ -116,6 +117,16 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
+  }
+
+  async getProfile(userId: number): Promise<ProfileDto> {
+    const user = await this.usersRepo.findOneBy({ id: userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...result } = user;
+    return result;
   }
 
   private createTokens(user: AuthUser): AuthTokens {

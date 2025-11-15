@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -9,6 +9,8 @@ import { AuthResult, AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshAuthDto } from './dto/refresh-auth.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { ProfileDto } from './dto/profile.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -91,5 +93,19 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid token' })
   async revoke(@Body() dto: RefreshAuthDto): Promise<void> {
     await this.authService.revoke(dto.refreshToken);
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+    type: ProfileDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProfile(@Request() req: { user: { id: number } }): Promise<ProfileDto> {
+    return this.authService.getProfile(req.user.id);
   }
 }
