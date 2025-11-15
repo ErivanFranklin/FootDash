@@ -5,7 +5,7 @@ on:
     branches: [ main, 'migration/**' ]
   pull_request:
     paths:
-      - 'backend-nest/**'
+      - 'backend/**'
 
 jobs:
   backend-tests:
@@ -37,25 +37,25 @@ jobs:
       - name: Cache backend node modules
         uses: actions/cache@v4
         with:
-          path: backend-nest/node_modules
-          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend/package-lock.json') }}
 
       - name: Install backend dependencies (capture logs)
         run: |
           node -v && npm -v
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
           (
-            npm ci 2>&1 | tee backend-nest/test-results/npm-ci.log
+            npm ci 2>&1 | tee backend/test-results/npm-ci.log
           ) || (
             echo "npm ci failed — falling back to npm install"
-            npm install --no-audit --no-fund 2>&1 | tee backend-nest/test-results/npm-install.log
+            npm install --no-audit --no-fund 2>&1 | tee backend/test-results/npm-install.log
           )
-        working-directory: backend-nest
+        working-directory: backend
 
       - name: Run backend lint
         run: npm run lint
-        working-directory: backend-nest
+        working-directory: backend
 
       - name: Wait for Postgres
         run: |
@@ -89,24 +89,24 @@ jobs:
           DB_NAME: footdash
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
-          npm run migrate:run 2>&1 | tee backend-nest/test-results/migrate.log
-        working-directory: backend-nest
+          npm run migrate:run 2>&1 | tee backend/test-results/migrate.log
+        working-directory: backend
 
       - name: Run backend tests (capture logs)
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
-          npm test --silent 2>&1 | tee backend-nest/test-results/npm-test.log
-        working-directory: backend-nest
+          npm test --silent 2>&1 | tee backend/test-results/npm-test.log
+        working-directory: backend
 
       - name: Run backend e2e tests (capture logs)
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
-          npm run test:e2e --silent 2>&1 | tee backend-nest/test-results/npm-test-e2e.log
-        working-directory: backend-nest
+          npm run test:e2e --silent 2>&1 | tee backend/test-results/npm-test-e2e.log
+        working-directory: backend
 
   backend-e2e-postgres:
     runs-on: ubuntu-latest
@@ -143,21 +143,21 @@ jobs:
       - name: Cache backend node modules
         uses: actions/cache@v4
         with:
-          path: backend-nest/node_modules
-          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}-e2e-pg
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend/package-lock.json') }}-e2e-pg
 
       - name: Install backend dependencies (capture logs)
         run: |
           node -v && npm -v
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
           (
-            npm ci 2>&1 | tee backend-nest/test-results/npm-ci-e2e-pg.log
+            npm ci 2>&1 | tee backend/test-results/npm-ci-e2e-pg.log
           ) || (
             echo "npm ci failed — falling back to npm install"
-            npm install --no-audit --no-fund 2>&1 | tee backend-nest/test-results/npm-install-e2e-pg.log
+            npm install --no-audit --no-fund 2>&1 | tee backend/test-results/npm-install-e2e-pg.log
           )
-        working-directory: backend-nest
+        working-directory: backend
 
       - name: Wait for Postgres
         run: |
@@ -192,10 +192,10 @@ jobs:
           DB_NAME: "footdash_${{ github.run_id }}"
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/footdash_${{ github.run_id }}
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
-          npm run migrate:run 2>&1 | tee backend-nest/test-results/migrate-e2e-pg.log
-        working-directory: backend-nest
+          npm run migrate:run 2>&1 | tee backend/test-results/migrate-e2e-pg.log
+        working-directory: backend
 
       - name: Run postgres-backed e2e tests (capture logs)
         env:
@@ -207,31 +207,31 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/footdash_${{ github.run_id }}
           JWT_SECRET: test-secret
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
-          npm run test:e2e -- test/auth.postgres.e2e-spec.ts --silent 2>&1 | tee backend-nest/test-results/npm-test-e2e-pg.log
-        working-directory: backend-nest
+          npm run test:e2e -- test/auth.postgres.e2e-spec.ts --silent 2>&1 | tee backend/test-results/npm-test-e2e-pg.log
+        working-directory: backend
 
       - name: Upload postgres e2e logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: backend-e2e-postgres-logs
-          path: backend-nest/test-results
+          path: backend/test-results
 
       - name: Upload backend coverage/artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: backend-nest/coverage
+          path: backend/coverage
 
       - name: Upload backend junit test report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
-          path: backend-nest/test-results/backend-junit.xml
+          path: backend/test-results/backend-junit.xml
 
       # PR annotation step removed: dorny/test-reporter caused runtime errors in the runner
       # If you want PR annotations, we can re-add a compatible reporter after confirming
@@ -241,10 +241,10 @@ jobs:
         if: failure()
         run: |
           echo "--- backend test-results dir ---"
-          ls -la backend-nest/test-results || true
-          if [ -f backend-nest/test-results/backend-junit.xml ]; then
-            echo "--- head of backend-nest/test-results/backend-junit.xml ---"
-            head -n 200 backend-nest/test-results/backend-junit.xml || true
+          ls -la backend/test-results || true
+          if [ -f backend/test-results/backend-junit.xml ]; then
+            echo "--- head of backend/test-results/backend-junit.xml ---"
+            head -n 200 backend/test-results/backend-junit.xml || true
           else
             echo "backend-junit.xml not present"
           fi
@@ -254,7 +254,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results-dir
-          path: backend-nest/test-results
+          path: backend/test-results
 
   express-smoke:
     name: Backend (Express) smoke tests
@@ -334,21 +334,21 @@ jobs:
       - name: Cache backend node modules
         uses: actions/cache@v4
         with:
-          path: backend-nest/node_modules
-          key: ${{ runner.os }}-backend-${{ hashFiles('backend-nest/package-lock.json') }}-dryrun
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend/package-lock.json') }}-dryrun
 
       - name: Install backend dependencies
         run: |
           node -v && npm -v
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
           (
-            npm ci 2>&1 | tee backend-nest/test-results/npm-ci-dryrun.log
+            npm ci 2>&1 | tee backend/test-results/npm-ci-dryrun.log
           ) || (
             echo "npm ci failed — falling back to npm install"
-            npm install --no-audit --no-fund 2>&1 | tee backend-nest/test-results/npm-install-dryrun.log
+            npm install --no-audit --no-fund 2>&1 | tee backend/test-results/npm-install-dryrun.log
           )
-        working-directory: backend-nest
+        working-directory: backend
 
       - name: Wait for Postgres
         run: |
@@ -382,11 +382,11 @@ jobs:
           DB_NAME: footdash_dryrun
           DATABASE_URL: postgresql://postgres:postgres@localhost:5434/footdash_dryrun
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
           echo "Running migration dry-run (show pending migrations)..."
-          npm run migrate:show 2>&1 | tee backend-nest/test-results/migrate-dryrun.log
-        working-directory: backend-nest
+          npm run migrate:show 2>&1 | tee backend/test-results/migrate-dryrun.log
+        working-directory: backend
 
       - name: Run migration dry-run (show full)
         env:
@@ -397,15 +397,15 @@ jobs:
           DB_NAME: footdash_dryrun
           DATABASE_URL: postgresql://postgres:postgres@localhost:5434/footdash_dryrun
         run: |
-          mkdir -p backend-nest/test-results
+          mkdir -p backend/test-results
           set -o pipefail
           echo "Running migration dry-run (show full migration status)..."
-          npm run migrate:show:full 2>&1 | tee backend-nest/test-results/migrate-dryrun-full.log
-        working-directory: backend-nest
+          npm run migrate:show:full 2>&1 | tee backend/test-results/migrate-dryrun-full.log
+        working-directory: backend
 
       - name: Upload migration dry-run logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: migration-dry-run-logs
-          path: backend-nest/test-results
+          path: backend/test-results

@@ -12,7 +12,7 @@ Checklist
 
 ```bash
 DATABASE_URL=postgresql://<user>:<pass>@staging-host:5432/footdash \
-  npm --prefix backend-nest run migrate:show:full
+  npm --prefix backend run migrate:show:full
 ```
 
 3. Apply migrations in staging (after backup)
@@ -23,7 +23,7 @@ pg_dump -h staging-host -U postgres -Fc -d footdash -f /tmp/footdash-staging-pre
 
 # apply migrations
 DATABASE_URL=postgresql://<user>:<pass>@staging-host:5432/footdash \
-  npm --prefix backend-nest run migrate:run
+  npm --prefix backend run migrate:run
 ```
 
 4. Smoke tests on staging
@@ -44,7 +44,7 @@ pg_dump -h prod-host -U postgres -Fc -d footdash -f /tmp/footdash-prod-pre-migra
 
 # apply migrations
 DATABASE_URL=postgresql://postgres:<prod-password>@prod-host:5432/footdash \
-  npm --prefix backend-nest run migrate:run
+  npm --prefix backend run migrate:run
 ```
 
 8. Post-deploy verification
@@ -63,15 +63,15 @@ Commands to run locally (examples)
 ```bash
 # short dry-run
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash \
-  npm --prefix backend-nest run migrate:show
+  npm --prefix backend run migrate:show
 
 # full dry-run
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash \
-  npm --prefix backend-nest run migrate:show:full
+  npm --prefix backend run migrate:show:full
 
 # apply migrations
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash \
-  npm --prefix backend-nest run migrate:run
+  npm --prefix backend run migrate:run
 ```
 
 If you want, I can open the PR for this branch, or convert the checklist into a GitHub issue or project card. Let me know which you prefer.

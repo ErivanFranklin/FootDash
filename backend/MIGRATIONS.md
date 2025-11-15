@@ -1,6 +1,6 @@
 Migrations — dry-run & usage
 
-This repository contains TypeORM migrations in `backend-nest/migrations` and a small migration runner at `backend-nest/scripts/run-migrations.ts`.
+This repository contains TypeORM migrations in `backend/migrations` and a small migration runner at `backend/scripts/run-migrations.ts`.
 
 Dry-run (list pending migrations)
 
@@ -9,12 +9,12 @@ To safely list pending migrations without applying anything, run from the reposi
 ```bash
 # point DATABASE_URL at the DB you want to inspect
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash \
-  npm --prefix backend-nest run migrate:show
+  npm --prefix backend run migrate:show
 ```
 
 What it does
 
-- `migrate:show` is read-only and compares migration filenames in `backend-nest/migrations` with the rows recorded in the `migrations` table in the target database.
+- `migrate:show` is read-only and compares migration filenames in `backend/migrations` with the rows recorded in the `migrations` table in the target database.
 - It prints configured migration files, how many are already applied, and any pending migration filenames (in order).
 
 Apply migrations (when ready)
@@ -23,7 +23,7 @@ If you want to actually apply pending migrations (make sure you've backed up pro
 
 ```bash
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash \
-  npm --prefix backend-nest run migrate:run
+  npm --prefix backend run migrate:run
 ```
 
 Safety notes

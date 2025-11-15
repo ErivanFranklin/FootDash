@@ -1,4 +1,4 @@
-import { FootballApiAdapter } from '../../../backend-nest/src/football-api/football-api-adapter.interface';
+import { FootballApiAdapter } from '../../src/football-api/football-api-adapter.interface';
 
 export function createMockedFootballApi(): jest.Mocked<FootballApiAdapter> {
   return {

@@ -33,9 +33,9 @@ If you need to reference the legacy implementation:
 git checkout v1.0.0-legacy-backend
 
 # Compare with current implementation
-git diff v1.0.0-legacy-backend:backend/ main:backend-nest/
+git diff v1.0.0-legacy-backend:backend/ main:backend/
 ```
 
 ---
 
-For current development, see `backend-nest/` directory and the main project README.
+For current development, see `backend/` directory and the main project README.

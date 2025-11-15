@@ -8,7 +8,7 @@ This roadmap bridges the current lightweight Express + Ionic codebase to the lon
 
 | Area      | Original State (Archived) | Current State |
 |-----------|---------------------------|---------------|
-| Backend   | Single-file Express app (`archive/backend-legacy/index.js`), in-memory auth, flat folder | NestJS modules (`backend-nest/`) with auth, users, teams, matches, football-api, shared `common/`, TypeORM configs, structured tests |
+| Backend   | Single-file Express app (`archive/backend-legacy/index.js`), in-memory auth, flat folder | NestJS modules (`backend/`) with auth, users, teams, matches, football-api, shared `common/`, TypeORM configs, structured tests |
 | Frontend  | Ionic standalone pages (`home`, `login`) and services under `app/services` | Same structure, ready for Phase C modularisation into layered folders (`core`, `features`, `shared`) |
 | DevOps    | Colima-powered Postgres, local scripts | Full Docker stack, comprehensive docs in `docs/`, CI/CD workflows |
 | Docs      | Concept docs under `prompt/` | Dedicated `docs/` folder for architecture, operations, and API documentation |
@@ -40,7 +40,7 @@ This roadmap bridges the current lightweight Express + Ionic codebase to the lon
 **Status**: Completed January 2025. NestJS backend achieved full parity with legacy Express backend.
 
 **Completed Items**:
-1. ✅ **Scaffolded NestJS app** under `backend-nest/`
+1. ✅ **Scaffolded NestJS app** under `backend/`
    - Configured TypeORM with PostgreSQL support
    - Created module structure (`common`, `config`, `auth`, `users`, `teams`, `matches`, `football-api`)
 2. ✅ **Shared config + DTOs**
@@ -120,7 +120,7 @@ Each story should end with: tests updated, docs tweaked, and migration checklist
 | Risk | Mitigation | Status |
 |------|------------|--------|
 | Large big-bang rewrite | Keep Express running in parallel; port routes module-by-module | ✅ Successfully mitigated - parallel development completed |
-| Schema drift between Express and NestJS | Define shared TypeScript interfaces/DTOs in `backend-nest/src/common/dto` and maintain consistency | ✅ Successfully mitigated - shared DTOs maintained |
+| Schema drift between Express and NestJS | Define shared TypeScript interfaces/DTOs in `backend/src/common/dto` and maintain consistency | ✅ Successfully mitigated - shared DTOs maintained |
 | Frontend regressions during file moves | Lean on Cypress/Playwright smoke tests and Angular standalone component imports to quickly verify | 🔄 Ongoing for Phase C |
 | Deployment surprises | Maintain working Docker compose throughout; add staging environment before go-live | ✅ Docker compose maintained and functional |
 

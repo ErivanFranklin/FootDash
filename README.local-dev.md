@@ -21,7 +21,7 @@ node -v
 1) Start backend (NestJS, dev)
 ```bash
 # from project root
-cd /Users/erivansilva/Documents/FootDash/backend-nest
+cd /Users/erivansilva/Documents/FootDash/backend
 npm ci
 
 # copy the sample env if present or create one
@@ -76,7 +76,7 @@ npm run dev
 # npm start
 ```
 Notes:
-- This legacy backend runs on port `4000` by default. Prefer the NestJS backend (`backend-nest`) for new work.
+- This legacy backend runs on port `4000` by default. Prefer the NestJS backend (`backend`) for new work.
 
 2) Start frontend (dev server, live reload)
 ```bash

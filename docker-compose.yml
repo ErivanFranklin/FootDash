@@ -10,7 +10,7 @@ services:
       - "5432:5432"
 
   backend:
-    build: ./backend-nest
+    build: ./backend
     environment:
       - PORT=4000
       - DB_HOST=db
