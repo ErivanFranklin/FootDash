@@ -1,0 +1,141 @@
+// FootDash Theme Tokens
+// Define design tokens for consistent theming across the application
+
+// Color Palette
+:root {
+  // Primary Colors
+  --primary-color: #3880ff;
+  --primary-contrast: #ffffff;
+
+  // Secondary Colors
+  --secondary-color: #3dc2ff;
+  --secondary-contrast: #ffffff;
+
+  // Success Colors
+  --success-color: #2dd36f;
+  --success-contrast: #ffffff;
+
+  // Warning Colors
+  --warning-color: #ffc409;
+  --warning-contrast: #000000;
+
+  // Danger Colors
+  --danger-color: #eb445a;
+  --danger-contrast: #ffffff;
+
+  // Neutral Colors
+  --light-color: #f4f5f8;
+  --light-contrast: #000000;
+
+  --medium-color: #92949c;
+  --medium-contrast: #ffffff;
+
+  --dark-color: #222428;
+  --dark-contrast: #ffffff;
+
+  // Background Colors
+  --background-color: #ffffff;
+  --background-contrast: #000000;
+
+  --surface-color: #ffffff;
+  --surface-contrast: #000000;
+
+  // Text Colors
+  --text-color: #000000;
+  --text-contrast: #ffffff;
+
+  // Team-based Colors (Football Theme)
+  --team-primary: #3880ff;    // Arsenal Blue
+  --team-secondary: #e53e3e;  // Liverpool Red
+  --team-accent: #2dd36f;     // Chelsea Green
+  --team-neutral: #ffc409;    // Manchester Yellow
+
+  // Spacing Scale
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  // Border Radius
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+
+  // Shadows
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+  // Typography
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+}
+
+// Dark Theme Overrides
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #121212;
+    --background-contrast: #ffffff;
+
+    --surface-color: #1e1e1e;
+    --surface-contrast: #ffffff;
+
+    --text-color: #ffffff;
+    --text-contrast: #000000;
+
+    --light-color: #2c2c2c;
+    --light-contrast: #ffffff;
+
+    --medium-color: #6d6d6d;
+    --medium-contrast: #ffffff;
+
+    --dark-color: #f4f4f4;
+    --dark-contrast: #000000;
+  }
+}
+
+// Team-specific theme overrides (can be applied dynamically)
+.team-arsenal {
+  --primary-color: #db0007;
+  --team-primary: #db0007;
+}
+
+.team-liverpool {
+  --primary-color: #c8102e;
+  --team-primary: #c8102e;
+}
+
+.team-manchester-united {
+  --primary-color: #da291c;
+  --team-primary: #da291c;
+}
+
+.team-manchester-city {
+  --primary-color: #6cabdd;
+  --team-primary: #6cabdd;
+}
+
+.team-chelsea {
+  --primary-color: #034694;
+  --team-primary: #034694;
+}
+
+.team-tottenham {
+  --primary-color: #132257;
+  --team-primary: #132257;
+}
