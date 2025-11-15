@@ -1,52 +1,72 @@
-# FootDash (Scaffold)
+# FootDash
 
 [![Backend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
 [![Frontend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
 
-This repository contains initial scaffold for the Football Dashboard project.
+A football dashboard application providing real-time match data, team statistics, and user authentication.
 
-Services
+## Services
 
-- backend: Minimal Express API with JWT auth scaffold. Run with `node backend/index.js`.
-- frontend: Static example at `frontend/index.html` demonstrating login and protected API calls.
-- docker-compose.yml: Local dev composition to run backend, frontend (nginx), and a Postgres DB.
+- **backend-nest/**: NestJS backend API with JWT authentication, match/team data, and Swagger documentation
+- **frontend/**: Ionic/Angular frontend (currently static scaffold)
+- **docker-compose.yml**: Local development composition with backend, frontend (nginx), and PostgreSQL database
 
-Quick start (local, without Docker)
+> **Note**: The legacy Express backend has been archived to `archive/backend-legacy/` after Phase B completion. See tag `v1.0.0-legacy-backend` for the last version with both backends.
 
-1. Backend
+## Quick Start (Local Development)
+
+### Backend (NestJS)
 
 ```bash
-cd backend
+cd backend-nest
 npm install
-npm run start
+npm run start:dev
 ```
 
-2. Frontend
+The API will be available at http://localhost:3000
 
-Open `frontend/index.html` in a browser. It will call the backend at port 4000 by default.
+### Frontend
 
-Docker
+Open `frontend/index.html` in a browser or serve via a local HTTP server.
+
+### Docker
 
 ```bash
 docker-compose up --build
 ```
 
-CI / Troubleshooting
+## API Documentation
 
-We added CI workflows for backend and frontend under `.github/workflows/`. For troubleshooting and local reproduction steps, see `.github/CI-README.md`.
+When the NestJS backend is running locally:
 
+- **Swagger UI**: http://localhost:3000/api
+- **OpenAPI JSON**: http://localhost:3000/api-json
 
----
+## Configuration
 
-## Local development notes (backend)
+The NestJS backend supports:
 
-The Nest backend supports a mock mode and a default-league fallback to make local development easier:
+- **FOOTBALL_API_MOCK** (boolean): Set to `true` for mock Football API responses (no external credentials needed)
+- **FOOTBALL_API_DEFAULT_LEAGUE** (number|string): Default league ID when omitted from requests
 
-- FOOTBALL_API_MOCK (boolean): set to `true` to enable mock responses from the Football API adapter so you can run the app without external API credentials.
-- FOOTBALL_API_DEFAULT_LEAGUE (number|string): optional default league id used when `leagueId` is omitted from team-stat requests. Strings will be coerced to numbers when possible.
+See `backend-nest/README.md` for full configuration options.
 
-Swagger / OpenAPI for the backend (when running locally) is available at:
+## CI / Testing
 
-- HTML UI: http://localhost:3000/api
-- OpenAPI JSON: http://localhost:3000/api-json
+CI workflows for backend and frontend are in `.github/workflows/`. For troubleshooting and local reproduction, see `.github/CI-README.md`.
+
+## Documentation
+
+- **Architecture & Planning**: See `docs/` for technical architecture, API endpoints, and migration roadmap
+- **Development Setup**: See `README.local-dev.md` for detailed local development instructions
+- **Migrations**: See `backend-nest/MIGRATIONS.md` for database migration guide
+- **Archive**: See `archive/` for historical reference to previous implementations
+
+## Project Status
+
+- ✅ **Phase A**: Angular/Ionic frontend scaffold - Complete
+- ✅ **Phase B**: NestJS backend with full feature parity - Complete
+- 🔄 **Phase C**: Frontend modularization - In Progress
+
+For detailed roadmap, see `docs/migration-roadmap.md`.
 
