@@ -13,6 +13,7 @@ import {
   FootballTeamInfo,
   FootballTeamStats,
 } from './football-api.interface';
+import { FootballApiAdapter } from './football-api-adapter.interface';
 import {
   normalizeTeamInfo,
   normalizeFixtures,
@@ -36,7 +37,7 @@ interface TeamFixturesParams {
 }
 
 @Injectable()
-export class FootballApiService {
+export class FootballApiService implements FootballApiAdapter {
   private readonly logger = new Logger(FootballApiService.name);
   private readonly isConfigured: boolean;
   private readonly mock: boolean;
@@ -49,6 +50,14 @@ export class FootballApiService {
     const apiUrl = this.config.get<string>('FOOTBALL_API_URL');
     this.isConfigured = Boolean(apiKey && apiUrl);
     this.mock = this.config.get<boolean>('FOOTBALL_API_MOCK', false);
+  }
+
+  /**
+   * Public accessor to check whether the service is running in mock mode.
+   * Useful so other services do not need to reach into private fields.
+   */
+  public isMockMode(): boolean {
+    return this.mock === true;
   }
 
   async getTeamInfo(teamId: number) {

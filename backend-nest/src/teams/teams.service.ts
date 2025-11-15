@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { FootballApiService } from '../football-api/football-api.service';
+import { ConfigService } from '@nestjs/config';
 import { TeamMatchesQueryDto } from './dto/team-matches-query.dto';
 import { TeamStatsQueryDto } from './dto/team-stats-query.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +14,7 @@ export class TeamsService {
     private readonly footballApi: FootballApiService,
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+    @Optional() private readonly config?: ConfigService,
   ) {}
 
   getTeamOverview(teamId: number) {
@@ -20,15 +22,40 @@ export class TeamsService {
   }
 
   getTeamStats(teamId: number, query: TeamStatsQueryDto) {
-    if (!query.leagueId || !query.season) {
-      throw new BadRequestException(
-        'leagueId and season query parameters are required for team stats',
-      );
+    // Read default league from config (env vars may be strings or numbers)
+    const defaultLeagueRaw = this.config?.get<string | number>(
+      'FOOTBALL_API_DEFAULT_LEAGUE',
+    );
+    const defaultLeague =
+      typeof defaultLeagueRaw === 'string'
+        ? Number(defaultLeagueRaw) || undefined
+        : (defaultLeagueRaw as number | undefined);
+
+    const leagueId = query.leagueId ?? defaultLeague;
+
+    // If still no leagueId or missing season, allow call only when running in mock mode; otherwise reject
+    // Prefer using the FootballApiService public API when available.
+    const isMock =
+      typeof (this.footballApi as any).isMockMode === 'function'
+        ? (this.footballApi as any).isMockMode()
+        : false;
+
+    if ((!leagueId && !isMock) || !query.season) {
+      // Require both leagueId and season in non-mock mode
+      if (!isMock) {
+        throw new BadRequestException(
+          'leagueId and season query parameters are required for team stats',
+        );
+      }
     }
 
+    // Final numeric league to send to the Football API. If not provided, and mock mode
+    // is enabled, fall back to 999 (a harmless dummy id) so mock responses work.
+    const finalLeague = Number(leagueId ?? 999);
+
     return this.footballApi.getTeamStats({
-      leagueId: query.leagueId,
-      season: query.season,
+      leagueId: finalLeague,
+      season: query.season as number,
       teamId,
     });
   }

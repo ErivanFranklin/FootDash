@@ -40,6 +40,25 @@ Notes:
 - Swagger UI: http://localhost:3000/api (OpenAPI JSON at /api-json)
 - Health check: http://localhost:3000/health
 - If you see a 503 from team endpoints without real API creds, enable FOOTBALL_API_MOCK=true.
+
+Football API configuration (dev)
+- FOOTBALL_API_MOCK (boolean) — when true the backend will return deterministic mock data for team info, fixtures and stats so you can develop without real API credentials. Set in `.env`:
+
+```ini
+FOOTBALL_API_MOCK=true
+```
+
+- FOOTBALL_API_DEFAULT_LEAGUE (integer, optional) — when provided the server will use this league id as a default for endpoints that normally require `leagueId` (for example `GET /teams/:teamId/stats`). This lets clients omit `leagueId` in local workflows. Example:
+
+```ini
+FOOTBALL_API_DEFAULT_LEAGUE=999
+```
+
+Behavior summary:
+- If `leagueId` is provided in the request it is used.
+- If `leagueId` is omitted but `FOOTBALL_API_DEFAULT_LEAGUE` is set, the server will use that value.
+- If neither is provided and `FOOTBALL_API_MOCK=true` the endpoint will still respond (mock ignores these params).
+- If neither is provided and the server is not in mock mode, the endpoint will return HTTP 400.
 - DB: For local DB via Colima, run `./scripts/start-db.sh` from project root first.
 
 1a) Start legacy backend (if needed)

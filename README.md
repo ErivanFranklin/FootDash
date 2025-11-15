@@ -35,3 +35,18 @@ CI / Troubleshooting
 
 We added CI workflows for backend and frontend under `.github/workflows/`. For troubleshooting and local reproduction steps, see `.github/CI-README.md`.
 
+
+---
+
+## Local development notes (backend)
+
+The Nest backend supports a mock mode and a default-league fallback to make local development easier:
+
+- FOOTBALL_API_MOCK (boolean): set to `true` to enable mock responses from the Football API adapter so you can run the app without external API credentials.
+- FOOTBALL_API_DEFAULT_LEAGUE (number|string): optional default league id used when `leagueId` is omitted from team-stat requests. Strings will be coerced to numbers when possible.
+
+Swagger / OpenAPI for the backend (when running locally) is available at:
+
+- HTML UI: http://localhost:3000/api
+- OpenAPI JSON: http://localhost:3000/api-json
+

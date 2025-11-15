@@ -100,3 +100,18 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 
+## Local development notes
+
+This backend provides a small adapter to an external Football API and supports a mock mode for local development.
+
+- FOOTBALL_API_MOCK (boolean): when set to `true` the Football API adapter returns deterministic mock data so you can develop and test without external API credentials.
+- FOOTBALL_API_DEFAULT_LEAGUE (number|string): optional default league id used by endpoints that normally require a `leagueId` query parameter. The service accepts this value as a number or a string (it will coerce strings to numbers when possible).
+
+Swagger / OpenAPI docs are available at:
+
+- HTML UI: http://localhost:3000/api
+- OpenAPI JSON: http://localhost:3000/api-json
+
+When running locally in mock mode you can omit `leagueId` for team stats endpoints; the server will use `FOOTBALL_API_DEFAULT_LEAGUE` if provided, or fall back to a dummy id when mock mode is enabled.
+
+
