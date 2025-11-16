@@ -12,7 +12,7 @@ Local preview (disposable DB):
 docker run --name footdash-migrate -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=footdash -p 32768:5432 -d postgres:15
 
 # Run preview (uses scripts/run-migrations)
-cd backend-nest
+cd backend
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:32768/footdash npm run migrate:show
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:32768/footdash npm run migrate:show:full
 
@@ -30,7 +30,7 @@ CI preview
 4. Apply migrations:
 
 ```bash
-cd backend-nest
+cd backend
 DATABASE_URL=postgresql://postgres:postgres@prod-host:5432/footdash npm run migrate:run
 ```
 
@@ -48,7 +48,7 @@ DATABASE_URL=postgresql://postgres:postgres@prod-host:5432/footdash npm run migr
 npx typeorm migration:generate -n CreateSomething
 ```
 
-Or create a manual migration in `backend-nest/migrations` following existing file patterns.
+Or create a manual migration in `backend/migrations` following existing file patterns.
 
 ## Rollback Strategy & Procedures
 
@@ -56,7 +56,7 @@ Or create a manual migration in `backend-nest/migrations` following existing fil
 
 #### TypeORM Migration Revert
 ```bash
-cd backend-nest
+cd backend
 # Revert last migration
 npm run migrate:revert
 
@@ -142,7 +142,7 @@ kubectl delete deployment footdash-green
 #### Complete Database Restore
 1. **Stop Application**: Prevent new data corruption
    ```bash
-   docker-compose stop backend-nest
+   docker-compose stop backend
    ```
 
 2. **Identify Recovery Point**: Choose appropriate backup
@@ -172,7 +172,7 @@ kubectl delete deployment footdash-green
 
 5. **Restart Application**: Bring services back online
    ```bash
-   docker-compose start backend-nest
+   docker-compose start backend
    ```
 
 #### Partial Data Recovery
@@ -266,6 +266,6 @@ Add to CI pipeline:
 - Key endpoints (auth, teams, matches) return expected responses
 
 ## Notes & links
-- Migration scripts: `backend-nest/scripts/run-migrations.ts`
-- Migrations directory: `backend-nest/migrations`
+- Migration scripts: `backend/scripts/run-migrations.ts`
+- Migrations directory: `backend/migrations`
 - CI job: `.github/workflows/backend-ci.yml` -> job `migration-dry-run`

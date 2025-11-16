@@ -180,13 +180,13 @@ gunzip -c backup.sql.gz | psql -h localhost -U postgres -d footdash_restore
 #### Docker-based Restore
 ```bash
 # Stop application containers
-docker-compose stop backend-nest
+docker-compose stop backend
 
 # Restore database
 docker exec -i footdash-db psql -U postgres -d footdash < backup.sql
 
 # Restart application
-docker-compose start backend-nest
+docker-compose start backend
 ```
 
 ### Point-in-Time Recovery

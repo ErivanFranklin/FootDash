@@ -5,9 +5,9 @@
   "scripts": {
     "start:dev": "npm run start:dev:db && npm run start:dev:api",
     "start:dev:db": "bash ./scripts/start-db.sh",
-    "start:dev:api": "npm run start:dev --prefix backend-nest",
-    "start:api": "npm run start --prefix backend-nest",
-    "build:api": "npm run build --prefix backend-nest",
+    "start:dev:api": "npm run start:dev --prefix backend",
+    "start:api": "npm run start --prefix backend",
+    "build:api": "npm run build --prefix backend",
     "open:swagger": "node -e \"require('child_process').exec('open http://localhost:3000/api')\""
   }
 }

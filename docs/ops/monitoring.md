@@ -67,7 +67,7 @@ SELECT count(*) FROM matches;
 ```yaml
 # In docker-compose.yml
 services:
-  backend-nest:
+  backend:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s

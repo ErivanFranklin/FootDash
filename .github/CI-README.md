@@ -16,7 +16,7 @@ Both workflows run on pushes to `main` and branches matching `migration/**`, and
     ```
   - Run migrations:
     ```bash
-    cd backend-nest
+    cd backend
     npm install
     npm run migrate:run
     npm test
@@ -49,7 +49,7 @@ From repo root:
 docker compose -f scripts/ci/docker-compose.ci.yml up --build
 
 # open a shell into the CI container (named <project>_ci_1 by compose) or run commands directly
-docker compose -f scripts/ci/docker-compose.ci.yml exec ci bash -lc "cd backend-nest && npm ci && npm run migrate:run && npm test"
+docker compose -f scripts/ci/docker-compose.ci.yml exec ci bash -lc "cd backend && npm ci && npm run migrate:run && npm test"
 
 # or run frontend from the CI container
 docker compose -f scripts/ci/docker-compose.ci.yml exec ci bash -lc "cd frontend && npm ci && npm run lint && npm test -- --watch=false && npm run build"
@@ -79,7 +79,7 @@ Symptoms:
 
 Fixes:
 1. The workflow uses a Postgres service container and waits for it to be ready using `pg_isready`. If the health check fails, extend the wait loop in the workflow or increase service health retries.
-2. Check `backend-nest/data-source.ts` — CI runs migrations using env vars set in the workflow. Ensure `DATABASE_URL` or `DB_*` env vars match the workflow values.
+2. Check `backend/data-source.ts` — CI runs migrations using env vars set in the workflow. Ensure `DATABASE_URL` or `DB_*` env vars match the workflow values.
 
 ### Migrations not applied
 - Ensure `npm ci` runs successfully and `ts-node` is available (it's in devDependencies). The workflow runs `npm run migrate:run` which executes `scripts/run-migrations.ts` using ts-node register.
@@ -88,14 +88,14 @@ Fixes:
 ## Useful local troubleshooting commands
 - Run only backend tests:
 ```bash
-cd backend-nest
+cd backend
 npm ci
 npm run test
 ```
 
 - Run migrations locally against docker Postgres:
 ```bash
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash npm run migrate:run --prefix backend-nest
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash npm run migrate:run --prefix backend
 ```
 
 - Run frontend tests headless locally (ensure Chrome installed):
