@@ -66,7 +66,7 @@ CI workflows for backend and frontend are in `.github/workflows/`. For troublesh
 
 - ✅ **Phase A**: Angular/Ionic frontend scaffold - Complete
 - ✅ **Phase B**: NestJS backend with full feature parity - Complete
-- 🔄 **Phase C**: Frontend modularization - In Progress
+- ✅ **Phase C**: Frontend modularization - Complete
 
-For detailed roadmap, see `docs/migration-roadmap.md`.
+For detailed roadmap, see `docs/migration-roadmap.md` and the Phase E checklist at `docs/phase-e-checklist.md`.
 
