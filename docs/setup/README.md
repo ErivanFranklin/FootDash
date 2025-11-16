@@ -14,7 +14,7 @@ This document explains how to get a local development environment running for th
 - Git
 
 ## Environment variables
-Create a `.env` file in `backend-nest/` with at least these entries (example values):
+Create a `.env` file in `backend/` with at least these entries (example values):
 
 ```
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/footdash
@@ -48,7 +48,7 @@ docker rm -f footdash-dev
 ## Install & run backend (dev)
 
 ```bash
-cd backend-nest
+cd backend
 npm ci
 # copy .env or set DATABASE_URL env var
 npm run start:dev   # or `npm run start` depending on script
@@ -64,10 +64,10 @@ npm run start
 ```
 
 ## Database seeding (dev)
-- A simple seeder script exists at `backend-nest/scripts/seed-dev.ts` (if present). Run with ts-node or via `npm` scripts:
+- A simple seeder script exists at `backend/scripts/seed-dev.ts` (if present). Run with ts-node or via `npm` scripts:
 
 ```bash
-cd backend-nest
+cd backend
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/footdash npm run seed:dev
 ```
 
