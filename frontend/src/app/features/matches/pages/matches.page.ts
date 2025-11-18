@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
@@ -12,7 +12,7 @@ import { PageHeaderComponent, MatchCardComponent, FormSectionComponent } from '.
   standalone: true,
   templateUrl: './matches.page.html',
   styleUrls: ['./matches.page.scss'],
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner, PageHeaderComponent, MatchCardComponent, FormSectionComponent]
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, PageHeaderComponent, MatchCardComponent, FormSectionComponent]
 })
 export class MatchesPage implements OnInit {
   private route = inject(ActivatedRoute);
