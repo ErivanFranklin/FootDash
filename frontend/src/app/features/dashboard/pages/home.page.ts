@@ -3,12 +3,13 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
+import { PageHeaderComponent, MatchCardComponent, FormSectionComponent, StatCardComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, FormsModule],
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, FormsModule, PageHeaderComponent, MatchCardComponent, FormSectionComponent, StatCardComponent],
 })
 export class HomePage {
   private api = inject(ApiService);

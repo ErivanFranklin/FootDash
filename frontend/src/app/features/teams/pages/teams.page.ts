@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonList, IonItem, IonLabel, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
+import { PageHeaderComponent, TeamCardComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-teams',
   standalone: true,
   templateUrl: './teams.page.html',
   styleUrls: ['./teams.page.scss'],
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonList, IonItem, IonLabel, IonSpinner]
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonList, IonItem, IonLabel, IonSpinner, PageHeaderComponent, TeamCardComponent]
 })
 export class TeamsPage implements OnInit {
   private api = inject(ApiService);

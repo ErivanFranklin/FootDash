@@ -1,10 +1,5 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      FootDash
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-page-header title="FootDash">
+</app-page-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
@@ -14,10 +9,28 @@
   </ion-header>
 
   <div id="container" style="padding: 12px;">
-    <ion-button (click)="pingBackend()" size="small">Ping API</ion-button>
-    <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <app-stat-card
+        label="Fixtures Loaded"
+        [value]="fixtures.length"
+        icon="football"
+        variant="primary">
+      </app-stat-card>
+      <app-stat-card
+        label="API Status"
+        [value]="pingResult ? 'Connected' : 'Not Tested'"
+        icon="cloud-done"
+        variant="success">
+      </app-stat-card>
+    </div>
 
-    <div style="margin-top: 12px;">
+    <app-form-section title="API Testing">
+      <ion-button (click)="pingBackend()" size="small">Ping API</ion-button>
+      <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+    </app-form-section>
+
+    <app-form-section title="Match Parameters">
       <ion-item>
         <ion-label position="stacked">Team ID</ion-label>
         <ion-input type="number" [(ngModel)]="teamId"></ion-input>
@@ -35,21 +48,21 @@
         <ion-input [(ngModel)]="range" placeholder="recent|upcoming|all"></ion-input>
       </ion-item>
       <ion-button (click)="fetchMatches()" expand="block" style="margin-top: 12px;">Fetch Matches</ion-button>
-    </div>
+    </app-form-section>
 
-    <ion-list style="margin-top: 16px;">
-      <ion-item lines="full"><ion-label>Ping Result</ion-label></ion-item>
-      <pre style="white-space: pre-wrap;">{{ pingResult | json }}</pre>
-    </ion-list>
+    <app-form-section title="API Results">
+      <ion-list>
+        <ion-item lines="full"><ion-label>Ping Result</ion-label></ion-item>
+        <pre style="white-space: pre-wrap;">{{ pingResult | json }}</pre>
+      </ion-list>
+    </app-form-section>
 
-    <ion-list style="margin-top: 16px;">
-      <ion-item lines="full"><ion-label>Fixtures ({{ fixtures.length || 0 }})</ion-label></ion-item>
+    <app-form-section title="Fixtures ({{ fixtures.length || 0 }})">
       <div *ngIf="!fixtures.length" style="padding: 8px; color: var(--ion-color-medium);">No fixtures loaded yet.</div>
-      <div *ngFor="let m of fixtures" style="padding: 8px; border-bottom: 1px solid var(--ion-color-step-150);">
-        <div><strong>{{ m?.homeTeam?.name || m?.home?.name || m?.homeTeamName }}</strong> vs <strong>{{ m?.awayTeam?.name || m?.away?.name || m?.awayTeamName }}</strong></div>
-        <div>{{ (m?.kickOff || m?.date || m?.fixtureDate) | date:'medium' }}</div>
-        <div>Status: {{ m?.status }}</div>
-      </div>
-    </ion-list>
+      <app-match-card
+        *ngFor="let match of fixtures"
+        [match]="match">
+      </app-match-card>
+    </app-form-section>
   </div>
 </ion-content>
