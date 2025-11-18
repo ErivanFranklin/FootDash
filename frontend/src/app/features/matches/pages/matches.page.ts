@@ -5,13 +5,14 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, Io
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
+import { PageHeaderComponent, MatchCardComponent, FormSectionComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-matches',
   standalone: true,
   templateUrl: './matches.page.html',
   styleUrls: ['./matches.page.scss'],
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner]
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner, PageHeaderComponent, MatchCardComponent, FormSectionComponent]
 })
 export class MatchesPage implements OnInit {
   private route = inject(ActivatedRoute);
