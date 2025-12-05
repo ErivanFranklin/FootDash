@@ -1,0 +1,8 @@
+<app-page-header title="Match Details" />
+
+<ion-content>
+  <div *ngIf="match$ | async as match">
+    <!-- Display match details here -->
+    <pre>{{ match | json }}</pre>
+  </div>
+</ion-content>

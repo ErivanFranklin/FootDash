@@ -1,5 +1,3 @@
-
-
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -17,6 +15,11 @@ export const routes: Routes = [
   {
     path: 'matches/:teamId',
     loadComponent: () => import('./features/matches/pages/matches.page').then((m) => m.MatchesPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'match/:matchId',
+    loadComponent: () => import('./features/matches/pages/match-details.page').then(m => m.MatchDetailsPage),
     canActivate: [authGuard],
   },
   {

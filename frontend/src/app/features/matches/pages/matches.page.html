@@ -34,9 +34,10 @@
   <div style="padding: 12px;" *ngIf="loading">Loading fixtures…</div>
 
   <div style="padding: 12px;">
-    <app-match-card
-      *ngFor="let match of fixtures"
-      [match]="match">
-    </app-match-card>
+    <a *ngFor="let match of fixtures" [routerLink]="['/match', match.fixture.id]">
+      <app-match-card
+        [match]="match">
+      </app-match-card>
+    </a>
   </div>
 </ion-content>
