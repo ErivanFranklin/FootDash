@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -105,7 +112,9 @@ export class AuthController {
     type: ProfileDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Request() req: { user: { id: number } }): Promise<ProfileDto> {
+  async getProfile(
+    @Request() req: { user: { id: number } },
+  ): Promise<ProfileDto> {
     return this.authService.getProfile(req.user.id);
   }
 }
