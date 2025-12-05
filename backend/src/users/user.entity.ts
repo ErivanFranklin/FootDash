@@ -10,10 +10,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email: string;
 
-  @Column()
+  @Column({ name: 'password_hash', nullable: true })
   passwordHash: string;
 
   @CreateDateColumn()

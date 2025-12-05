@@ -110,11 +110,28 @@ This roadmap bridges the current lightweight Express + Ionic codebase to the lon
 - ✅ Published comprehensive documentation in `docs/`
 - ✅ Docker compose working for full stack (backend, frontend, database)
 
-### Phase E – Cleanup & Enhancements
+### Phase E – Cleanup & Enhancements 🔄 IN PROGRESS
 
-- Remove deprecated Express files.
-- Update READMEs (root + per project) to reflect new commands.
-- Capture lessons learned for future phases (e.g., notifications, analytics).
+**Database Migration Status**: ✅ COMPLETE (December 2025)
+- ✅ Database migrations system operational
+- ✅ Two migrations applied successfully:
+  - `CreateUsersTable1680000000000`
+  - `AddMatchMetadata1690001000000`
+- ✅ Migration scripts and helpers created
+- ✅ Dev seed data working
+- ✅ All unit and e2e tests passing (27 tests total)
+
+**Migration System Improvements**:
+- Fixed race condition in `AuthService.createTokens()` that caused Postgres e2e test failures
+- Added column name mapping for `User` entity (`passwordHash` → `password_hash`)
+- Disabled runtime schema sync in production (`DatabaseModule`)
+- Created helper scripts for migration troubleshooting
+
+**Remaining Items**:
+- Remove deprecated Express files
+- Update READMEs (root + per project) to reflect new commands
+- Capture lessons learned for future phases (e.g., notifications, analytics)
+- Consider creating migration for adding NOT NULL constraints properly (currently entities use nullable for test compatibility)
 
 ---
 
