@@ -6,16 +6,17 @@ import { CommonModule } from '@angular/common';
   selector: 'app-stat-card',
   standalone: true,
   template: `
-    <ion-card class="stat-card" [class]="variant">
+    <ion-card class="stat-card" [class]="variant" role="group" [attr.aria-label]="ariaLabel || label">
       <ion-card-content>
         <div class="stat-content">
-          <div class="stat-icon" *ngIf="icon">
+          <div class="stat-icon" *ngIf="icon" aria-hidden="true">
             <ion-icon [name]="icon"></ion-icon>
           </div>
           <div class="stat-info">
-            <div class="stat-value">{{ value }}</div>
+            <div class="stat-value" [attr.aria-label]="valueAriaLabel || (label + ' value')">{{ value }}</div>
             <div class="stat-label">{{ label }}</div>
-            <div class="stat-change" *ngIf="change !== undefined">
+            <div class="stat-subtitle" *ngIf="subtitle">{{ subtitle }}</div>
+            <div class="stat-change" *ngIf="change !== undefined" aria-live="polite">
               <ion-icon [name]="changeIcon"></ion-icon>
               <span>{{ changeText }}</span>
             </div>
@@ -103,9 +104,12 @@ import { CommonModule } from '@angular/common';
 export class StatCardComponent {
   @Input() label: string = '';
   @Input() value: string | number = '';
+  @Input() subtitle?: string;
   @Input() icon?: string;
   @Input() variant: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | '' = '';
   @Input() change?: number;
+  @Input() ariaLabel?: string;
+  @Input() valueAriaLabel?: string;
 
   get changeIcon(): string {
     if (this.change === undefined) return '';
