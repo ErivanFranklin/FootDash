@@ -16,7 +16,7 @@ This document contains low-risk, high-value cleanup and enhancement tasks to fin
 
 2. Audit and remove deprecated files (manual review)
    - Confirm `archive/backend-legacy/` should be preserved (do not delete)
-   - Remove any leftover `backend-nest` references and any other stale files not needed.
+   - Remove any other stale files or references not needed.
 
 3. Sass migration (low-risk first pass)
    - Replace `@import` uses with `@use` where practical for our token files (e.g. `@use 'src/theme/_tokens' as tokens;`).

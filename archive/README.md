@@ -8,7 +8,7 @@ The original Express.js backend implementation, archived after Phase B completio
 
 - **Archive Date**: January 2025
 - **Last Working Version**: See tag `v1.0.0-legacy-backend`
-- **Reason for Archive**: Fully replaced by the NestJS backend (`backend-nest/`)
+- **Reason for Archive**: Fully replaced by the NestJS backend (`backend/`)
 - **Status**: No longer maintained, kept for historical reference
 
 ### Key Features (Historical)

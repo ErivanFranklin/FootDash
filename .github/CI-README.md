@@ -14,18 +14,13 @@ Both workflows run on pushes to `main` and branches matching `migration/**`, and
     ```bash
     docker compose -f docker-compose.postgres.yml up -d
     ```
-  - Run migrations:
+  - Run migrations and tests:
     ```bash
     cd backend
     npm install
     npm run migrate:run
     npm test
-    ```
-  - Express smoke tests (no DB required):
-    ```bash
-    cd backend
-    npm ci
-    npm test
+    npm run test:e2e
     ```
 
 - Frontend:

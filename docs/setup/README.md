@@ -71,13 +71,13 @@ cd backend
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/footdash npm run seed:dev
 ```
 
-If the project has no seeder, run SQL fixtures in `backend-nest/migrations` or create a minimal seed that inserts a test user and sample teams.
+If the project has no seeder, run SQL fixtures in `backend/migrations` or create a minimal seed that inserts a test user and sample teams.
 
 ## Running migrations locally (preview then apply)
 - Preview:
 
 ```bash
-cd backend-nest
+cd backend
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/footdash npm run migrate:show
 ```
 
@@ -88,12 +88,12 @@ DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/footdash npm run migr
 ```
 
 ## Tests
-- Backend unit tests: `cd backend-nest && npm test`
+- Backend unit tests: `cd backend && npm test`
 - Frontend tests: `cd frontend && npm test`
 
 ## Troubleshooting
 - If Postgres ports are in use, map to a different host port and update `DATABASE_URL` accordingly.
-- If `npm ci` fails on CI or locally, inspect `backend-nest/test-results/npm-ci*.log` (CI) or run `npm install` locally as fallback.
+- If `npm ci` fails on CI or locally, inspect `backend/test-results/npm-ci*.log` (CI) or run `npm install` locally as fallback.
 
 ---
 This document is a minimal onboarding guide. For production deployment and secrets management see `docs/ops/migrations-and-deployments.md`.
