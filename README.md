@@ -15,25 +15,58 @@ A football dashboard application providing real-time match data, team statistics
 
 ## Quick Start (Local Development)
 
-### Backend (NestJS)
+### Prerequisites
 
+- Node.js v18+ (or use the provided Docker setup)
+- PostgreSQL (or use Docker)
+- npm or yarn
+
+### Option 1: Docker (Recommended)
+
+```bash
+# Start all services (backend, frontend, database)
+docker-compose up --build
+```
+
+- Backend API: http://localhost:3000
+- Frontend: http://localhost:4200
+- Swagger Docs: http://localhost:3000/api
+
+### Option 2: Local Development
+
+**1. Start PostgreSQL**
+```bash
+# Using Docker for database only
+docker-compose -f docker-compose.db.yml up -d
+
+# Or use local PostgreSQL instance (ensure DB 'footdash' exists)
+```
+
+**2. Backend Setup**
 ```bash
 cd backend
 npm install
+
+# Run migrations
+npm run migrate:run
+
+# Seed dev data (optional)
+npm run seed:dev
+
+# Start development server
 npm run start:dev
 ```
 
-The API will be available at http://localhost:3000
+Backend will be available at http://localhost:3000
 
-### Frontend
-
-Open `frontend/index.html` in a browser or serve via a local HTTP server.
-
-### Docker
-
+**3. Frontend Setup**
 ```bash
-docker-compose up --build
+cd frontend
+npm install
+npm start
 ```
+
+Frontend will be available at http://localhost:4200
 
 ## API Documentation
 
@@ -67,6 +100,11 @@ CI workflows for backend and frontend are in `.github/workflows/`. For troublesh
 - ✅ **Phase A**: Angular/Ionic frontend scaffold - Complete
 - ✅ **Phase B**: NestJS backend with full feature parity - Complete
 - ✅ **Phase C**: Frontend modularization - Complete
+- ✅ **Phase D**: DevOps consolidation - Complete
+- 🔄 **Phase E**: Cleanup & Enhancements - In Progress
+  - ✅ Database migrations system operational
+  - ✅ Frontend proxy configuration fixed
+  - 🔄 README updates and documentation improvements
 
 For detailed roadmap, see `docs/migration-roadmap.md` and the Phase E checklist at `docs/phase-e-checklist.md`.
 

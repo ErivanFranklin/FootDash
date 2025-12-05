@@ -1,103 +1,142 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-For migration usage and a safe dry-run command, see MIGRATIONS.md in this folder.
+# FootDash Backend (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+[![Backend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+NestJS-based REST API providing authentication, team data, match information, and integration with football-data.org API.
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- 🔐 **JWT Authentication** - Secure user registration, login, and token refresh
+- ⚽ **Teams Module** - Team information and statistics from external APIs
+- 📊 **Matches Module** - Match data with metadata (referee, venue, league)
+- 🗄️ **TypeORM** - Database migrations and entity management
+- 📝 **Swagger/OpenAPI** - Interactive API documentation
+- 🧪 **Comprehensive Testing** - Unit and e2e tests with PostgreSQL
+- 🐳 **Docker Ready** - Containerized setup for development and production
 
-## Project setup
+## Prerequisites
+
+- Node.js v18+
+- PostgreSQL 14+ (or use Docker)
+- npm or yarn
+
+## Project Setup
 
 ```bash
-$ npm install
+# Install dependencies
+npm install
+
+# Configure environment (copy and edit)
+cp .env.example .env
 ```
 
-## Compile and run the project
+### Environment Variables
+
+Key variables (see `.env.example` for full list):
+
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - PostgreSQL connection
+- `JWT_SECRET` - Secret for JWT token signing
+- `JWT_ACCESS_EXPIRY`, `JWT_REFRESH_EXPIRY` - Token expiration times
+- `FOOTBALL_API_KEY` - Optional API key for football-data.org
+- `FOOTBALL_API_MOCK=true` - Use mock data (no external API required)
+
+## Database Setup
 
 ```bash
-# development
-$ npm run start
+# Run migrations
+npm run migrate:run
 
-# watch mode
-$ npm run start:dev
+# Check migration status
+npm run migrate:show
 
-# production mode
-$ npm run start:prod
+# Seed development data
+npm run seed:dev
 ```
 
-## Run tests
+For detailed migration usage, see `MIGRATIONS.md`.
+
+## Development
 
 ```bash
-# unit tests
-$ npm run test
+# Start development server with hot-reload
+npm run start:dev
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Start in production mode
+npm run start:prod
 ```
 
-## Deployment
+API will be available at http://localhost:3000
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### API Documentation
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- **Swagger UI**: http://localhost:3000/api
+- **OpenAPI JSON**: http://localhost:3000/api-json
+
+## Testing
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+# Run unit tests
+npm test
+
+# Run unit tests in watch mode
+npm run test:watch
+
+# Run e2e tests (requires PostgreSQL)
+npm run test:e2e
+
+# Run specific e2e test file
+npm run test:e2e -- auth.postgres.e2e-spec.ts
+
+# Test coverage
+npm run test:cov
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Test Database
 
-## Resources
+E2e tests use a separate test database configured via environment variables:
+- Uses `DB_NAME_TEST` or defaults to `footdash_test`
+- Automatically runs migrations before tests
+- Cleans up data between test suites
 
-Check out a few resources that may come in handy when working with NestJS:
+## Module Structure
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```
+backend/src/
+├── auth/          # JWT authentication, guards, strategies
+├── users/         # User entity and service
+├── teams/         # Team data from external API
+├── matches/       # Match data with metadata
+├── football-api/  # Football-data.org API integration
+├── db/            # Database configuration
+└── common/        # Shared utilities and constants
+```
 
-## Support
+## Available Scripts
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Command | Description |
+|---------|-------------|
+| `npm run start:dev` | Start development server with hot-reload |
+| `npm run build` | Build for production |
+| `npm run start:prod` | Run production build |
+| `npm test` | Run unit tests |
+| `npm run test:e2e` | Run e2e tests |
+| `npm run migrate:run` | Run pending migrations |
+| `npm run migrate:show` | Show migration status |
+| `npm run migrate:revert` | Revert last migration |
+| `npm run seed:dev` | Seed development data |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format code with Prettier |
 
-## Stay in touch
+## Documentation
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- **Migrations Guide**: `MIGRATIONS.md` - Database migration usage and commands
+- **API Endpoints**: `../docs/api/endpoints.md` - Full API documentation
+- **Architecture**: `../docs/architecture/` - System design and patterns
+- **Phase E Checklist**: `../docs/phase-e-checklist.md` - Current cleanup tasks
 
-## License
+## Contributing
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+See the root `README.md` and `docs/migration-roadmap.md` for project status and development workflow.
 
 
 ## Local development notes
