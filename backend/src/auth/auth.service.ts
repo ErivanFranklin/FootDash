@@ -49,7 +49,10 @@ export class AuthService {
     const created = this.usersRepo.create({ email, passwordHash });
     const saved = await this.usersRepo.save(created);
 
-    const tokens = await this.createTokens({ id: saved.id, email: saved.email });
+    const tokens = await this.createTokens({
+      id: saved.id,
+      email: saved.email,
+    });
     return { user: { id: saved.id, email: saved.email }, tokens };
   }
 
@@ -95,7 +98,10 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      const tokens = await this.createTokens({ id: user.id, email: user.email });
+      const tokens = await this.createTokens({
+        id: user.id,
+        email: user.email,
+      });
       return { user: { id: user.id, email: user.email }, tokens };
     } catch {
       throw new UnauthorizedException('Invalid refresh token');

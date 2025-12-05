@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { Observable, of, isObservable } from 'rxjs';
 
 @Component({
   selector: 'app-page-header',
@@ -15,8 +16,9 @@ import { CommonModule } from '@angular/common';
             [size]="action.size || 'small'"
             [color]="action.color || 'primary'"
             [disabled]="action.disabled"
+            [attr.aria-label]="action.ariaLabel || action.label"
             (click)="action.handler()">
-            <ng-container *ngIf="!action.loading; else loadingTemplate">
+            <ng-container *ngIf="(isLoading(action) | async) !== true; else loadingTemplate">
               <ion-icon *ngIf="action.icon" [name]="action.icon"></ion-icon>
               {{ action.label }}
             </ng-container>
@@ -40,6 +42,17 @@ export class PageHeaderComponent {
     color?: string;
     size?: string;
     disabled?: boolean;
-    loading?: boolean;
+    /** loading can be a boolean or an Observable<boolean> */
+    loading?: boolean | Observable<boolean>;
+    /** optional aria label for the action button */
+    ariaLabel?: string;
   }>;
+
+  /**
+   * Normalize loading to an Observable<boolean> so template can use async safely
+   */
+  isLoading(action: { loading?: boolean | Observable<boolean> } ): Observable<boolean> {
+    if (!action || action.loading == null) return of(false);
+    return isObservable(action.loading) ? (action.loading as Observable<boolean>) : of(!!action.loading);
+  }
 }
