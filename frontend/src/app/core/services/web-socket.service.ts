@@ -16,11 +16,11 @@ export class WebSocketService {
   }
 
   subscribeToMatch(matchId: number) {
-    this.socket.emit('subscribe-match', { matchId });
+    this.socket.emit('subscribe-match', String(matchId));
   }
 
-unsubscribefromMatch(matchId: number) {
-    this.socket.emit('unsubscribe-match', { matchId });
+  unsubscribefromMatch(matchId: number) {
+    this.socket.emit('unsubscribe-match', String(matchId));
   }
 
   onMatchUpdate(): Observable<any> {
