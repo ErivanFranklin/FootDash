@@ -1,5 +1,7 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
 
-// Import FootDash theme tokens
+// Import and forward FootDash theme tokens
+// Use @forward to make tokens available to consumers of this module
+@forward '_tokens';
 @use '_tokens';
