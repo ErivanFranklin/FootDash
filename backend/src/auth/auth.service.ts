@@ -49,7 +49,7 @@ export class AuthService {
     const created = this.usersRepo.create({ email, passwordHash });
     const saved = await this.usersRepo.save(created);
 
-    const tokens = this.createTokens({ id: saved.id, email: saved.email });
+    const tokens = await this.createTokens({ id: saved.id, email: saved.email });
     return { user: { id: saved.id, email: saved.email }, tokens };
   }
 
@@ -68,7 +68,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = this.createTokens({ id: user.id, email: user.email });
+    const tokens = await this.createTokens({ id: user.id, email: user.email });
     return { user: { id: user.id, email: user.email }, tokens };
   }
 
@@ -95,7 +95,7 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      const tokens = this.createTokens({ id: user.id, email: user.email });
+      const tokens = await this.createTokens({ id: user.id, email: user.email });
       return { user: { id: user.id, email: user.email }, tokens };
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
@@ -129,7 +129,7 @@ export class AuthService {
     return result;
   }
 
-  private createTokens(user: AuthUser): AuthTokens {
+  private async createTokens(user: AuthUser): Promise<AuthTokens> {
     const accessToken = this.jwtService.sign(
       { sub: user.id, email: user.email },
       { expiresIn: '15m' },
@@ -141,7 +141,7 @@ export class AuthService {
 
     // Persist the refresh token so it can be revoked later.
     // In production you'd store a hashed token or a rotation ID; for simplicity we store the token text here.
-    void this.refreshRepo.save(
+    await this.refreshRepo.save(
       this.refreshRepo.create({
         token: refreshToken,
         user: { id: user.id } as any,
