@@ -63,10 +63,11 @@ describe('StatCardComponent', () => {
 
     const changeEl = fixture.nativeElement.querySelector('.stat-change');
     expect(changeEl).toBeTruthy();
-    const ionIcon = changeEl.querySelector('ion-icon');
-    expect(ionIcon).toBeTruthy();
-    // name attribute should be set to trending-up
-    expect(ionIcon.getAttribute('name')).toBe('trending-up');
+    
+    // Use debugElement to find the ion-icon
+    const iconDebugEl = fixture.debugElement.query(By.css('.stat-change ion-icon'));
+    expect(iconDebugEl).toBeTruthy();
+    expect(iconDebugEl.nativeElement.getAttribute('name')).toBe('trending-up');
     expect(changeEl.textContent).toContain('+5');
   });
 
@@ -78,9 +79,11 @@ describe('StatCardComponent', () => {
 
     const changeEl = fixture.nativeElement.querySelector('.stat-change');
     expect(changeEl).toBeTruthy();
-    const ionIcon = changeEl.querySelector('ion-icon');
-    expect(ionIcon).toBeTruthy();
-    expect(ionIcon.getAttribute('name')).toBe('trending-down');
+    
+    // Use debugElement to find the ion-icon
+    const iconDebugEl = fixture.debugElement.query(By.css('.stat-change ion-icon'));
+    expect(iconDebugEl).toBeTruthy();
+    expect(iconDebugEl.nativeElement.getAttribute('name')).toBe('trending-down');
     expect(changeEl.textContent).toContain('-2');
   });
 });
