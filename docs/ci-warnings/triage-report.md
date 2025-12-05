@@ -1,4 +1,7 @@
-# CI Warnings Triage - Phase E
+# CI Warnings Triage - Phase E (Historical)
+
+> **Note**: This document has been superseded by `warnings-triage.md` (December 5, 2025).  
+> Kept for historical reference. See the new document for current warning status.
 
 This document summarizes the CI warnings review conducted as part of Phase E cleanup. It documents warnings found, their impact assessment, and resolution status.
 
