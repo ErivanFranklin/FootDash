@@ -79,9 +79,10 @@ describe('MatchGateway (e2e)', () => {
 
     const listener = (data: { matchId: string }) => {
       if (data.matchId === matchIdToUnsubscribe) {
-        done.fail(
-          `Received update for unsubscribed match: ${matchIdToUnsubscribe}`,
-        );
+        // Jest does not provide done.fail in this context; signal failure by calling done with an Error
+        clientSocket.off('match-update', listener);
+        done(new Error(`Received update for unsubscribed match: ${matchIdToUnsubscribe}`));
+        return;
       }
     };
 
