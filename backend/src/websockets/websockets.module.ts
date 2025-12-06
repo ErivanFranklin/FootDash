@@ -3,5 +3,6 @@ import { MatchGateway } from './match.gateway';
 
 @Module({
   providers: [MatchGateway],
+  exports: [MatchGateway],
 })
 export class WebsocketsModule {}
