@@ -22,7 +22,8 @@ export const AppDataSource = new DataSource(
         host: process.env.DB_HOST || 'localhost',
         port: Number(process.env.DB_PORT || 5432),
         username: process.env.DB_USERNAME || 'postgres',
-        password: process.env.DB_PASSWORD || '',
+        // Ensure password is always a string to avoid pg SASL errors in CI
+        password: String(process.env.DB_PASSWORD ?? ''),
         database: process.env.DB_NAME || 'footdash',
         synchronize: false,
         migrationsRun: false,

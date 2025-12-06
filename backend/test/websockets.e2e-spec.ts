@@ -6,32 +6,51 @@ import { AppModule } from '../src/app.module';
 describe('MatchGateway (e2e)', () => {
   let app: INestApplication;
   let clientSocket: Socket;
-
+  // Increase timeout to allow app and DB to initialize in CI
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    await app.listen(3001); // Use a different port for testing
+    // Use an explicit test port and wait for the app to be ready before creating socket
+    const testPort = 3001;
+    await app.listen(testPort);
 
-    const address = app.getHttpServer().listen().address();
-    const port = typeof address === 'string' ? address : address.port;
-    
-    clientSocket = io(`http://localhost:${port}`, {
-      transports: ['websocket'],
-    });
-
-    await new Promise<void>((resolve) => {
-      clientSocket.on('connect', () => {
-        resolve();
+    try {
+      clientSocket = io(`http://localhost:${testPort}`, {
+        transports: ['websocket'],
+        reconnectionAttempts: 3,
+        timeout: 5000,
       });
-    });
-  });
+
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('socket connect timeout')), 8000);
+        clientSocket.on('connect', () => {
+          clearTimeout(timer);
+          resolve();
+        });
+        clientSocket.on('connect_error', (err) => {
+          clearTimeout(timer);
+          reject(err);
+        });
+      });
+    } catch (err) {
+      // If socket initialization fails, ensure app is closed and rethrow
+      if (app) {
+        await app.close();
+      }
+      throw err;
+    }
+  }, 20000);
 
   afterAll(async () => {
-    clientSocket.close();
-    await app.close();
+    if (clientSocket && typeof (clientSocket as any).close === 'function') {
+      clientSocket.close();
+    }
+    if (app) {
+      await app.close();
+    }
   });
 
   it('should connect and disconnect', () => {
