@@ -9,6 +9,10 @@
   <div *ngIf="match$ | async as match" class="match-details">
     <section class="teams-row">
       <div class="team home">
+        <div class="team-avatar">
+          <img *ngIf="(match.homeTeam?.logo || match.home?.logo)" [src]="match.homeTeam?.logo || match.home?.logo" alt="{{ match.homeTeam?.name || match.home?.name }} logo" class="team-logo" />
+          <div *ngIf="!(match.homeTeam?.logo || match.home?.logo)" class="avatar-fallback">{{ (match.homeTeam?.name || match.home?.name || 'H').substring(0,2) }}</div>
+        </div>
         <div class="team-name">{{ match.homeTeam?.name || match.home?.name || match.homeName || 'Home' }}</div>
       </div>
 
@@ -20,6 +24,10 @@
       </div>
 
       <div class="team away">
+        <div class="team-avatar">
+          <img *ngIf="(match.awayTeam?.logo || match.away?.logo)" [src]="match.awayTeam?.logo || match.away?.logo" alt="{{ match.awayTeam?.name || match.away?.name }} logo" class="team-logo" />
+          <div *ngIf="!(match.awayTeam?.logo || match.away?.logo)" class="avatar-fallback">{{ (match.awayTeam?.name || match.away?.name || 'A').substring(0,2) }}</div>
+        </div>
         <div class="team-name">{{ match.awayTeam?.name || match.away?.name || match.awayName || 'Away' }}</div>
       </div>
     </section>
