@@ -1,0 +1,46 @@
+<app-page-header title="Match Details" />
+
+<ion-content>
+  <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;">
+    <ion-badge *ngIf="(connectionStatus$ | async) as status">Connection: {{ status }}</ion-badge>
+    <ion-spinner *ngIf="(connectionStatus$ | async) === 'connecting'" name="dots"></ion-spinner>
+  </div>
+
+  <div *ngIf="match$ | async as match" class="match-details">
+    <section class="teams-row">
+      <div class="team home">
+        <div class="team-avatar">
+          <img *ngIf="match.homeLogo" [src]="match.homeLogo" alt="{{ match.homeName }} logo" class="team-logo" loading="lazy" (load)="onLogoLoaded('home')" />
+          <div *ngIf="!match.homeLogo && !homeLogoLoaded" class="avatar-skeleton"></div>
+          <div *ngIf="!match.homeLogo && homeLogoLoaded" class="avatar-fallback">{{ (match.homeName || 'H').substring(0,2) }}</div>
+        </div>
+        <div class="team-name">{{ match.homeName }}</div>
+      </div>
+
+      <div class="score">
+        <div class="score-value">{{ match.homeScore ?? '-' }} : {{ match.awayScore ?? '-' }}</div>
+        <div class="status">
+          <ion-badge color="primary">{{ match.status || 'N/A' }}</ion-badge>
+        </div>
+      </div>
+
+      <div class="team away">
+        <div class="team-avatar">
+          <img *ngIf="match.awayLogo" [src]="match.awayLogo" alt="{{ match.awayName }} logo" class="team-logo" loading="lazy" (load)="onLogoLoaded('away')" />
+          <div *ngIf="!match.awayLogo && !awayLogoLoaded" class="avatar-skeleton"></div>
+          <div *ngIf="!match.awayLogo && awayLogoLoaded" class="avatar-fallback">{{ (match.awayName || 'A').substring(0,2) }}</div>
+        </div>
+        <div class="team-name">{{ match.awayName }}</div>
+      </div>
+    </section>
+
+    <section class="meta">
+      <div class="meta-row"><strong>Kickoff:</strong>
+        <span>{{ match.kickOff | date:'short' }}</span>
+      </div>
+      <div class="meta-row" *ngIf="match.venueName"><strong>Venue:</strong> <span>{{ match.venueName }}</span></div>
+      <div class="meta-row" *ngIf="match.referee"><strong>Referee:</strong> <span>{{ match.referee }}</span></div>
+      <div class="meta-row" *ngIf="match.leagueName"><strong>Competition:</strong> <span>{{ match.leagueName }}</span></div>
+    </section>
+  </div>
+</ion-content>

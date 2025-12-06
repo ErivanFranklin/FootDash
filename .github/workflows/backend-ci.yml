@@ -95,17 +95,17 @@ jobs:
         working-directory: backend
 
       - name: Run backend tests (capture logs)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash
         run: |
           mkdir -p backend/test-results
           set -o pipefail
-          npm test --silent 2>&1 | tee backend/test-results/npm-test.log
-        working-directory: backend
-
-      - name: Run backend e2e tests (capture logs)
-        run: |
-          mkdir -p backend/test-results
-          set -o pipefail
-          npm run test:e2e --silent 2>&1 | tee backend/test-results/npm-test-e2e.log
+          npm run test:e2e -- --ci --runInBand --reporters=default --reporters=jest-junit 2>&1 | tee backend/test-results/test-e2e.log
         working-directory: backend
 
   backend-e2e-postgres:

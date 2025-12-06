@@ -46,4 +46,9 @@ export class ApiService {
     if (opts?.to) params = params.set('to', opts.to);
     return this.http.post(`${this.base}/matches/team/${teamId}/sync`, {}, { params });
   }
+
+  // Single match
+  getMatch(matchId: number | string): Observable<any> {
+    return this.http.get(`${this.base}/matches/${matchId}`);
+  }
 }

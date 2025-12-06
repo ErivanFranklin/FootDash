@@ -7,6 +7,7 @@ import { DatabaseModule } from './db/database.module';
 import { FootballApiModule } from './football-api/football-api.module';
 import { TeamsModule } from './teams/teams.module';
 import { MatchesModule } from './matches/matches.module';
+import { WebsocketsModule } from './websockets/websockets.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -43,6 +44,7 @@ const isProd = process.env.NODE_ENV === 'production';
     FootballApiModule,
     TeamsModule,
     MatchesModule,
+    WebsocketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

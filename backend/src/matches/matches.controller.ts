@@ -16,6 +16,22 @@ import { TeamIdParamDto } from '../teams/dto/team-id-param.dto';
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a single match by ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'Match ID',
+    type: 'integer',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The match',
+  })
+  getMatch(@Param('id') id: number) {
+    return this.matchesService.getMatch(id);
+  }
+
   @Get('team/:teamId')
   @ApiOperation({ summary: 'Get matches for a specific team' })
   @ApiParam({

@@ -23,7 +23,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           host: config.get<string>('DB_HOST', 'localhost'),
           port: config.get<number>('DB_PORT', 5432),
           username: config.get<string>('DB_USERNAME', 'postgres'),
-          password: config.get<string>('DB_PASSWORD', ''),
+          password: String(config.get<string>('DB_PASSWORD', '')),
           database: config.get<string>('DB_NAME', 'footdash'),
           autoLoadEntities: true,
           synchronize: false,

@@ -5,9 +5,14 @@ import { FootballApiModule } from '../football-api/football-api.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
+import { WebsocketsModule } from '../websockets/websockets.module';
 
 @Module({
-  imports: [FootballApiModule, TypeOrmModule.forFeature([Match, Team])],
+  imports: [
+    FootballApiModule,
+    TypeOrmModule.forFeature([Match, Team]),
+    WebsocketsModule,
+  ],
   controllers: [MatchesController],
   providers: [MatchesService],
   exports: [MatchesService],

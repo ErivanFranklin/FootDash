@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
+import { MatchGateway } from '../websockets/match.gateway';
 
 @Injectable()
 export class MatchesService {
@@ -14,7 +15,15 @@ export class MatchesService {
     private readonly matchRepository: Repository<Match>,
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+    private readonly matchGateway: MatchGateway,
   ) {}
+
+  async getMatch(id: number) {
+    return this.matchRepository.findOne({
+      where: { id },
+      relations: ['homeTeam', 'awayTeam'],
+    });
+  }
 
   getTeamMatches(teamId: number, query: MatchesQueryDto) {
     const { range, limit, season, from, to } = query;
@@ -98,34 +107,30 @@ export class MatchesService {
         (f as any)?.goals?.away ?? (f as any)?.score?.fulltime?.away ?? null;
       const referee = (f as any)?.referee ?? null;
       const venue = (f as any)?.venue ?? null;
-      const league = (f as any)?.league ?? null;
 
-      if (!existing) {
-        existing = this.matchRepository.create({
-          externalId: externalMatchId,
-          homeTeam: home,
-          awayTeam: away,
-          kickOff,
-          status,
-          homeScore,
-          awayScore,
-          referee,
-          venue,
-          league,
-        } as Partial<Match>);
-      } else {
-        existing.homeTeam = home;
-        existing.awayTeam = away;
+      if (existing) {
         existing.kickOff = kickOff;
         existing.status = status;
         existing.homeScore = homeScore;
         existing.awayScore = awayScore;
         existing.referee = referee;
         existing.venue = venue;
-        existing.league = league;
+        existing.homeTeam = home;
+        existing.awayTeam = away;
+        existing = await this.matchRepository.save(existing);
+        this.matchGateway.broadcastMatchUpdate(String(existing.id), existing);
+        savedMatches.push(existing);
+        continue;
       }
 
-      const saved = await this.matchRepository.save(existing);
+      const newMatch = this.matchRepository.create({
+        externalId: externalMatchId,
+        homeTeam: home,
+        awayTeam: away,
+      });
+
+      const saved = await this.matchRepository.save(newMatch);
+      this.matchGateway.broadcastMatchUpdate(String(saved.id), saved);
       savedMatches.push(saved);
     }
 
