@@ -27,34 +27,44 @@ export class MatchGateway {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('subscribe-match')
-  handleMatchSubscription(
-    @MessageBody() matchId: string,
+    @SubscribeMessage('subscribe-match')
+  handleSubscribe(
+    @MessageBody() data: { matchId: string },
     @ConnectedSocket() client: Socket,
-  ): void {
-    this.logger.log(`Client ${client.id} subscribed to match ${matchId}`);
-    client.join(matchId);
-    // In a real app, you would fetch initial data and send it here
-    this.server.to(matchId).emit('match-update', {
-      matchId,
-      message: `Welcome to match ${matchId}`,
-      score: { home: 0, away: 0 },
+  ) {
+    if (!data || !data.matchId) {
+      this.logger.warn(`Invalid subscription request from ${client.id}`);
+      return;
+    }
+    this.logger.log(`Client ${client.id} subscribed to match ${data.matchId}`);
+    client.join(data.matchId);
+
+    // Acknowledge subscription and send initial data
+    this.server.to(data.matchId).emit('match-update', {
+      matchId: data.matchId,
+      message: `Welcome to match ${data.matchId}`,
     });
   }
 
   @SubscribeMessage('unsubscribe-match')
-  handleMatchUnsubscription(
-    @MessageBody() matchId: string,
+  handleUnsubscribe(
+    @MessageBody() data: { matchId: string },
     @ConnectedSocket() client: Socket,
-  ): void {
-    this.logger.log(`Client ${client.id} unsubscribed from match ${matchId}`);
-    client.leave(matchId);
+  ) {
+    if (!data || !data.matchId) {
+      this.logger.warn(`Invalid unsubscription request from ${client.id}`);
+      return;
+    }
+    this.logger.log(
+      `Client ${client.id} unsubscribed from match ${data.matchId}`,
+    );
+    client.leave(data.matchId);
   }
-
-  // Example of how you would broadcast a match update
-  // This would be called from your service layer when new data is available
+  // Broadcast a match update to all clients in the match room
   broadcastMatchUpdate(matchId: string, data: any) {
     this.logger.log(`Broadcasting update for match ${matchId}`);
-    this.server.to(matchId).emit('match-update', data);
+    if (this.server) {
+      this.server.to(matchId).emit('match-update', { matchId, ...data });
+    }
   }
 }
