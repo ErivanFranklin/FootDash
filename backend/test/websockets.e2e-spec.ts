@@ -76,10 +76,11 @@ describe('MatchGateway (e2e)', () => {
 
   it('should unsubscribe from a match', (done) => {
     const matchIdToUnsubscribe = 'test-match-456';
+    let unsubscribed = false;
 
     const listener = (data: { matchId: string }) => {
-      if (data.matchId === matchIdToUnsubscribe) {
-        // Jest does not provide done.fail in this context; signal failure by calling done with an Error
+      // Only treat messages as failures if they arrive after we've unsubscribed
+      if (unsubscribed && data.matchId === matchIdToUnsubscribe) {
         clientSocket.off('match-update', listener);
         done(new Error(`Received update for unsubscribed match: ${matchIdToUnsubscribe}`));
         return;
@@ -92,7 +93,8 @@ describe('MatchGateway (e2e)', () => {
     // Give it a moment to join the room before unsubscribing
     setTimeout(() => {
       clientSocket.emit('unsubscribe-match', { matchId: matchIdToUnsubscribe });
-      // Wait to see if any messages for the unsubscribed match arrive
+      unsubscribed = true;
+      // Wait to see if any messages for the unsubscribed match arrive after unsubscribe
       setTimeout(() => {
         clientSocket.off('match-update', listener);
         done();
