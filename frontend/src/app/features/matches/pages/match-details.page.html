@@ -1,6 +1,11 @@
 <app-page-header title="Match Details" />
 
 <ion-content>
+  <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;">
+    <ion-badge *ngIf="(connectionStatus$ | async) as status">Connection: {{ status }}</ion-badge>
+    <ion-spinner *ngIf="(connectionStatus$ | async) === 'connecting'" name="dots"></ion-spinner>
+  </div>
+
   <div *ngIf="match$ | async as match">
     <!-- Display match details here -->
     <pre>{{ match | json }}</pre>
