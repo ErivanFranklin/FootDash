@@ -133,4 +133,11 @@ export class MatchesService {
 
     return savedMatches;
   }
+
+  async getMatch(id: number) {
+    return this.matchRepository.findOne({
+      where: { id },
+      relations: ['homeTeam', 'awayTeam'],
+    });
+  }
 }
