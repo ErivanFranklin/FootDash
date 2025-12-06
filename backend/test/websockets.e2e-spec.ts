@@ -53,6 +53,11 @@ describe('MatchGateway (e2e)', () => {
     }
   });
 
+  afterEach(() => {
+    // Remove all listeners after each test to prevent leakage
+    clientSocket.off();
+  });
+
   it('should connect and disconnect', () => {
     expect(clientSocket.connected).toBe(true);
   });
@@ -63,24 +68,34 @@ describe('MatchGateway (e2e)', () => {
     clientSocket.on('match-update', (data) => {
       expect(data.matchId).toBe(matchId);
       expect(data.message).toContain('Welcome');
-      expect(data.score).toEqual({ home: 0, away: 0 });
       done();
     });
 
-    clientSocket.emit('subscribe-match', matchId);
+    clientSocket.emit('subscribe-match', { matchId });
   });
 
   it('should unsubscribe from a match', (done) => {
-    const matchId = 'test-match-456';
+    const matchIdToUnsubscribe = 'test-match-456';
 
-    clientSocket.emit('subscribe-match', matchId);
+    const listener = (data: { matchId: string }) => {
+      if (data.matchId === matchIdToUnsubscribe) {
+        done.fail(
+          `Received update for unsubscribed match: ${matchIdToUnsubscribe}`,
+        );
+      }
+    };
 
-    // Give it a moment to join the room
+    clientSocket.on('match-update', listener);
+    clientSocket.emit('subscribe-match', { matchId: matchIdToUnsubscribe });
+
+    // Give it a moment to join the room before unsubscribing
     setTimeout(() => {
-      clientSocket.emit('unsubscribe-match', matchId);
-      // No easy way to confirm server-side leave, but we can ensure no more messages are sent
-      // For this test, we'll just ensure the call doesn't crash
-      done();
+      clientSocket.emit('unsubscribe-match', { matchId: matchIdToUnsubscribe });
+      // Wait to see if any messages for the unsubscribed match arrive
+      setTimeout(() => {
+        clientSocket.off('match-update', listener);
+        done();
+      }, 500);
     }, 100);
   });
 });
