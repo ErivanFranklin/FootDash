@@ -5,9 +5,14 @@ import { MatchRangeType } from './dto/matches-query.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
+import { MatchGateway } from '../websockets/match.gateway';
 
 const footballApiMock = {
   getTeamFixtures: jest.fn(),
+};
+
+const mockMatchGateway = {
+  broadcastMatchUpdate: jest.fn(),
 };
 
 const mockMatchRepo = {
@@ -32,6 +37,7 @@ describe('MatchesService', () => {
         { provide: FootballApiService, useValue: footballApiMock },
         { provide: getRepositoryToken(Match), useValue: mockMatchRepo },
         { provide: getRepositoryToken(Team), useValue: mockTeamRepo },
+        { provide: MatchGateway, useValue: mockMatchGateway },
       ],
     }).compile();
 
