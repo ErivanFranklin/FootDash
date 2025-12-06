@@ -16,3 +16,56 @@ pre {
   padding: 10px;
   border-radius: 5px;
 }
+
+.match-details {
+  padding: 12px 16px;
+
+  .teams-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .team {
+      flex: 1 1 40%;
+      text-align: center;
+
+      .team-name {
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+    }
+
+    .score {
+      flex: 0 0 150px;
+      text-align: center;
+
+      .score-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .status {
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .meta-row {
+      font-size: 0.95rem;
+      color: #333;
+
+      strong {
+        display: inline-block;
+        width: 100px;
+      }
+    }
+  }
+}

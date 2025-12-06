@@ -12,7 +12,7 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, PageHeaderComponent],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, PageHeaderComponent],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

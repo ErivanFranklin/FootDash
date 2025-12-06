@@ -6,8 +6,31 @@
     <ion-spinner *ngIf="(connectionStatus$ | async) === 'connecting'" name="dots"></ion-spinner>
   </div>
 
-  <div *ngIf="match$ | async as match">
-    <!-- Display match details here -->
-    <pre>{{ match | json }}</pre>
+  <div *ngIf="match$ | async as match" class="match-details">
+    <section class="teams-row">
+      <div class="team home">
+        <div class="team-name">{{ match.homeTeam?.name || match.home?.name || match.homeName || 'Home' }}</div>
+      </div>
+
+      <div class="score">
+        <div class="score-value">{{ match.homeScore ?? match.score?.home ?? '-' }} : {{ match.awayScore ?? match.score?.away ?? '-' }}</div>
+        <div class="status">
+          <ion-badge color="primary">{{ match.status || match.fixture?.status || 'N/A' }}</ion-badge>
+        </div>
+      </div>
+
+      <div class="team away">
+        <div class="team-name">{{ match.awayTeam?.name || match.away?.name || match.awayName || 'Away' }}</div>
+      </div>
+    </section>
+
+    <section class="meta">
+      <div class="meta-row"><strong>Kickoff:</strong>
+        <span>{{ (match.kickOff || match.kickoff || match.fixture?.date) | date:'short' }}</span>
+      </div>
+      <div class="meta-row" *ngIf="match.venue?.name"><strong>Venue:</strong> <span>{{ match.venue?.name }}</span></div>
+      <div class="meta-row" *ngIf="match.referee"><strong>Referee:</strong> <span>{{ match.referee }}</span></div>
+      <div class="meta-row" *ngIf="match.league?.name"><strong>Competition:</strong> <span>{{ match.league?.name }}</span></div>
+    </section>
   </div>
 </ion-content>
