@@ -56,7 +56,7 @@ describe('MatchDetailsPage', () => {
     });
 
     it('should subscribe to WebSocket connection status', () => {
-      const status$ = of('connected');
+      const status$ = of('connected' as const);
       mockWebSocketService.connectionStatus.and.returnValue(status$);
       mockWebSocketService.onMatchUpdate.and.returnValue(of({}));
       mockApiService.getMatch.and.returnValue(of({}));
