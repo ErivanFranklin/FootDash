@@ -57,6 +57,14 @@ pre {
           font-weight: 700;
           font-size: 0.95rem;
         }
+        .avatar-skeleton {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+          background-size: 400% 100%;
+          animation: shimmer 1.4s ease infinite;
+        }
       }
 
       .team-name {
@@ -103,4 +111,9 @@ pre {
       }
     }
   }
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0 }
+  100% { background-position: -100% 0 }
 }

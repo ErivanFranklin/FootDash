@@ -6,6 +6,7 @@ import { PageHeaderComponent } from '../../../shared/components';
 import { WebSocketService } from '../../../core/services/web-socket.service';
 import { ApiService } from '../../../core/services/api.service';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { normalizeMatch, NormalizedMatch } from '../../../core/adapters/match-adapter';
 
 @Component({
   selector: 'app-match-details',
@@ -20,8 +21,10 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
   private api = inject(ApiService);
 
   matchId!: number;
-  private matchSubject = new BehaviorSubject<any>(null);
-  match$: Observable<any> = this.matchSubject.asObservable();
+  private matchSubject = new BehaviorSubject<NormalizedMatch | null>(null);
+  match$: Observable<NormalizedMatch | null> = this.matchSubject.asObservable();
+  homeLogoLoaded = false;
+  awayLogoLoaded = false;
   connectionStatus$: Observable<'connecting' | 'connected' | 'disconnected' | 'error'>;
 
   private subscriptions = new Subscription();
@@ -32,9 +35,12 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
     // expose connection status for the template
     this.connectionStatus$ = this.wsService.connectionStatus();
 
-    // 1. Fetch initial match data
+    // 1. Fetch initial match data and normalize
     const apiSub = this.api.getMatch(this.matchId).subscribe(initialMatch => {
-      this.matchSubject.next(initialMatch);
+      const normalized = normalizeMatch(initialMatch);
+      this.homeLogoLoaded = !Boolean(normalized.homeLogo);
+      this.awayLogoLoaded = !Boolean(normalized.awayLogo);
+      this.matchSubject.next(normalized);
     });
     this.subscriptions.add(apiSub);
 
@@ -43,7 +49,10 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
     // emit the subscribe event when connected (also re-subscribes on reconnect).
     this.wsService.subscribeToMatch(this.matchId);
     const wsSub = this.wsService.onMatchUpdate().subscribe(matchUpdate => {
-      this.matchSubject.next(matchUpdate);
+      const normalized = normalizeMatch(matchUpdate);
+      if (normalized.homeLogo) this.homeLogoLoaded = false;
+      if (normalized.awayLogo) this.awayLogoLoaded = false;
+      this.matchSubject.next(normalized);
     });
     this.subscriptions.add(wsSub);
   }
@@ -51,5 +60,10 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.wsService.unsubscribefromMatch(this.matchId);
     this.subscriptions.unsubscribe();
+  }
+
+  onLogoLoaded(side: 'home' | 'away') {
+    if (side === 'home') this.homeLogoLoaded = true;
+    if (side === 'away') this.awayLogoLoaded = true;
   }
 }
