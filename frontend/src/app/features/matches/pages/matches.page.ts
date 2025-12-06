@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IonContent, IonItem, IonLabel, IonInput } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
@@ -12,7 +12,7 @@ import { PageHeaderComponent, MatchCardComponent, FormSectionComponent } from '.
   standalone: true,
   templateUrl: './matches.page.html',
   styleUrls: ['./matches.page.scss'],
-  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, PageHeaderComponent, MatchCardComponent, FormSectionComponent]
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, PageHeaderComponent, MatchCardComponent, FormSectionComponent, RouterModule]
 })
 export class MatchesPage implements OnInit {
   private route = inject(ActivatedRoute);

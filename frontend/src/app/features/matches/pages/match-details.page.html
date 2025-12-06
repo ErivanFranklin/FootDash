@@ -14,13 +14,13 @@
           <div *ngIf="!match.homeLogo && !homeLogoLoaded" class="avatar-skeleton"></div>
           <div *ngIf="!match.homeLogo && homeLogoLoaded" class="avatar-fallback">{{ (match.homeName || 'H').substring(0,2) }}</div>
         </div>
-        <div class="team-name">{{ match.homeTeam?.name || match.home?.name || match.homeName || 'Home' }}</div>
+        <div class="team-name">{{ match.homeName }}</div>
       </div>
 
       <div class="score">
-        <div class="score-value">{{ match.homeScore ?? match.score?.home ?? '-' }} : {{ match.awayScore ?? match.score?.away ?? '-' }}</div>
+        <div class="score-value">{{ match.homeScore ?? '-' }} : {{ match.awayScore ?? '-' }}</div>
         <div class="status">
-          <ion-badge color="primary">{{ match.status || match.fixture?.status || 'N/A' }}</ion-badge>
+          <ion-badge color="primary">{{ match.status || 'N/A' }}</ion-badge>
         </div>
       </div>
 
@@ -30,17 +30,17 @@
           <div *ngIf="!match.awayLogo && !awayLogoLoaded" class="avatar-skeleton"></div>
           <div *ngIf="!match.awayLogo && awayLogoLoaded" class="avatar-fallback">{{ (match.awayName || 'A').substring(0,2) }}</div>
         </div>
-        <div class="team-name">{{ match.awayTeam?.name || match.away?.name || match.awayName || 'Away' }}</div>
+        <div class="team-name">{{ match.awayName }}</div>
       </div>
     </section>
 
     <section class="meta">
       <div class="meta-row"><strong>Kickoff:</strong>
-        <span>{{ (match.kickOff || match.kickoff || match.fixture?.date) | date:'short' }}</span>
+        <span>{{ match.kickOff | date:'short' }}</span>
       </div>
-      <div class="meta-row" *ngIf="match.venue?.name"><strong>Venue:</strong> <span>{{ match.venue?.name }}</span></div>
+      <div class="meta-row" *ngIf="match.venueName"><strong>Venue:</strong> <span>{{ match.venueName }}</span></div>
       <div class="meta-row" *ngIf="match.referee"><strong>Referee:</strong> <span>{{ match.referee }}</span></div>
-      <div class="meta-row" *ngIf="match.league?.name"><strong>Competition:</strong> <span>{{ match.league?.name }}</span></div>
+      <div class="meta-row" *ngIf="match.leagueName"><strong>Competition:</strong> <span>{{ match.leagueName }}</span></div>
     </section>
   </div>
 </ion-content>

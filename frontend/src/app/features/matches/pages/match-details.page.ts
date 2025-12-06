@@ -7,13 +7,14 @@ import { WebSocketService } from '../../../core/services/web-socket.service';
 import { ApiService } from '../../../core/services/api.service';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { normalizeMatch, NormalizedMatch } from '../../../core/adapters/match-adapter';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-match-details',
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, IonBadge, IonSpinner, PageHeaderComponent],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, PageHeaderComponent, RouterModule],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -25,7 +26,7 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
   match$: Observable<NormalizedMatch | null> = this.matchSubject.asObservable();
   homeLogoLoaded = false;
   awayLogoLoaded = false;
-  connectionStatus$: Observable<'connecting' | 'connected' | 'disconnected' | 'error'>;
+  connectionStatus$!: Observable<'connecting' | 'connected' | 'disconnected' | 'error'>;
 
   private subscriptions = new Subscription();
 

@@ -19,7 +19,10 @@ export class MatchesService {
   ) {}
 
   async getMatch(id: number) {
-    return this.matchRepository.findOne({ where: { id } });
+    return this.matchRepository.findOne({
+      where: { id },
+      relations: ['homeTeam', 'awayTeam'],
+    });
   }
 
   getTeamMatches(teamId: number, query: MatchesQueryDto) {
@@ -132,12 +135,5 @@ export class MatchesService {
     }
 
     return savedMatches;
-  }
-
-  async getMatch(id: number) {
-    return this.matchRepository.findOne({
-      where: { id },
-      relations: ['homeTeam', 'awayTeam'],
-    });
   }
 }
