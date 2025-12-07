@@ -1,33 +1,36 @@
-# Redis Socket Adapter for Clustering
+# Deploy Redis Socket Adapter to Staging
 
 ## Summary
-Adds Redis adapter to Socket.IO for horizontal scaling and clustering support. This enables WebSocket connections to be shared across multiple backend instances, ensuring real-time match updates work in a load-balanced environment.
+Deploys the Redis adapter for Socket.IO clustering to staging environment. This enables horizontal scaling of WebSocket connections across multiple backend instances.
 
 ## Changes
-- **Dependencies**: Added `@socket.io/redis-adapter` and `ioredis` for Redis connectivity
-- **Configuration**: Added `REDIS_URL` environment variable validation
-- **Adapter Implementation**: Created `RedisIoAdapter` class that conditionally uses Redis adapter when `REDIS_URL` is provided
-- **Integration**: Wired the adapter in `main.ts` for automatic clustering when Redis is available
+- **Merged from main**: Redis adapter implementation (#45)
+  - `@socket.io/redis-adapter` and `ioredis` dependencies
+  - `RedisIoAdapter` class with conditional Redis support
+  - `REDIS_URL` config validation
+  - Integration in `main.ts`
 
 ## Testing
-- All existing unit and e2e tests pass
-- WebSocket functionality remains unchanged when Redis is not configured
-- Adapter enables clustering when `REDIS_URL` is set (e.g., `redis://localhost:6379`)
+- All backend tests pass (unit + e2e)
+- WebSocket functionality verified locally
+- Redis adapter enables clustering when `REDIS_URL` is set
 
-## Deployment Notes
-- **Environment**: Add `REDIS_URL` to staging/production environments
-- **Redis Setup**: Ensure Redis instance is available and accessible
-- **Backward Compatibility**: Works without Redis (falls back to default adapter)
-- **Scaling**: Allows multiple backend pods to share WebSocket connections
+## Deployment Checklist
+- [ ] Set `REDIS_URL` in staging environment (e.g., `redis://localhost:6379`)
+- [ ] Ensure Redis instance is running and accessible
+- [ ] Deploy to staging
+- [ ] Verify health endpoint: `GET /health`
+- [ ] Test WebSocket clustering: connect multiple clients, broadcast across instances
+- [ ] Check logs for Redis connection and adapter initialization
+- [ ] Monitor for WebSocket errors or performance issues
+- [ ] Rollback plan: revert if Redis connectivity fails
 
-## Checklist
-- [x] Dependencies installed and committed
-- [x] Configuration updated
-- [x] Adapter implemented and integrated
-- [x] Tests pass locally
-- [x] Code reviewed for security/best practices
-- [x] Documentation updated (README if needed)
+## Rollback
+If issues:
+1. Unset `REDIS_URL` or revert deployment
+2. App falls back to default adapter (no clustering)
+3. Check Redis logs for connectivity issues
 
 ## Related Issues
 - Part of Phase 2: Real-time WebSocket match updates
-- Enables production-ready clustering for WebSocket broadcasts
+- Enables production-ready clustering

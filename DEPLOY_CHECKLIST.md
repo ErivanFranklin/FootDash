@@ -1,49 +1,38 @@
-Phase 2 — Staging Deploy Checklist
+# Staging Deploy Checklist: Redis Socket Adapter
 
-Pre-deploy
-- [ ] Confirm `main` branch is green and up-to-date.
-- [ ] Ensure branch `feat/phase-2-staging-deploy` is created from `main` and pushed.
-- [ ] Verify required secrets/envs exist for staging (DB credentials, websocket URL, API keys).
-- [ ] Snapshot or tag current staging deployment (for quick rollback).
+## Pre-Deploy
+- [ ] Confirm Redis instance is running in staging environment
+- [ ] Set `REDIS_URL` environment variable (e.g., `redis://redis-staging:6379`)
+- [ ] Verify main branch has the latest Redis adapter code (#45 merged)
+- [ ] Run local tests: `cd backend && npm test && npm run test:e2e`
 
-Deploy
-- [ ] Run DB migrations (if any): `cd backend && npm run migrate:run`.
-- [ ] Deploy backend service(s) and frontend (via CI or deploy script).
-- [ ] Ensure process manager / containers restarted and healthy.
+## Deploy Steps
+- [ ] Tag release: `git tag v2.1.0-redis-adapter && git push origin v2.1.0-redis-adapter`
+- [ ] Deploy to staging via CI/CD pipeline or manual deploy
+- [ ] Wait for deployment to complete (monitor staging logs)
 
-Smoke tests (immediate)
-- [ ] Health endpoint: `curl -sS https://staging.example.com/health` -> HTTP 200
-- [ ] API sanity: request a known endpoint (e.g., `GET /api/matches/:id`).
-- [ ] Socket connect: connect a client to the WebSocket endpoint and verify `connect` event.
-- [ ] Subscribe flow: subscribe to a test-match and confirm `match-update` initial message is received.
-- [ ] Unsubscribe flow: unsubscribe and confirm no further messages for that match.
+## Post-Deploy Verification
+- [ ] Health check: `curl -s https://staging.example.com/health` returns 200
+- [ ] WebSocket connection test:
+  ```bash
+  node -e "
+  const { io } = require('socket.io-client');
+  const s = io('https://staging.example.com', { transports: ['websocket'] });
+  s.on('connect', () => { console.log('Connected'); s.disconnect(); });
+  "
+  ```
+- [ ] Redis connectivity: Check app logs for "Redis adapter initialized" or similar
+- [ ] Clustering test: If multiple instances, verify broadcasts work across pods
+- [ ] Performance: Monitor WebSocket connection latency and error rates
+- [ ] Logs: No Redis connection errors or adapter failures
 
-Full test
-- [ ] Run backend e2e tests against staging: `cd backend && npm run test:e2e`.
-- [ ] Run frontend build + smoke tests: `cd frontend && npm run build && npm run test:smoke` (if available).
+## Rollback Plan
+- [ ] If Redis fails: Unset `REDIS_URL` and redeploy (falls back to default adapter)
+- [ ] If critical issues: Revert to previous tag/commit
+- [ ] Monitor for 30 minutes post-rollback
 
-Post-deploy monitoring
-- [ ] Watch logs for 15-30 minutes; look for errors in WebSocket gateway, reconnect floods, auth failures.
-- [ ] Check metrics: active socket connections, subscribe/unsubscribe rates, message broadcast rate.
-- [ ] Verify no memory or CPU spikes across instances.
-
-Rollback criteria
-- [ ] Critical application errors preventing API use or socket floods.
-- [ ] Repeated failing health checks or timeouts in smoke tests.
-
-Rollback steps
-- [ ] Trigger rollback to previous tag/commit and restart services.
-- [ ] Re-run smoke tests to confirm restored state.
-
-Postmortem
-- [ ] If issues required rollback, open a postmortem with root cause and actions.
-
-Notes
-- Adjust hostnames, ports and commands to match your staging infra.
-- For high-scale test, use load-test scripts (k6 / Artillery) to simulate concurrent sockets.
-
-Contacts
-- Backend: @alice
-- Frontend: @bob
-- DevOps: @devops
+## Notes
+- Backward compatible: App works without Redis
+- Next: Production rollout after staging validation
+- Observability: Add Redis metrics if needed for monitoring
 
