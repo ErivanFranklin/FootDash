@@ -3,6 +3,8 @@ import helmet from 'helmet';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { RedisIoAdapter } from './websockets/redis-io.adapter';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +20,12 @@ async function bootstrap() {
           },
     ),
   );
+
+  // Set up Redis adapter for Socket.IO clustering
+  const configService = app.get(ConfigService);
+  const redisAdapter = new RedisIoAdapter(app, configService);
+  await redisAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisAdapter);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
