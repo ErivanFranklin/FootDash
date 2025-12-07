@@ -1,46 +1,33 @@
-Title: Deploy Phase 2 WebSockets to Staging
+# Redis Socket Adapter for Clustering
 
-Summary:
-- Deploy the merged Phase 2 WebSocket feature to the staging environment for validation.
-- Includes: backend `MatchGateway` (WebSocket gateway), frontend WebSocket client/service, and tests.
+## Summary
+Adds Redis adapter to Socket.IO for horizontal scaling and clustering support. This enables WebSocket connections to be shared across multiple backend instances, ensuring real-time match updates work in a load-balanced environment.
 
-Changes included:
-- backend: `src/websockets/match.gateway.ts`, tests and DI fixes
-- backend: database password handling and CI test hardening
-- frontend: WebSocket client/service and `MatchDetailsPage` improvements
+## Changes
+- **Dependencies**: Added `@socket.io/redis-adapter` and `ioredis` for Redis connectivity
+- **Configuration**: Added `REDIS_URL` environment variable validation
+- **Adapter Implementation**: Created `RedisIoAdapter` class that conditionally uses Redis adapter when `REDIS_URL` is provided
+- **Integration**: Wired the adapter in `main.ts` for automatic clustering when Redis is available
 
-Why:
-- Validate WebSocket behavior in production-like infra (CORS, proxy, load balancer, and DB).
-- Run smoke tests and e2e against staging to catch infra-related issues before production rollout.
+## Testing
+- All existing unit and e2e tests pass
+- WebSocket functionality remains unchanged when Redis is not configured
+- Adapter enables clustering when `REDIS_URL` is set (e.g., `redis://localhost:6379`)
 
-How to test (Smoke):
-1. Ensure staging environment is ready (containers / infra up).
-2. Run DB migrations (if required): `cd backend && npm run migrate:run`.
-3. Deploy the app (your usual staging deploy command / CI job).
-4. Run quick health check:
-   - `curl -sS https://staging.example.com/health`
-5. Quick WebSocket smoke test (node):
-   - `node -e "const { io } = require('socket.io-client'); const s = io('https://staging.example.com',{transports:['websocket']}); s.on('connect',()=>{console.log('connected'); s.disconnect();});"`
-6. Run backend e2e tests against staging (if applicable): `cd backend && npm run test:e2e`.
+## Deployment Notes
+- **Environment**: Add `REDIS_URL` to staging/production environments
+- **Redis Setup**: Ensure Redis instance is available and accessible
+- **Backward Compatibility**: Works without Redis (falls back to default adapter)
+- **Scaling**: Allows multiple backend pods to share WebSocket connections
 
-Migration / Deploy notes:
-- No DB schema changes expected for this release. If migrations were added, run them before starting the app.
-- Ensure `DATABASE_URL` or `DB_*` env vars are set in staging.
+## Checklist
+- [x] Dependencies installed and committed
+- [x] Configuration updated
+- [x] Adapter implemented and integrated
+- [x] Tests pass locally
+- [x] Code reviewed for security/best practices
+- [x] Documentation updated (README if needed)
 
-Rollback plan:
-- If critical issues are found, revert to the previous tag/commit and redeploy the previous release.
-- Keep a hotfix branch ready if small fixes are required.
-
-CI / Post-deploy checks:
-- Confirm GitHub Actions on `main` are passing (unit + e2e).
-- Monitor logs for socket errors and disconnect spikes for 15–30 minutes after deploy.
-
-Reviewer suggestions:
-- @alice (backend)
-- @bob (frontend)
-
-Related issues:
-- Closes: #<issue-number> (if applicable)
-
-Notes:
-- This PR file is intentionally brief; detailed runbooks live in `docs/ops/` (or add here if you prefer).
+## Related Issues
+- Part of Phase 2: Real-time WebSocket match updates
+- Enables production-ready clustering for WebSocket broadcasts
