@@ -37,6 +37,7 @@ const isProd = process.env.NODE_ENV === 'production';
           otherwise: Joi.required(),
         }),
         FOOTBALL_API_TIMEOUT_MS: Joi.number().default(5000),
+        REDIS_URL: Joi.string().uri().optional(),
       }),
     }),
     DatabaseModule,
