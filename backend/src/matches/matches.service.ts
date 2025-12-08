@@ -133,8 +133,14 @@ export class MatchesService {
           existing.homeScore,
           existing.awayScore,
         );
-        const statusStarted = this.didStatusTransitionToLive(prevStatus, existing.status);
-        const statusFinished = this.didStatusTransitionToFinished(prevStatus, existing.status);
+        const statusStarted = this.didStatusTransitionToLive(
+          prevStatus,
+          existing.status,
+        );
+        const statusFinished = this.didStatusTransitionToFinished(
+          prevStatus,
+          existing.status,
+        );
         this.broadcastMatchUpdate(existing);
         if (statusStarted) {
           void this.notificationsService.sendMatchNotice(
@@ -144,7 +150,11 @@ export class MatchesService {
           );
         }
         if (goalSummary) {
-          void this.notificationsService.sendMatchNotice(existing, 'goal', goalSummary);
+          void this.notificationsService.sendMatchNotice(
+            existing,
+            'goal',
+            goalSummary,
+          );
         }
         if (statusFinished) {
           void this.notificationsService.sendMatchNotice(

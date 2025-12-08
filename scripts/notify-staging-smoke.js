@@ -3,20 +3,23 @@ const axios = require('axios');
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 // A known team ID from the seed data
 const TEAM_ID_TO_SYNC = parseInt(process.env.TEAM_ID || '1', 10);
+// You can provide a real token via `SMOKE_TEST_TOKEN` env var to avoid the placeholder
 const FAKE_FCM_TOKEN = process.env.FAKE_FCM_TOKEN || 'c_n7v5nL-fM:APA91bH...for-testing-only';
+const SMOKE_TEST_TOKEN = process.env.SMOKE_TEST_TOKEN || null;
 
 async function runSmokeTest() {
   console.log('--- Running Staging Smoke Test ---');
 
   try {
-    // 1. Register a fake FCM token for a user
-    console.log(`[1/2] Registering fake FCM token: ${FAKE_FCM_TOKEN}`);
+    // 1. Register a token for a user (use SMOKE_TEST_TOKEN if provided)
+    const tokenToRegister = SMOKE_TEST_TOKEN || FAKE_FCM_TOKEN;
+    console.log(`[1/2] Registering FCM token: ${tokenToRegister}`);
     const registerRes = await axios.post(
       `${API_BASE_URL}/notifications/tokens`,
       {
         // numeric userId matches DTO expectation
         userId: 1,
-        token: FAKE_FCM_TOKEN,
+        token: tokenToRegister,
       },
       { timeout: 10000 },
     );

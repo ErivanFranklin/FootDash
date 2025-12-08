@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>FCM Web Token Test</title>
+    <style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;background:#fff;padding:24px}pre{white-space:break-spaces;background:#f6f8fa;padding:12px;border-radius:6px}</style>
+  </head>
+  <body>
+    <h1>FCM Web Token Test</h1>
+    <p id="status">Waiting...</p>
+    <pre id="token">(no token yet)</pre>
+
+    <!-- Firebase compat libraries (simple for quick testing) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+
+    <script>
+      // Firebase Web App config (provided)
+      const firebaseConfig = {
+        apiKey: "AIzaSyCzjLYFxLRQecisIQBIHGuS2fHVFi3C24c",
+        authDomain: "foot-dash.firebaseapp.com",
+        projectId: "foot-dash",
+        storageBucket: "foot-dash.firebasestorage.app",
+        messagingSenderId: "905507573532",
+        appId: "1:905507573532:web:10da0a80b9e3cf71e734d9",
+        measurementId: "G-FWEY799N01"
+      };
+
+      const statusEl = document.getElementById('status');
+      const tokenEl = document.getElementById('token');
+
+      try {
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        async function requestAndGetToken() {
+          try {
+            statusEl.textContent = 'Requesting notification permission...';
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') {
+              statusEl.textContent = 'Notification permission not granted.';
+              return;
+            }
+            statusEl.textContent = 'Retrieving registration token...';
+            // If you have a public VAPID key, pass it here as { vapidKey: '...' }
+            const currentToken = await messaging.getToken();
+            if (currentToken) {
+              statusEl.textContent = 'Token obtained (also logged to console):';
+              tokenEl.textContent = currentToken;
+              console.log('FCM registration token:', currentToken);
+            } else {
+              statusEl.textContent = 'No registration token available.';
+            }
+          } catch (err) {
+            statusEl.textContent = 'Error retrieving token: ' + (err && err.message ? err.message : err);
+            console.error('getToken error', err);
+          }
+        }
+
+        // Don't prompt automatically (some browsers require a user gesture).
+        // Show a button the user must click to request permission and get the token.
+        const btn = document.createElement('button');
+        btn.textContent = 'Request Notification Permission';
+        btn.style.padding = '8px 12px';
+        btn.style.marginTop = '12px';
+        btn.onclick = () => requestAndGetToken();
+        document.body.insertBefore(btn, document.getElementById('status'));
+
+        messaging.onMessage((payload) => {
+          console.log('Message received (foreground):', payload);
+          alert('Received message: ' + JSON.stringify(payload.notification || payload));
+        });
+      } catch (e) {
+        statusEl.textContent = 'Failed to initialize Firebase SDK: ' + e;
+        console.error(e);
+      }
+    </script>
+  </body>
+</html>

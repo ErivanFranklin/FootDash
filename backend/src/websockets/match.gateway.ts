@@ -27,7 +27,7 @@ export class MatchGateway {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-    @SubscribeMessage('subscribe-match')
+  @SubscribeMessage('subscribe-match')
   handleSubscribe(
     @MessageBody() data: { matchId: string },
     @ConnectedSocket() client: Socket,
