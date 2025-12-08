@@ -6,6 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
 import { MatchGateway } from '../websockets/match.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const footballApiMock = {
   getTeamFixtures: jest.fn(),
@@ -13,6 +14,11 @@ const footballApiMock = {
 
 const mockMatchGateway = {
   broadcastMatchUpdate: jest.fn(),
+};
+
+const mockNotificationsService = {
+  sendMatchNotice: jest.fn(),
+  registerToken: jest.fn(),
 };
 
 const mockMatchRepo = {
@@ -38,6 +44,7 @@ describe('MatchesService', () => {
         { provide: getRepositoryToken(Match), useValue: mockMatchRepo },
         { provide: getRepositoryToken(Team), useValue: mockTeamRepo },
         { provide: MatchGateway, useValue: mockMatchGateway },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 

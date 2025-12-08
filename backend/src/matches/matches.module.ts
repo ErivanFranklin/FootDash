@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
 import { WebsocketsModule } from '../websockets/websockets.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     FootballApiModule,
     TypeOrmModule.forFeature([Match, Team]),
     WebsocketsModule,
+    NotificationsModule,
   ],
   controllers: [MatchesController],
   providers: [MatchesService],

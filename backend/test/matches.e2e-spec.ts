@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { TeamsModule } from '../src/teams/teams.module';
 import { MatchesModule } from '../src/matches/matches.module';
 import { Team } from '../src/teams/entities/team.entity';
@@ -27,6 +28,7 @@ describe('Matches (e2e)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
+        ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true }),
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',

@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
 import { MatchGateway } from '../websockets/match.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class MatchesService {
@@ -16,6 +17,7 @@ export class MatchesService {
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
     private readonly matchGateway: MatchGateway,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getMatch(id: number) {
@@ -109,6 +111,10 @@ export class MatchesService {
       const venue = (f as any)?.venue ?? null;
 
       if (existing) {
+        const prevStatus = existing.status;
+        const prevHomeScore = existing.homeScore;
+        const prevAwayScore = existing.awayScore;
+
         existing.kickOff = kickOff;
         existing.status = status;
         existing.homeScore = homeScore;
@@ -118,7 +124,35 @@ export class MatchesService {
         existing.homeTeam = home;
         existing.awayTeam = away;
         existing = await this.matchRepository.save(existing);
-        this.matchGateway.broadcastMatchUpdate(String(existing.id), existing);
+
+        const goalSummary = this.buildGoalEvent(
+          home,
+          away,
+          prevHomeScore,
+          prevAwayScore,
+          existing.homeScore,
+          existing.awayScore,
+        );
+        const statusStarted = this.didStatusTransitionToLive(prevStatus, existing.status);
+        const statusFinished = this.didStatusTransitionToFinished(prevStatus, existing.status);
+        this.broadcastMatchUpdate(existing);
+        if (statusStarted) {
+          void this.notificationsService.sendMatchNotice(
+            existing,
+            'match-start',
+            `${home.name} vs ${away.name} is live now!`,
+          );
+        }
+        if (goalSummary) {
+          void this.notificationsService.sendMatchNotice(existing, 'goal', goalSummary);
+        }
+        if (statusFinished) {
+          void this.notificationsService.sendMatchNotice(
+            existing,
+            'result',
+            `${home.name} ${existing.homeScore ?? 0} - ${existing.awayScore ?? 0} ${away.name} (FT)`,
+          );
+        }
         savedMatches.push(existing);
         continue;
       }
@@ -135,5 +169,48 @@ export class MatchesService {
     }
 
     return savedMatches;
+  }
+
+  private broadcastMatchUpdate(match: Match) {
+    this.matchGateway.broadcastMatchUpdate(String(match.id), match);
+  }
+
+  private buildGoalEvent(
+    home: Team,
+    away: Team,
+    currentHomeScore: number | null | undefined,
+    currentAwayScore: number | null | undefined,
+    incomingHomeScore: number | null | undefined,
+    incomingAwayScore: number | null | undefined,
+  ) {
+    const prevHome = currentHomeScore ?? 0;
+    const prevAway = currentAwayScore ?? 0;
+    const newHome = incomingHomeScore ?? prevHome;
+    const newAway = incomingAwayScore ?? prevAway;
+    if (newHome > prevHome) {
+      return `${home.name} scored! ${newHome}-${newAway}`;
+    }
+    if (newAway > prevAway) {
+      return `${away.name} scored! ${newHome}-${newAway}`;
+    }
+    return undefined;
+  }
+
+  private normalizeStatus(status?: string) {
+    return status?.toLowerCase().replace(/\s+/g, '') ?? '';
+  }
+
+  private didStatusTransitionToLive(previous?: string, next?: string) {
+    const liveStatuses = new Set(['inplay', 'live', 'active', 'playing']);
+    const prev = this.normalizeStatus(previous);
+    const curr = this.normalizeStatus(next);
+    return liveStatuses.has(curr) && !liveStatuses.has(prev);
+  }
+
+  private didStatusTransitionToFinished(previous?: string, next?: string) {
+    const finished = new Set(['finished', 'fulltime', 'ft', 'completed']);
+    const prev = this.normalizeStatus(previous);
+    const curr = this.normalizeStatus(next);
+    return finished.has(curr) && !finished.has(prev);
   }
 }
