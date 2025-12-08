@@ -8,6 +8,7 @@ import { FootballApiModule } from './football-api/football-api.module';
 import { TeamsModule } from './teams/teams.module';
 import { MatchesModule } from './matches/matches.module';
 import { WebsocketsModule } from './websockets/websockets.module';
+import { NotificationsModule } from './notifications/notifications.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -38,6 +39,9 @@ const isProd = process.env.NODE_ENV === 'production';
         }),
         FOOTBALL_API_TIMEOUT_MS: Joi.number().default(5000),
         REDIS_URL: Joi.string().uri().optional(),
+        FCM_PROJECT_ID: Joi.string().optional(),
+        FCM_CLIENT_EMAIL: Joi.string().optional(),
+        FCM_PRIVATE_KEY: Joi.string().optional(),
       }),
     }),
     DatabaseModule,
@@ -46,6 +50,7 @@ const isProd = process.env.NODE_ENV === 'production';
     TeamsModule,
     MatchesModule,
     WebsocketsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

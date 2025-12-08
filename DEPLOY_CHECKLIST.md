@@ -1,38 +1,30 @@
-# Staging Deploy Checklist: Redis Socket Adapter
+# Staging Deploy Checklist: Push Notifications
 
 ## Pre-Deploy
-- [ ] Confirm Redis instance is running in staging environment
-- [ ] Set `REDIS_URL` environment variable (e.g., `redis://redis-staging:6379`)
-- [ ] Verify main branch has the latest Redis adapter code (#45 merged)
-- [ ] Run local tests: `cd backend && npm test && npm run test:e2e`
+- [ ] Confirm Firebase project credentials are ready (`FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY`)
+- [ ] Ensure the Redis Socket.IO adapter rollout (#45) remains live in staging
+- [ ] Run backend tests locally: `cd backend && npm test && npm run test:e2e`
+- [ ] Identify one or more devices/emulators that can register push tokens
 
 ## Deploy Steps
-- [ ] Tag release: `git tag v2.1.0-redis-adapter && git push origin v2.1.0-redis-adapter`
-- [ ] Deploy to staging via CI/CD pipeline or manual deploy
-- [ ] Wait for deployment to complete (monitor staging logs)
+- [ ] Deploy backend with the new branch/commit that includes push notification logic
+- [ ] Wait for staging services to be healthy (watch logs for startup errors)
 
 ## Post-Deploy Verification
-- [ ] Health check: `curl -s https://staging.example.com/health` returns 200
-- [ ] WebSocket connection test:
-  ```bash
-  node -e "
-  const { io } = require('socket.io-client');
-  const s = io('https://staging.example.com', { transports: ['websocket'] });
-  s.on('connect', () => { console.log('Connected'); s.disconnect(); });
-  "
-  ```
-- [ ] Redis connectivity: Check app logs for "Redis adapter initialized" or similar
-- [ ] Clustering test: If multiple instances, verify broadcasts work across pods
-- [ ] Performance: Monitor WebSocket connection latency and error rates
-- [ ] Logs: No Redis connection errors or adapter failures
+- [ ] Health endpoint: `curl -s https://staging.example.com/health` returns 200
+- [ ] Register a token via `POST /notifications/tokens` (use staging-safe value for `token`)
+- [ ] Trigger `POST /matches/team/:teamId/sync` and confirm Firebase logs show notifications are sent
+- [ ] Verify at least one registered device receives notifications for match start, goals, and final score
+- [ ] Check server logs for any Firebase authentication or token-binding errors
+- [ ] Review metrics for WebSocket stability (no regressions from Redis adapter)
 
 ## Rollback Plan
-- [ ] If Redis fails: Unset `REDIS_URL` and redeploy (falls back to default adapter)
-- [ ] If critical issues: Revert to previous tag/commit
-- [ ] Monitor for 30 minutes post-rollback
+- [ ] Unset `FCM_*` env vars and redeploy if Firebase errors prevent message delivery
+- [ ] If critical, revert to the previous tag/commit and restart staging services
+- [ ] Monitor for 30 minutes post-rollback for signal/API errors
 
 ## Notes
-- Backward compatible: App works without Redis
-- Next: Production rollout after staging validation
-- Observability: Add Redis metrics if needed for monitoring
+- The app already falls back to the default adapter when push credentials are missing
+- This rollout depends on the Redis clustering work in #45 as its foundation
+- Collect Firebase debug logs if there are delivery failures
 
