@@ -4,6 +4,7 @@ import { NotificationToken } from './notification-token.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import admin from 'firebase-admin';
+import util from 'util';
 import { RegisterNotificationTokenDto } from './dto/register-notification-token.dto';
 import { Match } from '../matches/entities/match.entity';
 
@@ -56,6 +57,11 @@ export class NotificationsService {
       throw new BadRequestException('token is required');
     }
 
+    // Additional server-side sanity check: reject obviously short/malformed tokens
+    if (typeof token === 'string' && token.length < 50) {
+      throw new BadRequestException('token is too short or malformed');
+    }
+
     await this.tokenRepository.upsert(
       {
         token,
@@ -68,7 +74,15 @@ export class NotificationsService {
     return { registered: true };
   }
 
+  async getTokenDiagnostics() {
+    const tokens = await this.tokenRepository.find();
+    const total = tokens.length;
+    const short = tokens.filter((t) => !t.token || t.token.length < 50).map((t) => ({ id: t.id, tokenPreview: (t.token || '').slice(0, 60), len: (t.token || '').length }));
+    return { total, shortCount: short.length, short };
+  }
+
   async sendMatchNotice(match: Match, event: 'match-start' | 'goal' | 'result', summary: string) {
+    this.logger.log(`sendMatchNotice called for match=${match?.id} event=${event}`);
     if (!this.enabled || !this.messaging) {
       this.logger.debug('Push notification skipped because Firebase is not configured');
       return;
@@ -95,7 +109,39 @@ export class NotificationsService {
     };
 
     try {
+      // Verbose debug: log tokens being sent (only token strings, limit to 2000 chars)
+      try {
+        const tokenList = tokens.map((t) => t.token);
+        const tokenPreview = JSON.stringify(tokenList).slice(0, 2000);
+        this.logger.debug(`Sending multicast to tokens (${tokenList.length}): ${tokenPreview}`);
+      } catch (e) {
+        this.logger.debug('Failed to stringify tokens for debug logging');
+      }
+
       const response = await this.messaging.sendEachForMulticast(message);
+      // Log full response details in a JSON-friendly form
+      try {
+        const respDetails = response.responses.map((r, i) => ({
+          index: i,
+          success: r.success,
+          error: r.error ? { message: r.error.message, code: (r.error as any).code } : null,
+        }));
+        this.logger.debug(`FCM full response: ${util.inspect(respDetails, { depth: 5 })}`);
+      } catch (e) {
+        this.logger.debug('Failed to serialize FCM response for debug logging');
+      }
+      // Log summary of the multicast response for local verification
+      this.logger.log(
+        `FCM multicast result: success=${response.successCount}, failure=${response.failureCount}`,
+      );
+      if (response.failureCount > 0) {
+        const failed = response.responses
+          .map((r, i) => ({ r, token: tokens[i] }))
+          .filter(({ r }) => !r.success)
+          .map(({ r, token }) => ({ token: token.token, error: r.error?.message ?? r.error?.code }));
+        this.logger.warn('FCM failed responses:', JSON.stringify(failed));
+      }
+
       this.cleanupFailedTokens(tokens, response);
     } catch (error) {
       this.logger.warn('Failed to publish push notification', error as Error);
