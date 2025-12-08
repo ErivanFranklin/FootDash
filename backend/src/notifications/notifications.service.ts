@@ -13,12 +13,15 @@ export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   private messaging?: admin.messaging.Messaging;
   private enabled = false;
+  private debugEnabled = false;
 
   constructor(
     private readonly config: ConfigService,
     @InjectRepository(NotificationToken)
     private readonly tokenRepository: Repository<NotificationToken>,
   ) {
+    // Read debug flag before initializing to control verbose logging
+    this.debugEnabled = this.config.get<string>('NOTIFICATIONS_DEBUG') === 'true';
     this.initializeFirebase();
   }
 
@@ -125,39 +128,43 @@ export class NotificationsService {
       },
     };
 
-    try {
-      // Verbose debug: log tokens being sent (only token strings, limit to 2000 chars)
       try {
-        const tokenList = tokens.map((t) => t.token);
-        const tokenPreview = JSON.stringify(tokenList).slice(0, 2000);
-        this.logger.debug(
-          `Sending multicast to tokens (${tokenList.length}): ${tokenPreview}`,
-        );
-      } catch (err) {
-        this.logger.debug(
-          'Failed to stringify tokens for debug logging',
-          err as Error,
-        );
+      if (this.debugEnabled) {
+        // Verbose debug: log tokens being sent (only token strings, limit to 2000 chars)
+        try {
+          const tokenList = tokens.map((t) => t.token);
+          const tokenPreview = JSON.stringify(tokenList).slice(0, 2000);
+          this.logger.debug(
+            `Sending multicast to tokens (${tokenList.length}): ${tokenPreview}`,
+          );
+        } catch (err) {
+          this.logger.debug(
+            'Failed to stringify tokens for debug logging',
+            err as Error,
+          );
+        }
       }
 
       const response = await this.messaging.sendEachForMulticast(message);
-      // Log full response details in a JSON-friendly form
-      try {
-        const respDetails = response.responses.map((r, i) => ({
-          index: i,
-          success: r.success,
-          error: r.error
-            ? { message: r.error.message, code: (r.error as any).code }
-            : null,
-        }));
-        this.logger.debug(
-          `FCM full response: ${util.inspect(respDetails, { depth: 5 })}`,
-        );
-      } catch (err) {
-        this.logger.debug(
-          'Failed to serialize FCM response for debug logging',
-          err as Error,
-        );
+      // Conditionally log full response details in a JSON-friendly form
+      if (this.debugEnabled) {
+        try {
+          const respDetails = response.responses.map((r, i) => ({
+            index: i,
+            success: r.success,
+            error: r.error
+              ? { message: r.error.message, code: (r.error as any).code }
+              : null,
+          }));
+          this.logger.debug(
+            `FCM full response: ${util.inspect(respDetails, { depth: 5 })}`,
+          );
+        } catch (err) {
+          this.logger.debug(
+            'Failed to serialize FCM response for debug logging',
+            err as Error,
+          );
+        }
       }
       // Log summary of the multicast response for local verification
       this.logger.log(
@@ -175,7 +182,7 @@ export class NotificationsService {
       }
 
       this.cleanupFailedTokens(tokens, response);
-    } catch (error) {
+      } catch (error) {
       this.logger.warn('Failed to publish push notification', error as Error);
     }
   }
