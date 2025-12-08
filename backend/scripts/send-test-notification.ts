@@ -72,9 +72,24 @@ async function main() {
     console.log('sendMatchNotice invoked. Check logs for FCM output.');
 
     if (envToken && argv.cleanup) {
-      console.log('Cleaning up test token from DB');
-      const res = await removeTokenFromDb(envToken);
-      console.log('Cleanup result:', res);
+      // Prompt for confirmation before destructive cleanup
+      const readline = await import('readline');
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      const question = (q: string) => new Promise<string>((resolve) => rl.question(q, resolve));
+      try {
+        const answer = (await question(`Are you sure you want to DELETE token "${envToken}" from the local DB? Type 'yes' to confirm: `)).trim().toLowerCase();
+        rl.close();
+        if (answer === 'yes') {
+          console.log('Cleaning up test token from DB');
+          const res = await removeTokenFromDb(envToken);
+          console.log('Cleanup result:', res);
+        } else {
+          console.log('Cleanup aborted by user — token remains in DB');
+        }
+      } catch (promptErr) {
+        console.error('Prompt failed, skipping cleanup:', promptErr);
+        try { rl.close(); } catch (_) {}
+      }
     }
   } catch (err) {
     console.error('Error invoking sendMatchNotice:', err);
