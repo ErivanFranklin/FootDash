@@ -25,7 +25,10 @@ describe('MatchGateway (e2e)', () => {
       });
 
       await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error('socket connect timeout')), 8000);
+        const timer = setTimeout(
+          () => reject(new Error('socket connect timeout')),
+          8000,
+        );
         clientSocket.on('connect', () => {
           clearTimeout(timer);
           resolve();
@@ -82,7 +85,11 @@ describe('MatchGateway (e2e)', () => {
       // Only treat messages as failures if they arrive after we've unsubscribed
       if (unsubscribed && data.matchId === matchIdToUnsubscribe) {
         clientSocket.off('match-update', listener);
-        done(new Error(`Received update for unsubscribed match: ${matchIdToUnsubscribe}`));
+        done(
+          new Error(
+            `Received update for unsubscribed match: ${matchIdToUnsubscribe}`,
+          ),
+        );
         return;
       }
     };

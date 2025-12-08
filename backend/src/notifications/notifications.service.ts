@@ -47,7 +47,10 @@ export class NotificationsService {
       this.enabled = true;
       this.logger.log('Firebase initialized for push notifications');
     } catch (error) {
-      this.logger.warn('Firebase initialization failed, push notifications disabled', error as Error);
+      this.logger.warn(
+        'Firebase initialization failed, push notifications disabled',
+        error as Error,
+      );
     }
   }
 
@@ -77,14 +80,28 @@ export class NotificationsService {
   async getTokenDiagnostics() {
     const tokens = await this.tokenRepository.find();
     const total = tokens.length;
-    const short = tokens.filter((t) => !t.token || t.token.length < 50).map((t) => ({ id: t.id, tokenPreview: (t.token || '').slice(0, 60), len: (t.token || '').length }));
+    const short = tokens
+      .filter((t) => !t.token || t.token.length < 50)
+      .map((t) => ({
+        id: t.id,
+        tokenPreview: (t.token || '').slice(0, 60),
+        len: (t.token || '').length,
+      }));
     return { total, shortCount: short.length, short };
   }
 
-  async sendMatchNotice(match: Match, event: 'match-start' | 'goal' | 'result', summary: string) {
-    this.logger.log(`sendMatchNotice called for match=${match?.id} event=${event}`);
+  async sendMatchNotice(
+    match: Match,
+    event: 'match-start' | 'goal' | 'result',
+    summary: string,
+  ) {
+    this.logger.log(
+      `sendMatchNotice called for match=${match?.id} event=${event}`,
+    );
     if (!this.enabled || !this.messaging) {
-      this.logger.debug('Push notification skipped because Firebase is not configured');
+      this.logger.debug(
+        'Push notification skipped because Firebase is not configured',
+      );
       return;
     }
 
@@ -113,9 +130,14 @@ export class NotificationsService {
       try {
         const tokenList = tokens.map((t) => t.token);
         const tokenPreview = JSON.stringify(tokenList).slice(0, 2000);
-        this.logger.debug(`Sending multicast to tokens (${tokenList.length}): ${tokenPreview}`);
-      } catch (e) {
-        this.logger.debug('Failed to stringify tokens for debug logging');
+        this.logger.debug(
+          `Sending multicast to tokens (${tokenList.length}): ${tokenPreview}`,
+        );
+      } catch (err) {
+        this.logger.debug(
+          'Failed to stringify tokens for debug logging',
+          err as Error,
+        );
       }
 
       const response = await this.messaging.sendEachForMulticast(message);
@@ -124,11 +146,18 @@ export class NotificationsService {
         const respDetails = response.responses.map((r, i) => ({
           index: i,
           success: r.success,
-          error: r.error ? { message: r.error.message, code: (r.error as any).code } : null,
+          error: r.error
+            ? { message: r.error.message, code: (r.error as any).code }
+            : null,
         }));
-        this.logger.debug(`FCM full response: ${util.inspect(respDetails, { depth: 5 })}`);
-      } catch (e) {
-        this.logger.debug('Failed to serialize FCM response for debug logging');
+        this.logger.debug(
+          `FCM full response: ${util.inspect(respDetails, { depth: 5 })}`,
+        );
+      } catch (err) {
+        this.logger.debug(
+          'Failed to serialize FCM response for debug logging',
+          err as Error,
+        );
       }
       // Log summary of the multicast response for local verification
       this.logger.log(
@@ -138,7 +167,10 @@ export class NotificationsService {
         const failed = response.responses
           .map((r, i) => ({ r, token: tokens[i] }))
           .filter(({ r }) => !r.success)
-          .map(({ r, token }) => ({ token: token.token, error: r.error?.message ?? r.error?.code }));
+          .map(({ r, token }) => ({
+            token: token.token,
+            error: r.error?.message ?? r.error?.code,
+          }));
         this.logger.warn('FCM failed responses:', JSON.stringify(failed));
       }
 
@@ -157,9 +189,10 @@ export class NotificationsService {
       .filter(
         ({ result }) =>
           !result.success &&
-          ['messaging/registration-token-not-registered', 'messaging/invalid-registration-token'].includes(
-            result.error?.code ?? '',
-          ),
+          [
+            'messaging/registration-token-not-registered',
+            'messaging/invalid-registration-token',
+          ].includes(result.error?.code ?? ''),
       )
       .map(({ token }) => token);
 
