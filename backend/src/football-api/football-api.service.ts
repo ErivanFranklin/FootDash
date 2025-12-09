@@ -200,7 +200,7 @@ export class FootballApiService implements FootballApiAdapter {
       };
     }
 
-    const resp = await this.makeRequest<ApiResponse<FootballFixture>>(
+    const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
       'fixtures',
       {
         id: matchId,
@@ -208,8 +208,7 @@ export class FootballApiService implements FootballApiAdapter {
     );
 
     // The API returns an array even for single fixture
-    const data = resp as ApiResponse<FootballFixture[]>;
-    const fixtures = normalizeFixtures(data);
+    const fixtures = normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
     return fixtures && fixtures.length > 0 ? fixtures[0] : null;
   }
 
