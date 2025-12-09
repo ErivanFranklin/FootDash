@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MatchesController } from './matches.controller';
 import { MatchesService } from './matches.service';
+import { LiveMatchService } from './live-match.service';
+import { MatchSchedulerService } from './match-scheduler.service';
 import { FootballApiModule } from '../football-api/football-api.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Match } from './entities/match.entity';
@@ -16,7 +18,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     NotificationsModule,
   ],
   controllers: [MatchesController],
-  providers: [MatchesService],
-  exports: [MatchesService],
+  providers: [MatchesService, LiveMatchService, MatchSchedulerService],
+  exports: [MatchesService, LiveMatchService],
 })
 export class MatchesModule {}
