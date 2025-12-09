@@ -1,0 +1,159 @@
+name: Staging smoke - FCM
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # weekly on Mondays at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Run staging smoke
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install backend deps
+        working-directory: backend
+        run: |
+          npm ci --prefer-offline
+
+      - name: Write service account JSON
+        env:
+          FCM_PROJECT_ID: ${{ secrets.FCM_PROJECT_ID }}
+          FCM_CLIENT_EMAIL: ${{ secrets.FCM_CLIENT_EMAIL }}
+          FCM_PRIVATE_KEY_ID: ${{ secrets.FCM_PRIVATE_KEY_ID }}
+          FCM_PRIVATE_KEY: ${{ secrets.FCM_PRIVATE_KEY }}
+        run: |
+          # Expand escaped newlines in the private key and write a service account file
+          printf '{\n' > sa.json
+          printf '  "type": "service_account",\n' >> sa.json
+          printf '  "project_id": "%s",\n' "$FCM_PROJECT_ID" >> sa.json
+          printf '  "private_key_id": "%s",\n' "$FCM_PRIVATE_KEY_ID" >> sa.json
+          printf '  "private_key": "%s",\n' "$(printf '%b' "$FCM_PRIVATE_KEY" | sed -e ':a;N;$!ba;s/\n/\\n/g')" >> sa.json
+          printf '  "client_email": "%s",\n' "$FCM_CLIENT_EMAIL" >> sa.json
+          printf '  "auth_uri": "https://accounts.google.com/o/oauth2/auth",\n' >> sa.json
+          printf '  "token_uri": "https://oauth2.googleapis.com/token"\n' >> sa.json
+          printf '}\n' >> sa.json
+
+      - name: Run smoke script
+        env:
+          SMOKE_TEST_TOKEN: ${{ secrets.STAGING_SMOKE_TOKEN }}
+          MONITORING_WEBHOOK_URL: ${{ secrets.MONITORING_WEBHOOK_URL }}
+          FCM_PROJECT_ID: ${{ secrets.FCM_PROJECT_ID }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          set -e
+          cd backend
+          mkdir -p logs
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          LOG_FILE="logs/smoke-${TIMESTAMP}.log"
+          
+          # Run script with logging and optional DB registration
+          node scripts/send-test-notification.js \
+            --service-account "${{ github.workspace }}/sa.json" \
+            --token "$SMOKE_TEST_TOKEN" \
+            --debug \
+            --log-file "$LOG_FILE" \
+            --register \
+            || EXIT_CODE=$?
+          
+          if [ -n "${EXIT_CODE:-}" ] && [ "$EXIT_CODE" -ne 0 ]; then
+            echo "Smoke script failed with exit $EXIT_CODE"
+            if [ -n "$MONITORING_WEBHOOK_URL" ]; then
+              # Create Slack-formatted payload with fallback for generic webhooks
+              REPO_URL="https://github.com/${{ github.repository }}"
+              RUN_URL="${REPO_URL}/actions/runs/${{ github.run_id }}"
+              
+              # Slack format (also works with MS Teams via incoming webhook)
+              payload=$(jq -n \
+                --arg project "$FCM_PROJECT_ID" \
+                --arg event "staging_smoke_failed" \
+                --arg repo "${{ github.repository }}" \
+                --arg run_url "$RUN_URL" \
+                --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+                '{
+                  text: "❌ FCM Staging Smoke Test Failed",
+                  blocks: [
+                    {
+                      type: "section",
+                      text: {
+                        type: "mrkdwn",
+                        text: "*FCM Staging Smoke Test Failed*\n\n• *Project*: \($project)\n• *Event*: \($event)\n• *Repository*: \($repo)\n• *Timestamp*: \($timestamp)"
+                      }
+                    },
+                    {
+                      type: "actions",
+                      elements: [
+                        {
+                          type: "button",
+                          text: {
+                            type: "plain_text",
+                            text: "View Workflow Run"
+                          },
+                          url: \($run_url)
+                        }
+                      ]
+                    }
+                  ],
+                  attachments: [
+                    {
+                      color: "danger",
+                      fields: [
+                        {
+                          title: "Project",
+                          value: \($project),
+                          short: true
+                        },
+                        {
+                          title: "Event",
+                          value: \($event),
+                          short: true
+                        }
+                      ]
+                    }
+                  ]
+                }')
+              
+              curl -sS -X POST -H 'Content-Type: application/json' -d "$payload" "$MONITORING_WEBHOOK_URL" || true
+            fi
+            exit $EXIT_CODE
+          fi
+                      fields: [
+                        {
+                          title: "Project",
+                          value: \($project),
+                          short: true
+                        },
+                        {
+                          title: "Event",
+                          value: \($event),
+                          short: true
+                        }
+                      ]
+                    }
+                  ]
+                }')
+              
+              curl -sS -X POST -H 'Content-Type: application/json' -d "$payload" "$MONITORING_WEBHOOK_URL" || true
+            fi
+            exit $EXIT_CODE
+          fi
+      
+      - name: Upload smoke logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-logs-${{ github.run_number }}
+          path: backend/logs/smoke-*.log
+          retention-days: 30

@@ -32,3 +32,6 @@ yarn-error.log*
 # Local test and runtime artifacts
 /backend/logs/
 /test-results/
+backend/scripts/*.bak
+backend/scripts/*.bak
+backend/scripts/*.bak
