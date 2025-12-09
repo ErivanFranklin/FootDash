@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { MatchesService } from './matches.service';
 import { MatchGateway } from '../websockets/match.gateway';
 import { FootballApiService } from '../football-api/football-api.service';
