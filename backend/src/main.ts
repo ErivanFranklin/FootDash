@@ -5,9 +5,17 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { RedisIoAdapter } from './websockets/redis-io.adapter';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // Configure static file serving for avatars
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
+  
   app.enableCors();
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
   const isProd = process.env.NODE_ENV === 'production';
