@@ -108,3 +108,33 @@ CI workflows for backend and frontend are in `.github/workflows/`. For troublesh
 
 For detailed roadmap, see `docs/migration-roadmap.md` and the Phase E checklist at `docs/phase-e-checklist.md`.
 
+## Developer Scripts
+
+There are a few helper scripts in `backend/scripts/` to aid local development and testing. The most important one is `send-test-notification.ts`, which boots a Nest application context and invokes the backend `NotificationsService.sendMatchNotice(...)` to force a push notification for testing.
+
+Usage examples (run with `ts-node` during development):
+
+```bash
+# Register a token, send, then remove it from the DB
+node -r ts-node/register backend/scripts/send-test-notification.ts --token "<FCM_TOKEN>" --cleanup
+
+# Send without registering (useful if token already exists in DB)
+node -r ts-node/register backend/scripts/send-test-notification.ts --token "<FCM_TOKEN>" --no-register
+
+# Provide custom summary or match id
+node -r ts-node/register backend/scripts/send-test-notification.ts --token "<FCM_TOKEN>" --summary "Hello" --match-id 1234
+```
+
+Important flags:
+- `--token <token>`: (optional) FCM token to include for the test. If not provided, the script reads `SMOKE_TEST_TOKEN` from environment.
+- `--no-register`: do not attempt to register the token before sending (useful if the token is already in DB).
+- `--cleanup`: after sending, delete the token from `notification_tokens` table (only recommended for disposable tokens used in testing).
+- `--summary <text>`: optional notification body text.
+- `--match-id <id>`: optional match id to include in `data.matchId`.
+
+Safety notes:
+- Running this script will interact with your local database and (optionally) your Firebase project. Make sure you are running against a development/staging Firebase project before sending real push notifications.
+- The `--cleanup` flag removes the exact token string from the `notification_tokens` table. Do not use it with production tokens you intend to keep.
+- Avoid committing real tokens or service-account credentials into the repo. Keep credentials in environment variables or a secure vault.
+
+

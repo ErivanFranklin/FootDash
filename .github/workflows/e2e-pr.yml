@@ -1,0 +1,75 @@
+name: Backend E2E for PRs
+
+on:
+  pull_request:
+    branches:
+      - staging
+      - production
+    types: [opened, synchronize, reopened]
+
+jobs:
+  backend-e2e-matrix:
+    name: Backend E2E matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        postgres-version: [15]
+        node-version: [20]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_DB: footdash_pr
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d footdash_pr"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres -d footdash_pr && break || sleep 1;
+          done
+
+      - name: Run migrations
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_pr
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash_pr
+        run: |
+          cd backend
+          npm run migrate:run
+
+      - name: Run backend e2e tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_pr
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/footdash_pr
+        run: |
+          cd backend
+          npm run test:e2e -- --ci --runInBand
