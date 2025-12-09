@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonBadge } from '@ionic/angular/standalone';
 
@@ -63,7 +63,7 @@ import { IonBadge } from '@ionic/angular/standalone';
   `],
   imports: [CommonModule, IonBadge]
 })
-export class LiveIndicatorComponent implements OnInit {
+export class LiveIndicatorComponent implements OnInit, OnChanges {
   @Input() status: string = '';
   @Input() minute?: number;
   @Input() animate: boolean = true;
@@ -115,4 +115,9 @@ export class LiveIndicatorComponent implements OnInit {
       this.displayText = this.status || 'Unknown';
     }
   }
+}
+
+@Injectable()
+export class LiveMatchService {
+  // ...existing code...
 }

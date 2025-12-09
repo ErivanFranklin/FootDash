@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { WebSocketService } from './web-socket.service';
 import { BehaviorSubject, Observable, filter, map } from 'rxjs';
 
@@ -27,10 +27,11 @@ export interface MatchState {
   providedIn: 'root',
 })
 export class LiveMatchService implements OnDestroy {
+  private wsService = inject(WebSocketService);
   private matchStates = new Map<string, BehaviorSubject<MatchState>>();
   private liveMatchIds = new Set<string>();
 
-  constructor(private wsService: WebSocketService) {
+  constructor() {
     // Listen to all WebSocket match updates
     this.wsService.onMatchUpdate().subscribe((update: LiveMatchUpdate) => {
       this.handleMatchUpdate(update);
