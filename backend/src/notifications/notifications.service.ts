@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import admin from 'firebase-admin';
 import util from 'util';
+import axios from 'axios';
 import { RegisterNotificationTokenDto } from './dto/register-notification-token.dto';
 import { Match } from '../matches/entities/match.entity';
 
@@ -179,6 +180,25 @@ export class NotificationsService {
             error: r.error?.message ?? r.error?.code,
           }));
         this.logger.warn('FCM failed responses:', JSON.stringify(failed));
+
+        // Send monitoring webhook if configured
+        try {
+          const webhook = this.config.get<string>('MONITORING_WEBHOOK_URL');
+          if (webhook) {
+            await axios.post(webhook, {
+              source: 'notifications',
+              project: this.config.get<string>('FCM_PROJECT_ID') || null,
+              matchId: match?.id ?? null,
+              event,
+              successCount: response.successCount,
+              failureCount: response.failureCount,
+              failed,
+              timestamp: new Date().toISOString(),
+            }, { timeout: 5000 });
+          }
+        } catch (monitorErr) {
+          this.logger.debug('Failed to send monitoring webhook', monitorErr as Error);
+        }
       }
 
       this.cleanupFailedTokens(tokens, response);
