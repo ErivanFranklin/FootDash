@@ -36,9 +36,12 @@ export class LiveMatchService implements OnDestroy {
   constructor() {
     const ws = this.wsService;
     if (ws && typeof ws.onMatchUpdate === 'function') {
-      ws.onMatchUpdate().subscribe((update: LiveMatchUpdate) => {
-        this.handleMatchUpdate(update);
-      });
+      const matchUpdates$ = ws.onMatchUpdate();
+      if (matchUpdates$ && typeof matchUpdates$.subscribe === 'function') {
+        matchUpdates$.subscribe((update: LiveMatchUpdate) => {
+          this.handleMatchUpdate(update);
+        });
+      }
     }
   }
 
