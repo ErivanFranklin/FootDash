@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, inject } from '@angular/core';
+import { Injectable, OnDestroy, inject, Injector } from '@angular/core';
 import { WebSocketService } from './web-socket.service';
 import { BehaviorSubject, Observable, filter, map } from 'rxjs';
 
@@ -27,15 +27,32 @@ export interface MatchState {
   providedIn: 'root',
 })
 export class LiveMatchService implements OnDestroy {
-  private wsService = inject(WebSocketService);
+  private injector = inject(Injector);
+  private resolved = false;
+  private _wsService: WebSocketService | null = null;
   private matchStates = new Map<string, BehaviorSubject<MatchState>>();
   private liveMatchIds = new Set<string>();
 
   constructor() {
-    // Listen to all WebSocket match updates
-    this.wsService.onMatchUpdate().subscribe((update: LiveMatchUpdate) => {
-      this.handleMatchUpdate(update);
-    });
+    const ws = this.wsService;
+    if (ws && typeof ws.onMatchUpdate === 'function') {
+      ws.onMatchUpdate().subscribe((update: LiveMatchUpdate) => {
+        this.handleMatchUpdate(update);
+      });
+    }
+  }
+
+  private get wsService(): WebSocketService | null {
+    if (!this.resolved) {
+      try {
+        this._wsService = this.injector.get(WebSocketService, null);
+      } catch {
+        this._wsService = null;
+      } finally {
+        this.resolved = true;
+      }
+    }
+    return this._wsService;
   }
 
   /**
@@ -44,8 +61,11 @@ export class LiveMatchService implements OnDestroy {
   subscribeToMatch(matchId: number | string): Observable<MatchState> {
     const id = String(matchId);
     
-    // Subscribe via WebSocket
-    this.wsService.subscribeToMatch(Number(id));
+    // Subscribe via WebSocket if available
+    const ws = this.wsService;
+    if (ws && typeof ws.subscribeToMatch === 'function') {
+      ws.subscribeToMatch(Number(id));
+    }
     
     // Create or get the match state subject
     if (!this.matchStates.has(id)) {
@@ -68,7 +88,10 @@ export class LiveMatchService implements OnDestroy {
    */
   unsubscribeFromMatch(matchId: number | string): void {
     const id = String(matchId);
-    this.wsService.unsubscribefromMatch(Number(id));
+    const ws = this.wsService;
+    if (ws && typeof ws.unsubscribefromMatch === 'function') {
+      ws.unsubscribefromMatch(Number(id));
+    }
     
     // Optional: Clean up the state if no longer needed
     // this.matchStates.delete(id);

@@ -2,6 +2,7 @@
 
 import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';
+import { setAssetPath } from '@ionic/core/components';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
@@ -12,3 +13,11 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting(),
 );
+
+// Configure Ionic/Stencils asset path to avoid URL errors in Karma/JSDOM
+try {
+  const base = (document as any).baseURI || (window as any).location?.href || '/';
+  setAssetPath(base);
+} catch {
+  // no-op if document/window not available in certain environments
+}
