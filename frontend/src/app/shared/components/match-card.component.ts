@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
+import { LiveIndicatorComponent } from './live-indicator.component';
 
 @Component({
   selector: 'app-match-card',
@@ -9,18 +10,34 @@ import { DatePipe } from '@angular/common';
   template: `
     <ion-card>
       <ion-card-header>
-        <ion-card-title>
-          {{ getHomeTeamName() }} vs {{ getAwayTeamName() }}
-        </ion-card-title>
+        <div class="card-header-content">
+          <ion-card-title>
+            {{ getHomeTeamName() }} vs {{ getAwayTeamName() }}
+          </ion-card-title>
+          <app-live-indicator 
+            [status]="match?.status || ''" 
+            [minute]="getMatchMinute()"
+            class="live-badge">
+          </app-live-indicator>
+        </div>
       </ion-card-header>
       <ion-card-content>
+        <!-- Score Display -->
+        <div class="score-container" *ngIf="hasScore()">
+          <div class="score-display">
+            <span class="home-score">{{ getHomeScore() }}</span>
+            <span class="score-separator">-</span>
+            <span class="away-score">{{ getAwayScore() }}</span>
+          </div>
+          <div class="score-label" *ngIf="isHalfTime()">
+            (HT: {{ getHalfTimeScore() }})
+          </div>
+        </div>
+
         <div class="match-info">
           <div class="match-date">
             <ion-icon name="calendar-outline"></ion-icon>
             {{ getMatchDate() | date:'medium' }}
-          </div>
-          <div class="match-status" [class]="'status-' + (match?.status || 'unknown').toLowerCase()">
-            Status: {{ match?.status || 'Unknown' }}
           </div>
           <div class="match-league" *ngIf="getLeagueName()">
             <ion-icon name="trophy-outline"></ion-icon>
@@ -51,6 +68,49 @@ import { DatePipe } from '@angular/common';
     </ion-card>
   `,
   styles: [`
+    .card-header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .card-header-content ion-card-title {
+      flex: 1;
+    }
+
+    .live-badge {
+      flex-shrink: 0;
+    }
+
+    .score-container {
+      text-align: center;
+      margin-bottom: var(--spacing-md);
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--ion-color-light-shade);
+    }
+
+    .score-display {
+      font-size: 2rem;
+      font-weight: var(--font-weight-bold);
+      color: var(--ion-color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+    }
+
+    .score-separator {
+      color: var(--ion-color-medium);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .score-label {
+      font-size: var(--font-size-sm);
+      color: var(--ion-color-medium);
+      margin-top: var(--spacing-xs);
+    }
+
     .match-info {
       margin-bottom: var(--spacing-md);
     }
@@ -63,24 +123,24 @@ import { DatePipe } from '@angular/common';
       font-size: var(--font-size-sm);
     }
 
-    .match-status {
-      font-weight: var(--font-weight-medium);
-    }
-
-    .status-scheduled { color: var(--ion-color-primary); }
-    .status-live { color: var(--ion-color-success); }
-    .status-finished { color: var(--ion-color-medium); }
-    .status-postponed { color: var(--ion-color-warning); }
-    .status-cancelled { color: var(--ion-color-danger); }
-
     .match-actions {
       display: flex;
       gap: var(--spacing-sm);
       flex-wrap: wrap;
       margin-top: var(--spacing-md);
     }
+
+    @keyframes scoreUpdate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); color: var(--ion-color-success); }
+      100% { transform: scale(1); }
+    }
+
+    .score-display.updated {
+      animation: scoreUpdate 0.6s ease-in-out;
+    }
   `],
-  imports: [IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, CommonModule, DatePipe]
+  imports: [IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, CommonModule, DatePipe, LiveIndicatorComponent]
 })
 export class MatchCardComponent {
   @Input() match: any;
@@ -118,5 +178,35 @@ export class MatchCardComponent {
 
   getVenueName(): string | null {
     return this.match?.venue?.name || null;
+  }
+
+  hasScore(): boolean {
+    return this.match?.homeScore !== null && 
+           this.match?.homeScore !== undefined || 
+           this.match?.awayScore !== null && 
+           this.match?.awayScore !== undefined;
+  }
+
+  getHomeScore(): number | string {
+    return this.match?.homeScore ?? this.match?.score?.fullTime?.home ?? '-';
+  }
+
+  getAwayScore(): number | string {
+    return this.match?.awayScore ?? this.match?.score?.fullTime?.away ?? '-';
+  }
+
+  isHalfTime(): boolean {
+    const status = (this.match?.status || '').toUpperCase();
+    return status.includes('HALFTIME') || status.includes('HALF');
+  }
+
+  getHalfTimeScore(): string {
+    const homeHT = this.match?.score?.halfTime?.home ?? '-';
+    const awayHT = this.match?.score?.halfTime?.away ?? '-';
+    return `${homeHT}-${awayHT}`;
+  }
+
+  getMatchMinute(): number | undefined {
+    return this.match?.minute;
   }
 }

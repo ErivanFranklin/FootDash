@@ -5,3 +5,4 @@ export * from './match-card.component';
 export * from './team-card.component';
 export * from './form-section.component';
 export * from './stat-card.component';
+export * from './live-indicator.component';

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FootballApiService } from '../football-api/football-api.service';
 import { MatchesQueryDto, MatchRangeType } from './dto/matches-query.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
 import { MatchGateway } from '../websockets/match.gateway';
@@ -24,6 +24,25 @@ export class MatchesService {
     return this.matchRepository.findOne({
       where: { id },
       relations: ['homeTeam', 'awayTeam'],
+    });
+  }
+
+  async getMatchesByDate(date: string) {
+    // Parse the date string (YYYY-MM-DD) and create start/end of day
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    return this.matchRepository.find({
+      where: {
+        kickOff: Between(startOfDay, endOfDay),
+      },
+      relations: ['homeTeam', 'awayTeam'],
+      order: {
+        kickOff: 'ASC',
+      },
     });
   }
 

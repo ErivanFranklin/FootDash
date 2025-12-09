@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -44,6 +45,7 @@ const isProd = process.env.NODE_ENV === 'production';
         FCM_PRIVATE_KEY: Joi.string().optional(),
       }),
     }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     AuthModule,
     FootballApiModule,

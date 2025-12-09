@@ -6,6 +6,7 @@ export interface NormalizedMatch {
   homeScore?: number | null;
   awayScore?: number | null;
   status?: string | null;
+  minute?: number;
   kickOff?: string | Date | null;
   venueName?: string | null;
   referee?: string | null;
@@ -22,10 +23,12 @@ export function normalizeMatch(raw: any): NormalizedMatch {
   const homeLogo = raw?.homeTeam?.logo || raw?.home?.logo || raw?.home?.logoUrl || raw?.teams?.home?.logo || null;
   const awayLogo = raw?.awayTeam?.logo || raw?.away?.logo || raw?.away?.logoUrl || raw?.teams?.away?.logo || null;
 
-  const homeScore = (raw?.homeScore ?? raw?.score?.home ?? raw?.goals?.home) ?? null;
-  const awayScore = (raw?.awayScore ?? raw?.score?.away ?? raw?.goals?.away) ?? null;
+  const homeScore = (raw?.homeScore ?? raw?.score?.home ?? raw?.goals?.home ?? raw?.score?.fullTime?.home) ?? null;
+  const awayScore = (raw?.awayScore ?? raw?.score?.away ?? raw?.goals?.away ?? raw?.score?.fullTime?.away) ?? null;
 
   const status = raw?.status || raw?.fixture?.status || null;
+  
+  const minute = raw?.minute ?? undefined;
 
   const kickOff = raw?.kickOff || raw?.kickoff || raw?.fixture?.date || raw?.utcDate || null;
 
@@ -44,6 +47,7 @@ export function normalizeMatch(raw: any): NormalizedMatch {
     homeScore,
     awayScore,
     status,
+    minute,
     kickOff,
     venueName,
     referee,

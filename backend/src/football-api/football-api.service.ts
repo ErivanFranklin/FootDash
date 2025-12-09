@@ -160,6 +160,58 @@ export class FootballApiService implements FootballApiAdapter {
     return normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
   }
 
+  async getMatch(matchId: number) {
+    if (this.mock) {
+      return {
+        id: matchId,
+        date: new Date().toISOString(),
+        status: 'IN_PLAY',
+        minute: 45,
+        home: {
+          id: 100,
+          name: 'Mock Home Team',
+          logo: null,
+        },
+        away: {
+          id: 101,
+          name: 'Mock Away Team',
+          logo: null,
+        },
+        score: {
+          fullTime: { home: 1, away: 1 },
+          halfTime: { home: 1, away: 0 },
+        },
+        referee: null,
+        venue: {
+          id: 1,
+          name: 'Mock Stadium',
+          city: 'Mock City',
+          capacity: 50000,
+          image: null,
+        },
+        league: {
+          id: 999,
+          name: 'Mock League',
+          country: 'Mockland',
+          logo: null,
+          season: 2025,
+        },
+        raw: {},
+      };
+    }
+
+    const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
+      'fixtures',
+      {
+        id: matchId,
+      },
+    );
+
+    // The API returns an array even for single fixture
+    const fixtures = normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
+    return fixtures && fixtures.length > 0 ? fixtures[0] : null;
+  }
+
   private async makeRequest<T>(
     path: string,
     params?: Record<string, number | string>,

@@ -7,6 +7,14 @@
   </div>
 
   <div *ngIf="match$ | async as match" class="match-details">
+    <!-- Live Indicator -->
+    <div class="live-indicator-container" *ngIf="matchState$ | async as state">
+      <app-live-indicator 
+        [status]="state.status" 
+        [minute]="state.minute">
+      </app-live-indicator>
+    </div>
+
     <section class="teams-row">
       <div class="team home">
         <div class="team-avatar">
@@ -17,10 +25,10 @@
         <div class="team-name">{{ match.homeName }}</div>
       </div>
 
-      <div class="score">
+      <div class="score" [class.score-updated]="scoreUpdated">
         <div class="score-value">{{ match.homeScore ?? '-' }} : {{ match.awayScore ?? '-' }}</div>
-        <div class="status">
-          <ion-badge color="primary">{{ match.status || 'N/A' }}</ion-badge>
+        <div class="match-minute" *ngIf="match.minute">
+          <ion-badge color="danger">'{{ match.minute }}</ion-badge>
         </div>
       </div>
 
