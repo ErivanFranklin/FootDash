@@ -17,5 +17,5 @@ export class User {
   password_hash: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 }
