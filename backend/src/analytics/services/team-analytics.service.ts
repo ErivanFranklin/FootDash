@@ -136,6 +136,10 @@ export class TeamAnalyticsService {
       relations: ['team'],
     });
 
+    if (!savedWithRelations) {
+      throw new Error('Failed to save team analytics');
+    }
+
     return this.mapToDto(savedWithRelations);
   }
 

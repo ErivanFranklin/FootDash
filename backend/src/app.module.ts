@@ -11,6 +11,7 @@ import { MatchesModule } from './matches/matches.module';
 import { WebsocketsModule } from './websockets/websockets.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { UsersModule } from './users/users.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -55,6 +56,7 @@ const isProd = process.env.NODE_ENV === 'production';
     WebsocketsModule,
     NotificationsModule,
     UsersModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

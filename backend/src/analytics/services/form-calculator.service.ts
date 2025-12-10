@@ -54,7 +54,7 @@ export class FormCalculatorService {
       let result: 'win' | 'draw' | 'loss';
       let points = 0;
 
-      if (teamScore == null || opponentScore == null) {
+      if (teamScore == null || opponentScore == null || match.kickOff == null) {
         // Match not played yet or incomplete data
         continue;
       }

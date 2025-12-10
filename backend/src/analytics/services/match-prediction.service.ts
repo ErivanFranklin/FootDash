@@ -101,12 +101,20 @@ export class MatchPredictionService {
     });
 
     // Determine confidence
-    const confidence = this.insightsGenerator.determineConfidence({
+    const confidenceLevel = this.insightsGenerator.determineConfidence({
       homeMatchCount: homeMatches.length,
       awayMatchCount: awayMatches.length,
       h2hCount: h2hMatches.length,
       formConsistency: (homeForm.formRating + awayForm.formRating) / 2,
     });
+
+    // Map string confidence to enum
+    const confidenceEnum =
+      confidenceLevel === 'low'
+        ? PredictionConfidence.LOW
+        : confidenceLevel === 'medium'
+          ? PredictionConfidence.MEDIUM
+          : PredictionConfidence.HIGH;
 
     // Save prediction
     const prediction = this.predictionRepository.create({
@@ -114,7 +122,7 @@ export class MatchPredictionService {
       homeWinProbability: probabilities.homeWin,
       drawProbability: probabilities.draw,
       awayWinProbability: probabilities.awayWin,
-      confidence,
+      confidence: confidenceEnum,
       insights,
       metadata: {
         homeFormRating: homeForm.formRating,
@@ -135,6 +143,10 @@ export class MatchPredictionService {
       where: { id: saved.id },
       relations: ['match', 'match.homeTeam', 'match.awayTeam'],
     });
+
+    if (!savedWithRelations) {
+      throw new Error('Failed to save prediction');
+    }
 
     return this.mapToDto(savedWithRelations);
   }

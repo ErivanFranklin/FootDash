@@ -96,12 +96,15 @@ export class StatisticalAnalysisService {
     const lastFiveMeetings = [];
 
     // Sort by most recent first
-    const sortedMatches = h2hMatches.sort(
-      (a, b) => new Date(b.kickOff).getTime() - new Date(a.kickOff).getTime(),
-    );
+    const sortedMatches = h2hMatches
+      .filter((match) => match.kickOff !== undefined)
+      .sort(
+        (a, b) =>
+          new Date(b.kickOff!).getTime() - new Date(a.kickOff!).getTime(),
+      );
 
     for (const match of sortedMatches.slice(0, 5)) {
-      if (match.homeScore == null || match.awayScore == null) continue;
+      if (match.homeScore == null || match.awayScore == null || match.kickOff == null) continue;
 
       const isOriginalHome = match.homeTeam.id === homeTeamId;
       const homeScore = isOriginalHome ? match.homeScore : match.awayScore;
