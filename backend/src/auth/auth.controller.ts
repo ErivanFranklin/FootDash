@@ -113,7 +113,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(
-    @Request() req: { user: { id: number } },
+    @Request() req: { user: { id: string } },
   ): Promise<ProfileDto> {
     return this.authService.getProfile(req.user.id);
   }

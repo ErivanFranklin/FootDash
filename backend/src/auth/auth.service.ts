@@ -14,7 +14,7 @@ import { RefreshToken } from './refresh-token.entity';
 import { ProfileDto } from './dto/profile.dto';
 
 export interface AuthUser {
-  id: number;
+  id: string;
   email: string;
 }
 
@@ -46,7 +46,10 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
-    const created = this.usersRepo.create({ email, passwordHash });
+    const created = this.usersRepo.create({
+      email,
+      password_hash: passwordHash,
+    });
     const saved = await this.usersRepo.save(created);
 
     const tokens = await this.createTokens({
@@ -65,7 +68,7 @@ export class AuthService {
 
     const passwordMatches = await bcrypt.compare(
       dto.password,
-      user.passwordHash,
+      user.password_hash,
     );
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials');
@@ -79,7 +82,7 @@ export class AuthService {
     try {
       // verify refresh token and extract subject (user id)
       const payload: any = this.jwtService.verify(refreshToken);
-      const userId = Number(payload.sub);
+      const userId = payload.sub;
       if (!userId) {
         throw new UnauthorizedException('Invalid refresh token');
       }
@@ -125,13 +128,13 @@ export class AuthService {
     }
   }
 
-  async getProfile(userId: number): Promise<ProfileDto> {
+  async getProfile(userId: string): Promise<ProfileDto> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...result } = user;
+    const { password_hash, ...result } = user;
     return result;
   }
 
