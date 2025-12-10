@@ -32,7 +32,6 @@ export class ReactionResponseDto {
   id: number;
   userId: number;
   userName: string;
-  userAvatar?: string;
   targetType: ReactionTargetType;
   targetId: number;
   reactionType: ReactionType;

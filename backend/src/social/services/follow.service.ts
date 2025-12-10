@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { Follow } from '../entities/follow.entity';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/user.entity';
 import { CreateFollowDto, FollowResponseDto, FollowStatsDto, UserListItemDto, PaginatedUsersDto } from '../dto/follow.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
 
@@ -149,19 +149,16 @@ export class FollowService {
       followerId: follow.followerId,
       followingId: follow.followingId,
       followerName: follow.follower?.email,
-      followerAvatar: follow.follower?.avatar,
       followingName: follow.following?.email,
-      followingAvatar: follow.following?.avatar,
       createdAt: follow.createdAt.toISOString(),
     };
   }
 
   private toUserListItem(user: User): UserListItemDto {
     return {
-      id: user.id,
+      id: Number(user.id),
       email: user.email,
-      avatar: user.avatar,
-      createdAt: user.createdAt.toISOString(),
+      createdAt: user.created_at.toISOString(),
     };
   }
 }

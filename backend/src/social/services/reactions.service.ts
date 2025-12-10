@@ -108,7 +108,6 @@ export class ReactionsService {
       id: reaction.id,
       userId: reaction.userId,
       userName: reaction.user?.email || 'Unknown',
-      userAvatar: reaction.user?.avatar,
       targetType: reaction.targetType,
       targetId: reaction.targetId,
       reactionType: reaction.reactionType,

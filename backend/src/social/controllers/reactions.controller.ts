@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Request }
 import { ReactionsService } from '../services/reactions.service';
 import { CreateReactionDto } from '../dto/reaction.dto';
 import { ReactionTargetType } from '../entities/reaction.entity';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('reactions')
 @UseGuards(JwtAuthGuard)
@@ -10,7 +10,7 @@ export class ReactionsController {
   constructor(private readonly reactionsService: ReactionsService) {}
 
   @Post()
-  async addReaction(@Request() req, @Body() dto: CreateReactionDto) {
+  async addReaction(@Request() req: { user: { sub: number } }, @Body() dto: CreateReactionDto) {
     const userId = req.user.sub;
     const reaction = await this.reactionsService.addReaction(userId, dto);
     return { success: true, reaction: this.reactionsService.toResponseDto(reaction) };
@@ -18,7 +18,7 @@ export class ReactionsController {
 
   @Delete(':targetType/:targetId')
   async removeReaction(
-    @Request() req,
+    @Request() req: { user: { sub: number } },
     @Param('targetType') targetType: string,
     @Param('targetId') targetId: string,
   ) {
@@ -33,7 +33,7 @@ export class ReactionsController {
 
   @Get(':targetType/:targetId')
   async getReactionSummary(
-    @Request() req,
+    @Request() req: { user?: { sub: number } },
     @Param('targetType') targetType: string,
     @Param('targetId') targetId: string,
   ) {
@@ -63,7 +63,7 @@ export class ReactionsController {
 
   @Get('user/:targetType/:targetId')
   async getUserReaction(
-    @Request() req,
+    @Request() req: { user: { sub: number } },
     @Param('targetType') targetType: string,
     @Param('targetId') targetId: string,
   ) {

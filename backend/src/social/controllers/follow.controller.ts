@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Request }
 import { FollowService } from '../services/follow.service';
 import { CreateFollowDto } from '../dto/follow.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('follow')
 @UseGuards(JwtAuthGuard)
@@ -10,14 +10,14 @@ export class FollowController {
   constructor(private readonly followService: FollowService) {}
 
   @Post()
-  async followUser(@Request() req, @Body() dto: CreateFollowDto) {
+  async followUser(@Request() req: { user: { sub: number } }, @Body() dto: CreateFollowDto) {
     const followerId = req.user.sub;
     const follow = await this.followService.followUser(followerId, dto);
     return { success: true, follow: this.followService.toResponseDto(follow) };
   }
 
   @Delete(':userId')
-  async unfollowUser(@Request() req, @Param('userId') userId: string) {
+  async unfollowUser(@Request() req: { user: { sub: number } }, @Param('userId') userId: string) {
     const followerId = req.user.sub;
     await this.followService.unfollowUser(followerId, parseInt(userId));
     return { success: true, message: 'Unfollowed successfully' };
@@ -42,14 +42,14 @@ export class FollowController {
   }
 
   @Get('stats/:userId')
-  async getFollowStats(@Request() req, @Param('userId') userId: string) {
+  async getFollowStats(@Request() req: { user?: { sub: number } }, @Param('userId') userId: string) {
     const currentUserId = req.user?.sub || null;
     const stats = await this.followService.getFollowStats(currentUserId, parseInt(userId));
     return { success: true, stats };
   }
 
   @Get('check/:userId')
-  async checkFollowing(@Request() req, @Param('userId') userId: string) {
+  async checkFollowing(@Request() req: { user: { sub: number } }, @Param('userId') userId: string) {
     const followerId = req.user.sub;
     const isFollowing = await this.followService.isFollowing(followerId, parseInt(userId));
     return { success: true, isFollowing };

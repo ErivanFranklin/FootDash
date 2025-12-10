@@ -158,7 +158,6 @@ export class FeedService {
       id: activity.id,
       userId: activity.userId,
       userName: activity.user?.email || 'Unknown',
-      userAvatar: activity.user?.avatar,
       activityType: activity.activityType,
       targetType: activity.targetType,
       targetId: activity.targetId,

@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Param, UseGuards, Request } from '@nestjs/common';
 import { FeedService } from '../services/feed.service';
 import { FeedQueryDto } from '../dto/activity.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('feed')
 export class FeedController {
@@ -9,7 +9,7 @@ export class FeedController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getUserFeed(@Request() req, @Query() query: FeedQueryDto) {
+  async getUserFeed(@Request() req: { user: { sub: number } }, @Query() query: FeedQueryDto) {
     const userId = req.user.sub;
     const result = await this.feedService.getUserFeed(userId, query);
     return { success: true, ...result };

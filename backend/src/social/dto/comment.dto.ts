@@ -36,7 +36,6 @@ export class CommentResponseDto {
   id: number;
   userId: number;
   userName: string;
-  userAvatar?: string;
   matchId?: number;
   predictionId?: number;
   parentCommentId?: number;

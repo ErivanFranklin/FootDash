@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { Comment } from '../entities/comment.entity';
 import { CreateCommentDto, UpdateCommentDto, CommentResponseDto, PaginatedCommentsDto } from '../dto/comment.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
@@ -45,7 +45,7 @@ export class CommentsService {
     const skip = (page - 1) * limit;
 
     const [comments, total] = await this.commentRepository.findAndCount({
-      where: { matchId, parentCommentId: null, isDeleted: false },
+      where: { matchId, parentCommentId: IsNull(), isDeleted: false },
       relations: ['user'],
       order: { createdAt: 'DESC' },
       skip,
@@ -67,7 +67,7 @@ export class CommentsService {
     const skip = (page - 1) * limit;
 
     const [comments, total] = await this.commentRepository.findAndCount({
-      where: { predictionId, parentCommentId: null, isDeleted: false },
+      where: { predictionId, parentCommentId: IsNull(), isDeleted: false },
       relations: ['user'],
       order: { createdAt: 'DESC' },
       skip,
@@ -168,7 +168,6 @@ export class CommentsService {
       id: comment.id,
       userId: comment.userId,
       userName: comment.user?.email || 'Unknown',
-      userAvatar: comment.user?.avatar,
       matchId: comment.matchId,
       predictionId: comment.predictionId,
       parentCommentId: comment.parentCommentId,

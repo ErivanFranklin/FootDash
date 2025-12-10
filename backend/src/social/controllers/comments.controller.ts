@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Requ
 import { CommentsService } from '../services/comments.service';
 import { CreateCommentDto, UpdateCommentDto } from '../dto/comment.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('comments')
 @UseGuards(JwtAuthGuard)
@@ -10,7 +10,7 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
-  async createComment(@Request() req, @Body() dto: CreateCommentDto) {
+  async createComment(@Request() req: { user: { sub: number } }, @Body() dto: CreateCommentDto) {
     const userId = req.user.sub;
     const comment = await this.commentsService.createComment(userId, dto);
     return { success: true, comment };
@@ -45,7 +45,7 @@ export class CommentsController {
 
   @Put(':commentId')
   async updateComment(
-    @Request() req,
+    @Request() req: { user: { sub: number } },
     @Param('commentId') commentId: string,
     @Body() dto: UpdateCommentDto,
   ) {
@@ -55,7 +55,7 @@ export class CommentsController {
   }
 
   @Delete(':commentId')
-  async deleteComment(@Request() req, @Param('commentId') commentId: string) {
+  async deleteComment(@Request() req: { user: { sub: number } }, @Param('commentId') commentId: string) {
     const userId = req.user.sub;
     await this.commentsService.deleteComment(parseInt(commentId), userId);
     return { success: true, message: 'Comment deleted successfully' };

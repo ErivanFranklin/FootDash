@@ -13,9 +13,7 @@ export class FollowResponseDto {
   followerId: number;
   followingId: number;
   followerName?: string;
-  followerAvatar?: string;
   followingName?: string;
-  followingAvatar?: string;
   createdAt: string;
 }
 
@@ -29,7 +27,6 @@ export class FollowStatsDto {
 export class UserListItemDto {
   id: number;
   email: string;
-  avatar?: string;
   createdAt: string;
   isFollowing?: boolean;
 }
