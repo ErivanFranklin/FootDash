@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException, ConflictException }
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Follow } from '../entities/follow.entity';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/user.entity';
 import { CreateFollowDto, FollowStatsDto } from '../dto/follow.dto';
 
 @Injectable()

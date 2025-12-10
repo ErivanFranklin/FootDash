@@ -6,7 +6,7 @@ import { Comment } from './entities/comment.entity';
 import { Reaction } from './entities/reaction.entity';
 import { Follow } from './entities/follow.entity';
 import { UserActivity } from './entities/user-activity.entity';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 
 // Services
 import { CommentsService } from './services/comments.service';
