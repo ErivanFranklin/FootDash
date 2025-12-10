@@ -140,6 +140,8 @@ jobs:
     env:
       DB_NAME: "footdash_${{ github.run_id }}"
       DB_PORT: 5433
+      # Number of Jest workers to provision DBs for (adjust as needed)
+      WORKERS: 4
 
     steps:
       - name: Checkout
@@ -196,7 +198,8 @@ jobs:
       - name: Prepare DB (optional script)
         run: |
           if [ -x "./scripts/create-test-db.sh" ]; then
-            ./scripts/create-test-db.sh "${{ env.DB_NAME }}" localhost 5433 postgres postgres || true
+            echo "Creating base DB and ${WORKERS} worker DBs for ${DB_NAME}"
+            ./scripts/create-test-db.sh --db "${{ env.DB_NAME }}" --host localhost --port 5433 --user postgres --pass postgres --workers ${WORKERS} || true
           else
             echo "create-test-db.sh not found or not executable — skipped"
           fi
