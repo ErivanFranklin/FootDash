@@ -1,0 +1,265 @@
+.team-comparison-card {
+  margin: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  min-height: 200px;
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 8px 0;
+    color: var(--ion-color-medium);
+  }
+}
+
+.advantage-badge {
+  text-align: center;
+  margin-bottom: 24px;
+
+  ion-badge {
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+}
+
+h3 {
+  margin: 24px 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Comparison Bar Sections
+.comparison-section {
+  margin-bottom: 24px;
+
+  .comparison-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .team-value {
+      display: flex;
+      flex-direction: column;
+      min-width: 80px;
+
+      &.home {
+        align-items: flex-start;
+      }
+
+      &.away {
+        align-items: flex-end;
+      }
+
+      .team-name {
+        font-size: 11px;
+        color: var(--ion-color-medium);
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px;
+      }
+
+      .value {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--ion-color-dark);
+      }
+    }
+
+    .bar-container {
+      flex: 1;
+      display: flex;
+      height: 32px;
+      background: var(--ion-color-light);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+
+      .bar {
+        height: 100%;
+        transition: width 0.3s ease;
+
+        &.home {
+          background: linear-gradient(90deg, rgba(52, 199, 89, 0.8), rgba(52, 199, 89, 1));
+          border-radius: 16px 0 0 16px;
+        }
+
+        &.away {
+          background: linear-gradient(90deg, rgba(255, 59, 48, 1), rgba(255, 59, 48, 0.8));
+          border-radius: 0 16px 16px 0;
+        }
+      }
+    }
+  }
+}
+
+// Head-to-Head Section
+.h2h-section {
+  margin: 32px 0;
+  padding: 20px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+
+  .h2h-stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 16px 0;
+
+    .h2h-stat {
+      text-align: center;
+
+      .value {
+        display: block;
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 4px;
+
+        .home & {
+          color: var(--ion-color-success);
+        }
+
+        .draws & {
+          color: var(--ion-color-warning);
+        }
+
+        .away & {
+          color: var(--ion-color-danger);
+        }
+      }
+
+      .label {
+        display: block;
+        font-size: 12px;
+        color: var(--ion-color-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  .h2h-total {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ion-color-medium);
+    margin: 12px 0 0 0;
+    font-weight: 500;
+  }
+}
+
+// Recent Meetings
+.recent-meetings {
+  margin: 24px 0;
+
+  ion-list {
+    background: transparent;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --background: var(--ion-color-light);
+    border-radius: 8px;
+    margin-bottom: 8px;
+
+    .meeting-info {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+
+      .date {
+        font-size: 12px;
+        color: var(--ion-color-medium);
+        min-width: 100px;
+      }
+
+      .score {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 600;
+
+        .home-score,
+        .away-score {
+          color: var(--ion-color-medium);
+
+          &.winner {
+            color: var(--ion-color-success);
+            font-weight: 700;
+          }
+        }
+
+        .separator {
+          color: var(--ion-color-medium);
+        }
+      }
+
+      ion-badge {
+        min-width: 60px;
+        text-align: center;
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+// Insights
+.insights {
+  margin: 24px 0;
+
+  ion-list {
+    background: transparent;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+
+    ion-icon {
+      margin-right: 12px;
+    }
+
+    ion-label {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .team-comparison-card {
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  }
+
+  .h2h-section,
+  .recent-meetings ion-item {
+    background: var(--ion-color-step-100);
+  }
+
+  .comparison-bar .bar-container {
+    background: var(--ion-color-step-150);
+  }
+}
