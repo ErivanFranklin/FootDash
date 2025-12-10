@@ -13,6 +13,10 @@ import { UserPreferencesController } from './controllers/user-preferences.contro
   imports: [TypeOrmModule.forFeature([User, UserProfile, UserPreferences])],
   controllers: [UserProfileController, UserPreferencesController],
   providers: [UserProfileService, UserPreferencesService, AvatarUploadService],
-  exports: [UserProfileService, UserPreferencesService],
+  exports: [
+    TypeOrmModule, // Export TypeORM repositories for User, UserProfile, UserPreferences
+    UserProfileService,
+    UserPreferencesService,
+  ],
 })
 export class UsersModule {}
