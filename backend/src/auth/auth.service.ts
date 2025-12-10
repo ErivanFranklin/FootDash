@@ -133,9 +133,12 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password_hash, ...result } = user;
-    return result;
+    // map DB snake_case -> API camelCase explicitly to match ProfileDto
+    return {
+      id: user.id,
+      email: user.email,
+      createdAt: (user as any).created_at,
+    } as ProfileDto;
   }
 
   private async createTokens(user: AuthUser): Promise<AuthTokens> {

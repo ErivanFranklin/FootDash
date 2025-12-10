@@ -170,3 +170,35 @@ docker compose -f docker-compose.db.yml down
 ```
 
 This pattern keeps backend and frontend running on your machine without container isolation while keeping the database in a lightweight Colima VM/container.
+
+7) Running E2E tests locally (Postgres)
+
+If you want to run the Postgres-backed E2E tests locally and ensure the DB and migrations run deterministically, follow these steps from the project root:
+
+```bash
+# create the DB (idempotent)
+./scripts/create-test-db.sh footdash localhost 5432 postgres postgres
+
+# run migrations so the schema exists
+cd backend
+npm ci
+npm run migrate:run
+
+# run e2e tests serially (recommended locally)
+npm run test:e2e -- --runInBand
+```
+
+Alternatively you can use the convenience script from the backend package.json which wraps these steps (it expects `DB_*` env vars to be set):
+
+```bash
+# from project root
+cd backend
+# set environment overrides if needed, e.g. DB_NAME, DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD
+DB_NAME=footdash DB_HOST=localhost DB_PORT=5432 DB_USERNAME=postgres DB_PASSWORD=postgres npm run test:e2e:setup
+# then run tests serially
+npm run test:e2e:ci
+```
+
+Notes:
+- Use `--runInBand` to avoid parallel workers clobbering a shared DB schema.
+- CI uses a separate DB instance per job; check `.github/workflows/backend-ci.yml` for the exact job configuration.

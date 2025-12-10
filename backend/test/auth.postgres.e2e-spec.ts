@@ -7,6 +7,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../src/auth/auth.module';
 import { User } from '../src/users/user.entity';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
+import { CreateUsersTable1680000000000 } from '../migrations/1680000000000-CreateUsersTable';
+import { AddMatchMetadata1690001000000 } from '../migrations/1690001000000-AddMatchMetadata';
+import { CreateNotificationsAndTeams1700000000000 } from '../migrations/1700000000000-CreateNotificationsAndTeams';
+import { AddUserProfileAndPreferences1733783250000 } from '../migrations/1733783250000-AddUserProfileAndPreferences';
+import { CreateRefreshTokens1740000000000 } from '../migrations/1740000000000-CreateRefreshTokens';
 
 describe('Auth e2e (Postgres)', () => {
   let app: INestApplication;
@@ -29,7 +34,17 @@ describe('Auth e2e (Postgres)', () => {
           password,
           database,
           entities: [User, RefreshToken],
-          synchronize: true,
+          // Use migrations for E2E to get deterministic schema creation instead of synchronize
+          synchronize: false,
+          migrationsRun: true,
+          // Load migrations from the repository; ts-jest will handle TS files during tests
+          migrations: [
+            CreateUsersTable1680000000000,
+            AddMatchMetadata1690001000000,
+            CreateNotificationsAndTeams1700000000000,
+            AddUserProfileAndPreferences1733783250000,
+            CreateRefreshTokens1740000000000,
+          ],
         }),
         TypeOrmModule.forFeature([User, RefreshToken]),
         JwtModule.register({ secret: process.env.JWT_SECRET || 'test-secret' }),

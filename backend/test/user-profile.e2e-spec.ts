@@ -33,6 +33,8 @@ describe('UserProfile E2E', () => {
           database,
           entities: [User, UserProfile, UserPreferences, RefreshToken],
           synchronize: false,
+          migrationsRun: true,
+          migrations: [__dirname + '/../migrations/*{.ts,.js}'],
         }),
         ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forFeature([
