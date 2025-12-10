@@ -105,6 +105,19 @@ Located in `backend/scripts/`:
  - `check-null-passwords.ts` - Diagnostic script to find users with NULL passwords
  - `../scripts/create-test-db.sh` - Repo-level helper to create base and per-worker test DBs (used by CI and local flows)
 
+## Migration files (machine-readable)
+
+Below is a concise table of migration files present in `backend/migrations` with their numeric timestamps and a short description. All listed migrations are applied in the current `footdash` database.
+
+| Timestamp | Filename | Description | Status |
+|---:|---|---|---|
+| 1680000000000 | `1680000000000-CreateUsersTable.ts` | Create `users` table (`id`, `email`, `password_hash`, `created_at`) | ✅ applied |
+| 1690001000000 | `1690001000000-AddMatchMetadata.ts` | Add `referee`, `venue`, `league` to `matches` | ✅ applied |
+| 1700000000000 | `1700000000000-CreateNotificationsAndTeams.ts` | Create `notifications` and `teams` tables | ✅ applied |
+| 1733783250000 | `1733783250000-AddUserProfileAndPreferences.ts` | Create `user_profiles` and `user_preferences` (enums for theme/language) | ✅ applied |
+| 1740000000000 | `1740000000000-CreateRefreshTokens.ts` | Create `refresh_tokens` table for persisted refresh tokens | ✅ applied |
+
+
 ## Safety Notes
 
 - ⚠️ **Always backup production databases** before applying migrations
