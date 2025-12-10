@@ -53,7 +53,18 @@ export class UserPreferencesService {
     userId: number,
     updatePreferencesDto: UpdatePreferencesDto,
   ): Promise<UserPreferences> {
-    const preferences = await this.findByUserId(userId);
+    let preferences: UserPreferences;
+
+    try {
+      preferences = await this.findByUserId(userId);
+    } catch (error) {
+      // If preferences do not exist, create default preferences then apply updates
+      if (error instanceof NotFoundException) {
+        preferences = await this.createDefault(userId);
+      } else {
+        throw error;
+      }
+    }
 
     Object.assign(preferences, updatePreferencesDto);
 

@@ -42,8 +42,6 @@ describe('UserPreferencesService', () => {
     }).compile();
 
     service = module.get<UserPreferencesService>(UserPreferencesService);
-    // repository is not used by these unit tests; repository access is mocked via mockRepository
-
     jest.clearAllMocks();
   });
 
@@ -117,7 +115,7 @@ describe('UserPreferencesService', () => {
       mockRepository.findOne.mockResolvedValue(prefs);
       mockRepository.save.mockImplementation(async (p) => p);
 
-      const result = await service.update(1, updateDto);
+      const result = await service.update(1, updateDto as any);
 
       expect(result.theme).toBe(Theme.DARK);
       expect(result.language).toBe(Language.ES);
@@ -126,12 +124,20 @@ describe('UserPreferencesService', () => {
       expect(result.timezone).toBe('America/New_York');
     });
 
-    it('should throw NotFoundException when preferences do not exist', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+    it('should upsert when preferences do not exist', async () => {
+      // When no preferences exist, update() should create defaults then apply updates
+      mockRepository.findOne.mockResolvedValueOnce(null); // findByUserId -> NotFound
+      mockRepository.findOne.mockResolvedValueOnce(null); // createDefault check
 
-      await expect(service.update(999, { theme: Theme.DARK })).rejects.toThrow(
-        NotFoundException,
-      );
+      mockRepository.create.mockImplementation((obj) => ({ id: 2, ...obj }));
+      mockRepository.save.mockImplementation(async (p) => p);
+
+      const result = await service.update(999, { theme: Theme.DARK } as any);
+
+      expect(mockRepository.create).toHaveBeenCalled();
+      expect(mockRepository.save).toHaveBeenCalled();
+      expect(result.theme).toBe(Theme.DARK);
+      expect(result.userId).toBe(999);
     });
 
     it('should update only provided fields', async () => {
@@ -143,7 +149,7 @@ describe('UserPreferencesService', () => {
       mockRepository.findOne.mockResolvedValue(prefs);
       mockRepository.save.mockImplementation(async (p) => p);
 
-      const result = await service.update(1, updateDto);
+      const result = await service.update(1, updateDto as any);
 
       expect(result.theme).toBe(Theme.LIGHT);
       expect(result.language).toBe(Language.EN); // unchanged

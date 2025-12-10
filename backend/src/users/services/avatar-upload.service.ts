@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
@@ -9,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AvatarUploadService {
+  private readonly logger = new Logger(AvatarUploadService.name);
   private readonly uploadDir = join(process.cwd(), 'uploads', 'avatars');
   private readonly maxFileSize = 2 * 1024 * 1024; // 2MB
   private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -66,9 +68,8 @@ export class AvatarUploadService {
       await fs.access(filepath);
       await fs.unlink(filepath);
     } catch (error) {
-      // Silently fail if file doesn't exist
-      // eslint-disable-next-line no-console
-      console.error('Failed to delete avatar:', error.message);
+      // Silently fail if file doesn't exist — log at debug level
+      this.logger.debug(`Failed to delete avatar: ${error?.message ?? error}`);
     }
   }
 }
