@@ -10,9 +10,7 @@ import { UserProfileController } from './controllers/user-profile.controller';
 import { UserPreferencesController } from './controllers/user-preferences.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, UserProfile, UserPreferences]),
-  ],
+  imports: [TypeOrmModule.forFeature([User, UserProfile, UserPreferences])],
   controllers: [UserProfileController, UserPreferencesController],
   providers: [UserProfileService, UserPreferencesService, AvatarUploadService],
   exports: [UserProfileService, UserPreferencesService],

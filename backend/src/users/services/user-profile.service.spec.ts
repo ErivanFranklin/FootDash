@@ -1,13 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UserProfileService } from './user-profile.service';
 import { UserProfile } from '../entities/user-profile.entity';
 import { NotFoundException } from '@nestjs/common';
 
 describe('UserProfileService', () => {
   let service: UserProfileService;
-  let repository: Repository<UserProfile>;
 
   const mockUserProfile = {
     id: 1,
@@ -37,9 +35,7 @@ describe('UserProfileService', () => {
     }).compile();
 
     service = module.get<UserProfileService>(UserProfileService);
-    repository = module.get<Repository<UserProfile>>(
-      getRepositoryToken(UserProfile),
-    );
+    // repository is not used by these unit tests; repository access is mocked via mockRepository
 
     jest.clearAllMocks();
   });

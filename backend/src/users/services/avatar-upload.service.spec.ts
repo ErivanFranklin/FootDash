@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AvatarUploadService } from './avatar-upload.service';
 import { BadRequestException } from '@nestjs/common';
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { Readable } from 'stream';
 
 jest.mock('fs/promises');
@@ -52,7 +51,11 @@ describe('AvatarUploadService', () => {
     });
 
     it('should save avatar with valid PNG file', async () => {
-      const pngFile = { ...mockFile, mimetype: 'image/png', originalname: 'test.png' };
+      const pngFile = {
+        ...mockFile,
+        mimetype: 'image/png',
+        originalname: 'test.png',
+      };
 
       const result = await service.saveAvatar(pngFile);
 
@@ -60,7 +63,11 @@ describe('AvatarUploadService', () => {
     });
 
     it('should save avatar with valid WEBP file', async () => {
-      const webpFile = { ...mockFile, mimetype: 'image/webp', originalname: 'test.webp' };
+      const webpFile = {
+        ...mockFile,
+        mimetype: 'image/webp',
+        originalname: 'test.webp',
+      };
 
       const result = await service.saveAvatar(webpFile);
 
@@ -159,8 +166,10 @@ describe('AvatarUploadService', () => {
 
     it('should handle avatarUrl without throwing for non-existent path', async () => {
       (fs.access as jest.Mock).mockRejectedValue(new Error('File not found'));
-      
-      await expect(service.deleteAvatar('/uploads/avatars/test.jpg')).resolves.not.toThrow();
+
+      await expect(
+        service.deleteAvatar('/uploads/avatars/test.jpg'),
+      ).resolves.not.toThrow();
     });
   });
 });

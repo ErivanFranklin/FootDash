@@ -10,12 +10,12 @@ import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
+
   // Configure static file serving for avatars
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-  
+
   app.enableCors();
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
   const isProd = process.env.NODE_ENV === 'production';

@@ -22,7 +22,8 @@ export class NotificationsService {
     private readonly tokenRepository: Repository<NotificationToken>,
   ) {
     // Read debug flag before initializing to control verbose logging
-    this.debugEnabled = this.config.get<string>('NOTIFICATIONS_DEBUG') === 'true';
+    this.debugEnabled =
+      this.config.get<string>('NOTIFICATIONS_DEBUG') === 'true';
     this.initializeFirebase();
   }
 
@@ -129,7 +130,7 @@ export class NotificationsService {
       },
     };
 
-      try {
+    try {
       if (this.debugEnabled) {
         // Verbose debug: log tokens being sent (only token strings, limit to 2000 chars)
         try {
@@ -185,24 +186,31 @@ export class NotificationsService {
         try {
           const webhook = this.config.get<string>('MONITORING_WEBHOOK_URL');
           if (webhook) {
-            await axios.post(webhook, {
-              source: 'notifications',
-              project: this.config.get<string>('FCM_PROJECT_ID') || null,
-              matchId: match?.id ?? null,
-              event,
-              successCount: response.successCount,
-              failureCount: response.failureCount,
-              failed,
-              timestamp: new Date().toISOString(),
-            }, { timeout: 5000 });
+            await axios.post(
+              webhook,
+              {
+                source: 'notifications',
+                project: this.config.get<string>('FCM_PROJECT_ID') || null,
+                matchId: match?.id ?? null,
+                event,
+                successCount: response.successCount,
+                failureCount: response.failureCount,
+                failed,
+                timestamp: new Date().toISOString(),
+              },
+              { timeout: 5000 },
+            );
           }
         } catch (monitorErr) {
-          this.logger.debug('Failed to send monitoring webhook', monitorErr as Error);
+          this.logger.debug(
+            'Failed to send monitoring webhook',
+            monitorErr as Error,
+          );
         }
       }
 
       this.cleanupFailedTokens(tokens, response);
-      } catch (error) {
+    } catch (error) {
       this.logger.warn('Failed to publish push notification', error as Error);
     }
   }

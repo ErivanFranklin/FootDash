@@ -19,7 +19,10 @@ export class LiveMatchService implements OnModuleDestroy {
   private readonly logger = new Logger(LiveMatchService.name);
   private pollingIntervals = new Map<string, NodeJS.Timeout>();
   private lastMatchData = new Map<string, any>();
-  private readonly pollInterval = parseInt(process.env.LIVE_MATCH_POLL_INTERVAL || '30000', 10); // 30 seconds default
+  private readonly pollInterval = parseInt(
+    process.env.LIVE_MATCH_POLL_INTERVAL || '30000',
+    10,
+  ); // 30 seconds default
 
   constructor(
     private readonly matchesService: MatchesService,
@@ -57,7 +60,7 @@ export class LiveMatchService implements OnModuleDestroy {
    */
   stopPolling(matchId: string) {
     const interval = this.pollingIntervals.get(matchId);
-    
+
     if (interval) {
       this.logger.log(`Stopping live polling for match ${matchId}`);
       clearInterval(interval);
@@ -92,7 +95,9 @@ export class LiveMatchService implements OnModuleDestroy {
   private async pollMatch(matchId: string) {
     try {
       // Fetch latest match data from API
-      const match = await this.footballApiService.getMatch(parseInt(matchId, 10));
+      const match = await this.footballApiService.getMatch(
+        parseInt(matchId, 10),
+      );
 
       if (!match) {
         this.logger.warn(`Match ${matchId} not found`);
@@ -101,12 +106,18 @@ export class LiveMatchService implements OnModuleDestroy {
       }
 
       // Check if match is finished
-      if (match.status === 'FINISHED' || match.status === 'POSTPONED' || match.status === 'CANCELLED') {
-        this.logger.log(`Match ${matchId} is ${match.status}, stopping polling`);
-        
+      if (
+        match.status === 'FINISHED' ||
+        match.status === 'POSTPONED' ||
+        match.status === 'CANCELLED'
+      ) {
+        this.logger.log(
+          `Match ${matchId} is ${match.status}, stopping polling`,
+        );
+
         // Send final update
         this.broadcastMatchUpdate(matchId, match);
-        
+
         // Stop polling this match
         this.stopPolling(matchId);
         return;
@@ -120,10 +131,9 @@ export class LiveMatchService implements OnModuleDestroy {
       } else {
         this.logger.debug(`No changes for match ${matchId}`);
       }
-
     } catch (error) {
       this.logger.error(`Error polling match ${matchId}:`, error.message);
-      
+
       // If error persists, we might want to stop polling after X failures
       // For now, just log and continue
     }
@@ -134,13 +144,13 @@ export class LiveMatchService implements OnModuleDestroy {
    */
   private hasMatchDataChanged(matchId: string, newData: any): boolean {
     const lastData = this.lastMatchData.get(matchId);
-    
+
     if (!lastData) {
       return true; // First time seeing this match
     }
 
     // Check for score changes
-    const scoreChanged = 
+    const scoreChanged =
       lastData.score?.fullTime?.home !== newData.score?.fullTime?.home ||
       lastData.score?.fullTime?.away !== newData.score?.fullTime?.away ||
       lastData.score?.halfTime?.home !== newData.score?.halfTime?.home ||

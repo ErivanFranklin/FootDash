@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UserPreferencesService } from './user-preferences.service';
 import {
   UserPreferences,
@@ -11,7 +10,6 @@ import { NotFoundException } from '@nestjs/common';
 
 describe('UserPreferencesService', () => {
   let service: UserPreferencesService;
-  let repository: Repository<UserPreferences>;
 
   const mockUserPreferences = {
     id: 1,
@@ -44,9 +42,7 @@ describe('UserPreferencesService', () => {
     }).compile();
 
     service = module.get<UserPreferencesService>(UserPreferencesService);
-    repository = module.get<Repository<UserPreferences>>(
-      getRepositoryToken(UserPreferences),
-    );
+    // repository is not used by these unit tests; repository access is mocked via mockRepository
 
     jest.clearAllMocks();
   });
@@ -133,9 +129,9 @@ describe('UserPreferencesService', () => {
     it('should throw NotFoundException when preferences do not exist', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.update(999, { theme: Theme.DARK }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, { theme: Theme.DARK })).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should update only provided fields', async () => {
@@ -188,10 +184,7 @@ describe('UserPreferencesService', () => {
       mockRepository.findOne.mockResolvedValue(prefs);
       mockRepository.save.mockImplementation(async (p) => p);
 
-      const result = await service.updateNotifications(
-        1,
-        notificationSettings,
-      );
+      const result = await service.updateNotifications(1, notificationSettings);
 
       expect(result.notificationEnabled).toBe(false);
       expect(result.emailNotifications).toBe(false);
@@ -215,10 +208,7 @@ describe('UserPreferencesService', () => {
       mockRepository.findOne.mockResolvedValue(prefs);
       mockRepository.save.mockImplementation(async (p) => p);
 
-      const result = await service.updateNotifications(
-        1,
-        notificationSettings,
-      );
+      const result = await service.updateNotifications(1, notificationSettings);
 
       expect(result.emailNotifications).toBe(false);
       expect(result.notificationEnabled).toBe(true); // unchanged

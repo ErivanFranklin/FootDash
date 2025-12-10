@@ -5,7 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { User } from '../src/users/user.entity';
 import { UserProfile } from '../src/users/entities/user-profile.entity';
-import { UserPreferences, Theme, Language } from '../src/users/entities/user-preferences.entity';
+import {
+  UserPreferences,
+  Theme,
+  Language,
+} from '../src/users/entities/user-preferences.entity';
 import { UsersModule } from '../src/users/users.module';
 import { AuthModule } from '../src/auth/auth.module';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
@@ -35,7 +39,12 @@ describe('UserPreferences E2E', () => {
           synchronize: false,
         }),
         ConfigModule.forRoot({ isGlobal: true }),
-        TypeOrmModule.forFeature([User, UserProfile, UserPreferences, RefreshToken]),
+        TypeOrmModule.forFeature([
+          User,
+          UserProfile,
+          UserPreferences,
+          RefreshToken,
+        ]),
         AuthModule,
         UsersModule,
       ],

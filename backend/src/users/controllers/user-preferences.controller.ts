@@ -34,9 +34,7 @@ class UpdateNotificationsDto {
 
 @Controller('users/:userId/preferences')
 export class UserPreferencesController {
-  constructor(
-    private readonly preferencesService: UserPreferencesService,
-  ) {}
+  constructor(private readonly preferencesService: UserPreferencesService) {}
 
   @Get()
   async getPreferences(@Param('userId', ParseIntPipe) userId: number) {
@@ -50,12 +48,9 @@ export class UserPreferencesController {
   ) {
     try {
       return await this.preferencesService.update(userId, updatePreferencesDto);
-    } catch (error) {
-      if (error.status === 404) {
-        await this.preferencesService.createDefault(userId);
-        return this.preferencesService.update(userId, updatePreferencesDto);
-      }
-      throw error;
+    } catch (_error) {
+      this.logger.error('Upload failed', _error);
+      throw _error;
     }
   }
 

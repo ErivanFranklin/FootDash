@@ -44,10 +44,12 @@ export class MatchSchedulerService implements OnModuleInit {
       }
 
       // Stop polling matches that are no longer in live window
-      const liveMatchIds = liveMatches.map(m => m.id.toString());
+      const liveMatchIds = liveMatches.map((m) => m.id.toString());
       for (const polledId of currentlyPolled) {
         if (!liveMatchIds.includes(polledId)) {
-          this.logger.log(`Match ${polledId} is no longer in live window, stopping polling`);
+          this.logger.log(
+            `Match ${polledId} is no longer in live window, stopping polling`,
+          );
           this.liveMatchService.stopPolling(polledId);
         }
       }
@@ -70,7 +72,9 @@ export class MatchSchedulerService implements OnModuleInit {
   private async findLiveMatches(): Promise<any[]> {
     try {
       const now = new Date();
-      const windowStart = new Date(now.getTime() - this.liveMatchWindowMinutes * 60 * 1000);
+      const windowStart = new Date(
+        now.getTime() - this.liveMatchWindowMinutes * 60 * 1000,
+      );
       const windowEnd = new Date(now.getTime() + 15 * 60 * 1000); // 15 minutes into future
 
       // Get today's matches (this is a simplified approach)
@@ -80,14 +84,20 @@ export class MatchSchedulerService implements OnModuleInit {
       );
 
       // Filter matches that are in live window
-      const liveMatches = todayMatches.filter(match => {
+      const liveMatches = todayMatches.filter((match) => {
         // Always include matches with live status
-        if (match.status && ['IN_PLAY', 'PAUSED', 'HALFTIME'].includes(match.status)) {
+        if (
+          match.status &&
+          ['IN_PLAY', 'PAUSED', 'HALFTIME'].includes(match.status)
+        ) {
           return true;
         }
 
         // Include scheduled matches in the time window
-        if (match.status && (match.status === 'SCHEDULED' || match.status === 'TIMED')) {
+        if (
+          match.status &&
+          (match.status === 'SCHEDULED' || match.status === 'TIMED')
+        ) {
           if (match.kickOff) {
             const matchDate = new Date(match.kickOff);
             return matchDate >= windowStart && matchDate <= windowEnd;

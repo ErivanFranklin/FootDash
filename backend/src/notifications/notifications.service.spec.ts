@@ -48,7 +48,7 @@ describe('NotificationsService', () => {
     it('should accept a valid token', async () => {
       const validToken = 'a'.repeat(51);
       const payload = { token: validToken, platform: 'web' };
-      
+
       await service.registerToken(payload);
 
       expect(mockTokenRepository.upsert).toHaveBeenCalledWith(
@@ -77,16 +77,16 @@ describe('NotificationsService', () => {
     });
 
     it('should trim whitespace from a token', async () => {
-        const tokenWithWhitespace = '  ' + 'a'.repeat(51) + '  ';
-        const trimmedToken = 'a'.repeat(51);
-        const payload = { token: tokenWithWhitespace };
+      const tokenWithWhitespace = '  ' + 'a'.repeat(51) + '  ';
+      const trimmedToken = 'a'.repeat(51);
+      const payload = { token: tokenWithWhitespace };
 
-        await service.registerToken(payload);
+      await service.registerToken(payload);
 
-        expect(mockTokenRepository.upsert).toHaveBeenCalledWith(
-            { token: trimmedToken, platform: undefined, userId: undefined },
-            ['token'],
-        );
+      expect(mockTokenRepository.upsert).toHaveBeenCalledWith(
+        { token: trimmedToken, platform: undefined, userId: undefined },
+        ['token'],
+      );
     });
   });
 });

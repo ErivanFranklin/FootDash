@@ -24,7 +24,10 @@ export class UserProfileService {
     return profile;
   }
 
-  async create(userId: number, createProfileDto: CreateProfileDto): Promise<UserProfile> {
+  async create(
+    userId: number,
+    createProfileDto: CreateProfileDto,
+  ): Promise<UserProfile> {
     const existingProfile = await this.profileRepository.findOne({
       where: { userId },
     });
@@ -41,7 +44,10 @@ export class UserProfileService {
     return this.profileRepository.save(profile);
   }
 
-  async update(userId: number, updateProfileDto: UpdateProfileDto): Promise<UserProfile> {
+  async update(
+    userId: number,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<UserProfile> {
     const profile = await this.findByUserId(userId);
 
     Object.assign(profile, updateProfileDto);

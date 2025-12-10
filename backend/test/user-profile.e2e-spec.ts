@@ -9,8 +9,6 @@ import { UserPreferences } from '../src/users/entities/user-preferences.entity';
 import { UsersModule } from '../src/users/users.module';
 import { AuthModule } from '../src/auth/auth.module';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
-import * as path from 'path';
-import * as fs from 'fs';
 
 describe('UserProfile E2E', () => {
   let app: INestApplication;
@@ -37,7 +35,12 @@ describe('UserProfile E2E', () => {
           synchronize: false,
         }),
         ConfigModule.forRoot({ isGlobal: true }),
-        TypeOrmModule.forFeature([User, UserProfile, UserPreferences, RefreshToken]),
+        TypeOrmModule.forFeature([
+          User,
+          UserProfile,
+          UserPreferences,
+          RefreshToken,
+        ]),
         AuthModule,
         UsersModule,
       ],
@@ -165,7 +168,7 @@ describe('UserProfile E2E', () => {
       // Create a small test image buffer (1x1 pixel PNG)
       const testImageBuffer = Buffer.from(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-        'base64'
+        'base64',
       );
 
       const res = await request(app.getHttpServer())
@@ -206,7 +209,7 @@ describe('UserProfile E2E', () => {
       // First upload an avatar
       const testImageBuffer = Buffer.from(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-        'base64'
+        'base64',
       );
 
       await request(app.getHttpServer())

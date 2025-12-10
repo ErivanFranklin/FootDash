@@ -21,7 +21,9 @@ export class AvatarUploadService {
 
     // Validate mime type
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException('Invalid file type. Only JPG, PNG, and WEBP are allowed');
+      throw new BadRequestException(
+        'Invalid file type. Only JPG, PNG, and WEBP are allowed',
+      );
     }
 
     try {
@@ -38,7 +40,11 @@ export class AvatarUploadService {
 
       // Return relative URL
       return `/uploads/avatars/${filename}`;
-    } catch (error) {
+    } catch (_error) {
+      // Log and rethrow as a generic internal server error
+      // (_error is intentionally prefixed to avoid lint no-unused-vars)
+      // eslint-disable-next-line no-console
+      console.error('Failed to save avatar:', _error?.message ?? _error);
       throw new InternalServerErrorException('Failed to save avatar');
     }
   }
@@ -61,6 +67,7 @@ export class AvatarUploadService {
       await fs.unlink(filepath);
     } catch (error) {
       // Silently fail if file doesn't exist
+      // eslint-disable-next-line no-console
       console.error('Failed to delete avatar:', error.message);
     }
   }

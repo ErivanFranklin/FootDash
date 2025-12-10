@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  UseGuards,
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
@@ -15,7 +14,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserProfileService } from '../services/user-profile.service';
 import { AvatarUploadService } from '../services/avatar-upload.service';
-import { CreateProfileDto } from '../dto/create-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 
 @Controller('users/:userId/profile')
@@ -72,7 +70,7 @@ export class UserProfileController {
       // If profile doesn't exist, create it with the avatar
       if (error.status === 404) {
         const avatarUrl = await this.avatarService.saveAvatar(file);
-        const profile = await this.profileService.create(userId, {});
+        await this.profileService.create(userId, {});
         return this.profileService.updateAvatar(userId, avatarUrl);
       }
       throw error;

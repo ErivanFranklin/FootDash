@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserPreferences, Theme, Language } from '../entities/user-preferences.entity';
+import {
+  UserPreferences,
+  Theme,
+  Language,
+} from '../entities/user-preferences.entity';
 import { UpdatePreferencesDto } from '../dto/update-preferences.dto';
 
 @Injectable()
@@ -45,7 +49,10 @@ export class UserPreferencesService {
     return this.preferencesRepository.save(preferences);
   }
 
-  async update(userId: number, updatePreferencesDto: UpdatePreferencesDto): Promise<UserPreferences> {
+  async update(
+    userId: number,
+    updatePreferencesDto: UpdatePreferencesDto,
+  ): Promise<UserPreferences> {
     const preferences = await this.findByUserId(userId);
 
     Object.assign(preferences, updatePreferencesDto);
@@ -61,7 +68,12 @@ export class UserPreferencesService {
 
   async updateNotifications(
     userId: number,
-    notificationSettings: Partial<Pick<UserPreferences, 'notificationEnabled' | 'emailNotifications' | 'pushNotifications'>>,
+    notificationSettings: Partial<
+      Pick<
+        UserPreferences,
+        'notificationEnabled' | 'emailNotifications' | 'pushNotifications'
+      >
+    >,
   ): Promise<UserPreferences> {
     const preferences = await this.findByUserId(userId);
     Object.assign(preferences, notificationSettings);
