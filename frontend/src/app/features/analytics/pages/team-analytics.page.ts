@@ -49,7 +49,7 @@ export class TeamAnalyticsPage implements OnInit {
 
   loadTeam() {
     // Using the teams endpoint to get team info
-    this.team$ = this.api.get(`/teams/${this.teamId}`).pipe(
+    this.team$ = this.api.getTeam(this.teamId).pipe(
       map((team: any) => {
         this.loading = false;
         return {

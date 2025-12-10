@@ -14,7 +14,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AnalyticsService {
-  private readonly apiUrl = `${environment.apiUrl}/analytics`;
+  private readonly apiUrl = `${environment.apiBaseUrl}/analytics`;
   private cache = new Map<string, { data: any; timestamp: number }>();
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for predictions
   private readonly ANALYTICS_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days for analytics
