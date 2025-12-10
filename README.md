@@ -88,6 +88,35 @@ See `backend/README.md` for full configuration options.
 
 CI workflows for backend and frontend are in `.github/workflows/`. For troubleshooting and local reproduction, see `.github/CI-README.md`.
 
+### E2E testing (local and CI)
+
+We provide tooling to make Postgres-backed E2E tests deterministic and safe both locally and in CI.
+
+- The repo includes `./scripts/create-test-db.sh`, a small idempotent helper to create the test database and (optionally) per-worker databases used by parallel Jest workers. It supports the following useful flags:
+  - `--dry-run`: print actions without executing them (safe for validating CI steps)
+  - `--create-user`: attempt to create the DB role/user and grant privileges (use with care in CI)
+
+- A top-level `Makefile` includes convenient targets:
+  - `make e2e-setup` — create the base DB and run migrations
+  - `make e2e-parallel-setup WORKERS=4` — create base DB and per-worker DBs, then run migrations
+  - `make e2e-run` — run backend e2e tests
+  - `make e2e-local` — shorthand for `e2e-setup` then `e2e-run`
+
+Local quick example (from repo root):
+
+```bash
+# Create base + per-worker DBs and run migrations (4 workers)
+make e2e-parallel-setup WORKERS=4
+
+# Run backend E2E tests in CI mode (Jest will use the configured number of workers)
+cd backend
+npm run test:e2e -- --ci --maxWorkers=4
+```
+
+CI notes:
+- The backend CI workflow uses the same helper and provisions per-worker DBs before running migrations. The workflow passes `--maxWorkers=${WORKERS}` to Jest so the test runner and DB provisioning remain in sync.
+- Use `--dry-run` to validate the CI DB provisioning command locally before enabling it in the workflow.
+
 ## Documentation
 
 - **Architecture & Planning**: See `docs/` for technical architecture, API endpoints, and migration roadmap

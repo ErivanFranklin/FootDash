@@ -25,6 +25,8 @@ DB_USER="postgres"
 DB_PASS="postgres"
 WORKERS=0
 WORKER_ID=""
+DRY_RUN=0
+CREATE_USER=0
 
 print_help() {
   sed -n '1,200p' "$0" | sed -n '1,120p'
@@ -56,6 +58,14 @@ while [[ $# -gt 0 ]]; do
       WORKERS="$2"
       shift 2
       ;;
+      --dry-run)
+        DRY_RUN=1
+        shift 1
+        ;;
+      --create-user)
+        CREATE_USER=1
+        shift 1
+        ;;
     --worker-id)
       WORKER_ID="$2"
       shift 2
@@ -99,8 +109,12 @@ create_db_if_missing() {
     echo "Database '$name' already exists."
   else
     echo "Creating database '$name'..."
-    psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "CREATE DATABASE \"$name\";"
-    echo "Database '$name' created."
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      echo "DRY RUN: psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -c \"CREATE DATABASE \"$name\";\""
+    else
+      psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "CREATE DATABASE \"$name\";"
+      echo "Database '$name' created."
+    fi
   fi
 }
 
@@ -110,6 +124,11 @@ ensure_connection
 if [[ -n "$WORKER_ID" ]]; then
   create_db_if_missing "${DB_NAME}_worker_${WORKER_ID}"
   echo "Done. Worker DB: ${DB_NAME}_worker_${WORKER_ID}"
+
+  if [[ "$CREATE_USER" -eq 1 ]]; then
+    create_db_user_if_missing "${DB_NAME}_worker_${WORKER_ID}"
+  fi
+
   exit 0
 fi
 
@@ -117,6 +136,9 @@ fi
 if [[ -n "${JEST_WORKER_ID:-}" && "$WORKERS" -eq 0 ]]; then
   create_db_if_missing "${DB_NAME}_worker_${JEST_WORKER_ID}"
   echo "Done. Worker DB: ${DB_NAME}_worker_${JEST_WORKER_ID}"
+  if [[ "$CREATE_USER" -eq 1 ]]; then
+    create_db_user_if_missing "${DB_NAME}_worker_${JEST_WORKER_ID}"
+  fi
   exit 0
 fi
 
@@ -129,10 +151,33 @@ if [[ "$WORKERS" -gt 0 ]]; then
     i=$((i+1))
   done
   echo "Done. Created base DB and $WORKERS worker DBs."
+  if [[ "$CREATE_USER" -eq 1 ]]; then
+    i=1
+    while [[ $i -le $WORKERS ]]; do
+      create_db_user_if_missing "${DB_NAME}_worker_${i}"
+      i=$((i+1))
+    done
+  fi
   exit 0
 fi
 
 # Default: create single base DB
 create_db_if_missing "$DB_NAME"
 echo "Done. Base DB: $DB_NAME"
+
+# Helper: create DB user/role if missing and grant privileges on the DB
+create_db_user_if_missing() {
+  local dbname="$1"
+  # CREATE ROLE if not exists and grant privileges on database
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo "DRY RUN: create role $DB_USER with password and grant privileges on $dbname"
+    return
+  fi
+
+  # Create role if not exists
+  psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$DB_USER') THEN CREATE ROLE \"$DB_USER\" LOGIN PASSWORD '$DB_PASS'; END IF; END $$;"
+
+  # Grant all privileges on the target database to the role
+  psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE \"$dbname\" TO \"$DB_USER\";" || true
+}
 

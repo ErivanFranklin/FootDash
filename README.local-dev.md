@@ -202,3 +202,29 @@ npm run test:e2e:ci
 Notes:
 - Use `--runInBand` to avoid parallel workers clobbering a shared DB schema.
 - CI uses a separate DB instance per job; check `.github/workflows/backend-ci.yml` for the exact job configuration.
+
+7a) `create-test-db.sh` advanced usage
+
+The repository includes a small helper script `./scripts/create-test-db.sh` used by CI and local workflows. It now supports two extra flags which are useful for CI and safe testing:
+
+- `--dry-run`: prints the actions the script would take (create DBs, create users) without executing them. Use this to validate CI steps before making changes.
+- `--create-user`: attempts to create the DB role/user (named by `--user`) if it does not exist and grants privileges on the created DB(s). Use this in CI only if the runner has permission to create roles.
+
+Examples:
+
+```bash
+# dry-run: show what would be done without side effects
+./scripts/create-test-db.sh --db footdash --host localhost --port 5432 --user postgres --pass postgres --workers 4 --dry-run
+
+# create base DB + 4 worker DBs and also create/grant the DB user (CI scenarios)
+./scripts/create-test-db.sh --db footdash --host localhost --port 5432 --user postgres --pass $PGPASS --workers 4 --create-user
+```
+
+CI note:
+In CI we call the same script from the workflow. For example the parallel e2e job will run:
+
+```bash
+./scripts/create-test-db.sh --db "${{ env.DB_NAME }}" --host localhost --port 5433 --user postgres --pass postgres --workers ${WORKERS}
+```
+
+If you want to validate the CI invocation without creating DBs, run the same command locally with `--dry-run`.
