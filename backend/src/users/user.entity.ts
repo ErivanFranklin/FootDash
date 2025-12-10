@@ -3,32 +3,30 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  OneToMany,
 } from 'typeorm';
-import { User } from './user.entity';
+// Do NOT import User from './user.entity' here; this file defines and exports it.
 
-@Entity('refresh_tokens')
-export class RefreshToken {
+// If you have related entities, import them here (avoid circular imports). Example:
+// import { RefreshToken } from '../auth/entities/refresh-token.entity';
+
+@Entity('users')
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  token: string;
+  @Column({ unique: true })
+  email: string;
 
-  @Column({ default: false })
-  revoked: boolean;
+  // Map to snake_case column in DB
+  @Column({ name: 'password_hash' })
+  password_hash: string;
 
-  // map to snake_case created_at in DB
+  // Map to snake_case created_at
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // store foreign key in snake_case user_id and set up relation to User
-  @ManyToOne(() => User, (user) => (user as any).refreshTokens, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
-  // explicit userId column mapped to snake_case to match existing DB conventions/queries
-  @Column({ name: 'user_id' })
-  userId: string;
+  // Example relation (uncomment if RefreshToken entity exists and avoid circular imports)
+  // @OneToMany(() => RefreshToken, (rt) => rt.user, { cascade: true })
+  // refreshTokens: RefreshToken[];
 }
