@@ -10,6 +10,9 @@ on:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
+    env:
+      # number of Jest workers to use for parallel test runs in this job
+      WORKERS: 4
     services:
       postgres:
         image: postgres:15
@@ -84,7 +87,8 @@ jobs:
         run: |
           # prefer repository script for db creation if present
           if [ -x "./scripts/create-test-db.sh" ]; then
-            ./scripts/create-test-db.sh footdash localhost 5432 postgres postgres || true
+            echo "Creating base DB and ${WORKERS} worker DBs for footdash"
+            ./scripts/create-test-db.sh --db footdash --host localhost --port 5432 --user postgres --pass postgres --workers ${WORKERS} || true
           else
             echo "create-test-db.sh not found or not executable — skipped"
           fi
@@ -115,7 +119,7 @@ jobs:
         run: |
           mkdir -p backend/test-results
           set -o pipefail
-          npm run test:e2e -- --ci --reporters=default --reporters=jest-junit 2>&1 | tee backend/test-results/test-e2e.log
+          npm run test:e2e -- --ci --maxWorkers=${WORKERS} --reporters=default --reporters=jest-junit 2>&1 | tee backend/test-results/test-e2e.log
         working-directory: backend
 
   backend-e2e-postgres:
@@ -123,7 +127,7 @@ jobs:
     strategy:
       matrix:
         postgres-version: [15]
-        workers: [2,4]
+        workers: [4]
     services:
       postgres:
         image: postgres:${{ matrix.postgres-version }}
@@ -232,7 +236,7 @@ jobs:
         run: |
           mkdir -p backend/test-results
           set -o pipefail
-          npm run test:e2e -- test/auth.postgres.e2e-spec.ts --silent 2>&1 | tee backend/test-results/npm-test-e2e-pg.log
+          npm run test:e2e -- --ci --maxWorkers=${WORKERS} test/auth.postgres.e2e-spec.ts --silent 2>&1 | tee backend/test-results/npm-test-e2e-pg.log
         working-directory: backend
 
       - name: Upload postgres e2e logs on failure
