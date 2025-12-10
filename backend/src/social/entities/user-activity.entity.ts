@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { User } from '../../users/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 export enum ActivityType {
   COMMENT = 'comment',

@@ -1,10 +1,11 @@
-import { IsString, IsInt, IsOptional, MaxLength, MinLength, IsEnum } from 'class-validator';
+import { IsString, IsInt, IsOptional, MaxLength, MinLength, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateCommentDto {
   @IsString()
-  @MinLength(1, { message: 'Comment cannot be empty' })
-  @MaxLength(500, { message: 'Comment cannot exceed 500 characters' })
+  @IsNotEmpty()
+  @MinLength(1)
+  @MaxLength(500)
   content: string;
 
   @IsOptional()
@@ -25,8 +26,9 @@ export class CreateCommentDto {
 
 export class UpdateCommentDto {
   @IsString()
-  @MinLength(1, { message: 'Comment cannot be empty' })
-  @MaxLength(500, { message: 'Comment cannot exceed 500 characters' })
+  @IsNotEmpty()
+  @MinLength(1)
+  @MaxLength(500)
   content: string;
 }
 
@@ -42,6 +44,15 @@ export class CommentResponseDto {
   replyCount: number;
   reactionCount: number;
   userReaction?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+}
+
+export class PaginatedCommentsDto {
+  comments: CommentResponseDto[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
 }
