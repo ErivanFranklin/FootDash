@@ -1,0 +1,160 @@
+<ion-card class="team-comparison-card">
+  <ion-card-header>
+    <ion-card-title>Team Comparison</ion-card-title>
+    <ion-card-subtitle *ngIf="comparison">
+      {{ comparison.homeTeam.teamName }} vs {{ comparison.awayTeam.teamName }}
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading comparison...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+      <p>{{ error }}</p>
+      <ion-button size="small" (click)="loadComparison()">Retry</ion-button>
+    </div>
+
+    <!-- Comparison Content -->
+    <div *ngIf="comparison && !loading && !error">
+      <!-- Overall Advantage -->
+      <div class="advantage-badge">
+        <ion-badge [color]="getAdvantageColor()" mode="ios">
+          {{ getAdvantageText() }}
+        </ion-badge>
+      </div>
+
+      <!-- Form Comparison -->
+      <div class="comparison-section">
+        <h3>Form Rating</h3>
+        <div class="comparison-bar">
+          <div class="team-value home">
+            <span class="team-name">{{ comparison.homeTeam.teamName }}</span>
+            <span class="value">{{ comparison.homeTeam.formRating.toFixed(0) }}</span>
+          </div>
+          <div class="bar-container">
+            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.formRating, comparison.awayTeam.formRating, true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.formRating, comparison.awayTeam.formRating, false)"></div>
+          </div>
+          <div class="team-value away">
+            <span class="value">{{ comparison.awayTeam.formRating.toFixed(0) }}</span>
+            <span class="team-name">{{ comparison.awayTeam.teamName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Win Percentage Comparison -->
+      <div class="comparison-section">
+        <h3>Win Percentage</h3>
+        <div class="comparison-bar">
+          <div class="team-value home">
+            <span class="value">{{ comparison.homeTeam.overallStats.winPercentage.toFixed(0) }}%</span>
+          </div>
+          <div class="bar-container">
+            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.winPercentage, comparison.awayTeam.overallStats.winPercentage, true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.winPercentage, comparison.awayTeam.overallStats.winPercentage, false)"></div>
+          </div>
+          <div class="team-value away">
+            <span class="value">{{ comparison.awayTeam.overallStats.winPercentage.toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goals For Comparison -->
+      <div class="comparison-section">
+        <h3>Goals Scored</h3>
+        <div class="comparison-bar">
+          <div class="team-value home">
+            <span class="value">{{ comparison.homeTeam.overallStats.goalsFor }}</span>
+          </div>
+          <div class="bar-container">
+            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.goalsFor, comparison.awayTeam.overallStats.goalsFor, true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.goalsFor, comparison.awayTeam.overallStats.goalsFor, false)"></div>
+          </div>
+          <div class="team-value away">
+            <span class="value">{{ comparison.awayTeam.overallStats.goalsFor }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Defensive Rating Comparison -->
+      <div class="comparison-section">
+        <h3>Defensive Rating</h3>
+        <div class="comparison-bar">
+          <div class="team-value home">
+            <span class="value">{{ comparison.homeTeam.defensiveRating.toFixed(0) }}</span>
+          </div>
+          <div class="bar-container">
+            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.defensiveRating, comparison.awayTeam.defensiveRating, true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.defensiveRating, comparison.awayTeam.defensiveRating, false)"></div>
+          </div>
+          <div class="team-value away">
+            <span class="value">{{ comparison.awayTeam.defensiveRating.toFixed(0) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Head-to-Head Record -->
+      <div class="h2h-section">
+        <h3>Head-to-Head Record</h3>
+        <div class="h2h-stats">
+          <div class="h2h-stat home">
+            <span class="value">{{ comparison.headToHead.homeWins }}</span>
+            <span class="label">{{ comparison.homeTeam.teamName }} Wins</span>
+          </div>
+          <div class="h2h-stat draws">
+            <span class="value">{{ comparison.headToHead.draws }}</span>
+            <span class="label">Draws</span>
+          </div>
+          <div class="h2h-stat away">
+            <span class="value">{{ comparison.headToHead.awayWins }}</span>
+            <span class="label">{{ comparison.awayTeam.teamName }} Wins</span>
+          </div>
+        </div>
+        <p class="h2h-total">
+          Total meetings: {{ comparison.headToHead.totalMeetings }}
+        </p>
+      </div>
+
+      <!-- Recent Meetings -->
+      <div class="recent-meetings" *ngIf="comparison.headToHead.lastFiveMeetings.length > 0">
+        <h3>Recent Meetings</h3>
+        <ion-list lines="none">
+          <ion-item *ngFor="let meeting of comparison.headToHead.lastFiveMeetings">
+            <div class="meeting-info">
+              <span class="date">{{ meeting.date | date: 'mediumDate' }}</span>
+              <div class="score">
+                <span class="home-score" [class.winner]="meeting.result === 'home'">
+                  {{ meeting.homeScore }}
+                </span>
+                <span class="separator">-</span>
+                <span class="away-score" [class.winner]="meeting.result === 'away'">
+                  {{ meeting.awayScore }}
+                </span>
+              </div>
+              <ion-badge [color]="meeting.result === 'home' ? 'success' : meeting.result === 'away' ? 'danger' : 'warning'">
+                {{ meeting.result === 'home' ? comparison.homeTeam.teamName : meeting.result === 'away' ? comparison.awayTeam.teamName : 'Draw' }}
+              </ion-badge>
+            </div>
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <!-- Key Insights -->
+      <div class="insights" *ngIf="comparison.keyInsights.length > 0">
+        <h3>Key Insights</h3>
+        <ion-list lines="none">
+          <ion-item *ngFor="let insight of comparison.keyInsights">
+            <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+            <ion-label class="ion-text-wrap">{{ insight }}</ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card>

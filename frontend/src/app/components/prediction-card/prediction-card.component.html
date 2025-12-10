@@ -1,0 +1,134 @@
+<ion-card class="prediction-card">
+  <ion-card-header>
+    <ion-card-title>Match Prediction</ion-card-title>
+    <ion-card-subtitle *ngIf="prediction">
+      {{ prediction.homeTeam }} vs {{ prediction.awayTeam }}
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading prediction...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+      <p>{{ error }}</p>
+      <ion-button size="small" (click)="loadPrediction()">Retry</ion-button>
+    </div>
+
+    <!-- Prediction Content -->
+    <div *ngIf="prediction && !loading && !error">
+      <!-- Confidence Badge -->
+      <div class="confidence-badge">
+        <ion-badge [color]="getConfidenceColor()">
+          {{ getConfidenceText() }}
+        </ion-badge>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-container">
+        <canvas #probabilityChart></canvas>
+      </div>
+
+      <!-- Most Likely Outcome -->
+      <div class="outcome-summary" *ngIf="getMostLikelyOutcome() as outcome">
+        <h3>Most Likely</h3>
+        <p class="outcome-text">{{ outcome.outcome }}</p>
+        <p class="probability-text">{{ outcome.probability.toFixed(1) }}%</p>
+      </div>
+
+      <!-- Detailed Probabilities -->
+      <div class="probabilities" *ngIf="showDetails">
+        <div class="probability-item">
+          <span class="label">{{ prediction.homeTeam }} Win</span>
+          <ion-progress-bar
+            [value]="prediction.homeWinProbability / 100"
+            color="success"
+          ></ion-progress-bar>
+          <span class="value">{{ prediction.homeWinProbability.toFixed(1) }}%</span>
+        </div>
+
+        <div class="probability-item">
+          <span class="label">Draw</span>
+          <ion-progress-bar
+            [value]="prediction.drawProbability / 100"
+            color="warning"
+          ></ion-progress-bar>
+          <span class="value">{{ prediction.drawProbability.toFixed(1) }}%</span>
+        </div>
+
+        <div class="probability-item">
+          <span class="label">{{ prediction.awayTeam }} Win</span>
+          <ion-progress-bar
+            [value]="prediction.awayWinProbability / 100"
+            color="danger"
+          ></ion-progress-bar>
+          <span class="value">{{ prediction.awayWinProbability.toFixed(1) }}%</span>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="insights" *ngIf="showDetails && prediction.insights.length > 0">
+        <h4>Key Insights</h4>
+        <ion-list lines="none">
+          <ion-item *ngFor="let insight of prediction.insights">
+            <ion-icon name="bulb-outline" slot="start" color="primary"></ion-icon>
+            <ion-label class="ion-text-wrap">{{ insight }}</ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <!-- Metadata -->
+      <div class="metadata" *ngIf="showDetails && prediction.metadata">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6" *ngIf="prediction.metadata.homeFormRating !== undefined">
+              <div class="stat">
+                <div class="stat-label">{{ prediction.homeTeam }} Form</div>
+                <div class="stat-value">{{ prediction.metadata.homeFormRating.toFixed(0) }}/100</div>
+              </div>
+            </ion-col>
+            <ion-col size="6" *ngIf="prediction.metadata.awayFormRating !== undefined">
+              <div class="stat">
+                <div class="stat-label">{{ prediction.awayTeam }} Form</div>
+                <div class="stat-value">{{ prediction.metadata.awayFormRating.toFixed(0) }}/100</div>
+              </div>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngIf="prediction.metadata.headToHeadWins">
+            <ion-col size="12">
+              <div class="h2h-summary">
+                <span>Head-to-Head: </span>
+                <strong>{{ prediction.metadata.headToHeadWins.home }}</strong> - 
+                <strong>{{ prediction.metadata.headToHeadWins.draws }}</strong> - 
+                <strong>{{ prediction.metadata.headToHeadWins.away }}</strong>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <ion-button
+          expand="block"
+          fill="outline"
+          size="small"
+          (click)="generateNewPrediction()"
+        >
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          Regenerate Prediction
+        </ion-button>
+      </div>
+
+      <!-- Timestamp -->
+      <p class="timestamp">
+        Generated: {{ prediction.createdAt | date: 'short' }}
+      </p>
+    </div>
+  </ion-card-content>
+</ion-card>

@@ -46,6 +46,12 @@ export class TeamsPage implements OnInit {
     this.router.navigate(['/matches', id]);
   }
 
+  viewAnalytics(team: any) {
+    const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    if (id == null) return;
+    this.router.navigate(['/analytics/team', id]);
+  }
+
   async syncTeam(team: any) {
     const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
     if (id == null) return;

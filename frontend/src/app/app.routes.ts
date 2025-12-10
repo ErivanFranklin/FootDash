@@ -23,6 +23,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'analytics/match/:matchId',
+    loadComponent: () => import('./features/analytics/pages/match-prediction.page').then(m => m.MatchPredictionPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'analytics/team/:teamId',
+    loadComponent: () => import('./features/analytics/pages/team-analytics.page').then(m => m.TeamAnalyticsPage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },

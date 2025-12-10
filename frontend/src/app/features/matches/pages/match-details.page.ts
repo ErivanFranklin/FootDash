@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { IonContent, IonBadge, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonBadge, IonSpinner, IonButton } from '@ionic/angular/standalone';
 import { PageHeaderComponent, LiveIndicatorComponent } from '../../../shared/components';
 import { WebSocketService } from '../../../core/services/web-socket.service';
 import { LiveMatchService, MatchState } from '../../../core/services/live-match.service';
@@ -15,7 +15,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, IonBadge, IonSpinner, PageHeaderComponent, LiveIndicatorComponent, RouterModule],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, PageHeaderComponent, LiveIndicatorComponent, RouterModule],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

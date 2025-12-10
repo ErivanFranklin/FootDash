@@ -50,5 +50,13 @@
       <div class="meta-row" *ngIf="match.referee"><strong>Referee:</strong> <span>{{ match.referee }}</span></div>
       <div class="meta-row" *ngIf="match.leagueName"><strong>Competition:</strong> <span>{{ match.leagueName }}</span></div>
     </section>
+
+    <section class="actions">
+      <a [routerLink]="['/analytics/match', matchId]" class="view-prediction-btn">
+        <ion-button expand="block" color="secondary">
+          View Match Prediction
+        </ion-button>
+      </a>
+    </section>
   </div>
 </ion-content>

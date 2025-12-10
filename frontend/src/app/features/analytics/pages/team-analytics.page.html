@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teams"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Team Analytics</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading team data...</p>
+    </div>
+
+    <!-- Team Content -->
+    <ng-container *ngIf="team$ | async as team">
+      <div *ngIf="team" class="team-header">
+        <img *ngIf="team.logo" [src]="team.logo" [alt]="team.name" class="team-logo" />
+        <h2>{{ team.name }}</h2>
+      </div>
+
+      <!-- View Selector -->
+      <ion-segment [value]="selectedView" (ionChange)="onSegmentChange($event)" class="view-selector">
+        <ion-segment-button value="overview">
+          <ion-label>Overview</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="charts">
+          <ion-label>Charts</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <!-- Analytics Card -->
+      <app-team-analytics-card
+        *ngIf="team"
+        [teamId]="team.id"
+        [showCharts]="selectedView === 'charts'"
+      ></app-team-analytics-card>
+    </ng-container>
+
+    <!-- Error State -->
+    <div *ngIf="!loading && !(team$ | async)" class="error-container">
+      <p>Unable to load team data</p>
+    </div>
+  </div>
+</ion-content>

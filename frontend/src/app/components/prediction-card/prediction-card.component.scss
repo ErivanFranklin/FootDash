@@ -1,0 +1,193 @@
+.prediction-card {
+  margin: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  min-height: 200px;
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 8px 0;
+    color: var(--ion-color-medium);
+  }
+}
+
+.confidence-badge {
+  text-align: center;
+  margin-bottom: 16px;
+
+  ion-badge {
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 16px;
+  }
+}
+
+.chart-container {
+  position: relative;
+  height: 250px;
+  margin: 24px 0;
+}
+
+.outcome-summary {
+  text-align: center;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  margin: 16px 0;
+
+  h3 {
+    margin: 0 0 8px 0;
+    color: var(--ion-color-medium);
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .outcome-text {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+
+  .probability-text {
+    margin: 4px 0 0 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+  }
+}
+
+.probabilities {
+  margin: 24px 0;
+
+  .probability-item {
+    margin-bottom: 20px;
+
+    .label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--ion-color-dark);
+    }
+
+    ion-progress-bar {
+      height: 24px;
+      border-radius: 12px;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ion-color-primary);
+      text-align: right;
+    }
+  }
+}
+
+.insights {
+  margin: 24px 0;
+
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+
+  ion-list {
+    background: transparent;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+
+    ion-icon {
+      margin-right: 12px;
+    }
+
+    ion-label {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+}
+
+.metadata {
+  margin: 24px 0;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+
+  .stat {
+    text-align: center;
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--ion-color-medium);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .h2h-summary {
+    text-align: center;
+    font-size: 14px;
+    color: var(--ion-color-dark);
+    margin-top: 12px;
+
+    strong {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ion-color-primary);
+      padding: 0 4px;
+    }
+  }
+}
+
+.actions {
+  margin: 24px 0 16px 0;
+}
+
+.timestamp {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 8px 0 0 0;
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .prediction-card {
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  }
+
+  .outcome-summary,
+  .metadata {
+    background: var(--ion-color-step-100);
+  }
+}

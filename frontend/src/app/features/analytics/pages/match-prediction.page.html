@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/matches"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Match Prediction</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading match data...</p>
+    </div>
+
+    <!-- Match Content -->
+    <ng-container *ngIf="match$ | async as match">
+      <div *ngIf="match" class="match-header">
+        <h2>{{ match.homeTeam.name }} vs {{ match.awayTeam.name }}</h2>
+        <p *ngIf="match.kickOff" class="match-time">
+          {{ match.kickOff | date: 'medium' }}
+        </p>
+        <p *ngIf="match.status" class="match-status">
+          Status: {{ match.status }}
+        </p>
+      </div>
+
+      <!-- Prediction Card -->
+      <app-prediction-card
+        *ngIf="match"
+        [matchId]="match.id"
+        [showDetails]="true"
+      ></app-prediction-card>
+
+      <!-- Team Comparison -->
+      <app-team-comparison
+        *ngIf="match"
+        [homeTeamId]="match.homeTeam.id"
+        [awayTeamId]="match.awayTeam.id"
+      ></app-team-comparison>
+    </ng-container>
+
+    <!-- Error State -->
+    <div *ngIf="!loading && !(match$ | async)" class="error-container">
+      <p>Unable to load match data</p>
+    </div>
+  </div>
+</ion-content>

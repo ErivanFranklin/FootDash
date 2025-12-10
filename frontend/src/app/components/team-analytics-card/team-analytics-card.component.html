@@ -1,0 +1,181 @@
+<ion-card class="team-analytics-card">
+  <ion-card-header>
+    <ion-card-title>Team Analytics</ion-card-title>
+    <ion-card-subtitle *ngIf="analytics">
+      {{ analytics.teamName }}
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading analytics...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+      <p>{{ error }}</p>
+      <ion-button size="small" (click)="loadAnalytics()">Retry</ion-button>
+    </div>
+
+    <!-- Analytics Content -->
+    <div *ngIf="analytics && !loading && !error">
+      <!-- Form Rating -->
+      <div class="form-rating-section">
+        <h3>Current Form</h3>
+        <div class="form-rating-display">
+          <div class="rating-circle" [attr.data-rating]="getFormRatingColor(analytics.formRating)">
+            <span class="rating-value">{{ analytics.formRating.toFixed(0) }}</span>
+            <span class="rating-max">/100</span>
+          </div>
+          <div class="rating-details">
+            <ion-badge [color]="getFormRatingColor(analytics.formRating)">
+              {{ analytics.formRating >= 70 ? 'Excellent' : analytics.formRating >= 50 ? 'Good' : 'Poor' }}
+            </ion-badge>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring Trend -->
+      <div class="trend-section" *ngIf="analytics.scoringTrend">
+        <h3>
+          Scoring Trend
+          <ion-icon
+            [name]="getTrendIcon(analytics.scoringTrend.trend)"
+            [color]="getTrendColor(analytics.scoringTrend.trend)"
+          ></ion-icon>
+        </h3>
+        <div class="trend-stats">
+          <div class="trend-stat">
+            <span class="label">Average</span>
+            <span class="value">{{ analytics.scoringTrend.average.toFixed(1) }} goals</span>
+          </div>
+        </div>
+        <div class="chart-container" *ngIf="showCharts">
+          <canvas #formChart></canvas>
+        </div>
+      </div>
+
+      <!-- Overall Statistics -->
+      <div class="stats-section">
+        <h3>Season Statistics</h3>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Played</div>
+                <div class="stat-value">{{ analytics.overallStats.played }}</div>
+              </div>
+            </ion-col>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Wins</div>
+                <div class="stat-value success">{{ analytics.overallStats.won }}</div>
+              </div>
+            </ion-col>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Points</div>
+                <div class="stat-value primary">{{ analytics.overallStats.points }}</div>
+              </div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Draws</div>
+                <div class="stat-value warning">{{ analytics.overallStats.drawn }}</div>
+              </div>
+            </ion-col>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Losses</div>
+                <div class="stat-value danger">{{ analytics.overallStats.lost }}</div>
+              </div>
+            </ion-col>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Win %</div>
+                <div class="stat-value">{{ analytics.overallStats.winPercentage.toFixed(0) }}%</div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <!-- Goals Statistics -->
+      <div class="goals-section">
+        <h3>Goals</h3>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">For</div>
+                <div class="stat-value success">{{ analytics.overallStats.goalsFor }}</div>
+              </div>
+            </ion-col>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Against</div>
+                <div class="stat-value danger">{{ analytics.overallStats.goalsAgainst }}</div>
+              </div>
+            </ion-col>
+            <ion-col size="4">
+              <div class="stat-box">
+                <div class="stat-label">Difference</div>
+                <div class="stat-value" [class.success]="analytics.overallStats.goalDifference > 0" [class.danger]="analytics.overallStats.goalDifference < 0">
+                  {{ analytics.overallStats.goalDifference > 0 ? '+' : '' }}{{ analytics.overallStats.goalDifference }}
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <!-- Defensive Rating -->
+      <div class="defensive-section">
+        <h3>Defensive Rating</h3>
+        <ion-progress-bar
+          [value]="analytics.defensiveRating / 100"
+          [color]="getDefensiveRatingColor(analytics.defensiveRating)"
+        ></ion-progress-bar>
+        <div class="rating-value-display">
+          {{ analytics.defensiveRating.toFixed(0) }}/100
+        </div>
+      </div>
+
+      <!-- Home vs Away Performance -->
+      <div class="performance-section" *ngIf="showCharts">
+        <h3>Home vs Away Performance</h3>
+        <div class="chart-container">
+          <canvas #performanceChart></canvas>
+        </div>
+        <ion-grid class="performance-details">
+          <ion-row>
+            <ion-col size="6">
+              <div class="performance-summary">
+                <h4>Home</h4>
+                <p>{{ analytics.homePerformance.won }}-{{ analytics.homePerformance.drawn }}-{{ analytics.homePerformance.lost }}</p>
+                <span class="win-rate">{{ analytics.homePerformance.winPercentage.toFixed(0) }}% wins</span>
+              </div>
+            </ion-col>
+            <ion-col size="6">
+              <div class="performance-summary">
+                <h4>Away</h4>
+                <p>{{ analytics.awayPerformance.won }}-{{ analytics.awayPerformance.drawn }}-{{ analytics.awayPerformance.lost }}</p>
+                <span class="win-rate">{{ analytics.awayPerformance.winPercentage.toFixed(0) }}% wins</span>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <!-- Last Updated -->
+      <p class="timestamp">
+        Last updated: {{ analytics.lastUpdated | date: 'short' }}
+      </p>
+    </div>
+  </ion-card-content>
+</ion-card>
