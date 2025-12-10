@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { UserPreferencesService } from '../services/user-preferences.service';
 import { UpdatePreferencesDto } from '../dto/update-preferences.dto';
@@ -31,10 +32,13 @@ class UpdateNotificationsDto {
   @IsOptional()
   pushNotifications?: boolean;
 }
-
 @Controller('users/:userId/preferences')
 export class UserPreferencesController {
-  constructor(private readonly preferencesService: UserPreferencesService) {}
+  private readonly logger = new Logger(UserPreferencesController.name);
+
+  constructor(
+    private readonly preferencesService: UserPreferencesService,
+  ) {}
 
   @Get()
   async getPreferences(@Param('userId', ParseIntPipe) userId: number) {
