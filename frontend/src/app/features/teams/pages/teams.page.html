@@ -17,6 +17,7 @@
       [showDetails]="false"
       [actions]="[
         { label: 'View Matches', handler: viewMatches.bind(this), icon: 'eye' },
+        { label: 'View Analytics', handler: viewAnalytics.bind(this), icon: 'stats-chart', color: 'secondary' },
         { label: 'Sync Team', handler: syncTeam.bind(this), icon: 'sync', color: 'medium', loading: loading }
       ]">
     </app-team-card>

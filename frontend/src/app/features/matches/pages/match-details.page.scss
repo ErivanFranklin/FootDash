@@ -140,6 +140,14 @@ pre {
       }
     }
   }
+
+  .actions {
+    margin-top: 24px;
+    
+    .view-prediction-btn {
+      text-decoration: none;
+    }
+  }
 }
 
 @keyframes shimmer {
