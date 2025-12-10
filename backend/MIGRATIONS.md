@@ -4,11 +4,12 @@ This repository contains TypeORM migrations in `backend/migrations` and a migrat
 
 ## Current Migration Status
 
-**Last Updated**: December 5, 2025
+**Last Updated**: December 9, 2025
 
 **Applied Migrations**:
 1. ✅ `CreateUsersTable1680000000000` - Creates `users` table with `id`, `email`, `password_hash`, `created_at`
 2. ✅ `AddMatchMetadata1690001000000` - Adds `referee`, `venue`, `league` columns to `matches` table
+3. ✅ `AddUserProfileAndPreferences1733783250000` - Creates `user_profiles` and `user_preferences` tables with enums for theme/language
 
 **Database**: `footdash` (PostgreSQL)
 **Status**: All migrations applied successfully

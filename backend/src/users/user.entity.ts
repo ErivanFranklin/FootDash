@@ -5,17 +5,17 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'users' })
+@Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ unique: true })
   email: string;
 
-  @Column({ name: 'password_hash', nullable: true })
-  passwordHash: string;
+  @Column({ name: 'password_hash' })
+  password_hash: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  created_at: Date;
 }

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Uploads (keep directory structure, ignore files)
+uploads/**/*
+!uploads/**/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/

@@ -8,7 +8,12 @@
     "start:dev:api": "npm run start:dev --prefix backend",
     "start:api": "npm run start --prefix backend",
     "build:api": "npm run build --prefix backend",
-    "open:swagger": "node -e \"require('child_process').exec('open http://localhost:3000/api')\""
+    "open:swagger": "node -e \"require('child_process').exec('open http://localhost:3000/api')\"",
+    "e2e:setup": "make e2e-setup",
+    "e2e:parallel-setup": "make e2e-parallel-setup",
+    "e2e:run": "make e2e-run",
+    "e2e:local": "make e2e-local",
+    "e2e:parallel": "make e2e-parallel"
   },
   "dependencies": {
     "axios": "^1.13.2"
