@@ -4,17 +4,20 @@ This repository contains TypeORM migrations in `backend/migrations` and a migrat
 
 ## Current Migration Status
 
-**Last Updated**: December 9, 2025
+**Last Updated**: December 10, 2025
 
 **Applied Migrations**:
 1. ✅ `CreateUsersTable1680000000000` - Creates `users` table with `id`, `email`, `password_hash`, `created_at`
 2. ✅ `AddMatchMetadata1690001000000` - Adds `referee`, `venue`, `league` columns to `matches` table
-3. ✅ `AddUserProfileAndPreferences1733783250000` - Creates `user_profiles` and `user_preferences` tables with enums for theme/language
+3. ✅ `CreateNotificationsAndTeams1700000000000` - Creates `notifications` and `teams` tables and related indexes
+4. ✅ `AddUserProfileAndPreferences1733783250000` - Creates `user_profiles` and `user_preferences` tables with enums for theme/language
+5. ✅ `CreateRefreshTokens1740000000000` - Creates `refresh_tokens` table to persist refresh tokens for users (token, revoked, created_at)
 
 **Database**: `footdash` (PostgreSQL)
-**Status**: All migrations applied successfully
+**Status**: All migrations applied successfully (no pending migrations)
 
 ## Available Commands
+
 
 ### Check Migration Status
 
@@ -33,6 +36,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/footdash \
 ```
 
 **What it does**: Read-only comparison of migration files in `backend/migrations` with the `migrations` table in the target database.
+
 
 ### Apply Migrations
 
@@ -77,13 +81,13 @@ npm --prefix backend run migrate:show:full
 
 The `User` entity uses snake_case column names in the database to match the migrations:
 - Entity property `passwordHash` maps to DB column `password_hash`
-- Entity property `email` and `passwordHash` are temporarily nullable in the entity to support test-time schema synchronization
 
 ### Application vs. Test Database Sync
 
-- **Application (`DatabaseModule`)**: Uses `synchronize: false` to rely on migrations only
-- **E2E Tests**: Use `synchronize: true` for convenience in isolated test environments
-- This split allows production-safe migrations while keeping tests flexible
+- **Application (`DatabaseModule`)**: Uses `synchronize: false` and relies on migrations only (production-safe)
+- **E2E Tests**: Use `migrationsRun: true` in test bootstraps so test databases are created/updated via the same migrations as application environments. This prevents schema drift and avoids destructive `synchronize` behavior during parallel CI runs.
+
+This approach keeps production and CI schemas consistent while allowing per-worker databases for parallel tests.
 
 ## Helper Scripts
 
@@ -94,6 +98,12 @@ Located in `backend/scripts/`:
 - `fix-passwordhash.ts` - Utility to backfill NULL password/email values (for migration troubleshooting)
 - `check-null-users.ts` - Diagnostic script to find users with NULL emails
 - `check-null-passwords.ts` - Diagnostic script to find users with NULL passwords
+ - `run-migrations.ts` - Migration runner with dry-run support
+ - `seed-dev.ts` - Seeds development user data
+ - `fix-passwordhash.ts` - Utility to backfill NULL password/email values (for migration troubleshooting)
+ - `check-null-users.ts` - Diagnostic script to find users with NULL emails
+ - `check-null-passwords.ts` - Diagnostic script to find users with NULL passwords
+ - `../scripts/create-test-db.sh` - Repo-level helper to create base and per-worker test DBs (used by CI and local flows)
 
 ## Safety Notes
 
