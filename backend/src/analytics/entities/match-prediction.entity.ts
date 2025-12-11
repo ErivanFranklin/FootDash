@@ -30,13 +30,23 @@ export class MatchPrediction {
   @JoinColumn({ name: 'match_id' })
   match: Match;
 
-  @Column({ name: 'home_win_probability', type: 'decimal', precision: 5, scale: 2 })
+  @Column({
+    name: 'home_win_probability',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+  })
   homeWinProbability: number;
 
   @Column({ name: 'draw_probability', type: 'decimal', precision: 5, scale: 2 })
   drawProbability: number;
 
-  @Column({ name: 'away_win_probability', type: 'decimal', precision: 5, scale: 2 })
+  @Column({
+    name: 'away_win_probability',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+  })
   awayWinProbability: number;
 
   @Column({

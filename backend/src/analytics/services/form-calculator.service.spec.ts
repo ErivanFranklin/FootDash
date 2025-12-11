@@ -21,10 +21,10 @@ describe('FormCalculatorService', () => {
   describe('calculateForm', () => {
     it('should calculate form rating correctly for winning team', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 1, isHome: true },  // Win: 3 points
-        { homeScore: 2, awayScore: 2, isHome: true },  // Draw: 1 point
+        { homeScore: 3, awayScore: 1, isHome: true }, // Win: 3 points
+        { homeScore: 2, awayScore: 2, isHome: true }, // Draw: 1 point
         { homeScore: 1, awayScore: 0, isHome: false }, // Win: 3 points
-        { homeScore: 2, awayScore: 1, isHome: true },  // Win: 3 points
+        { homeScore: 2, awayScore: 1, isHome: true }, // Win: 3 points
         { homeScore: 1, awayScore: 1, isHome: false }, // Draw: 1 point
       ]);
 
@@ -40,9 +40,9 @@ describe('FormCalculatorService', () => {
 
     it('should calculate form rating correctly for losing team', () => {
       const matches = createMockMatches([
-        { homeScore: 0, awayScore: 2, isHome: true },  // Loss: 0 points
+        { homeScore: 0, awayScore: 2, isHome: true }, // Loss: 0 points
         { homeScore: 1, awayScore: 3, isHome: false }, // Loss: 0 points
-        { homeScore: 0, awayScore: 1, isHome: true },  // Loss: 0 points
+        { homeScore: 0, awayScore: 1, isHome: true }, // Loss: 0 points
       ]);
 
       const result = service.calculateForm(matches, 1, 5);
@@ -123,10 +123,10 @@ describe('FormCalculatorService', () => {
 
     it('should identify improving trend', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 0, isHome: true },  // Win (most recent)
-        { homeScore: 2, awayScore: 1, isHome: true },  // Win
+        { homeScore: 3, awayScore: 0, isHome: true }, // Win (most recent)
+        { homeScore: 2, awayScore: 1, isHome: true }, // Win
         { homeScore: 1, awayScore: 1, isHome: false }, // Draw
-        { homeScore: 0, awayScore: 1, isHome: true },  // Loss
+        { homeScore: 0, awayScore: 1, isHome: true }, // Loss
         { homeScore: 1, awayScore: 2, isHome: false }, // Loss (oldest)
       ]);
 
@@ -137,10 +137,10 @@ describe('FormCalculatorService', () => {
 
     it('should identify declining trend', () => {
       const matches = createMockMatches([
-        { homeScore: 0, awayScore: 2, isHome: true },  // Loss (most recent)
-        { homeScore: 1, awayScore: 1, isHome: true },  // Draw
+        { homeScore: 0, awayScore: 2, isHome: true }, // Loss (most recent)
+        { homeScore: 1, awayScore: 1, isHome: true }, // Draw
         { homeScore: 2, awayScore: 1, isHome: false }, // Win
-        { homeScore: 3, awayScore: 0, isHome: true },  // Win
+        { homeScore: 3, awayScore: 0, isHome: true }, // Win
         { homeScore: 2, awayScore: 1, isHome: false }, // Win (oldest)
       ]);
 
@@ -152,7 +152,11 @@ describe('FormCalculatorService', () => {
 
   // Helper function to create mock matches
   function createMockMatches(
-    configs: Array<{ homeScore: number | null; awayScore: number | null; isHome: boolean }>,
+    configs: Array<{
+      homeScore: number | null;
+      awayScore: number | null;
+      isHome: boolean;
+    }>,
   ): Match[] {
     return configs.map((config, index) => {
       const match = new Match();

@@ -1,0 +1,39 @@
+<form [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+  <ion-item lines="none">
+    <ion-textarea
+      formControlName="content"
+      [placeholder]="placeholder"
+      [maxlength]="maxLength"
+      rows="3"
+      [autoGrow]="true"
+      [counter]="true"
+      [counterFormatter]="counterFormatter">
+    </ion-textarea>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-buttons slot="end">
+      <ion-button
+        type="submit"
+        size="small"
+        [disabled]="!canSubmit()"
+        [strong]="true">
+        <ion-icon name="send" slot="start" *ngIf="!submitting"></ion-icon>
+        <ion-spinner name="crescent" slot="start" *ngIf="submitting"></ion-spinner>
+        {{ parentCommentId ? 'Reply' : 'Comment' }}
+      </ion-button>
+    </ion-buttons>
+
+    <ion-text slot="start" color="medium" *ngIf="remainingChars < 50">
+      {{ remainingChars }} characters left
+    </ion-text>
+  </ion-item>
+
+  <!-- Validation Errors -->
+  <ion-item lines="none" *ngIf="content?.invalid && content?.touched">
+    <ion-text color="danger">
+      <p *ngIf="content?.errors?.['required']">Comment cannot be empty</p>
+      <p *ngIf="content?.errors?.['maxlength']">Comment is too long (max {{ maxLength }} characters)</p>
+    </ion-text>
+  </ion-item>
+</form>

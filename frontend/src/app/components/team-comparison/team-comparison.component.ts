@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { TeamComparison } from '../../models/analytics.model';
@@ -19,7 +19,7 @@ export class TeamComparisonComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(public analyticsService: AnalyticsService) {}
+  private analyticsService = inject(AnalyticsService);
 
   ngOnInit() {
     this.loadComparison();

@@ -1,0 +1,73 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Activity Feed</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Feed Type Selector -->
+  <ion-segment
+    [(ngModel)]="feedType"
+    (ionChange)="changeFeedType($event.detail.value || 'global')"
+    class="feed-selector">
+    <ion-segment-button value="global">
+      <ion-label>Global</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="personalized">
+      <ion-label>For You</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Pull to Refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="refreshFeed($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Activity Feed -->
+  <ion-list *ngIf="activities.length > 0">
+    <app-feed-item
+      *ngFor="let activity of activities; trackBy: trackByActivityId"
+      [activity]="activity"
+      (itemClicked)="onActivityClicked($event)"
+      (userClicked)="onUserClicked($event)"
+      (matchClicked)="onMatchClicked($event)">
+    </app-feed-item>
+  </ion-list>
+
+  <!-- Load More Button -->
+  <ion-button
+    *ngIf="hasMore && !loading"
+    expand="block"
+    fill="outline"
+    (click)="loadMoreActivities()">
+    Load More Activity
+  </ion-button>
+
+  <!-- Empty State -->
+  <ion-card *ngIf="activities.length === 0 && !loading">
+    <ion-card-content>
+      <ion-text color="medium">
+        <p *ngIf="feedType === feedTypes.GLOBAL">
+          No global activity yet. Be the first to comment or react!
+        </p>
+        <p *ngIf="feedType === feedTypes.PERSONALIZED">
+          No personalized activity yet. Follow some users or teams to see their activity here.
+        </p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading State -->
+  <ion-card *ngIf="loading && activities.length === 0">
+    <ion-card-content>
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading feed...</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading More Indicator -->
+  <ion-item *ngIf="loading && activities.length > 0" lines="none">
+    <ion-spinner name="crescent" slot="start"></ion-spinner>
+    <ion-label>Loading more activity...</ion-label>
+  </ion-item>
+</ion-content>

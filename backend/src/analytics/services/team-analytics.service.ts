@@ -28,7 +28,10 @@ export class TeamAnalyticsService {
   /**
    * Get team analytics (from cache or calculate)
    */
-  async getTeamAnalytics(teamId: number, season?: string): Promise<TeamAnalyticsData> {
+  async getTeamAnalytics(
+    teamId: number,
+    season?: string,
+  ): Promise<TeamAnalyticsData> {
     const currentSeason = season || this.getCurrentSeason();
 
     // Check for existing analytics
@@ -48,8 +51,13 @@ export class TeamAnalyticsService {
   /**
    * Calculate and save team analytics
    */
-  async calculateTeamAnalytics(teamId: number, season: string): Promise<TeamAnalyticsData> {
-    this.logger.log(`Calculating analytics for team ${teamId}, season ${season}`);
+  async calculateTeamAnalytics(
+    teamId: number,
+    season: string,
+  ): Promise<TeamAnalyticsData> {
+    this.logger.log(
+      `Calculating analytics for team ${teamId}, season ${season}`,
+    );
 
     // Fetch team
     const team = await this.teamRepository.findOne({ where: { id: teamId } });
@@ -76,13 +84,23 @@ export class TeamAnalyticsService {
       teamId,
       false,
     );
-    const overallStats = this.statisticalAnalysis.calculatePerformanceStats(allMatches, teamId);
+    const overallStats = this.statisticalAnalysis.calculatePerformanceStats(
+      allMatches,
+      teamId,
+    );
 
     // Calculate defensive rating
-    const defensiveRating = this.statisticalAnalysis.calculateDefensiveRating(allMatches, teamId);
+    const defensiveRating = this.statisticalAnalysis.calculateDefensiveRating(
+      allMatches,
+      teamId,
+    );
 
     // Calculate scoring trend
-    const scoringTrend = this.statisticalAnalysis.calculateScoringTrend(allMatches, teamId, 5);
+    const scoringTrend = this.statisticalAnalysis.calculateScoringTrend(
+      allMatches,
+      teamId,
+      5,
+    );
 
     // Create or update analytics
     let analytics = await this.analyticsRepository.findOne({
@@ -163,7 +181,11 @@ export class TeamAnalyticsService {
   /**
    * Compare two teams
    */
-  async compareTeams(team1Id: number, team2Id: number, season?: string): Promise<any> {
+  async compareTeams(
+    team1Id: number,
+    team2Id: number,
+    season?: string,
+  ): Promise<any> {
     const currentSeason = season || this.getCurrentSeason();
 
     const team1Analytics = await this.getTeamAnalytics(team1Id, currentSeason);
@@ -171,7 +193,11 @@ export class TeamAnalyticsService {
 
     // Get head-to-head
     const h2hMatches = await this.getHeadToHeadMatches(team1Id, team2Id);
-    const h2h = this.statisticalAnalysis.analyzeHeadToHead(h2hMatches, team1Id, team2Id);
+    const h2h = this.statisticalAnalysis.analyzeHeadToHead(
+      h2hMatches,
+      team1Id,
+      team2Id,
+    );
 
     // Determine advantage
     let advantage: 'home' | 'away' | 'neutral' = 'neutral';
@@ -183,10 +209,14 @@ export class TeamAnalyticsService {
 
     // Generate comparison insights
     const insights: string[] = [];
-    insights.push(`Form: ${team1Analytics.teamName} (${team1Analytics.formRating.toFixed(0)}) vs ${team2Analytics.teamName} (${team2Analytics.formRating.toFixed(0)})`);
-    
+    insights.push(
+      `Form: ${team1Analytics.teamName} (${team1Analytics.formRating.toFixed(0)}) vs ${team2Analytics.teamName} (${team2Analytics.formRating.toFixed(0)})`,
+    );
+
     if (h2h.homeWins + h2h.awayWins + h2h.draws > 0) {
-      insights.push(`Head-to-head: ${h2h.homeWins} wins for ${team1Analytics.teamName}, ${h2h.awayWins} for ${team2Analytics.teamName}, ${h2h.draws} draws`);
+      insights.push(
+        `Head-to-head: ${h2h.homeWins} wins for ${team1Analytics.teamName}, ${h2h.awayWins} for ${team2Analytics.teamName}, ${h2h.draws} draws`,
+      );
     }
 
     return {
@@ -201,13 +231,20 @@ export class TeamAnalyticsService {
   /**
    * Get matches for a team in a season
    */
-  private async getTeamMatches(teamId: number, season?: string): Promise<Match[]> {
+  private async getTeamMatches(
+    teamId: number,
+    season?: string,
+  ): Promise<Match[]> {
     const query = this.matchRepository
       .createQueryBuilder('match')
       .leftJoinAndSelect('match.homeTeam', 'homeTeam')
       .leftJoinAndSelect('match.awayTeam', 'awayTeam')
-      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', { teamId })
-      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', {
+        teamId,
+      })
+      .andWhere('match.status IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT'],
+      })
       .andWhere('match.homeScore IS NOT NULL')
       .andWhere('match.awayScore IS NOT NULL');
 
@@ -223,7 +260,10 @@ export class TeamAnalyticsService {
   /**
    * Get head-to-head matches
    */
-  private async getHeadToHeadMatches(team1Id: number, team2Id: number): Promise<Match[]> {
+  private async getHeadToHeadMatches(
+    team1Id: number,
+    team2Id: number,
+  ): Promise<Match[]> {
     return await this.matchRepository
       .createQueryBuilder('match')
       .leftJoinAndSelect('match.homeTeam', 'homeTeam')
@@ -232,7 +272,9 @@ export class TeamAnalyticsService {
         '((match.homeTeam = :team1Id AND match.awayTeam = :team2Id) OR (match.homeTeam = :team2Id AND match.awayTeam = :team1Id))',
         { team1Id, team2Id },
       )
-      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .andWhere('match.status IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT'],
+      })
       .orderBy('match.kickOff', 'DESC')
       .limit(10)
       .getMany();
@@ -275,19 +317,25 @@ export class TeamAnalyticsService {
       homePerformance: {
         ...analytics.homePerformance,
         goalDifference:
-          analytics.homePerformance.goalsFor - analytics.homePerformance.goalsAgainst,
+          analytics.homePerformance.goalsFor -
+          analytics.homePerformance.goalsAgainst,
         winPercentage:
           analytics.homePerformance.played > 0
-            ? (analytics.homePerformance.won / analytics.homePerformance.played) * 100
+            ? (analytics.homePerformance.won /
+                analytics.homePerformance.played) *
+              100
             : 0,
       },
       awayPerformance: {
         ...analytics.awayPerformance,
         goalDifference:
-          analytics.awayPerformance.goalsFor - analytics.awayPerformance.goalsAgainst,
+          analytics.awayPerformance.goalsFor -
+          analytics.awayPerformance.goalsAgainst,
         winPercentage:
           analytics.awayPerformance.played > 0
-            ? (analytics.awayPerformance.won / analytics.awayPerformance.played) * 100
+            ? (analytics.awayPerformance.won /
+                analytics.awayPerformance.played) *
+              100
             : 0,
       },
       overallStats: {
@@ -298,8 +346,11 @@ export class TeamAnalyticsService {
         goalsFor: analytics.overallStats.totalGoalsFor,
         goalsAgainst: analytics.overallStats.totalGoalsAgainst,
         goalDifference:
-          analytics.overallStats.totalGoalsFor - analytics.overallStats.totalGoalsAgainst,
-        points: analytics.overallStats.totalWon * 3 + analytics.overallStats.totalDrawn,
+          analytics.overallStats.totalGoalsFor -
+          analytics.overallStats.totalGoalsAgainst,
+        points:
+          analytics.overallStats.totalWon * 3 +
+          analytics.overallStats.totalDrawn,
         winPercentage: analytics.overallStats.winPercentage,
       },
       scoringTrend: analytics.scoringTrend,
@@ -321,7 +372,10 @@ export class TeamAnalyticsService {
         await this.calculateTeamAnalytics(team.id, currentSeason);
         refreshed++;
       } catch (error) {
-        this.logger.warn(`Failed to refresh analytics for team ${team.id}:`, error.message);
+        this.logger.warn(
+          `Failed to refresh analytics for team ${team.id}:`,
+          error.message,
+        );
       }
     }
 

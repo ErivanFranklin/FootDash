@@ -1,7 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThanOrEqual, MoreThan } from 'typeorm';
-import { MatchPrediction, PredictionConfidence } from '../entities/match-prediction.entity';
+import { Repository } from 'typeorm';
+import {
+  MatchPrediction,
+  PredictionConfidence,
+} from '../entities/match-prediction.entity';
 import { Match } from '../../matches/entities/match.entity';
 import { FormCalculatorService } from './form-calculator.service';
 import { StatisticalAnalysisService } from './statistical-analysis.service';
@@ -26,7 +29,10 @@ export class MatchPredictionService {
   /**
    * Get prediction for a match (from cache or generate new)
    */
-  async getPrediction(matchId: number, forceRecalculate = false): Promise<PredictionResult> {
+  async getPrediction(
+    matchId: number,
+    forceRecalculate = false,
+  ): Promise<PredictionResult> {
     // Check for existing prediction (unless forcing recalculation)
     if (!forceRecalculate) {
       const existing = await this.predictionRepository.findOne({
@@ -68,15 +74,33 @@ export class MatchPredictionService {
     const h2hMatches = await this.getHeadToHeadMatches(homeTeamId, awayTeamId);
 
     // Calculate form ratings
-    const homeForm = this.formCalculator.calculateForm(homeMatches, homeTeamId, 5);
-    const awayForm = this.formCalculator.calculateForm(awayMatches, awayTeamId, 5);
+    const homeForm = this.formCalculator.calculateForm(
+      homeMatches,
+      homeTeamId,
+      5,
+    );
+    const awayForm = this.formCalculator.calculateForm(
+      awayMatches,
+      awayTeamId,
+      5,
+    );
 
     // Calculate performance stats
-    const homeStats = this.statisticalAnalysis.calculatePerformanceStats(homeMatches, homeTeamId);
-    const awayStats = this.statisticalAnalysis.calculatePerformanceStats(awayMatches, awayTeamId);
+    const homeStats = this.statisticalAnalysis.calculatePerformanceStats(
+      homeMatches,
+      homeTeamId,
+    );
+    const awayStats = this.statisticalAnalysis.calculatePerformanceStats(
+      awayMatches,
+      awayTeamId,
+    );
 
     // Analyze head-to-head
-    const h2h = this.statisticalAnalysis.analyzeHeadToHead(h2hMatches, homeTeamId, awayTeamId);
+    const h2h = this.statisticalAnalysis.analyzeHeadToHead(
+      h2hMatches,
+      homeTeamId,
+      awayTeamId,
+    );
 
     // Calculate probabilities
     const probabilities = this.calculateProbabilities({
@@ -163,18 +187,27 @@ export class MatchPredictionService {
     h2hAwayWins: number;
     h2hDraws: number;
   }): { homeWin: number; draw: number; awayWin: number } {
-    const { homeFormRating, awayFormRating, homeWinRate, awayWinRate, h2hHomeWins, h2hAwayWins, h2hDraws } = params;
+    const {
+      homeFormRating,
+      awayFormRating,
+      homeWinRate,
+      awayWinRate,
+      h2hHomeWins,
+      h2hAwayWins,
+      h2hDraws,
+    } = params;
 
     // Calculate base scores (0-100)
-    let homeScore = (homeFormRating * 0.4) + (homeWinRate * 0.4) + this.HOME_ADVANTAGE;
-    let awayScore = (awayFormRating * 0.4) + (awayWinRate * 0.4);
+    let homeScore =
+      homeFormRating * 0.4 + homeWinRate * 0.4 + this.HOME_ADVANTAGE;
+    let awayScore = awayFormRating * 0.4 + awayWinRate * 0.4;
 
     // Adjust based on head-to-head if available
     const totalH2H = h2hHomeWins + h2hAwayWins + h2hDraws;
     if (totalH2H > 0) {
       const h2hHomePercent = (h2hHomeWins / totalH2H) * 100;
       const h2hAwayPercent = (h2hAwayWins / totalH2H) * 100;
-      
+
       homeScore += h2hHomePercent * 0.2;
       awayScore += h2hAwayPercent * 0.2;
     }
@@ -216,8 +249,12 @@ export class MatchPredictionService {
       .createQueryBuilder('match')
       .leftJoinAndSelect('match.homeTeam', 'homeTeam')
       .leftJoinAndSelect('match.awayTeam', 'awayTeam')
-      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', { teamId })
-      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', {
+        teamId,
+      })
+      .andWhere('match.status IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT'],
+      })
       .andWhere('match.homeScore IS NOT NULL')
       .andWhere('match.awayScore IS NOT NULL')
       .orderBy('match.kickOff', 'DESC')
@@ -230,7 +267,10 @@ export class MatchPredictionService {
   /**
    * Get head-to-head matches between two teams
    */
-  private async getHeadToHeadMatches(team1Id: number, team2Id: number): Promise<Match[]> {
+  private async getHeadToHeadMatches(
+    team1Id: number,
+    team2Id: number,
+  ): Promise<Match[]> {
     const matches = await this.matchRepository
       .createQueryBuilder('match')
       .leftJoinAndSelect('match.homeTeam', 'homeTeam')
@@ -239,7 +279,9 @@ export class MatchPredictionService {
         '((match.homeTeam = :team1Id AND match.awayTeam = :team2Id) OR (match.homeTeam = :team2Id AND match.awayTeam = :team1Id))',
         { team1Id, team2Id },
       )
-      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .andWhere('match.status IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT'],
+      })
       .orderBy('match.kickOff', 'DESC')
       .limit(10)
       .getMany();
@@ -266,8 +308,8 @@ export class MatchPredictionService {
       { type: 'away', value: prediction.awayWinProbability },
     ];
 
-    const mostLikely = probabilities.reduce((max, curr) => 
-      curr.value > max.value ? curr : max
+    const mostLikely = probabilities.reduce((max, curr) =>
+      curr.value > max.value ? curr : max,
     ).type as 'home' | 'draw' | 'away';
 
     return {
@@ -295,7 +337,9 @@ export class MatchPredictionService {
       .createQueryBuilder('match')
       .where('match.kickOff > :now', { now })
       .andWhere('match.kickOff < :weekFromNow', { weekFromNow })
-      .andWhere('match.status NOT IN (:...statuses)', { statuses: ['FINISHED', 'FT', 'CANCELLED'] })
+      .andWhere('match.status NOT IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT', 'CANCELLED'],
+      })
       .orderBy('match.kickOff', 'ASC')
       .limit(limit)
       .getMany();
@@ -307,7 +351,10 @@ export class MatchPredictionService {
         const prediction = await this.getPrediction(match.id);
         predictions.push(prediction);
       } catch (error) {
-        this.logger.warn(`Failed to generate prediction for match ${match.id}:`, error.message);
+        this.logger.warn(
+          `Failed to generate prediction for match ${match.id}:`,
+          error.message,
+        );
       }
     }
 

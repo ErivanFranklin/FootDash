@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -19,7 +19,7 @@ export class AnalyticsService {
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for predictions
   private readonly ANALYTICS_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days for analytics
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   /**
    * Get prediction for a specific match

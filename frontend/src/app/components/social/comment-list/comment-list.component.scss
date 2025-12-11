@@ -1,0 +1,20 @@
+.replies-container {
+  margin-left: 16px;
+  border-left: 2px solid var(--ion-color-light-shade);
+  padding-left: 16px;
+}
+
+.comment-meta {
+  font-size: 0.8em;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
+}
+
+ion-item-group {
+  margin-bottom: 16px;
+}
+
+ion-spinner {
+  display: block;
+  margin: 20px auto;
+}

@@ -11,7 +11,9 @@ describe('StatisticalAnalysisService', () => {
       providers: [StatisticalAnalysisService],
     }).compile();
 
-    service = module.get<StatisticalAnalysisService>(StatisticalAnalysisService);
+    service = module.get<StatisticalAnalysisService>(
+      StatisticalAnalysisService,
+    );
   });
 
   it('should be defined', () => {
@@ -21,10 +23,34 @@ describe('StatisticalAnalysisService', () => {
   describe('analyzePerformance', () => {
     it('should calculate performance metrics correctly', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 1, homeGoals: 10, awayGoals: 5, isHome: true },  // Win
-        { homeScore: 2, awayScore: 2, homeGoals: 8, awayGoals: 8, isHome: true },   // Draw
-        { homeScore: 1, awayScore: 2, homeGoals: 6, awayGoals: 9, isHome: false },  // Loss
-        { homeScore: 4, awayScore: 0, homeGoals: 12, awayGoals: 2, isHome: true },  // Win
+        {
+          homeScore: 3,
+          awayScore: 1,
+          homeGoals: 10,
+          awayGoals: 5,
+          isHome: true,
+        }, // Win
+        {
+          homeScore: 2,
+          awayScore: 2,
+          homeGoals: 8,
+          awayGoals: 8,
+          isHome: true,
+        }, // Draw
+        {
+          homeScore: 1,
+          awayScore: 2,
+          homeGoals: 6,
+          awayGoals: 9,
+          isHome: false,
+        }, // Loss
+        {
+          homeScore: 4,
+          awayScore: 0,
+          homeGoals: 12,
+          awayGoals: 2,
+          isHome: true,
+        }, // Win
       ]);
 
       const result = service.analyzePerformance(matches, 1);
@@ -40,9 +66,27 @@ describe('StatisticalAnalysisService', () => {
 
     it('should handle perfect record (all wins)', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 0, homeGoals: 9, awayGoals: 2, isHome: true },
-        { homeScore: 2, awayScore: 1, homeGoals: 6, awayGoals: 3, isHome: true },
-        { homeScore: 1, awayScore: 0, homeGoals: 3, awayGoals: 1, isHome: false },
+        {
+          homeScore: 3,
+          awayScore: 0,
+          homeGoals: 9,
+          awayGoals: 2,
+          isHome: true,
+        },
+        {
+          homeScore: 2,
+          awayScore: 1,
+          homeGoals: 6,
+          awayGoals: 3,
+          isHome: true,
+        },
+        {
+          homeScore: 1,
+          awayScore: 0,
+          homeGoals: 3,
+          awayGoals: 1,
+          isHome: false,
+        },
       ]);
 
       const result = service.analyzePerformance(matches, 1);
@@ -55,9 +99,27 @@ describe('StatisticalAnalysisService', () => {
 
     it('should handle winless record', () => {
       const matches = createMockMatches([
-        { homeScore: 0, awayScore: 2, homeGoals: 2, awayGoals: 6, isHome: true },
-        { homeScore: 1, awayScore: 1, homeGoals: 3, awayGoals: 3, isHome: true },
-        { homeScore: 0, awayScore: 1, homeGoals: 1, awayGoals: 3, isHome: false },
+        {
+          homeScore: 0,
+          awayScore: 2,
+          homeGoals: 2,
+          awayGoals: 6,
+          isHome: true,
+        },
+        {
+          homeScore: 1,
+          awayScore: 1,
+          homeGoals: 3,
+          awayGoals: 3,
+          isHome: true,
+        },
+        {
+          homeScore: 0,
+          awayScore: 1,
+          homeGoals: 1,
+          awayGoals: 3,
+          isHome: false,
+        },
       ]);
 
       const result = service.analyzePerformance(matches, 1);
@@ -70,10 +132,34 @@ describe('StatisticalAnalysisService', () => {
 
     it('should calculate home and away performance separately', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 0, homeGoals: 9, awayGoals: 2, isHome: true },  // Home win
-        { homeScore: 2, awayScore: 1, homeGoals: 6, awayGoals: 3, isHome: true },  // Home win
-        { homeScore: 1, awayScore: 2, homeGoals: 3, awayGoals: 6, isHome: false }, // Away loss
-        { homeScore: 0, awayScore: 1, homeGoals: 2, awayGoals: 3, isHome: false }, // Away loss
+        {
+          homeScore: 3,
+          awayScore: 0,
+          homeGoals: 9,
+          awayGoals: 2,
+          isHome: true,
+        }, // Home win
+        {
+          homeScore: 2,
+          awayScore: 1,
+          homeGoals: 6,
+          awayGoals: 3,
+          isHome: true,
+        }, // Home win
+        {
+          homeScore: 1,
+          awayScore: 2,
+          homeGoals: 3,
+          awayGoals: 6,
+          isHome: false,
+        }, // Away loss
+        {
+          homeScore: 0,
+          awayScore: 1,
+          homeGoals: 2,
+          awayGoals: 3,
+          isHome: false,
+        }, // Away loss
       ]);
 
       const result = service.analyzePerformance(matches, 1);

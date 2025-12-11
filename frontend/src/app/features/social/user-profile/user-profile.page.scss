@@ -1,0 +1,98 @@
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: var(--ion-background-color);
+  border-bottom: 1px solid var(--ion-border-color);
+
+  .profile-avatar {
+    margin-right: 16px;
+
+    ion-avatar {
+      width: 80px;
+      height: 80px;
+    }
+  }
+
+  .profile-info {
+    flex: 1;
+
+    h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .join-date {
+      margin: 0;
+      color: var(--ion-color-medium);
+      font-size: 0.9rem;
+    }
+  }
+
+  .profile-actions {
+    margin-left: 16px;
+  }
+}
+
+.stats-grid {
+  padding: 16px;
+
+  .stat-col {
+    text-align: center;
+
+    .stat-card {
+      padding: 16px;
+      background: var(--ion-card-background);
+      border-radius: 8px;
+      border: 1px solid var(--ion-border-color);
+
+      h2 {
+        margin: 0 0 4px 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+ion-list {
+  background: transparent;
+
+  ion-list-header {
+    background: var(--ion-background-color);
+    padding-top: 16px;
+    padding-bottom: 8px;
+
+    ion-label {
+      font-weight: 600;
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+ion-card {
+  margin: 16px;
+
+  ion-card-content {
+    text-align: center;
+    padding: 24px;
+
+    ion-spinner {
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--ion-color-medium);
+    }
+  }
+}

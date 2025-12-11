@@ -14,7 +14,7 @@ import { RefreshToken } from './refresh-token.entity';
 import { ProfileDto } from './dto/profile.dto';
 
 export interface AuthUser {
-  id: string;
+  id: number;
   email: string;
 }
 
@@ -128,7 +128,7 @@ export class AuthService {
     }
   }
 
-  async getProfile(userId: string): Promise<ProfileDto> {
+  async getProfile(userId: number): Promise<ProfileDto> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user) {
       throw new UnauthorizedException('User not found');

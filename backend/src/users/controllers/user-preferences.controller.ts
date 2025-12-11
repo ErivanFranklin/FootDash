@@ -36,9 +36,7 @@ class UpdateNotificationsDto {
 export class UserPreferencesController {
   private readonly logger = new Logger(UserPreferencesController.name);
 
-  constructor(
-    private readonly preferencesService: UserPreferencesService,
-  ) {}
+  constructor(private readonly preferencesService: UserPreferencesService) {}
 
   @Get()
   async getPreferences(@Param('userId', ParseIntPipe) userId: number) {

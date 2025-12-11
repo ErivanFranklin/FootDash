@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -32,7 +33,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
   error: string | null = null;
   chart: Chart | null = null;
 
-  constructor(public analyticsService: AnalyticsService) {}
+  private analyticsService = inject(AnalyticsService);
 
   ngOnInit() {
     this.loadPrediction();

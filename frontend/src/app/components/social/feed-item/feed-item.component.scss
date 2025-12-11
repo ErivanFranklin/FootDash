@@ -1,0 +1,51 @@
+.feed-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --border-radius: 8px;
+  --background: var(--ion-item-background, var(--ion-background-color, #fff));
+
+  &:hover {
+    --background: var(--ion-color-light-shade);
+  }
+}
+
+.activity-text {
+  color: var(--ion-color-medium);
+  margin-left: 8px;
+}
+
+.activity-meta {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.content-preview {
+  font-style: italic;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
+  display: block;
+}
+
+.timestamp {
+  margin-top: 8px;
+  font-size: 0.8em;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+ion-chip {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-dark);
+  cursor: pointer;
+
+  &:hover {
+    --background: var(--ion-color-light-shade);
+  }
+}

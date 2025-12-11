@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -34,7 +35,7 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
   formChart: Chart | null = null;
   performanceChart: Chart | null = null;
 
-  constructor(public analyticsService: AnalyticsService) {}
+  private analyticsService = inject(AnalyticsService);
 
   ngOnInit() {
     this.loadAnalytics();

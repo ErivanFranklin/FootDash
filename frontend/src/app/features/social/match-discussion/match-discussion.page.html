@@ -1,0 +1,75 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/matches"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Match Discussion</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Match Header -->
+  <div class="match-header" *ngIf="match">
+    <div class="match-teams">
+      <div class="team">
+        <ion-avatar>
+          <img [src]="match.homeTeam.logo || '/assets/default-team.png'" [alt]="match.homeTeam.name">
+        </ion-avatar>
+        <h3>{{ match.homeTeam.name }}</h3>
+      </div>
+
+      <div class="match-info">
+        <div class="match-score" *ngIf="match.score">
+          <span class="score">{{ match.score.home }}</span>
+          <span class="separator">-</span>
+          <span class="score">{{ match.score.away }}</span>
+        </div>
+        <div class="match-status" [class.live]="match.status === 'live'">
+          {{ getMatchStatusText() }}
+        </div>
+        <div class="match-date">
+          {{ match.date | date:'medium' }}
+        </div>
+      </div>
+
+      <div class="team">
+        <ion-avatar>
+          <img [src]="match.awayTeam.logo || '/assets/default-team.png'" [alt]="match.awayTeam.name">
+        </ion-avatar>
+        <h3>{{ match.awayTeam.name }}</h3>
+      </div>
+    </div>
+
+    <!-- Match Reactions -->
+    <div class="match-reactions" *ngIf="reactionSummary">
+      <app-reaction-button
+        [targetType]="ReactionTargetType.MATCH"
+        [targetId]="matchId"
+        [summary]="reactionSummary"
+        [showText]="false">
+      </app-reaction-button>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comments-section" *ngIf="match">
+    <ion-list-header>
+      <ion-label>Discussion</ion-label>
+    </ion-list-header>
+
+    <app-comment-list
+      [targetType]="'match'"
+      [targetId]="matchId"
+      (commentAdded)="onCommentAdded($event)"
+      (commentDeleted)="onCommentDeleted($event)">
+    </app-comment-list>
+  </div>
+
+  <!-- Loading State -->
+  <ion-card *ngIf="!match">
+    <ion-card-content>
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading match details...</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

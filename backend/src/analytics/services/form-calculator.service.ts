@@ -43,7 +43,7 @@ export class FormCalculatorService {
     const recentMatches = matches.slice(0, lastN);
     let totalPoints = 0;
     const formLetters: string[] = [];
-    const matchDetails = [];
+    const matchDetails: FormResult['matches'] = [];
 
     for (const match of recentMatches) {
       const isHome = match.homeTeam.id === teamId;
@@ -145,10 +145,10 @@ export class FormCalculatorService {
   ): 'low' | 'medium' | 'high' {
     if (matchCount < 3) return 'low';
     if (matchCount < 5) return 'medium';
-    
+
     // High variance in form (inconsistent results) = lower confidence
     if (formVariance > 30) return 'medium';
-    
+
     return 'high';
   }
 }

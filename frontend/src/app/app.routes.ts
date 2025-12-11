@@ -41,4 +41,19 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'user-profile/:id',
+    loadComponent: () => import('./features/social/user-profile/user-profile.page').then( m => m.UserProfilePage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'feed',
+    loadComponent: () => import('./features/social/feed/feed.page').then( m => m.FeedPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'match-discussion/:id',
+    loadComponent: () => import('./features/social/match-discussion/match-discussion.page').then( m => m.MatchDiscussionPage),
+    canActivate: [authGuard],
+  },
 ];

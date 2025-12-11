@@ -41,7 +41,7 @@
     </ng-container>
 
     <!-- Error State -->
-    <div *ngIf="!loading && !(team$ | async)" class="error-container">
+    <div *ngIf="!loading && (team$ | async) === null" class="error-container">
       <p>Unable to load team data</p>
     </div>
   </div>

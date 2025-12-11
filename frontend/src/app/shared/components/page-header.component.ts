@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { Observable, of, isObservable, BehaviorSubject, from, Subject } from 'rxjs';
 import { takeUntil, finalize, catchError } from 'rxjs/operators';
@@ -10,6 +10,9 @@ import { takeUntil, finalize, catchError } from 'rxjs/operators';
   template: `
     <ion-header [translucent]="translucent">
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end" *ngIf="actions?.length">
           <ion-button
@@ -31,7 +34,7 @@ import { takeUntil, finalize, catchError } from 'rxjs/operators';
       </ion-toolbar>
     </ion-header>
   `,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, CommonModule]
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton, CommonModule]
 })
 export class PageHeaderComponent implements OnDestroy {
   @Input() title!: string;
