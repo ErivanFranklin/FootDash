@@ -22,12 +22,14 @@ import { FeedController } from './controllers/feed.controller';
 // External dependencies
 import { UsersModule } from '../users/users.module';
 import { MatchesModule } from '../matches/matches.module';
+import { WebsocketsModule } from '../websockets/websockets.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Comment, Reaction, Follow, UserActivity]),
     UsersModule,
     MatchesModule,
+    WebsocketsModule,
   ],
   controllers: [
     CommentsController,

@@ -5,6 +5,7 @@ import { Follow } from '../entities/follow.entity';
 import { User } from '../../users/user.entity';
 import { CreateFollowDto, FollowResponseDto, FollowStatsDto, UserListItemDto, PaginatedUsersDto } from '../dto/follow.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
+import { SocialGateway } from '../../websockets/social.gateway';
 
 @Injectable()
 export class FollowService {
@@ -13,6 +14,7 @@ export class FollowService {
     private readonly followRepository: Repository<Follow>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly socialGateway: SocialGateway,
   ) {}
 
   async followUser(followerId: number, dto: CreateFollowDto): Promise<Follow> {
@@ -43,7 +45,23 @@ export class FollowService {
       followingId,
     });
 
-    return await this.followRepository.save(follow);
+    const savedFollow = await this.followRepository.save(follow);
+
+    // Broadcast real-time follow event (global event for feed updates)
+    this.socialGateway.broadcastGlobalEvent({
+      type: 'follow',
+      targetType: 'match', // Not relevant for follow events
+      targetId: followingId,
+      userId: followerId,
+      userName: '', // Will be populated by controller
+      data: {
+        follow: savedFollow,
+        followerStats: await this.getFollowStats(followerId),
+        followingStats: await this.getFollowStats(followingId),
+      },
+    });
+
+    return savedFollow;
   }
 
   async unfollowUser(followerId: number, followingId: number): Promise<boolean> {

@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FeedService } from '../../../services/social/feed.service';
-import { Activity, PaginatedActivities, FeedType } from '../../../models/social';
+import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
+import { Activity, PaginatedActivities, FeedType, ActivityType, ActivityTargetType } from '../../../models/social';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-feed',
@@ -18,7 +20,7 @@ import { Activity, PaginatedActivities, FeedType } from '../../../models/social'
     FeedItemComponent
   ]
 })
-export class FeedPage implements OnInit {
+export class FeedPage implements OnInit, OnDestroy {
   activities: Activity[] = [];
   loading: boolean = false;
   hasMore: boolean = false;
@@ -28,10 +30,51 @@ export class FeedPage implements OnInit {
   feedType: string = 'global';
   feedTypes = FeedType;
 
-  constructor(private feedService: FeedService) {}
+  private globalEventSubscription?: Subscription;
+
+  constructor(
+    private feedService: FeedService,
+    private websocketService: WebsocketService
+  ) {}
 
   ngOnInit() {
     this.loadActivities();
+    this.setupGlobalEventSubscription();
+  }
+
+  ngOnDestroy() {
+    if (this.globalEventSubscription) {
+      this.globalEventSubscription.unsubscribe();
+    }
+  }
+
+  private setupGlobalEventSubscription() {
+    // Listen for global social events (like follows) to update feed
+    this.globalEventSubscription = this.websocketService.onGlobalSocialEvent().subscribe((event: SocialEvent) => {
+      if (event.type === 'follow') {
+        // Add follow activity to the feed if it's a global feed
+        if (this.feedType === 'global') {
+          this.addFollowActivityToFeed(event);
+        }
+      }
+    });
+  }
+
+  private addFollowActivityToFeed(event: SocialEvent) {
+    // Create a follow activity and add it to the beginning of the feed
+    const followActivity: Activity = {
+      id: Date.now(), // Temporary ID for real-time updates
+      userId: event.userId,
+      userName: event.userName || 'Unknown User',
+      activityType: ActivityType.FOLLOW,
+      targetType: ActivityTargetType.USER,
+      targetId: event.targetId,
+      createdAt: new Date().toISOString(),
+      metadata: event.data
+    };
+
+    // Add to the beginning of activities array
+    this.activities.unshift(followActivity);
   }
 
   private loadActivities() {

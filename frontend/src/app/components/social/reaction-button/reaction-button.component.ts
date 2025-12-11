@@ -1,9 +1,11 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, PopoverController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import { ReactionType, ReactionSummary, ReactionTargetType } from '../../../models/social';
 import { ReactionsService } from '../../../services/social/reactions.service';
+import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-reaction-button',
@@ -12,7 +14,7 @@ import { ReactionsService } from '../../../services/social/reactions.service';
   standalone: true,
   imports: [CommonModule, IonicModule]
 })
-export class ReactionButtonComponent implements OnInit, OnChanges {
+export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
   @Input() targetType!: ReactionTargetType;
   @Input() targetId!: number;
   @Input() summary?: ReactionSummary;
@@ -26,19 +28,73 @@ export class ReactionButtonComponent implements OnInit, OnChanges {
 
   readonly ReactionType = ReactionType;
 
+  private socialSubscription?: Subscription;
+
   constructor(
     private reactionsService: ReactionsService,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private websocketService: WebsocketService
   ) {}
 
   ngOnInit() {
     this.updateReactionData();
+    this.setupWebSocketSubscription();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['summary']) {
       this.updateReactionData();
     }
+    if ((changes['targetType'] || changes['targetId']) && this.targetType && this.targetId) {
+      this.updateReactionData();
+      this.setupWebSocketSubscription();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.socialSubscription) {
+      this.socialSubscription.unsubscribe();
+    }
+    // Unsubscribe from WebSocket
+    if (this.targetType && this.targetId) {
+      this.websocketService.unsubscribeFromSocial(
+        this.targetType === ReactionTargetType.MATCH ? 'match' : 'prediction',
+        this.targetId
+      );
+    }
+  }
+
+  private setupWebSocketSubscription() {
+    // Clean up existing subscription
+    if (this.socialSubscription) {
+      this.socialSubscription.unsubscribe();
+    }
+
+    // Unsubscribe from previous target if exists
+    if (this.targetType && this.targetId) {
+      this.websocketService.unsubscribeFromSocial(
+        this.targetType === ReactionTargetType.MATCH ? 'match' : 'prediction',
+        this.targetId
+      );
+    }
+
+    // Subscribe to new target
+    if (this.targetType && this.targetId) {
+      const targetType = this.targetType === ReactionTargetType.MATCH ? 'match' : 'prediction';
+      this.websocketService.subscribeToSocial(targetType, this.targetId);
+
+      // Listen for real-time reaction events
+      this.socialSubscription = this.websocketService.onSocialEvent().subscribe((event: SocialEvent) => {
+        if (event.targetType === targetType && event.targetId === this.targetId && event.type === 'reaction') {
+          this.handleReactionUpdate(event);
+        }
+      });
+    }
+  }
+
+  private handleReactionUpdate(event: SocialEvent) {
+    // Update the reaction summary with real-time data
+    this.updateReactionDataFromSummary(event.data.summary);
   }
 
   private updateReactionData() {
@@ -139,6 +195,15 @@ export class ReactionButtonComponent implements OnInit, OnChanges {
       case ReactionType.SAD: return 'medium';
       case ReactionType.ANGRY: return 'danger';
       default: return 'primary';
+    }
+  }
+
+  private updateReactionDataFromSummary(summary: ReactionSummary) {
+    this.totalReactions = summary.totalCount;
+    this.topReactions = summary.topReactions || [];
+    // Update user reaction if available in summary
+    if (summary.userReaction) {
+      this.userReaction = summary.userReaction;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -6,8 +6,10 @@ import { CommentFormComponent } from '../comment-form/comment-form.component';
 import { ReactionButtonComponent } from '../reaction-button/reaction-button.component';
 import { CommentsService } from '../../../services/social/comments.service';
 import { ReactionsService } from '../../../services/social/reactions.service';
+import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
 import { Comment as SocialComment, PaginatedComments, ReactionTargetType } from '../../../models/social';
 import { ReactionSummary } from '../../../models/social/reaction.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-comment-list',
@@ -16,7 +18,7 @@ import { ReactionSummary } from '../../../models/social/reaction.model';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, CommentFormComponent, ReactionButtonComponent]
 })
-export class CommentListComponent implements OnInit, OnChanges {
+export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() targetType: 'match' | 'prediction' = 'match';
   @Input() targetId!: number;
   @Input() showReplies: boolean = true;
@@ -38,18 +40,81 @@ export class CommentListComponent implements OnInit, OnChanges {
   // Enum for template access
   ReactionTargetType = ReactionTargetType;
 
+  private socialSubscription?: Subscription;
+
   constructor(
     private commentsService: CommentsService,
-    private reactionsService: ReactionsService
+    private reactionsService: ReactionsService,
+    private websocketService: WebsocketService
   ) {}
 
   ngOnInit() {
     this.loadComments();
+    this.setupWebSocketSubscription();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['targetId'] && !changes['targetId'].firstChange) {
       this.resetAndLoad();
+      this.setupWebSocketSubscription();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.socialSubscription) {
+      this.socialSubscription.unsubscribe();
+    }
+    // Unsubscribe from WebSocket
+    if (this.targetId) {
+      this.websocketService.unsubscribeFromSocial(this.targetType, this.targetId);
+    }
+  }
+
+  private setupWebSocketSubscription() {
+    // Clean up existing subscription
+    if (this.socialSubscription) {
+      this.socialSubscription.unsubscribe();
+    }
+
+    // Unsubscribe from previous target if exists
+    if (this.targetId) {
+      this.websocketService.unsubscribeFromSocial(this.targetType, this.targetId);
+    }
+
+    // Subscribe to new target
+    if (this.targetId) {
+      this.websocketService.subscribeToSocial(this.targetType, this.targetId);
+
+      // Listen for real-time social events
+      this.socialSubscription = this.websocketService.onSocialEvent().subscribe((event: SocialEvent) => {
+        if (event.targetType === this.targetType && event.targetId === this.targetId) {
+          if (event.type === 'comment') {
+            this.handleNewComment(event);
+          } else if (event.type === 'reaction') {
+            this.handleReactionUpdate(event);
+          }
+        }
+      });
+    }
+  }
+
+  private handleNewComment(event: SocialEvent) {
+    // Add new comment to the list if it's not already there
+    const newComment = event.data.comment;
+    const existingIndex = this.comments.findIndex(c => c.id === newComment.id);
+
+    if (existingIndex === -1) {
+      // Add to the beginning for new comments
+      this.comments.unshift(newComment);
+      this.commentAdded.emit(newComment);
+    }
+  }
+
+  private handleReactionUpdate(event: SocialEvent) {
+    // Update reaction summary for the target
+    const summary = event.data.summary;
+    if (event.data.reaction.targetType === ReactionTargetType.COMMENT) {
+      this.reactionSummaries.set(event.data.reaction.targetId, summary);
     }
   }
 

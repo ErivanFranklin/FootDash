@@ -4,12 +4,14 @@ import { Repository, IsNull } from 'typeorm';
 import { Comment } from '../entities/comment.entity';
 import { CreateCommentDto, UpdateCommentDto, CommentResponseDto, PaginatedCommentsDto } from '../dto/comment.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
+import { SocialGateway } from '../../websockets/social.gateway';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    private readonly socialGateway: SocialGateway,
   ) {}
 
   async createComment(userId: number, dto: CreateCommentDto): Promise<Comment> {
@@ -36,7 +38,26 @@ export class CommentsService {
       parentCommentId: dto.parentCommentId,
     });
 
-    return await this.commentRepository.save(comment);
+    const savedComment = await this.commentRepository.save(comment);
+
+    // Broadcast real-time comment event
+    const targetType = dto.matchId ? 'match' : 'prediction';
+    const targetId = dto.matchId || dto.predictionId;
+
+    if (targetId) {
+      this.socialGateway.broadcastSocialEvent({
+        type: 'comment',
+        targetType: targetType as 'match' | 'prediction',
+        targetId,
+        userId,
+        userName: '', // Will be populated by the controller or from user data
+        data: {
+          comment: await this.toResponseDto(savedComment),
+        },
+      });
+    }
+
+    return savedComment;
   }
 
   async getCommentsByMatch(matchId: number, query: PaginationQueryDto): Promise<PaginatedCommentsDto> {

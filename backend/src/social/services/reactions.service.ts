@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reaction, ReactionType, ReactionTargetType } from '../entities/reaction.entity';
 import { CreateReactionDto, ReactionSummaryDto, ReactionResponseDto } from '../dto/reaction.dto';
+import { SocialGateway } from '../../websockets/social.gateway';
 
 @Injectable()
 export class ReactionsService {
   constructor(
     @InjectRepository(Reaction)
     private readonly reactionRepository: Repository<Reaction>,
+    private readonly socialGateway: SocialGateway,
   ) {}
 
   async addReaction(userId: number, dto: CreateReactionDto): Promise<Reaction> {
@@ -35,7 +37,22 @@ export class ReactionsService {
       reactionType: dto.reactionType,
     });
 
-    return await this.reactionRepository.save(reaction);
+    const savedReaction = await this.reactionRepository.save(reaction);
+
+    // Broadcast real-time reaction event
+    this.socialGateway.broadcastSocialEvent({
+      type: 'reaction',
+      targetType: dto.targetType === ReactionTargetType.MATCH ? 'match' : 'prediction',
+      targetId: dto.targetId,
+      userId,
+      userName: '', // Will be populated by the controller
+      data: {
+        reaction: savedReaction,
+        summary: await this.getReactionSummary(dto.targetType, dto.targetId),
+      },
+    });
+
+    return savedReaction;
   }
 
   async removeReaction(userId: number, targetType: ReactionTargetType, targetId: number): Promise<boolean> {
