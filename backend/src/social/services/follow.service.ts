@@ -1,9 +1,20 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Follow } from '../entities/follow.entity';
 import { User } from '../../users/user.entity';
-import { CreateFollowDto, FollowResponseDto, FollowStatsDto, UserListItemDto, PaginatedUsersDto } from '../dto/follow.dto';
+import {
+  CreateFollowDto,
+  FollowResponseDto,
+  FollowStatsDto,
+  UserListItemDto,
+  PaginatedUsersDto,
+} from '../dto/follow.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
 import { SocialGateway } from '../../websockets/social.gateway';
 
@@ -26,7 +37,9 @@ export class FollowService {
     }
 
     // Check if target user exists
-    const targetUser = await this.userRepository.findOne({ where: { id: followingId } });
+    const targetUser = await this.userRepository.findOne({
+      where: { id: followingId },
+    });
     if (!targetUser) {
       throw new NotFoundException('User not found');
     }
@@ -64,7 +77,10 @@ export class FollowService {
     return savedFollow;
   }
 
-  async unfollowUser(followerId: number, followingId: number): Promise<boolean> {
+  async unfollowUser(
+    followerId: number,
+    followingId: number,
+  ): Promise<boolean> {
     const follow = await this.followRepository.findOne({
       where: { followerId, followingId },
     });
@@ -77,7 +93,10 @@ export class FollowService {
     return true;
   }
 
-  async getFollowers(userId: number, query: PaginationQueryDto): Promise<PaginatedUsersDto> {
+  async getFollowers(
+    userId: number,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedUsersDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -90,7 +109,7 @@ export class FollowService {
       take: limit,
     });
 
-    const users = follows.map(f => this.toUserListItem(f.follower));
+    const users = follows.map((f) => this.toUserListItem(f.follower));
 
     return {
       users,
@@ -101,7 +120,10 @@ export class FollowService {
     };
   }
 
-  async getFollowing(userId: number, query: PaginationQueryDto): Promise<PaginatedUsersDto> {
+  async getFollowing(
+    userId: number,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedUsersDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -114,7 +136,7 @@ export class FollowService {
       take: limit,
     });
 
-    const users = follows.map(f => this.toUserListItem(f.following));
+    const users = follows.map((f) => this.toUserListItem(f.following));
 
     return {
       users,
@@ -144,10 +166,13 @@ export class FollowService {
     return !!follow;
   }
 
-  async getFollowStats(currentUserId: number | null, targetUserId: number): Promise<FollowStatsDto> {
+  async getFollowStats(
+    currentUserId: number | null,
+    targetUserId: number,
+  ): Promise<FollowStatsDto> {
     const followersCount = await this.getFollowerCount(targetUserId);
     const followingCount = await this.getFollowingCount(targetUserId);
-    
+
     let isFollowing = false;
     if (currentUserId && currentUserId !== targetUserId) {
       isFollowing = await this.isFollowing(currentUserId, targetUserId);

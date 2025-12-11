@@ -1,6 +1,9 @@
 import { IsEnum, IsOptional, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ActivityType, ActivityTargetType } from '../entities/user-activity.entity';
+import {
+  ActivityType,
+  ActivityTargetType,
+} from '../entities/user-activity.entity';
 
 export class ActivityResponseDto {
   id: number;

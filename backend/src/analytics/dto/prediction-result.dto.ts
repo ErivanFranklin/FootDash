@@ -1,4 +1,12 @@
-import { IsNumber, IsString, IsEnum, IsArray, IsOptional, Min, Max } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsEnum,
+  IsArray,
+  IsOptional,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PredictionConfidence } from '../entities/match-prediction.entity';
 

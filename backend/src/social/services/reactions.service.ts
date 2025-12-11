@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Reaction, ReactionType, ReactionTargetType } from '../entities/reaction.entity';
-import { CreateReactionDto, ReactionSummaryDto, ReactionResponseDto } from '../dto/reaction.dto';
+import {
+  Reaction,
+  ReactionType,
+  ReactionTargetType,
+} from '../entities/reaction.entity';
+import {
+  CreateReactionDto,
+  ReactionSummaryDto,
+  ReactionResponseDto,
+} from '../dto/reaction.dto';
 import { SocialGateway } from '../../websockets/social.gateway';
 
 @Injectable()
@@ -42,20 +50,29 @@ export class ReactionsService {
     // Broadcast real-time reaction event
     this.socialGateway.broadcastSocialEvent({
       type: 'reaction',
-      targetType: dto.targetType === ReactionTargetType.MATCH ? 'match' : 'prediction',
+      targetType:
+        dto.targetType === ReactionTargetType.MATCH ? 'match' : 'prediction',
       targetId: dto.targetId,
       userId,
       userName: '', // Will be populated by the controller
       data: {
         reaction: savedReaction,
-        summary: await this.getReactionSummary(null, dto.targetType, dto.targetId),
+        summary: await this.getReactionSummary(
+          null,
+          dto.targetType,
+          dto.targetId,
+        ),
       },
     });
 
     return savedReaction;
   }
 
-  async removeReaction(userId: number, targetType: ReactionTargetType, targetId: number): Promise<boolean> {
+  async removeReaction(
+    userId: number,
+    targetType: ReactionTargetType,
+    targetId: number,
+  ): Promise<boolean> {
     const reaction = await this.reactionRepository.findOne({
       where: { userId, targetType, targetId },
     });
@@ -68,7 +85,10 @@ export class ReactionsService {
     return true;
   }
 
-  async getReactionsByTarget(targetType: ReactionTargetType, targetId: number): Promise<Reaction[]> {
+  async getReactionsByTarget(
+    targetType: ReactionTargetType,
+    targetId: number,
+  ): Promise<Reaction[]> {
     return await this.reactionRepository.find({
       where: { targetType, targetId },
       relations: ['user'],
@@ -76,13 +96,21 @@ export class ReactionsService {
     });
   }
 
-  async getUserReaction(userId: number, targetType: ReactionTargetType, targetId: number): Promise<Reaction | null> {
+  async getUserReaction(
+    userId: number,
+    targetType: ReactionTargetType,
+    targetId: number,
+  ): Promise<Reaction | null> {
     return await this.reactionRepository.findOne({
       where: { userId, targetType, targetId },
     });
   }
 
-  async getReactionSummary(userId: number | null, targetType: ReactionTargetType, targetId: number): Promise<ReactionSummaryDto> {
+  async getReactionSummary(
+    userId: number | null,
+    targetType: ReactionTargetType,
+    targetId: number,
+  ): Promise<ReactionSummaryDto> {
     const reactions = await this.getReactionsByTarget(targetType, targetId);
 
     const summary: ReactionSummaryDto = {
@@ -96,9 +124,9 @@ export class ReactionsService {
     };
 
     // Count each reaction type
-    reactions.forEach(reaction => {
+    reactions.forEach((reaction) => {
       summary[reaction.reactionType]++;
-      
+
       // Check if this is the current user's reaction
       if (userId && reaction.userId === userId) {
         summary.userReaction = reaction.reactionType;
@@ -108,13 +136,20 @@ export class ReactionsService {
     return summary;
   }
 
-  async getReactionCount(targetType: ReactionTargetType, targetId: number): Promise<number> {
+  async getReactionCount(
+    targetType: ReactionTargetType,
+    targetId: number,
+  ): Promise<number> {
     return await this.reactionRepository.count({
       where: { targetType, targetId },
     });
   }
 
-  async getReactionCountByType(targetType: ReactionTargetType, targetId: number, reactionType: ReactionType): Promise<number> {
+  async getReactionCountByType(
+    targetType: ReactionTargetType,
+    targetId: number,
+    reactionType: ReactionType,
+  ): Promise<number> {
     return await this.reactionRepository.count({
       where: { targetType, targetId, reactionType },
     });

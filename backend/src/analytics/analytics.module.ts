@@ -14,17 +14,9 @@ import { TeamAnalyticsController } from './controllers/team-analytics.controller
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      MatchPrediction,
-      TeamAnalytics,
-      Match,
-      Team,
-    ]),
+    TypeOrmModule.forFeature([MatchPrediction, TeamAnalytics, Match, Team]),
   ],
-  controllers: [
-    PredictionsController,
-    TeamAnalyticsController,
-  ],
+  controllers: [PredictionsController, TeamAnalyticsController],
   providers: [
     FormCalculatorService,
     StatisticalAnalysisService,
@@ -32,9 +24,6 @@ import { TeamAnalyticsController } from './controllers/team-analytics.controller
     MatchPredictionService,
     TeamAnalyticsService,
   ],
-  exports: [
-    MatchPredictionService,
-    TeamAnalyticsService,
-  ],
+  exports: [MatchPredictionService, TeamAnalyticsService],
 })
 export class AnalyticsModule {}

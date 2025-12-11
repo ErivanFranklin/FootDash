@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ReactionsService } from '../services/reactions.service';
 import { CreateReactionDto } from '../dto/reaction.dto';
 import { ReactionTargetType } from '../entities/reaction.entity';
@@ -10,10 +19,16 @@ export class ReactionsController {
   constructor(private readonly reactionsService: ReactionsService) {}
 
   @Post()
-  async addReaction(@Request() req: { user: { sub: number } }, @Body() dto: CreateReactionDto) {
+  async addReaction(
+    @Request() req: { user: { sub: number } },
+    @Body() dto: CreateReactionDto,
+  ) {
     const userId = req.user.sub;
     const reaction = await this.reactionsService.addReaction(userId, dto);
-    return { success: true, reaction: this.reactionsService.toResponseDto(reaction) };
+    return {
+      success: true,
+      reaction: this.reactionsService.toResponseDto(reaction),
+    };
   }
 
   @Delete(':targetType/:targetId')
@@ -57,7 +72,7 @@ export class ReactionsController {
     );
     return {
       success: true,
-      reactions: reactions.map(r => this.reactionsService.toResponseDto(r)),
+      reactions: reactions.map((r) => this.reactionsService.toResponseDto(r)),
     };
   }
 
@@ -73,11 +88,14 @@ export class ReactionsController {
       targetType as ReactionTargetType,
       parseInt(targetId),
     );
-    
+
     if (!reaction) {
       return { success: true, reaction: null };
     }
 
-    return { success: true, reaction: this.reactionsService.toResponseDto(reaction) };
+    return {
+      success: true,
+      reaction: this.reactionsService.toResponseDto(reaction),
+    };
   }
 }

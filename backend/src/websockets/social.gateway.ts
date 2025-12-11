@@ -44,7 +44,8 @@ export class SocialGateway implements OnModuleInit {
 
   @SubscribeMessage('subscribe-social')
   handleSubscribe(
-    @MessageBody() data: { targetType: 'match' | 'prediction'; targetId: number },
+    @MessageBody()
+    data: { targetType: 'match' | 'prediction'; targetId: number },
     @ConnectedSocket() client: Socket,
   ) {
     if (!data || !data.targetType || !data.targetId) {
@@ -53,7 +54,9 @@ export class SocialGateway implements OnModuleInit {
     }
 
     const roomName = `${data.targetType}-${data.targetId}`;
-    this.logger.log(`Client ${client.id} subscribed to social room ${roomName}`);
+    this.logger.log(
+      `Client ${client.id} subscribed to social room ${roomName}`,
+    );
     client.join(roomName);
 
     // Acknowledge subscription
@@ -66,16 +69,21 @@ export class SocialGateway implements OnModuleInit {
 
   @SubscribeMessage('unsubscribe-social')
   handleUnsubscribe(
-    @MessageBody() data: { targetType: 'match' | 'prediction'; targetId: number },
+    @MessageBody()
+    data: { targetType: 'match' | 'prediction'; targetId: number },
     @ConnectedSocket() client: Socket,
   ) {
     if (!data || !data.targetType || !data.targetId) {
-      this.logger.warn(`Invalid social unsubscription request from ${client.id}`);
+      this.logger.warn(
+        `Invalid social unsubscription request from ${client.id}`,
+      );
       return;
     }
 
     const roomName = `${data.targetType}-${data.targetId}`;
-    this.logger.log(`Client ${client.id} unsubscribed from social room ${roomName}`);
+    this.logger.log(
+      `Client ${client.id} unsubscribed from social room ${roomName}`,
+    );
     client.leave(roomName);
 
     client.emit('social-unsubscribed', {

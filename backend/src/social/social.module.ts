@@ -37,17 +37,7 @@ import { WebsocketsModule } from '../websockets/websockets.module';
     FollowController,
     FeedController,
   ],
-  providers: [
-    CommentsService,
-    ReactionsService,
-    FollowService,
-    FeedService,
-  ],
-  exports: [
-    CommentsService,
-    ReactionsService,
-    FollowService,
-    FeedService,
-  ],
+  providers: [CommentsService, ReactionsService, FollowService, FeedService],
+  exports: [CommentsService, ReactionsService, FollowService, FeedService],
 })
 export class SocialModule {}

@@ -27,7 +27,13 @@ export class TeamAnalytics {
   @Column({ type: 'varchar', length: 20 })
   season: string; // e.g., "2024", "2024-25"
 
-  @Column({ name: 'form_rating', type: 'decimal', precision: 5, scale: 2, default: 0 })
+  @Column({
+    name: 'form_rating',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+  })
   formRating: number; // 0-100 rating based on recent results
 
   @Column({ type: 'simple-json', nullable: true })
@@ -59,7 +65,13 @@ export class TeamAnalytics {
     trend: 'up' | 'down' | 'stable';
   };
 
-  @Column({ name: 'defensive_rating', type: 'decimal', precision: 5, scale: 2, default: 0 })
+  @Column({
+    name: 'defensive_rating',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+  })
   defensiveRating: number; // Lower is better, goals conceded per match
 
   @Column({ type: 'simple-json', nullable: true })

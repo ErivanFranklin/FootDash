@@ -1,4 +1,11 @@
-import { IsString, IsInt, IsOptional, MaxLength, MinLength, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsOptional,
+  MaxLength,
+  MinLength,
+  IsNotEmpty,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateCommentDto {

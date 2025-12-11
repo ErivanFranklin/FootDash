@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { UserActivity, ActivityType, ActivityTargetType } from '../entities/user-activity.entity';
+import { Repository } from 'typeorm';
+import {
+  UserActivity,
+  ActivityTargetType,
+} from '../entities/user-activity.entity';
 import { Follow } from '../entities/follow.entity';
-import { ActivityResponseDto, PaginatedActivityDto, FeedQueryDto, CreateActivityDto } from '../dto/activity.dto';
+import {
+  ActivityResponseDto,
+  PaginatedActivityDto,
+  FeedQueryDto,
+  CreateActivityDto,
+} from '../dto/activity.dto';
 
 @Injectable()
 export class FeedService {
@@ -14,7 +22,10 @@ export class FeedService {
     private readonly followRepository: Repository<Follow>,
   ) {}
 
-  async getUserFeed(userId: number, query: FeedQueryDto): Promise<PaginatedActivityDto> {
+  async getUserFeed(
+    userId: number,
+    query: FeedQueryDto,
+  ): Promise<PaginatedActivityDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -25,8 +36,8 @@ export class FeedService {
       select: ['followingId'],
     });
 
-    const followingIds = follows.map(f => f.followingId);
-    
+    const followingIds = follows.map((f) => f.followingId);
+
     // Include user's own activities
     followingIds.push(userId);
 
@@ -39,13 +50,15 @@ export class FeedService {
       .take(limit);
 
     if (query.activityType) {
-      queryBuilder.andWhere('activity.activityType = :activityType', { activityType: query.activityType });
+      queryBuilder.andWhere('activity.activityType = :activityType', {
+        activityType: query.activityType,
+      });
     }
 
     const [activities, total] = await queryBuilder.getManyAndCount();
 
     return {
-      activities: activities.map(a => this.toResponseDto(a)),
+      activities: activities.map((a) => this.toResponseDto(a)),
       total,
       page,
       limit,
@@ -66,13 +79,15 @@ export class FeedService {
       .take(limit);
 
     if (query.activityType) {
-      queryBuilder.where('activity.activityType = :activityType', { activityType: query.activityType });
+      queryBuilder.where('activity.activityType = :activityType', {
+        activityType: query.activityType,
+      });
     }
 
     const [activities, total] = await queryBuilder.getManyAndCount();
 
     return {
-      activities: activities.map(a => this.toResponseDto(a)),
+      activities: activities.map((a) => this.toResponseDto(a)),
       total,
       page,
       limit,
@@ -80,7 +95,10 @@ export class FeedService {
     };
   }
 
-  async getMatchFeed(matchId: number, query: FeedQueryDto): Promise<PaginatedActivityDto> {
+  async getMatchFeed(
+    matchId: number,
+    query: FeedQueryDto,
+  ): Promise<PaginatedActivityDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -88,20 +106,24 @@ export class FeedService {
     const queryBuilder = this.activityRepository
       .createQueryBuilder('activity')
       .leftJoinAndSelect('activity.user', 'user')
-      .where('activity.targetType = :targetType', { targetType: ActivityTargetType.MATCH })
+      .where('activity.targetType = :targetType', {
+        targetType: ActivityTargetType.MATCH,
+      })
       .andWhere('activity.targetId = :matchId', { matchId })
       .orderBy('activity.createdAt', 'DESC')
       .skip(skip)
       .take(limit);
 
     if (query.activityType) {
-      queryBuilder.andWhere('activity.activityType = :activityType', { activityType: query.activityType });
+      queryBuilder.andWhere('activity.activityType = :activityType', {
+        activityType: query.activityType,
+      });
     }
 
     const [activities, total] = await queryBuilder.getManyAndCount();
 
     return {
-      activities: activities.map(a => this.toResponseDto(a)),
+      activities: activities.map((a) => this.toResponseDto(a)),
       total,
       page,
       limit,
@@ -109,7 +131,10 @@ export class FeedService {
     };
   }
 
-  async getUserActivity(targetUserId: number, query: FeedQueryDto): Promise<PaginatedActivityDto> {
+  async getUserActivity(
+    targetUserId: number,
+    query: FeedQueryDto,
+  ): Promise<PaginatedActivityDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -123,13 +148,15 @@ export class FeedService {
       .take(limit);
 
     if (query.activityType) {
-      queryBuilder.andWhere('activity.activityType = :activityType', { activityType: query.activityType });
+      queryBuilder.andWhere('activity.activityType = :activityType', {
+        activityType: query.activityType,
+      });
     }
 
     const [activities, total] = await queryBuilder.getManyAndCount();
 
     return {
-      activities: activities.map(a => this.toResponseDto(a)),
+      activities: activities.map((a) => this.toResponseDto(a)),
       total,
       page,
       limit,
@@ -149,7 +176,10 @@ export class FeedService {
     return await this.activityRepository.save(activity);
   }
 
-  async deleteActivitiesByTarget(targetType: ActivityTargetType, targetId: number): Promise<void> {
+  async deleteActivitiesByTarget(
+    targetType: ActivityTargetType,
+    targetId: number,
+  ): Promise<void> {
     await this.activityRepository.delete({ targetType, targetId });
   }
 

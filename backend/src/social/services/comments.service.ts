@@ -1,8 +1,17 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { Comment } from '../entities/comment.entity';
-import { CreateCommentDto, UpdateCommentDto, CommentResponseDto, PaginatedCommentsDto } from '../dto/comment.dto';
+import {
+  CreateCommentDto,
+  UpdateCommentDto,
+  CommentResponseDto,
+  PaginatedCommentsDto,
+} from '../dto/comment.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
 import { SocialGateway } from '../../websockets/social.gateway';
 
@@ -17,7 +26,9 @@ export class CommentsService {
   async createComment(userId: number, dto: CreateCommentDto): Promise<Comment> {
     // Validate that at least one target is provided
     if (!dto.matchId && !dto.predictionId && !dto.parentCommentId) {
-      throw new ForbiddenException('Comment must be associated with a match, prediction, or parent comment');
+      throw new ForbiddenException(
+        'Comment must be associated with a match, prediction, or parent comment',
+      );
     }
 
     // If replying to a comment, verify parent exists
@@ -60,7 +71,10 @@ export class CommentsService {
     return savedComment;
   }
 
-  async getCommentsByMatch(matchId: number, query: PaginationQueryDto): Promise<PaginatedCommentsDto> {
+  async getCommentsByMatch(
+    matchId: number,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedCommentsDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -74,7 +88,7 @@ export class CommentsService {
     });
 
     return {
-      comments: await Promise.all(comments.map(c => this.toResponseDto(c))),
+      comments: await Promise.all(comments.map((c) => this.toResponseDto(c))),
       total,
       page,
       limit,
@@ -82,7 +96,10 @@ export class CommentsService {
     };
   }
 
-  async getCommentsByPrediction(predictionId: number, query: PaginationQueryDto): Promise<PaginatedCommentsDto> {
+  async getCommentsByPrediction(
+    predictionId: number,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedCommentsDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -96,7 +113,7 @@ export class CommentsService {
     });
 
     return {
-      comments: await Promise.all(comments.map(c => this.toResponseDto(c))),
+      comments: await Promise.all(comments.map((c) => this.toResponseDto(c))),
       total,
       page,
       limit,
@@ -104,7 +121,10 @@ export class CommentsService {
     };
   }
 
-  async getReplies(parentCommentId: number, query: PaginationQueryDto): Promise<PaginatedCommentsDto> {
+  async getReplies(
+    parentCommentId: number,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedCommentsDto> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
@@ -118,7 +138,7 @@ export class CommentsService {
     });
 
     return {
-      comments: await Promise.all(comments.map(c => this.toResponseDto(c))),
+      comments: await Promise.all(comments.map((c) => this.toResponseDto(c))),
       total,
       page,
       limit,
@@ -126,7 +146,11 @@ export class CommentsService {
     };
   }
 
-  async updateComment(commentId: number, userId: number, dto: UpdateCommentDto): Promise<Comment> {
+  async updateComment(
+    commentId: number,
+    userId: number,
+    dto: UpdateCommentDto,
+  ): Promise<Comment> {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId, isDeleted: false },
     });
@@ -164,9 +188,12 @@ export class CommentsService {
     return true;
   }
 
-  async getCommentCount(targetType: 'match' | 'prediction', targetId: number): Promise<number> {
+  async getCommentCount(
+    targetType: 'match' | 'prediction',
+    targetId: number,
+  ): Promise<number> {
     const where: any = { isDeleted: false, parentCommentId: null };
-    
+
     if (targetType === 'match') {
       where.matchId = targetId;
     } else {

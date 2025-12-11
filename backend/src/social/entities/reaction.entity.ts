@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { User } from '../../users/user.entity';
 
 export enum ReactionType {
@@ -17,7 +25,9 @@ export enum ReactionTargetType {
 }
 
 @Entity('reactions')
-@Index('IDX_REACTIONS_UNIQUE', ['userId', 'targetType', 'targetId'], { unique: true })
+@Index('IDX_REACTIONS_UNIQUE', ['userId', 'targetType', 'targetId'], {
+  unique: true,
+})
 @Index('IDX_REACTIONS_TARGET', ['targetType', 'targetId'])
 export class Reaction {
   @PrimaryGeneratedColumn()

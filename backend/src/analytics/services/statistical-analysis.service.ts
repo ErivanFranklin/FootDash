@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Match } from '../../matches/entities/match.entity';
-import { PerformanceStats, HeadToHeadStats } from '../interfaces/analytics.interface';
+import {
+  PerformanceStats,
+  HeadToHeadStats,
+} from '../interfaces/analytics.interface';
 
 @Injectable()
 export class StatisticalAnalysisService {
@@ -9,13 +12,17 @@ export class StatisticalAnalysisService {
   /**
    * Calculate comprehensive performance statistics
    */
-  calculatePerformanceStats(matches: Match[], teamId: number, isHome?: boolean): PerformanceStats {
+  calculatePerformanceStats(
+    matches: Match[],
+    teamId: number,
+    isHome?: boolean,
+  ): PerformanceStats {
     let filteredMatches = matches;
 
     // Filter by home/away if specified
     if (isHome !== undefined) {
-      filteredMatches = matches.filter((m) => 
-        isHome ? m.homeTeam.id === teamId : m.awayTeam.id === teamId
+      filteredMatches = matches.filter((m) =>
+        isHome ? m.homeTeam.id === teamId : m.awayTeam.id === teamId,
       );
     }
 
@@ -65,7 +72,7 @@ export class StatisticalAnalysisService {
   calculateDefensiveRating(matches: Match[], teamId: number): number {
     const stats = this.calculatePerformanceStats(matches, teamId);
     if (stats.played === 0) return 0;
-    
+
     return Math.round((stats.goalsAgainst / stats.played) * 100) / 100;
   }
 
@@ -75,14 +82,18 @@ export class StatisticalAnalysisService {
   calculateAttackingRating(matches: Match[], teamId: number): number {
     const stats = this.calculatePerformanceStats(matches, teamId);
     if (stats.played === 0) return 0;
-    
+
     return Math.round((stats.goalsFor / stats.played) * 100) / 100;
   }
 
   /**
    * Analyze head-to-head history between two teams
    */
-  analyzeHeadToHead(matches: Match[], homeTeamId: number, awayTeamId: number): HeadToHeadStats {
+  analyzeHeadToHead(
+    matches: Match[],
+    homeTeamId: number,
+    awayTeamId: number,
+  ): HeadToHeadStats {
     // Filter matches between these two teams
     const h2hMatches = matches.filter(
       (m) =>
@@ -93,7 +104,7 @@ export class StatisticalAnalysisService {
     let homeWins = 0;
     let awayWins = 0;
     let draws = 0;
-    const lastFiveMeetings = [];
+    const lastFiveMeetings: HeadToHeadStats['lastFiveMeetings'] = [];
 
     // Sort by most recent first
     const sortedMatches = h2hMatches
@@ -104,7 +115,12 @@ export class StatisticalAnalysisService {
       );
 
     for (const match of sortedMatches.slice(0, 5)) {
-      if (match.homeScore == null || match.awayScore == null || match.kickOff == null) continue;
+      if (
+        match.homeScore == null ||
+        match.awayScore == null ||
+        match.kickOff == null
+      )
+        continue;
 
       const isOriginalHome = match.homeTeam.id === homeTeamId;
       const homeScore = isOriginalHome ? match.homeScore : match.awayScore;
@@ -147,22 +163,27 @@ export class StatisticalAnalysisService {
     matches: Match[],
     teamId: number,
     lastN = 5,
-  ): { last5Matches: number[]; average: number; trend: 'up' | 'down' | 'stable' } {
+  ): {
+    last5Matches: number[];
+    average: number;
+    trend: 'up' | 'down' | 'stable';
+  } {
     const recentMatches = matches.slice(0, lastN);
     const goalsScored: number[] = [];
 
     for (const match of recentMatches) {
       const isHome = match.homeTeam.id === teamId;
       const teamScore = isHome ? match.homeScore : match.awayScore;
-      
+
       if (teamScore != null) {
         goalsScored.push(teamScore);
       }
     }
 
-    const average = goalsScored.length > 0
-      ? goalsScored.reduce((a, b) => a + b, 0) / goalsScored.length
-      : 0;
+    const average =
+      goalsScored.length > 0
+        ? goalsScored.reduce((a, b) => a + b, 0) / goalsScored.length
+        : 0;
 
     // Determine trend by comparing first half vs second half
     const trend = this.determineTrend(goalsScored);
@@ -197,9 +218,17 @@ export class StatisticalAnalysisService {
   /**
    * Calculate home advantage factor (percentage boost for home teams)
    */
-  calculateHomeAdvantage(homeMatches: Match[], awayMatches: Match[], teamId: number): number {
+  calculateHomeAdvantage(
+    homeMatches: Match[],
+    awayMatches: Match[],
+    teamId: number,
+  ): number {
     const homeStats = this.calculatePerformanceStats(homeMatches, teamId, true);
-    const awayStats = this.calculatePerformanceStats(awayMatches, teamId, false);
+    const awayStats = this.calculatePerformanceStats(
+      awayMatches,
+      teamId,
+      false,
+    );
 
     if (homeStats.played === 0 || awayStats.played === 0) return 10; // Default 10% advantage
 

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { FormResult } from './form-calculator.service';
-import { HeadToHeadStats, PerformanceStats } from '../interfaces/analytics.interface';
+import {
+  HeadToHeadStats,
+  PerformanceStats,
+} from '../interfaces/analytics.interface';
 
 @Injectable()
 export class InsightsGeneratorService {
@@ -17,19 +20,35 @@ export class InsightsGeneratorService {
     awayTeamName: string;
   }): string[] {
     const insights: string[] = [];
-    const { homeForm, awayForm, homeStats, awayStats, h2h, homeTeamName, awayTeamName } = params;
+    const {
+      homeForm,
+      awayForm,
+      homeStats,
+      awayStats,
+      h2h,
+      homeTeamName,
+      awayTeamName,
+    } = params;
 
     // Form-based insights
     if (homeForm.formRating > 70) {
-      insights.push(`${homeTeamName} are in excellent form with ${homeForm.recentForm}`);
+      insights.push(
+        `${homeTeamName} are in excellent form with ${homeForm.recentForm}`,
+      );
     } else if (homeForm.formRating < 30) {
-      insights.push(`${homeTeamName} are struggling with recent form (${homeForm.recentForm})`);
+      insights.push(
+        `${homeTeamName} are struggling with recent form (${homeForm.recentForm})`,
+      );
     }
 
     if (awayForm.formRating > 70) {
-      insights.push(`${awayTeamName} are in excellent form with ${awayForm.recentForm}`);
+      insights.push(
+        `${awayTeamName} are in excellent form with ${awayForm.recentForm}`,
+      );
     } else if (awayForm.formRating < 30) {
-      insights.push(`${awayTeamName} are struggling with recent form (${awayForm.recentForm})`);
+      insights.push(
+        `${awayTeamName} are struggling with recent form (${awayForm.recentForm})`,
+      );
     }
 
     // Head-to-head insights
@@ -44,13 +63,17 @@ export class InsightsGeneratorService {
           `${awayTeamName} have the upper hand historically (${h2h.awayWins} wins in last ${totalH2H} matches)`,
         );
       } else if (h2h.draws >= totalH2H / 2) {
-        insights.push(`Recent meetings have been closely contested with ${h2h.draws} draws`);
+        insights.push(
+          `Recent meetings have been closely contested with ${h2h.draws} draws`,
+        );
       }
     }
 
     // Scoring insights
-    const homeGoalsPerGame = homeStats.played > 0 ? homeStats.goalsFor / homeStats.played : 0;
-    const awayGoalsPerGame = awayStats.played > 0 ? awayStats.goalsFor / awayStats.played : 0;
+    const homeGoalsPerGame =
+      homeStats.played > 0 ? homeStats.goalsFor / homeStats.played : 0;
+    const awayGoalsPerGame =
+      awayStats.played > 0 ? awayStats.goalsFor / awayStats.played : 0;
 
     if (homeGoalsPerGame > 2.5) {
       insights.push(
@@ -65,19 +88,29 @@ export class InsightsGeneratorService {
     }
 
     // Defensive insights
-    const homeDefense = homeStats.played > 0 ? homeStats.goalsAgainst / homeStats.played : 0;
-    const awayDefense = awayStats.played > 0 ? awayStats.goalsAgainst / awayStats.played : 0;
+    const homeDefense =
+      homeStats.played > 0 ? homeStats.goalsAgainst / homeStats.played : 0;
+    const awayDefense =
+      awayStats.played > 0 ? awayStats.goalsAgainst / awayStats.played : 0;
 
     if (homeDefense < 0.8) {
-      insights.push(`${homeTeamName} have a strong defense conceding only ${homeDefense.toFixed(1)} goals per game`);
+      insights.push(
+        `${homeTeamName} have a strong defense conceding only ${homeDefense.toFixed(1)} goals per game`,
+      );
     } else if (homeDefense > 2) {
-      insights.push(`${homeTeamName} have defensive concerns conceding ${homeDefense.toFixed(1)} goals per game`);
+      insights.push(
+        `${homeTeamName} have defensive concerns conceding ${homeDefense.toFixed(1)} goals per game`,
+      );
     }
 
     if (awayDefense < 0.8) {
-      insights.push(`${awayTeamName} have a solid defense conceding only ${awayDefense.toFixed(1)} goals per game`);
+      insights.push(
+        `${awayTeamName} have a solid defense conceding only ${awayDefense.toFixed(1)} goals per game`,
+      );
     } else if (awayDefense > 2) {
-      insights.push(`${awayTeamName} have been leaking goals (${awayDefense.toFixed(1)} per game)`);
+      insights.push(
+        `${awayTeamName} have been leaking goals (${awayDefense.toFixed(1)} per game)`,
+      );
     }
 
     // Win streak insights
@@ -105,7 +138,14 @@ export class InsightsGeneratorService {
     scoringTrend: { trend: 'up' | 'down' | 'stable'; average: number };
   }): string[] {
     const insights: string[] = [];
-    const { teamName, formRating, homeStats, awayStats, overallStats, scoringTrend } = params;
+    const {
+      teamName,
+      formRating,
+      homeStats,
+      awayStats,
+      overallStats,
+      scoringTrend,
+    } = params;
 
     // Overall form
     if (formRating > 70) {
@@ -116,30 +156,42 @@ export class InsightsGeneratorService {
 
     // Home vs Away performance
     if (homeStats.winPercentage > awayStats.winPercentage + 20) {
-      insights.push(`Much stronger at home (${homeStats.winPercentage.toFixed(0)}% vs ${awayStats.winPercentage.toFixed(0)}% away)`);
+      insights.push(
+        `Much stronger at home (${homeStats.winPercentage.toFixed(0)}% vs ${awayStats.winPercentage.toFixed(0)}% away)`,
+      );
     } else if (awayStats.winPercentage > homeStats.winPercentage + 20) {
       insights.push(`Surprisingly better away from home`);
     }
 
     // Scoring trend
     if (scoringTrend.trend === 'up') {
-      insights.push(`Goals scoring is trending upward (${scoringTrend.average.toFixed(1)} per game)`);
+      insights.push(
+        `Goals scoring is trending upward (${scoringTrend.average.toFixed(1)} per game)`,
+      );
     } else if (scoringTrend.trend === 'down') {
-      insights.push(`Struggling to find the net recently (${scoringTrend.average.toFixed(1)} per game)`);
+      insights.push(
+        `Struggling to find the net recently (${scoringTrend.average.toFixed(1)} per game)`,
+      );
     }
 
     // Goal difference
     if (overallStats.goalDifference > 20) {
-      insights.push(`Exceptional goal difference of +${overallStats.goalDifference}`);
+      insights.push(
+        `Exceptional goal difference of +${overallStats.goalDifference}`,
+      );
     } else if (overallStats.goalDifference < -20) {
       insights.push(`Poor goal difference of ${overallStats.goalDifference}`);
     }
 
     // Win percentage
     if (overallStats.winPercentage > 60) {
-      insights.push(`Impressive ${overallStats.winPercentage.toFixed(0)}% win rate this season`);
+      insights.push(
+        `Impressive ${overallStats.winPercentage.toFixed(0)}% win rate this season`,
+      );
     } else if (overallStats.winPercentage < 30) {
-      insights.push(`Struggling with only ${overallStats.winPercentage.toFixed(0)}% win rate`);
+      insights.push(
+        `Struggling with only ${overallStats.winPercentage.toFixed(0)}% win rate`,
+      );
     }
 
     return insights.slice(0, 5);
@@ -154,7 +206,8 @@ export class InsightsGeneratorService {
     h2hCount: number;
     formConsistency: number;
   }): 'low' | 'medium' | 'high' {
-    const { homeMatchCount, awayMatchCount, h2hCount, formConsistency } = params;
+    const { homeMatchCount, awayMatchCount, h2hCount, formConsistency } =
+      params;
 
     // Low confidence if insufficient data
     if (homeMatchCount < 3 || awayMatchCount < 3) {
