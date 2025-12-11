@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { CommentFormComponent } from './comment-form.component';
 
@@ -9,8 +10,7 @@ describe('CommentFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CommentFormComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule.forRoot(), HttpClientTestingModule, CommentFormComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(CommentFormComponent);

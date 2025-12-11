@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { FollowButtonComponent } from './follow-button.component';
 
@@ -9,8 +10,7 @@ describe('FollowButtonComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FollowButtonComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule.forRoot(), HttpClientTestingModule, FollowButtonComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FollowButtonComponent);

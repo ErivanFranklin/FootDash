@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FeedPage } from './feed.page';
 
 describe('FeedPage', () => {
@@ -6,6 +7,9 @@ describe('FeedPage', () => {
   let fixture: ComponentFixture<FeedPage>;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, FeedPage]
+    });
     fixture = TestBed.createComponent(FeedPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
