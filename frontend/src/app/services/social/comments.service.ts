@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class CommentsService {
-  private apiUrl = `${environment.apiUrl}/comments`;
+  private apiUrl = `${environment.apiBaseUrl}/comments`;
 
   constructor(private http: HttpClient) {}
 

@@ -2,9 +2,11 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { Comment, PaginatedComments, ReactionTargetType } from '../../../models/social';
+import { CommentFormComponent } from '../comment-form/comment-form.component';
+import { ReactionButtonComponent } from '../reaction-button/reaction-button.component';
 import { CommentsService } from '../../../services/social/comments.service';
 import { ReactionsService } from '../../../services/social/reactions.service';
+import { Comment as SocialComment, PaginatedComments, ReactionTargetType } from '../../../models/social';
 import { ReactionSummary } from '../../../models/social/reaction.model';
 
 @Component({
@@ -12,7 +14,7 @@ import { ReactionSummary } from '../../../models/social/reaction.model';
   templateUrl: './comment-list.component.html',
   styleUrls: ['./comment-list.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule]
+  imports: [CommonModule, FormsModule, IonicModule, CommentFormComponent, ReactionButtonComponent]
 })
 export class CommentListComponent implements OnInit, OnChanges {
   @Input() targetType: 'match' | 'prediction' = 'match';
@@ -20,10 +22,11 @@ export class CommentListComponent implements OnInit, OnChanges {
   @Input() showReplies: boolean = true;
   @Input() maxDepth: number = 3;
 
-  @Output() commentAdded = new EventEmitter<Comment>();
+  @Input() comments: SocialComment[] = []; // For passing pre-loaded comments (e.g., replies)
+
+  @Output() commentAdded = new EventEmitter<SocialComment>();
   @Output() commentDeleted = new EventEmitter<number>();
 
-  comments: Comment[] = [];
   loading: boolean = false;
   hasMore: boolean = false;
   currentPage: number = 1;
@@ -31,6 +34,9 @@ export class CommentListComponent implements OnInit, OnChanges {
 
   expandedReplies: Set<number> = new Set();
   reactionSummaries: Map<number, ReactionSummary> = new Map();
+
+  // Enum for template access
+  ReactionTargetType = ReactionTargetType;
 
   constructor(
     private commentsService: CommentsService,
@@ -85,7 +91,7 @@ export class CommentListComponent implements OnInit, OnChanges {
     });
   }
 
-  private loadReactionSummaries(comments: Comment[]) {
+  private loadReactionSummaries(comments: SocialComment[]) {
     comments.forEach(comment => {
       this.reactionsService.getReactionSummary(ReactionTargetType.COMMENT, comment.id)
         .subscribe({
@@ -114,7 +120,7 @@ export class CommentListComponent implements OnInit, OnChanges {
     }
   }
 
-  onCommentAdded(comment: Comment) {
+  onCommentAdded(comment: SocialComment) {
     this.commentAdded.emit(comment);
     // Refresh comments if it's a top-level comment
     if (!comment.parentCommentId) {
@@ -132,7 +138,7 @@ export class CommentListComponent implements OnInit, OnChanges {
     return this.reactionSummaries.get(commentId);
   }
 
-  trackByCommentId(index: number, comment: Comment): number {
+  trackByCommentId(index: number, comment: SocialComment): number {
     return comment.id;
   }
 }

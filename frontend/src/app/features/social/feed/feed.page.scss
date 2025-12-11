@@ -1,0 +1,38 @@
+.feed-selector {
+  margin: 16px;
+  --background: var(--ion-card-background);
+  --background-checked: var(--ion-color-primary);
+  --border-radius: 8px;
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-card {
+  margin: 16px;
+
+  ion-card-content {
+    text-align: center;
+    padding: 24px;
+
+    ion-spinner {
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+ion-item {
+  ion-spinner {
+    margin-right: 12px;
+  }
+
+  ion-label {
+    color: var(--ion-color-medium);
+  }
+}

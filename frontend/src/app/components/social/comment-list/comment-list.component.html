@@ -12,10 +12,10 @@
       <!-- Main Comment -->
       <ion-item lines="none">
         <ion-avatar slot="start">
-          <img [src]="comment.user.avatar || '/assets/default-avatar.png'" [alt]="comment.user.username">
+          <img [src]="comment.userId ? '/assets/default-avatar.png' : '/assets/default-avatar.png'" [alt]="comment.userName">
         </ion-avatar>
         <ion-label>
-          <h3>{{ comment.user.username }}</h3>
+          <h3>{{ comment.userName }}</h3>
           <p>{{ comment.content }}</p>
           <p class="comment-meta">
             {{ comment.createdAt | date:'short' }}
@@ -28,7 +28,7 @@
       <ion-item lines="none">
         <ion-buttons slot="start">
           <app-reaction-button
-            [targetType]="'comment'"
+            [targetType]="ReactionTargetType.COMMENT"
             [targetId]="comment.id"
             [summary]="getReactionSummary(comment.id)">
           </app-reaction-button>
@@ -39,9 +39,9 @@
             fill="clear"
             size="small"
             (click)="toggleReplies(comment.id)"
-            *ngIf="comment.repliesCount > 0">
+            *ngIf="comment.replyCount > 0">
             <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-            {{ comment.repliesCount }} {{ comment.repliesCount === 1 ? 'Reply' : 'Replies' }}
+            {{ comment.replyCount }} {{ comment.replyCount === 1 ? 'Reply' : 'Replies' }}
             <ion-icon
               [name]="expandedReplies.has(comment.id) ? 'chevron-up' : 'chevron-down'"
               slot="end">
@@ -52,17 +52,12 @@
 
       <!-- Nested Replies -->
       <ion-item-group
-        *ngIf="expandedReplies.has(comment.id) && comment.replies && comment.replies.length > 0"
+        *ngIf="expandedReplies.has(comment.id)"
         class="replies-container">
-        <app-comment-list
-          [targetType]="targetType"
-          [targetId]="targetId"
-          [showReplies]="false"
-          [maxDepth]="maxDepth - 1"
-          [comments]="comment.replies"
-          (commentAdded)="onCommentAdded($event)"
-          (commentDeleted)="onCommentDeleted($event)">
-        </app-comment-list>
+        <!-- TODO: Load and display replies here -->
+        <ion-text color="medium" class="ion-padding">
+          <p>Replies functionality will be implemented with nested comment loading</p>
+        </ion-text>
       </ion-item-group>
 
       <!-- Reply Form (when expanded) -->

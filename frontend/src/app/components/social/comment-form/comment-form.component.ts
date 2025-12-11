@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { Comment } from '../../../models/social';
+import { Comment as SocialComment, CreateCommentRequest } from '../../../models/social';
 import { CommentsService } from '../../../services/social/comments.service';
 
 @Component({
@@ -18,7 +18,7 @@ export class CommentFormComponent {
   @Input() parentCommentId?: number;
   @Input() placeholder: string = 'Write a comment...';
 
-  @Output() commentAdded = new EventEmitter<Comment>();
+  @Output() commentAdded = new EventEmitter<SocialComment>();
 
   commentForm: FormGroup;
   submitting: boolean = false;
@@ -47,12 +47,15 @@ export class CommentFormComponent {
       this.submitting = true;
       const content = this.commentForm.value.content.trim();
 
-      const createMethod = this.targetType === 'match'
-        ? this.commentsService.createMatchComment(this.targetId, content, this.parentCommentId)
-        : this.commentsService.createPredictionComment(this.targetId, content, this.parentCommentId);
+      const request: CreateCommentRequest = {
+        content,
+        matchId: this.targetType === 'match' ? this.targetId : undefined,
+        predictionId: this.targetType === 'prediction' ? this.targetId : undefined,
+        parentCommentId: this.parentCommentId
+      };
 
-      createMethod.subscribe({
-        next: (comment: Comment) => {
+      this.commentsService.createComment(request).subscribe({
+        next: (comment: SocialComment) => {
           this.commentForm.reset();
           this.commentAdded.emit(comment);
           this.submitting = false;

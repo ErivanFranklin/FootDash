@@ -39,5 +39,7 @@ export interface ReactionSummary {
   sad: number;
   angry: number;
   total: number;
+  totalCount: number;
+  topReactions: { type: ReactionType; count: number }[];
   userReaction?: ReactionType;
 }

@@ -5,6 +5,11 @@ export enum ActivityType {
   FOLLOW = 'follow'
 }
 
+export enum FeedType {
+  GLOBAL = 'global',
+  PERSONALIZED = 'personalized'
+}
+
 export enum ActivityTargetType {
   MATCH = 'match',
   PREDICTION = 'prediction',

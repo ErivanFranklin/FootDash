@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class FeedService {
-  private apiUrl = `${environment.apiUrl}/feed`;
+  private apiUrl = `${environment.apiBaseUrl}/feed`;
 
   constructor(private http: HttpClient) {}
 

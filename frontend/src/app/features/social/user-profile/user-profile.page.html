@@ -1,0 +1,102 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/feed"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ user?.username || 'User Profile' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- User Profile Header -->
+  <div class="profile-header" *ngIf="user">
+    <div class="profile-avatar">
+      <ion-avatar>
+        <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.username">
+      </ion-avatar>
+    </div>
+
+    <div class="profile-info">
+      <h1>{{ user.username }}</h1>
+      <p class="join-date">Joined {{ user.createdAt | date:'mediumDate' }}</p>
+    </div>
+
+    <div class="profile-actions">
+      <app-follow-button
+        [targetUserId]="userId"
+        (followChanged)="onFollowChanged($event)">
+      </app-follow-button>
+    </div>
+  </div>
+
+  <!-- Follow Stats -->
+  <ion-grid class="stats-grid" *ngIf="user">
+    <ion-row>
+      <ion-col size="6" class="stat-col">
+        <div class="stat-card">
+          <ion-text color="primary">
+            <h2>{{ followerCount }}</h2>
+          </ion-text>
+          <p>Followers</p>
+        </div>
+      </ion-col>
+      <ion-col size="6" class="stat-col">
+        <div class="stat-card">
+          <ion-text color="primary">
+            <h2>{{ followingCount }}</h2>
+          </ion-text>
+          <p>Following</p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Activity Feed -->
+  <ion-list *ngIf="activities.length > 0">
+    <ion-list-header>
+      <ion-label>Recent Activity</ion-label>
+    </ion-list-header>
+
+    <app-feed-item
+      *ngFor="let activity of activities; trackBy: trackByActivityId"
+      [activity]="activity"
+      (itemClicked)="onActivityClicked($event)"
+      (userClicked)="onUserClicked($event)"
+      (matchClicked)="onMatchClicked($event)">
+    </app-feed-item>
+  </ion-list>
+
+  <!-- Load More Button -->
+  <ion-button
+    *ngIf="hasMore && !loading"
+    expand="block"
+    fill="outline"
+    (click)="loadMoreActivities()">
+    Load More Activity
+  </ion-button>
+
+  <!-- Empty State -->
+  <ion-card *ngIf="activities.length === 0 && !loading && user">
+    <ion-card-content>
+      <ion-text color="medium">
+        <p>No activity yet. {{ user.username }} hasn't performed any actions.</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading State -->
+  <ion-card *ngIf="loading">
+    <ion-card-content>
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading activity...</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading User State -->
+  <ion-card *ngIf="!user && !loading">
+    <ion-card-content>
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading user profile...</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

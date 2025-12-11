@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class ReactionsService {
-  private apiUrl = `${environment.apiUrl}/reactions`;
+  private apiUrl = `${environment.apiBaseUrl}/reactions`;
 
   constructor(private http: HttpClient) {}
 

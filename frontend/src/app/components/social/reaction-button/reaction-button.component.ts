@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, PopoverController } from '@ionic/angular';
+import { map } from 'rxjs/operators';
 import { ReactionType, ReactionSummary, ReactionTargetType } from '../../../models/social';
 import { ReactionsService } from '../../../services/social/reactions.service';
 
@@ -86,24 +87,27 @@ export class ReactionButtonComponent implements OnInit, OnChanges {
       }
     } else {
       // Add or update reaction
-      const method = this.userReaction
-        ? this.reactionsService.updateReaction(this.targetType, this.targetId, reaction)
-        : this.reactionsService.addReaction(this.targetType, this.targetId, reaction);
+      const request = {
+        targetType: this.targetType,
+        targetId: this.targetId,
+        reactionType: reaction
+      };
 
-      method.subscribe({
-        next: () => {
-          this.userReaction = reaction;
-          if (!this.userReaction) {
-            this.totalReactions++;
+      this.reactionsService.addReaction(request)
+        .subscribe({
+          next: () => {
+            this.userReaction = reaction;
+            if (!this.userReaction) {
+              this.totalReactions++;
+            }
+            this.updateTopReactions();
+            this.reacting = false;
+          },
+          error: (error) => {
+            console.error('Error adding reaction:', error);
+            this.reacting = false;
           }
-          this.updateTopReactions();
-          this.reacting = false;
-        },
-        error: (error) => {
-          console.error('Error adding/updating reaction:', error);
-          this.reacting = false;
-        }
-      });
+        });
     }
 
     this.popoverController.dismiss();

@@ -36,51 +36,45 @@ export class FeedItemComponent {
   }
 
   getActivityIcon(): string {
-    switch (this.activity.type) {
-      case ActivityType.COMMENT_CREATED:
+    switch (this.activity.activityType) {
+      case ActivityType.COMMENT:
         return 'chatbubble';
-      case ActivityType.REACTION_ADDED:
+      case ActivityType.REACTION:
         return 'heart';
-      case ActivityType.USER_FOLLOWED:
+      case ActivityType.FOLLOW:
         return 'person-add';
-      case ActivityType.MATCH_PREDICTION:
+      case ActivityType.PREDICTION:
         return 'football';
-      case ActivityType.TEAM_FOLLOWED:
-        return 'star';
       default:
         return 'information-circle';
     }
   }
 
   getActivityColor(): string {
-    switch (this.activity.type) {
-      case ActivityType.COMMENT_CREATED:
+    switch (this.activity.activityType) {
+      case ActivityType.COMMENT:
         return 'primary';
-      case ActivityType.REACTION_ADDED:
+      case ActivityType.REACTION:
         return 'danger';
-      case ActivityType.USER_FOLLOWED:
+      case ActivityType.FOLLOW:
         return 'success';
-      case ActivityType.MATCH_PREDICTION:
+      case ActivityType.PREDICTION:
         return 'warning';
-      case ActivityType.TEAM_FOLLOWED:
-        return 'tertiary';
       default:
         return 'medium';
     }
   }
 
   getActivityText(): string {
-    switch (this.activity.type) {
-      case ActivityType.COMMENT_CREATED:
-        return `commented on ${this.activity.metadata?.targetType === 'match' ? 'a match' : 'a prediction'}`;
-      case ActivityType.REACTION_ADDED:
-        return `reacted to a ${this.activity.metadata?.targetType}`;
-      case ActivityType.USER_FOLLOWED:
+    switch (this.activity.activityType) {
+      case ActivityType.COMMENT:
+        return `commented on ${this.activity.targetType}`;
+      case ActivityType.REACTION:
+        return `reacted to a ${this.activity.targetType}`;
+      case ActivityType.FOLLOW:
         return 'started following someone';
-      case ActivityType.MATCH_PREDICTION:
+      case ActivityType.PREDICTION:
         return 'made a match prediction';
-      case ActivityType.TEAM_FOLLOWED:
-        return 'started following a team';
       default:
         return 'performed an activity';
     }

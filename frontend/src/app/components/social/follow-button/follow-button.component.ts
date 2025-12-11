@@ -20,6 +20,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
 
   isFollowing: boolean = false;
   followerCount: number = 0;
+  followingCount: number = 0;
   loading: boolean = false;
 
   constructor(private followService: FollowService) {}
@@ -52,12 +53,13 @@ export class FollowButtonComponent implements OnInit, OnChanges {
     });
 
     // Get follower count
-    this.followService.getFollowerCount(this.targetUserId).subscribe({
-      next: (count: number) => {
-        this.followerCount = count;
+    this.followService.getFollowStats(this.targetUserId).subscribe({
+      next: (stats) => {
+        this.followerCount = stats.followersCount;
+        this.followingCount = stats.followingCount;
       },
       error: (error) => {
-        console.error('Error getting follower count:', error);
+        console.error('Error getting follow stats:', error);
       }
     });
   }
@@ -67,26 +69,41 @@ export class FollowButtonComponent implements OnInit, OnChanges {
 
     this.loading = true;
 
-    const action = this.isFollowing
-      ? this.followService.unfollow(this.targetUserId)
-      : this.followService.follow(this.targetUserId);
+    this.loading = true;
 
-    action.subscribe({
-      next: () => {
-        this.isFollowing = !this.isFollowing;
-        this.followerCount += this.isFollowing ? 1 : -1;
-        this.loading = false;
-        this.followChanged.emit({
-          isFollowing: this.isFollowing,
-          followerCount: this.followerCount
-        });
-      },
-      error: (error) => {
-        console.error('Error toggling follow:', error);
-        this.loading = false;
-        // TODO: Show error toast
-      }
-    });
+    if (this.isFollowing) {
+      this.followService.unfollowUser(this.targetUserId).subscribe({
+        next: () => {
+          this.isFollowing = false;
+          this.followerCount -= 1;
+          this.loading = false;
+          this.followChanged.emit({
+            isFollowing: this.isFollowing,
+            followerCount: this.followerCount
+          });
+        },
+        error: (err: any) => {
+          console.error('Error unfollowing user:', err);
+          this.loading = false;
+        }
+      });
+    } else {
+      this.followService.followUser({ followingId: this.targetUserId }).subscribe({
+        next: () => {
+          this.isFollowing = true;
+          this.followerCount += 1;
+          this.loading = false;
+          this.followChanged.emit({
+            isFollowing: this.isFollowing,
+            followerCount: this.followerCount
+          });
+        },
+        error: (err: any) => {
+          console.error('Error following user:', err);
+          this.loading = false;
+        }
+      });
+    }
   }
 
   getButtonText(): string {

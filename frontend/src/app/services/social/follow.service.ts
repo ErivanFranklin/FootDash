@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class FollowService {
-  private apiUrl = `${environment.apiUrl}/follow`;
+  private apiUrl = `${environment.apiBaseUrl}/follow`;
 
   constructor(private http: HttpClient) {}
 

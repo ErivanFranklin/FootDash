@@ -7,13 +7,13 @@
 
   <!-- User Avatar -->
   <ion-avatar slot="start">
-    <img [src]="activity.user.avatar || '/assets/default-avatar.png'" [alt]="activity.user.username">
+    <img [src]="activity.userId ? '/assets/default-avatar.png' : '/assets/default-avatar.png'" [alt]="activity.userName">
   </ion-avatar>
 
   <!-- Activity Content -->
   <ion-label>
     <h3>
-      <strong>{{ activity.user.username }}</strong>
+      <strong>{{ activity.userName }}</strong>
       <span class="activity-text">{{ getActivityText() }}</span>
     </h3>
 
