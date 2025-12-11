@@ -17,27 +17,6 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  // Serve frontend production build (www) and provide SPA fallback for client-side routing.
-  // Exclude API and uploads routes from the fallback so API routes continue to work.
-  // Try two candidate paths for the built frontend (dist vs source run modes)
-  const candidateA = join(__dirname, '..', '..', 'frontend', 'www');
-  const candidateB = join(__dirname, '..', '..', '..', 'frontend', 'www');
-  const frontendDist = existsSync(candidateA) ? candidateA : candidateB;
-  if (existsSync(frontendDist)) {
-    app.useStaticAssets(frontendDist);
-    app.use((req: any, res: any, next: any) => {
-      const url = req.url || '';
-      if (
-        url.startsWith('/api') ||
-        url.startsWith('/uploads') ||
-        url.startsWith('/swagger') ||
-        url.startsWith('/api-docs')
-      ) {
-        return next();
-      }
-      res.sendFile(join(frontendDist, 'index.html'));
-    });
-  }
 
   app.enableCors();
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
@@ -96,6 +75,35 @@ async function bootstrap() {
       displayRequestDuration: true,
     },
   });
+  // Initialize the Nest app internals (register routes) so we can mount
+  // static middleware afterwards and let Nest API routes take precedence.
+  await app.init();
+
+  // Serve frontend production build (www) and provide SPA fallback for client-side routing.
+  // Exclude API and uploads routes from the fallback so API routes continue to work.
+  // Try two candidate paths for the built frontend (dist vs source run modes)
+  const candidateA = join(__dirname, '..', '..', 'frontend', 'www');
+  const candidateB = join(__dirname, '..', '..', '..', 'frontend', 'www');
+  const frontendDist = existsSync(candidateA) ? candidateA : candidateB;
+  if (existsSync(frontendDist)) {
+    app.useStaticAssets(frontendDist);
+    app.use((req: any, res: any, next: any) => {
+      const url = req.url || '';
+      // Only handle navigation requests (GET) for SPA fallback. Ignore API and non-GET requests.
+      if (req.method !== 'GET') return next();
+      if (
+        url.startsWith('/api') ||
+        url.startsWith('/uploads') ||
+        url.startsWith('/swagger') ||
+        url.startsWith('/api-docs')
+      ) {
+        return next();
+      }
+      // If the request looks like a static file (has an extension), skip fallback.
+      if (url.includes('.') && !url.endsWith('/')) return next();
+      res.sendFile(join(frontendDist, 'index.html'));
+    });
+  }
 
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port);
