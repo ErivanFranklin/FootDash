@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FollowService } from '../../../services/social/follow.service';
@@ -23,7 +23,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
   followingCount: number = 0;
   loading: boolean = false;
 
-  constructor(private followService: FollowService) {}
+  private followService = inject(FollowService);
 
   ngOnInit() {
     this.loadFollowStatus();

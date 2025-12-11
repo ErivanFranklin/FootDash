@@ -48,7 +48,7 @@ export class ReactionsService {
       userName: '', // Will be populated by the controller
       data: {
         reaction: savedReaction,
-        summary: await this.getReactionSummary(dto.targetType, dto.targetId),
+        summary: await this.getReactionSummary(null, dto.targetType, dto.targetId),
       },
     });
 

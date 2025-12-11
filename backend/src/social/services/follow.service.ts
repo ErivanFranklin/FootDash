@@ -56,8 +56,8 @@ export class FollowService {
       userName: '', // Will be populated by controller
       data: {
         follow: savedFollow,
-        followerStats: await this.getFollowStats(followerId),
-        followingStats: await this.getFollowStats(followingId),
+        followerStats: await this.getFollowStats(null, followerId),
+        followingStats: await this.getFollowStats(null, followingId),
       },
     });
 

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -42,11 +42,9 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
 
   private socialSubscription?: Subscription;
 
-  constructor(
-    private commentsService: CommentsService,
-    private reactionsService: ReactionsService,
-    private websocketService: WebsocketService
-  ) {}
+  private commentsService = inject(CommentsService);
+  private reactionsService = inject(ReactionsService);
+  private websocketService = inject(WebsocketService);
 
   ngOnInit() {
     this.loadComments();

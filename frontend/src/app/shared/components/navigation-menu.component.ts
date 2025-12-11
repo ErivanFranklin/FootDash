@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -29,7 +29,7 @@ import { Router } from '@angular/router';
   imports: [CommonModule, IonicModule]
 })
 export class NavigationMenuComponent {
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   navigateTo(route: string) {
     this.router.navigate([route]);

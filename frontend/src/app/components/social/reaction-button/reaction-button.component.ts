@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, PopoverController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
@@ -30,11 +30,9 @@ export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
 
   private socialSubscription?: Subscription;
 
-  constructor(
-    private reactionsService: ReactionsService,
-    private popoverController: PopoverController,
-    private websocketService: WebsocketService
-  ) {}
+  private reactionsService = inject(ReactionsService);
+  private popoverController = inject(PopoverController);
+  private websocketService = inject(WebsocketService);
 
   ngOnInit() {
     this.updateReactionData();

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import {
 export class ReactionsService {
   private apiUrl = `${environment.apiBaseUrl}/reactions`;
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   addReaction(request: CreateReactionRequest): Observable<Reaction> {
     return this.http.post<{ success: boolean; reaction: Reaction }>(this.apiUrl, request)

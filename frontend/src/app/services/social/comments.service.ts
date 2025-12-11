@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import {
 export class CommentsService {
   private apiUrl = `${environment.apiBaseUrl}/comments`;
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   createComment(request: CreateCommentRequest): Observable<Comment> {
     return this.http.post<{ success: boolean; comment: Comment }>(this.apiUrl, request)

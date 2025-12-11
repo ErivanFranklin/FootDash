@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import {
 export class FollowService {
   private apiUrl = `${environment.apiBaseUrl}/follow`;
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   followUser(request: CreateFollowRequest): Observable<Follow> {
     return this.http.post<{ success: boolean; follow: Follow }>(this.apiUrl, request)

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -32,10 +32,8 @@ export class FeedPage implements OnInit, OnDestroy {
 
   private globalEventSubscription?: Subscription;
 
-  constructor(
-    private feedService: FeedService,
-    private websocketService: WebsocketService
-  ) {}
+  private feedService = inject(FeedService);
+  private websocketService = inject(WebsocketService);
 
   ngOnInit() {
     this.loadActivities();

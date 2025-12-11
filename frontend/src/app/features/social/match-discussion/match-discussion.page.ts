@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -30,10 +30,8 @@ export class MatchDiscussionPage implements OnInit {
   // Enum for template access
   ReactionTargetType = ReactionTargetType;
 
-  constructor(
-    private route: ActivatedRoute,
-    private reactionsService: ReactionsService
-  ) {}
+  private route = inject(ActivatedRoute);
+  private reactionsService = inject(ReactionsService);
 
   ngOnInit() {
     this.route.params.subscribe(params => {

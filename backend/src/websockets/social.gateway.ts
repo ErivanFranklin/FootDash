@@ -4,10 +4,9 @@ import {
   MessageBody,
   WebSocketServer,
   ConnectedSocket,
-  OnModuleInit,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, Injectable } from '@nestjs/common';
+import { Logger, Injectable, OnModuleInit } from '@nestjs/common';
 
 export interface SocialEventData {
   type: 'comment' | 'reaction' | 'follow';

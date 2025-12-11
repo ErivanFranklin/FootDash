@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -35,11 +35,9 @@ export class UserProfilePage implements OnInit {
   followerCount: number = 0;
   followingCount: number = 0;
 
-  constructor(
-    private route: ActivatedRoute,
-    private followService: FollowService,
-    private feedService: FeedService
-  ) {}
+  private route = inject(ActivatedRoute);
+  private followService = inject(FollowService);
+  private feedService = inject(FeedService);
 
   ngOnInit() {
     this.route.params.subscribe(params => {

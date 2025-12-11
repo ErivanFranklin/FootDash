@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -24,10 +24,10 @@ export class CommentFormComponent {
   submitting: boolean = false;
   maxLength: number = 500;
 
-  constructor(
-    private fb: FormBuilder,
-    private commentsService: CommentsService
-  ) {
+  private fb = inject(FormBuilder);
+  private commentsService = inject(CommentsService);
+
+  constructor() {
     this.commentForm = this.fb.group({
       content: ['', [Validators.required, Validators.maxLength(this.maxLength)]]
     });
