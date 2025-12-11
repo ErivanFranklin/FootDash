@@ -1,0 +1,60 @@
+<ion-item
+  button
+  detail
+  lines="none"
+  (click)="onItemClick()"
+  class="feed-item">
+
+  <!-- User Avatar -->
+  <ion-avatar slot="start">
+    <img [src]="activity.user.avatar || '/assets/default-avatar.png'" [alt]="activity.user.username">
+  </ion-avatar>
+
+  <!-- Activity Content -->
+  <ion-label>
+    <h3>
+      <strong>{{ activity.user.username }}</strong>
+      <span class="activity-text">{{ getActivityText() }}</span>
+    </h3>
+
+    <!-- Activity Metadata -->
+    <p class="activity-meta">
+      <!-- Match Link -->
+      <ion-chip
+        *ngIf="shouldShowMatchLink()"
+        color="light"
+        (click)="onMatchClick(activity.metadata.matchId, $event)">
+        <ion-icon name="football" size="small"></ion-icon>
+        <ion-label>{{ activity.metadata.matchName }}</ion-label>
+      </ion-chip>
+
+      <!-- Target User Link -->
+      <ion-chip
+        *ngIf="shouldShowUserLink()"
+        color="light"
+        (click)="onUserClick(activity.metadata.targetUserId, $event)">
+        <ion-icon name="person" size="small"></ion-icon>
+        <ion-label>{{ activity.metadata.targetUsername }}</ion-label>
+      </ion-chip>
+
+      <!-- Activity Content Preview -->
+      <span *ngIf="activity.metadata?.content" class="content-preview">
+        "{{ activity.metadata.content | slice:0:100 }}{{ activity.metadata.content.length > 100 ? '...' : '' }}"
+      </span>
+    </p>
+
+    <!-- Timestamp -->
+    <p class="timestamp">
+      <ion-icon name="time" size="small"></ion-icon>
+      {{ getTimeAgo() }}
+    </p>
+  </ion-label>
+
+  <!-- Activity Icon -->
+  <ion-icon
+    slot="end"
+    [name]="getActivityIcon()"
+    [color]="getActivityColor()"
+    size="large">
+  </ion-icon>
+</ion-item>

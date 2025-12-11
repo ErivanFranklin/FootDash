@@ -1,0 +1,100 @@
+<ion-content>
+  <!-- Comment Form -->
+  <app-comment-form
+    [targetType]="targetType"
+    [targetId]="targetId"
+    (commentAdded)="onCommentAdded($event)">
+  </app-comment-form>
+
+  <!-- Comments List -->
+  <ion-list *ngIf="comments.length > 0">
+    <ion-item-group *ngFor="let comment of comments; trackBy: trackByCommentId">
+      <!-- Main Comment -->
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <img [src]="comment.user.avatar || '/assets/default-avatar.png'" [alt]="comment.user.username">
+        </ion-avatar>
+        <ion-label>
+          <h3>{{ comment.user.username }}</h3>
+          <p>{{ comment.content }}</p>
+          <p class="comment-meta">
+            {{ comment.createdAt | date:'short' }}
+            <span *ngIf="comment.updatedAt && comment.updatedAt !== comment.createdAt">(edited)</span>
+          </p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Comment Actions -->
+      <ion-item lines="none">
+        <ion-buttons slot="start">
+          <app-reaction-button
+            [targetType]="'comment'"
+            [targetId]="comment.id"
+            [summary]="getReactionSummary(comment.id)">
+          </app-reaction-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end" *ngIf="showReplies">
+          <ion-button
+            fill="clear"
+            size="small"
+            (click)="toggleReplies(comment.id)"
+            *ngIf="comment.repliesCount > 0">
+            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+            {{ comment.repliesCount }} {{ comment.repliesCount === 1 ? 'Reply' : 'Replies' }}
+            <ion-icon
+              [name]="expandedReplies.has(comment.id) ? 'chevron-up' : 'chevron-down'"
+              slot="end">
+            </ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+
+      <!-- Nested Replies -->
+      <ion-item-group
+        *ngIf="expandedReplies.has(comment.id) && comment.replies && comment.replies.length > 0"
+        class="replies-container">
+        <app-comment-list
+          [targetType]="targetType"
+          [targetId]="targetId"
+          [showReplies]="false"
+          [maxDepth]="maxDepth - 1"
+          [comments]="comment.replies"
+          (commentAdded)="onCommentAdded($event)"
+          (commentDeleted)="onCommentDeleted($event)">
+        </app-comment-list>
+      </ion-item-group>
+
+      <!-- Reply Form (when expanded) -->
+      <ion-item *ngIf="expandedReplies.has(comment.id)" lines="none">
+        <app-comment-form
+          [targetType]="targetType"
+          [targetId]="targetId"
+          [parentCommentId]="comment.id"
+          (commentAdded)="onCommentAdded($event)">
+        </app-comment-form>
+      </ion-item>
+    </ion-item-group>
+  </ion-list>
+
+  <!-- Empty State -->
+  <ion-card *ngIf="comments.length === 0 && !loading">
+    <ion-card-content>
+      <ion-text color="medium">
+        <p>No comments yet. Be the first to comment!</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Load More Button -->
+  <ion-button
+    *ngIf="hasMore && !loading"
+    expand="block"
+    fill="outline"
+    (click)="loadMore()">
+    Load More Comments
+  </ion-button>
+
+  <!-- Loading Spinner -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+</ion-content>

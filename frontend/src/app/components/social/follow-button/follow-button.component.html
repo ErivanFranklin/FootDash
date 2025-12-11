@@ -1,0 +1,25 @@
+<ion-button
+  [fill]="fill"
+  [size]="size"
+  [color]="getButtonColor()"
+  (click)="toggleFollow()"
+  [disabled]="loading">
+
+  <ion-icon
+    [name]="getButtonIcon()"
+    slot="start"
+    *ngIf="!loading">
+  </ion-icon>
+
+  <ion-spinner
+    *ngIf="loading"
+    name="crescent"
+    slot="start">
+  </ion-spinner>
+
+  <span *ngIf="showText">{{ getButtonText() }}</span>
+
+  <span *ngIf="showText && followerCount > 0" class="follower-count">
+    ({{ followerCount }})
+  </span>
+</ion-button>

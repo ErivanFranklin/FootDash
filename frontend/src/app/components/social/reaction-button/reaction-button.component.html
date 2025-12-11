@@ -1,0 +1,32 @@
+<ion-button
+  fill="clear"
+  size="small"
+  [class.reacted]="userReaction"
+  (click)="showReactionPicker($event)"
+  [disabled]="reacting">
+
+  <!-- Top Reactions Display -->
+  <ng-container *ngIf="topReactions.length > 0">
+    <ion-icon
+      *ngFor="let reaction of topReactions"
+      [name]="getReactionIcon(reaction.type)"
+      [color]="getReactionColor(reaction.type)"
+      size="small">
+    </ion-icon>
+  </ng-container>
+
+  <!-- Default Reaction Icon -->
+  <ion-icon
+    *ngIf="topReactions.length === 0"
+    name="thumbs-up-outline"
+    size="small">
+  </ion-icon>
+
+  <!-- Reaction Count -->
+  <span *ngIf="showText && totalReactions > 0" class="reaction-count">
+    {{ totalReactions }}
+  </span>
+
+  <!-- Loading Spinner -->
+  <ion-spinner *ngIf="reacting" name="crescent" slot="end"></ion-spinner>
+</ion-button>
