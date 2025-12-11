@@ -18,6 +18,29 @@ import { CreateTeamDto } from './dto/create-team.dto';
 export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
+  @Get()
+  @ApiOperation({ summary: 'Get all teams from database' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all teams in database',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 33 },
+          name: { type: 'string', example: 'FC Example' },
+          country: { type: 'string', example: 'England' },
+          founded: { type: 'integer', example: 1878 },
+          logo: { type: 'string', nullable: true },
+        },
+      },
+    },
+  })
+  getAllTeams() {
+    return this.teamsService.findAllTeams();
+  }
+
   @Get(':teamId')
   @ApiOperation({ summary: 'Get team details by ID' })
   @ApiParam({

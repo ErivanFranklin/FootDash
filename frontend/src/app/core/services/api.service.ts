@@ -8,9 +8,9 @@ export class ApiService {
   private http = inject(HttpClient);
   private base = (environment.apiBaseUrl || '').replace(/\/$/, '');
 
-  // Basic ping of backend root
+  // Basic ping of backend health endpoint
   ping(): Observable<any> {
-    return this.http.get(`${this.base}/`);
+    return this.http.get(`${this.base}/health`);
   }
 
   // Teams

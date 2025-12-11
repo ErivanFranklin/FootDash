@@ -72,6 +72,12 @@ export class TeamsService {
   }
 
   // Persistence helpers
+  async findAllTeams() {
+    return this.teamRepository.find({
+      order: { name: 'ASC' },
+    });
+  }
+
   async createTeam(dto: CreateTeamDto) {
     const t = this.teamRepository.create(dto as Partial<Team>);
     return this.teamRepository.save(t);
