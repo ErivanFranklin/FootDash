@@ -7,6 +7,7 @@ import { RedisIoAdapter } from './websockets/redis-io.adapter';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { existsSync } from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,6 +16,28 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
+
+  // Serve frontend production build (www) and provide SPA fallback for client-side routing.
+  // Exclude API and uploads routes from the fallback so API routes continue to work.
+  // Try two candidate paths for the built frontend (dist vs source run modes)
+  const candidateA = join(__dirname, '..', '..', 'frontend', 'www');
+  const candidateB = join(__dirname, '..', '..', '..', 'frontend', 'www');
+  const frontendDist = existsSync(candidateA) ? candidateA : candidateB;
+  if (existsSync(frontendDist)) {
+    app.useStaticAssets(frontendDist);
+    app.use((req: any, res: any, next: any) => {
+      const url = req.url || '';
+      if (
+        url.startsWith('/api') ||
+        url.startsWith('/uploads') ||
+        url.startsWith('/swagger') ||
+        url.startsWith('/api-docs')
+      ) {
+        return next();
+      }
+      res.sendFile(join(frontendDist, 'index.html'));
+    });
+  }
 
   app.enableCors();
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
