@@ -141,11 +141,11 @@ export class AuthService {
           email: profile.email,
           createdAt: profile.createdAt,
         } as ProfileDto;
-      } catch (err) {
+      } catch {
         // fallthrough to user lookup
       }
     }
-    
+
     // Fallback to user record if profile service not available or profile not found
     try {
       const user = await this.usersRepo.findOneBy({ id: userId });

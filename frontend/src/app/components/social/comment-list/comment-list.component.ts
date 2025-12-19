@@ -249,7 +249,7 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
     await toast.present();
   }
 
-  trackByActivityId(index: number, item: any) {
-    return comment.id;
+  trackByCommentId(index: number, item: any) {
+    return item?.id ?? index;
   }
 }
