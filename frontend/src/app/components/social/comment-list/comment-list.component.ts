@@ -6,10 +6,12 @@ import { CommentFormComponent } from '../comment-form/comment-form.component';
 import { ReactionButtonComponent } from '../reaction-button/reaction-button.component';
 import { CommentsService } from '../../../services/social/comments.service';
 import { ReactionsService } from '../../../services/social/reactions.service';
+import { ReportsService } from '../../../services/social/reports.service';
 import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
-import { Comment as SocialComment, PaginatedComments, ReactionTargetType } from '../../../models/social';
+import { Comment as SocialComment, PaginatedComments, ReactionTargetType, ReportTargetType, ReportReason } from '../../../models/social';
 import { ReactionSummary } from '../../../models/social/reaction.model';
 import { Subscription } from 'rxjs';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-comment-list',
@@ -44,7 +46,10 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
 
   private commentsService = inject(CommentsService);
   private reactionsService = inject(ReactionsService);
+  private reportsService = inject(ReportsService);
   private websocketService = inject(WebsocketService);
+  private alertController = inject(AlertController);
+  private toastController = inject(ToastController);
 
   ngOnInit() {
     this.loadComments();
@@ -201,7 +206,50 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
     return this.reactionSummaries.get(commentId);
   }
 
-  trackByCommentId(index: number, comment: SocialComment): number {
+  async reportComment(comment: SocialComment) {
+    const alert = await this.alertController.create({
+      header: 'Report Comment',
+      message: 'Why are you reporting this comment?',
+      inputs: [
+        { name: 'reason', type: 'radio', label: 'Spam', value: ReportReason.SPAM, checked: true },
+        { name: 'reason', type: 'radio', label: 'Harassment', value: ReportReason.HARASSMENT },
+        { name: 'reason', type: 'radio', label: 'Inappropriate', value: ReportReason.INAPPROPRIATE },
+        { name: 'reason', type: 'radio', label: 'Hate Speech', value: ReportReason.HATE_SPEECH },
+        { name: 'reason', type: 'radio', label: 'Other', value: ReportReason.OTHER },
+        { name: 'description', type: 'textarea', placeholder: 'Additional details (optional)' }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Report',
+          handler: (data) => {
+            this.reportsService.createReport({
+              targetType: ReportTargetType.COMMENT,
+              targetId: comment.id,
+              reason: data.reason,
+              description: data.description
+            }).subscribe({
+              next: () => this.showToast('Comment reported successfully'),
+              error: () => this.showToast('Error reporting comment', 'danger')
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async showToast(message: string, color: string = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color
+    });
+    await toast.present();
+  }
+
+  trackByActivityId(index: number, item: any) {
     return comment.id;
   }
 }

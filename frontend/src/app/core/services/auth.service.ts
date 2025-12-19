@@ -57,6 +57,13 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
+  getCurrentUserId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const decoded = this.jwtHelper.decodeToken(token);
+    return decoded?.sub || null;
+  }
+
   setToken(token: string): void {
     localStorage.setItem('access_token', token);
     this.currentTokenSubject.next(token);

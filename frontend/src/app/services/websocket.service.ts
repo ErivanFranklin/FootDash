@@ -89,6 +89,10 @@ export class WebsocketService {
       console.log('Received global social event:', event);
       // Global events like follows
     });
+
+    this.socialSocket.on('new-follower', (data: any) => {
+      console.log('Received new follower notification:', data);
+    });
   }
 
   // Connection status observables
@@ -126,6 +130,18 @@ export class WebsocketService {
     }
   }
 
+  subscribeToUser(userId: number) {
+    if (this.socialSocket) {
+      this.socialSocket.emit('subscribe-user', { userId });
+    }
+  }
+
+  unsubscribeFromUser(userId: number) {
+    if (this.socialSocket) {
+      this.socialSocket.emit('unsubscribe-user', { userId });
+    }
+  }
+
   // Listen to social events
   onSocialEvent(): Observable<SocialEvent> {
     return new Observable<SocialEvent>((observer) => {
@@ -155,6 +171,24 @@ export class WebsocketService {
         return () => {
           if (this.socialSocket) {
             this.socialSocket.off('global-social-event', handler);
+          }
+        };
+      } else {
+        observer.complete();
+        return () => {};
+      }
+    });
+  }
+
+  onNewFollower(): Observable<any> {
+    return new Observable<any>((observer) => {
+      if (this.socialSocket) {
+        const handler = (data: any) => observer.next(data);
+        this.socialSocket.on('new-follower', handler);
+
+        return () => {
+          if (this.socialSocket) {
+            this.socialSocket.off('new-follower', handler);
           }
         };
       } else {

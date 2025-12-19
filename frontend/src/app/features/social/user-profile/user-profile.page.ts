@@ -7,8 +7,10 @@ import { FollowButtonComponent } from '../../../components/social/follow-button/
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FollowService } from '../../../services/social/follow.service';
 import { FeedService } from '../../../services/social/feed.service';
+import { ReportsService } from '../../../services/social/reports.service';
 import { User } from '../../../models/user.model';
-import { Activity, PaginatedActivities } from '../../../models/social';
+import { Activity, PaginatedActivities, ReportTargetType, ReportReason } from '../../../models/social';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-user-profile',
@@ -38,6 +40,9 @@ export class UserProfilePage implements OnInit {
   private route = inject(ActivatedRoute);
   private followService = inject(FollowService);
   private feedService = inject(FeedService);
+  private reportsService = inject(ReportsService);
+  private alertController = inject(AlertController);
+  private toastController = inject(ToastController);
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -96,6 +101,49 @@ export class UserProfilePage implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  async reportUser() {
+    const alert = await this.alertController.create({
+      header: 'Report User',
+      message: 'Why are you reporting this user?',
+      inputs: [
+        { name: 'reason', type: 'radio', label: 'Spam', value: ReportReason.SPAM, checked: true },
+        { name: 'reason', type: 'radio', label: 'Harassment', value: ReportReason.HARASSMENT },
+        { name: 'reason', type: 'radio', label: 'Inappropriate', value: ReportReason.INAPPROPRIATE },
+        { name: 'reason', type: 'radio', label: 'Hate Speech', value: ReportReason.HATE_SPEECH },
+        { name: 'reason', type: 'radio', label: 'Other', value: ReportReason.OTHER },
+        { name: 'description', type: 'textarea', placeholder: 'Additional details (optional)' }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Report',
+          handler: (data) => {
+            this.reportsService.createReport({
+              targetType: ReportTargetType.USER,
+              targetId: this.userId,
+              reason: data.reason,
+              description: data.description
+            }).subscribe({
+              next: () => this.showToast('User reported successfully'),
+              error: () => this.showToast('Error reporting user', 'danger')
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async showToast(message: string, color: string = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color
+    });
+    await toast.present();
   }
 
   loadMoreActivities() {
