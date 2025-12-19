@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Report, ReportTargetType } from '../entities/report.entity';
+import { Report } from '../entities/report.entity';
 import { CreateReportDto } from '../dto/create-report.dto';
-import { User } from '../../users/user.entity';
 
 @Injectable()
 export class ReportsService {
@@ -12,7 +11,10 @@ export class ReportsService {
     private reportsRepository: Repository<Report>,
   ) {}
 
-  async createReport(reporterId: number, dto: CreateReportDto): Promise<Report> {
+  async createReport(
+    reporterId: number,
+    dto: CreateReportDto,
+  ): Promise<Report> {
     const report = this.reportsRepository.create({
       ...dto,
       reporterId,
@@ -21,7 +23,8 @@ export class ReportsService {
   }
 
   async getReports(isResolved?: boolean): Promise<Report[]> {
-    const query = this.reportsRepository.createQueryBuilder('report')
+    const query = this.reportsRepository
+      .createQueryBuilder('report')
       .leftJoinAndSelect('report.reporter', 'reporter')
       .orderBy('report.createdAt', 'DESC');
 
@@ -33,7 +36,9 @@ export class ReportsService {
   }
 
   async resolveReport(reportId: number, resolvedById: number): Promise<Report> {
-    const report = await this.reportsRepository.findOne({ where: { id: reportId } });
+    const report = await this.reportsRepository.findOne({
+      where: { id: reportId },
+    });
     if (!report) {
       throw new NotFoundException(`Report with ID ${reportId} not found`);
     }

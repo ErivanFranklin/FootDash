@@ -111,7 +111,9 @@ export class SocialGateway implements OnModuleInit {
   ) {
     if (!data || !data.userId) return;
     const roomName = `user-${data.userId}`;
-    this.logger.log(`Client ${client.id} unsubscribed from user room ${roomName}`);
+    this.logger.log(
+      `Client ${client.id} unsubscribed from user room ${roomName}`,
+    );
     client.leave(roomName);
   }
 

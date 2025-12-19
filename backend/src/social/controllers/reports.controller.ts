@@ -9,7 +9,6 @@ import {
   Param,
   Patch,
   ParseIntPipe,
-  ParseBoolPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';

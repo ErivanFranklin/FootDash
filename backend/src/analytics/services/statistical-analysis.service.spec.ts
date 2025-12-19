@@ -250,8 +250,20 @@ describe('StatisticalAnalysisService', () => {
   describe('calculateDefensiveRating', () => {
     it('should calculate defensive rating correctly', () => {
       const matches = createMockMatches([
-        { homeScore: 0, awayScore: 1, homeGoals: 0, awayGoals: 1, isHome: true },
-        { homeScore: 1, awayScore: 2, homeGoals: 1, awayGoals: 2, isHome: false },
+        {
+          homeScore: 0,
+          awayScore: 1,
+          homeGoals: 0,
+          awayGoals: 1,
+          isHome: true,
+        },
+        {
+          homeScore: 1,
+          awayScore: 2,
+          homeGoals: 1,
+          awayGoals: 2,
+          isHome: false,
+        },
       ]);
 
       const rating = service.calculateDefensiveRating(matches, 1);
@@ -266,8 +278,20 @@ describe('StatisticalAnalysisService', () => {
   describe('calculateAttackingRating', () => {
     it('should calculate attacking rating correctly', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 0, homeGoals: 3, awayGoals: 0, isHome: true },
-        { homeScore: 1, awayScore: 1, homeGoals: 1, awayGoals: 1, isHome: false },
+        {
+          homeScore: 3,
+          awayScore: 0,
+          homeGoals: 3,
+          awayGoals: 0,
+          isHome: true,
+        },
+        {
+          homeScore: 1,
+          awayScore: 1,
+          homeGoals: 1,
+          awayGoals: 1,
+          isHome: false,
+        },
       ]);
 
       const rating = service.calculateAttackingRating(matches, 1);

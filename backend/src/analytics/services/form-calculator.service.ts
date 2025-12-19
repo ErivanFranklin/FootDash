@@ -112,11 +112,13 @@ export class FormCalculatorService {
         const recent = matchDetails.slice(0, 2);
         const older = matchDetails.slice(2, 5);
         const recentPoints = recent.reduce(
-          (sum, m) => sum + (m.result === 'win' ? 3 : m.result === 'draw' ? 1 : 0),
+          (sum, m) =>
+            sum + (m.result === 'win' ? 3 : m.result === 'draw' ? 1 : 0),
           0,
         );
         const olderPoints = older.reduce(
-          (sum, m) => sum + (m.result === 'win' ? 3 : m.result === 'draw' ? 1 : 0),
+          (sum, m) =>
+            sum + (m.result === 'win' ? 3 : m.result === 'draw' ? 1 : 0),
           0,
         );
         const recentAvg = recentPoints / recent.length;

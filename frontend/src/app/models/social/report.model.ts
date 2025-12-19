@@ -1,3 +1,5 @@
+import { Injectable as AngularInjectable, Injectable } from '@angular/core';
+
 export enum ReportTargetType {
   COMMENT = 'comment',
   USER = 'user',
@@ -29,3 +31,9 @@ export interface Report {
   isResolved: boolean;
   createdAt: string;
 }
+
+@Injectable()
+export class ReportsService {
+  constructor() {}
+}
+
