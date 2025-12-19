@@ -12,16 +12,22 @@ export class UserProfileService {
     private readonly profileRepository: Repository<UserProfile>,
   ) {}
 
-  async findByUserId(userId: number): Promise<UserProfile> {
+  async findByUserId(userId: number): Promise<any> {
     const profile = await this.profileRepository.findOne({
       where: { userId },
+      relations: ['user'],
     });
 
     if (!profile) {
       throw new NotFoundException(`Profile for user ${userId} not found`);
     }
 
-    return profile;
+    // Return a plain object including the user's email from the joined relation
+    const { user, ...profileRest } = profile as any;
+    return {
+      ...profileRest,
+      email: user?.email,
+    };
   }
 
   async create(
