@@ -23,7 +23,7 @@ describe('FormCalculatorService', () => {
       const matches = createMockMatches([
         { homeScore: 3, awayScore: 1, isHome: true }, // Win: 3 points
         { homeScore: 2, awayScore: 2, isHome: true }, // Draw: 1 point
-        { homeScore: 1, awayScore: 0, isHome: false }, // Win: 3 points
+        { homeScore: 0, awayScore: 1, isHome: false }, // Win: 3 points (Team 1 is away, awayScore 1 > homeScore 0)
         { homeScore: 2, awayScore: 1, isHome: true }, // Win: 3 points
         { homeScore: 1, awayScore: 1, isHome: false }, // Draw: 1 point
       ]);
@@ -41,7 +41,7 @@ describe('FormCalculatorService', () => {
     it('should calculate form rating correctly for losing team', () => {
       const matches = createMockMatches([
         { homeScore: 0, awayScore: 2, isHome: true }, // Loss: 0 points
-        { homeScore: 1, awayScore: 3, isHome: false }, // Loss: 0 points
+        { homeScore: 2, awayScore: 1, isHome: false }, // Loss: 0 points (Team 1 is away, awayScore 1 < homeScore 2)
         { homeScore: 0, awayScore: 1, isHome: true }, // Loss: 0 points
       ]);
 
@@ -58,9 +58,9 @@ describe('FormCalculatorService', () => {
       const matches = createMockMatches([
         { homeScore: 3, awayScore: 0, isHome: true },
         { homeScore: 2, awayScore: 1, isHome: true },
-        { homeScore: 1, awayScore: 0, isHome: false },
+        { homeScore: 0, awayScore: 1, isHome: false },
         { homeScore: 4, awayScore: 1, isHome: true },
-        { homeScore: 2, awayScore: 0, isHome: false },
+        { homeScore: 0, awayScore: 2, isHome: false },
       ]);
 
       const result = service.calculateForm(matches, 1, 5);
@@ -86,8 +86,8 @@ describe('FormCalculatorService', () => {
 
     it('should handle away matches correctly', () => {
       const matches = createMockMatches([
-        { homeScore: 1, awayScore: 3, isHome: false }, // Win (team is away, scored 3)
-        { homeScore: 2, awayScore: 0, isHome: false }, // Loss (team is away, scored 0)
+        { homeScore: 1, awayScore: 3, isHome: false }, // Win (team is away, scored 3 > home 1)
+        { homeScore: 2, awayScore: 0, isHome: false }, // Loss (team is away, scored 0 < home 2)
       ]);
 
       const result = service.calculateForm(matches, 1, 5);
@@ -123,11 +123,11 @@ describe('FormCalculatorService', () => {
 
     it('should identify improving trend', () => {
       const matches = createMockMatches([
-        { homeScore: 3, awayScore: 0, isHome: true }, // Win (most recent)
-        { homeScore: 2, awayScore: 1, isHome: true }, // Win
-        { homeScore: 1, awayScore: 1, isHome: false }, // Draw
-        { homeScore: 0, awayScore: 1, isHome: true }, // Loss
-        { homeScore: 1, awayScore: 2, isHome: false }, // Loss (oldest)
+        { homeScore: 1, awayScore: 0, isHome: true }, // W (Newest)
+        { homeScore: 2, awayScore: 0, isHome: true }, // W
+        { homeScore: 0, awayScore: 1, isHome: true }, // L
+        { homeScore: 0, awayScore: 2, isHome: true }, // L
+        { homeScore: 0, awayScore: 3, isHome: true }, // L (Oldest)
       ]);
 
       const result = service.calculateForm(matches, 1, 5);
@@ -137,11 +137,25 @@ describe('FormCalculatorService', () => {
 
     it('should identify declining trend', () => {
       const matches = createMockMatches([
+        { homeScore: 0, awayScore: 1, isHome: true }, // L (Newest)
+        { homeScore: 0, awayScore: 2, isHome: true }, // L
+        { homeScore: 1, awayScore: 0, isHome: true }, // W
+        { homeScore: 2, awayScore: 0, isHome: true }, // W
+        { homeScore: 3, awayScore: 0, isHome: true }, // W (Oldest)
+      ]);
+
+      const result = service.calculateForm(matches, 1, 5);
+
+      expect(result.trend).toContain('declining');
+    });
+
+    it('should identify declining trend', () => {
+      const matches = createMockMatches([
         { homeScore: 0, awayScore: 2, isHome: true }, // Loss (most recent)
         { homeScore: 1, awayScore: 1, isHome: true }, // Draw
-        { homeScore: 2, awayScore: 1, isHome: false }, // Win
+        { homeScore: 1, awayScore: 2, isHome: false }, // Win (Team 1 is away, awayScore 2 > homeScore 1)
         { homeScore: 3, awayScore: 0, isHome: true }, // Win
-        { homeScore: 2, awayScore: 1, isHome: false }, // Win (oldest)
+        { homeScore: 1, awayScore: 2, isHome: false }, // Win (oldest)
       ]);
 
       const result = service.calculateForm(matches, 1, 5);
@@ -150,7 +164,7 @@ describe('FormCalculatorService', () => {
     });
   });
 
-  // Helper function to create mock matches
+  // Helper functions
   function createMockMatches(
     configs: Array<{
       homeScore: number | null;
@@ -161,21 +175,19 @@ describe('FormCalculatorService', () => {
     return configs.map((config, index) => {
       const match = new Match();
       match.id = index + 1;
-      match.homeTeamId = config.isHome ? 1 : 2;
-      match.awayTeamId = config.isHome ? 2 : 1;
-      match.homeScore = config.homeScore;
-      match.awayScore = config.awayScore;
-      match.kickOff = new Date(2024, 0, index + 1); // Sequential dates
+      match.homeScore = config.homeScore ?? undefined;
+      match.awayScore = config.awayScore ?? undefined;
+      match.kickOff = new Date(2024, 0, 10 - index); // Reverse chronological: Index 0 is newest
       match.status = 'FINISHED';
 
       const homeTeam = new Team();
-      homeTeam.id = match.homeTeamId;
-      homeTeam.name = config.isHome ? 'Test Team' : 'Opponent Team';
+      homeTeam.id = config.isHome ? 1 : 2;
+      homeTeam.name = config.isHome ? 'Test Team' : 'Opponent';
       match.homeTeam = homeTeam;
 
       const awayTeam = new Team();
-      awayTeam.id = match.awayTeamId;
-      awayTeam.name = config.isHome ? 'Opponent Team' : 'Test Team';
+      awayTeam.id = config.isHome ? 2 : 1;
+      awayTeam.name = config.isHome ? 'Opponent' : 'Test Team';
       match.awayTeam = awayTeam;
 
       return match;

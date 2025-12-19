@@ -14,6 +14,8 @@ export interface FormResult {
   points: number;
   maxPoints: number;
   recentForm: string; // e.g., "W-D-L-W-W"
+  form: string; // e.g., "WDLWW"
+  trend: string; // e.g., "excellent", "consistent", "poor"
 }
 
 @Injectable()
@@ -36,11 +38,20 @@ export class FormCalculatorService {
         points: 0,
         maxPoints: 0,
         recentForm: '',
+        form: '',
+        trend: 'No recent matches',
       };
     }
 
-    // Take only the last N matches
-    const recentMatches = matches.slice(0, lastN);
+    // Take only the last N matches (assume they are sorted newest first)
+    // If not sorted, we should sort them here
+    const sortedMatches = [...matches].sort((a, b) => {
+      const dateA = a.kickOff ? new Date(a.kickOff).getTime() : 0;
+      const dateB = b.kickOff ? new Date(b.kickOff).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    const recentMatches = sortedMatches.slice(0, lastN);
     let totalPoints = 0;
     const formLetters: string[] = [];
     const matchDetails: FormResult['matches'] = [];
@@ -89,13 +100,48 @@ export class FormCalculatorService {
 
     // Calculate rating: (points earned / max possible points) * 100
     const formRating = maxPoints > 0 ? (totalPoints / maxPoints) * 100 : 50;
+    const roundedRating = Math.round(formRating * 100) / 100;
+
+    // Calculate trend
+    let trend = 'stable';
+    if (matchDetails.length === 0) {
+      trend = 'No recent matches';
+    } else {
+      // Simple trend analysis: compare last 2 matches to previous 3
+      if (matchDetails.length >= 4) {
+        const recent = matchDetails.slice(0, 2);
+        const older = matchDetails.slice(2, 5);
+        const recentPoints = recent.reduce(
+          (sum, m) => sum + (m.result === 'win' ? 3 : m.result === 'draw' ? 1 : 0),
+          0,
+        );
+        const olderPoints = older.reduce(
+          (sum, m) => sum + (m.result === 'win' ? 3 : m.result === 'draw' ? 1 : 0),
+          0,
+        );
+        const recentAvg = recentPoints / recent.length;
+        const olderAvg = olderPoints / older.length;
+
+        if (recentAvg > olderAvg + 0.5) trend = 'improving';
+        else if (recentAvg < olderAvg - 0.5) trend = 'declining';
+      }
+
+      if (trend === 'stable') {
+        if (roundedRating >= 85) trend = 'excellent';
+        else if (roundedRating >= 75) trend = 'good';
+        else if (roundedRating >= 40) trend = 'consistent';
+        else trend = 'poor';
+      }
+    }
 
     return {
       matches: matchDetails,
-      formRating: Math.round(formRating * 100) / 100, // Round to 2 decimal places
+      formRating: roundedRating,
       points: totalPoints,
       maxPoints,
       recentForm: formLetters.join('-'),
+      form: formLetters.join(''),
+      trend,
     };
   }
 

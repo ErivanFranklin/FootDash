@@ -74,6 +74,12 @@ export class FollowService {
       },
     });
 
+    // Send personal notification to the followed user
+    this.socialGateway.emitToUser(followingId, 'new-follower', {
+      followerId,
+      createdAt: savedFollow.createdAt,
+    });
+
     return savedFollow;
   }
 
