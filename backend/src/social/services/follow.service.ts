@@ -207,7 +207,7 @@ export class FollowService {
     return {
       id: Number(user.id),
       email: user.email,
-      createdAt: user.created_at.toISOString(),
+      createdAt: user.createdAt.toISOString(),
     };
   }
 }

@@ -81,15 +81,18 @@ describe('Auth e2e (auth workflow)', () => {
       .post('/auth/login')
       .send({ email, password })
       .expect(201);
+    
 
     const accessToken = loginRes.body?.tokens?.accessToken;
     expect(accessToken).toBeDefined();
+    
 
     // Get profile with the access token
     const profileRes = await request(app.getHttpServer())
       .get('/auth/profile')
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
+    
 
     expect(profileRes.body).toBeDefined();
     expect(profileRes.body.email).toEqual(email);

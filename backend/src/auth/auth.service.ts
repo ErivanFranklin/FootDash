@@ -11,6 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { UserProfileService } from '../users/services/user-profile.service';
+import { Optional } from '@nestjs/common';
 import { ProfileDto } from './dto/profile.dto';
 
 export interface AuthUser {
@@ -36,6 +38,7 @@ export class AuthService {
     private readonly usersRepo: Repository<User>,
     @InjectRepository(RefreshToken)
     private readonly refreshRepo: Repository<RefreshToken>,
+    @Optional() private readonly profileService?: UserProfileService,
   ) {}
 
   async register(dto: RegisterAuthDto): Promise<AuthResult> {
@@ -129,16 +132,34 @@ export class AuthService {
   }
 
   async getProfile(userId: number): Promise<ProfileDto> {
-    const user = await this.usersRepo.findOneBy({ id: userId });
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+    // Prefer profile record (which contains user relation/email) when available
+    if (this.profileService) {
+      try {
+        const profile = await this.profileService.findByUserId(userId);
+        return {
+          id: profile.id,
+          email: profile.email,
+          createdAt: profile.createdAt,
+        } as ProfileDto;
+      } catch (err) {
+        // fallthrough to user lookup
+      }
     }
-    // map DB snake_case -> API camelCase explicitly to match ProfileDto
-    return {
-      id: user.id,
-      email: user.email,
-      createdAt: (user as any).created_at,
-    } as ProfileDto;
+    
+    // Fallback to user record if profile service not available or profile not found
+    try {
+      const user = await this.usersRepo.findOneBy({ id: userId });
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      return {
+        id: user.id,
+        email: user.email,
+        createdAt: (user as any).createdAt,
+      } as ProfileDto;
+    } catch (err) {
+      throw err;
+    }
   }
 
   private async createTokens(user: AuthUser): Promise<AuthTokens> {
