@@ -87,7 +87,7 @@
 - [x] Comprehensive documentation
 - [x] Enhancements roadmap (ML models, weather data, player availability)
 
-### ✅ Priority 5: Social Features (COMPLETE) ✅
+### ✅ Priority 5: Social Features (Core - COMPLETE) ✅
 **Status:** Complete  
 **Duration:** Weeks 10-12  
 **Completion Date:** December 19, 2025
@@ -101,12 +101,11 @@
 - [x] Real-time social notifications (WebSockets)
 - [x] Content moderation (Reporting system)
 
-#### 📋 Priority 5: Social Features (Refinement) - Outstanding Items
+### 📋 Priority 5.5: Social Features (Refinement) - Outstanding Items
 **Status:** Pending  
 **Estimated Duration:** 1-2 weeks
 
 **Content Moderation:**
-- [ ] Reporting System: Backend/Frontend for users to report inappropriate comments or profiles
 - [ ] Profanity Filtering: Basic automated check for comment content
 
 **Social Feed Refinement:**
