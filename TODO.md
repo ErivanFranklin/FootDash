@@ -22,7 +22,7 @@
 	- [x] Smoke tests with Slack webhook monitoring
 	- [x] Documentation and deployment guide
 
-## Phase 2 - Enhanced Features (67% Complete - 4 of 6)
+## Phase 2 - Enhanced Features (100% Complete - 5 of 5) ✅
 
 ### ✅ Priority 1: Real-time Match Updates (COMPLETE) ✅
 **Status:** Complete  
@@ -100,18 +100,32 @@
 - [x] Frontend: Follow/friend system
 - [x] Real-time social notifications (WebSockets)
 - [x] Content moderation (Reporting system)
-- [ ] Content moderation
 
-### ⏳ Priority 6: Admin Dashboard
+#### 📋 Priority 5: Social Features (Refinement) - Outstanding Items
 **Status:** Pending  
+**Estimated Duration:** 1-2 weeks
+
+**Content Moderation:**
+- [ ] Reporting System: Backend/Frontend for users to report inappropriate comments or profiles
+- [ ] Profanity Filtering: Basic automated check for comment content
+
+**Social Feed Refinement:**
+- [ ] Following vs. Global: Frontend toggle/tab to switch between personalized feed (people you follow) and global community feed
+- [ ] Activity Templates: Ensure feed correctly displays different types of activity (e.g., "User A predicted Arsenal to win" vs. "User B followed you")
+
+**Real-time Social Notifications:**
+- [ ] In-App Alerts: Toast or notification badge when user receives a new follower or reaction while app is open
+
+### ⏳ Priority 6: Admin Dashboard (NEW)
+**Status:** Not Started  
 **Estimated Duration:** Weeks 12-14
 
-- [ ] Backend: Admin API endpoints
-- [ ] Backend: User management
-- [ ] Backend: Content moderation tools
-- [ ] Backend: Analytics API
-- [ ] Frontend: Admin dashboard UI
-- [ ] Frontend: User management interface
-- [ ] Frontend: System monitoring
-- [ ] Frontend: Notification management
-- [ ] Role-based access control
+**Backend:**
+- [ ] RBAC (Role-Based Access Control): Implement AdminGuard and roles in User entity
+- [ ] Admin API: Endpoints for user management (block/delete) and content moderation (reviewing reports)
+- [ ] System Monitoring: API to check server health, DB stats, and active WebSocket connections
+
+**Frontend:**
+- [ ] Admin UI: Dedicated area for administrators to manage the platform
+- [ ] User Management: Interface to search, view, and manage user accounts
+- [ ] Moderation Queue: Interface to review reported content and take action
