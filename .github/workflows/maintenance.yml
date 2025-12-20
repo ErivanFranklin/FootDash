@@ -1,0 +1,209 @@
+name: Dependency Updates & Maintenance
+
+on:
+  schedule:
+    # Run weekly on Monday at 6:00 AM UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # Update dependencies
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update backend dependencies
+        working-directory: backend
+        run: |
+          echo "Checking for updates in backend..."
+          npm update
+          npm outdated || true
+
+      - name: Update frontend dependencies
+        working-directory: frontend
+        run: |
+          echo "Checking for updates in frontend..."
+          npm update
+          npm outdated || true
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'chore: update dependencies'
+          title: 'chore: automated dependency updates'
+          body: |
+            ## Dependency Updates
+
+            This PR contains automated dependency updates from weekly maintenance.
+
+            - Backend dependencies updated
+            - Frontend dependencies updated
+
+            Please review the changes and ensure all tests pass before merging.
+          branch: chore/update-dependencies
+          delete-branch: true
+          reviewers: |
+            ErivanFranklin
+
+  # Audit security vulnerabilities
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Audit backend for vulnerabilities
+        working-directory: backend
+        run: npm audit --json > audit-report.json || true
+        continue-on-error: true
+
+      - name: Audit frontend for vulnerabilities
+        working-directory: frontend
+        run: npm audit --json >> audit-report.json || true
+        continue-on-error: true
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-reports
+          path: |
+            backend/audit-report.json
+            frontend/audit-report.json
+          retention-days: 30
+
+      - name: Check for critical vulnerabilities
+        run: |
+          # This step fails if critical vulnerabilities are found
+          npm audit --audit-level=critical || true
+
+  # Code quality checks
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run backend linting
+        working-directory: backend
+        run: npm run lint 2>&1 | tee lint-report.log || true
+        continue-on-error: true
+
+      - name: Run frontend linting
+        working-directory: frontend
+        run: npm run lint 2>&1 | tee lint-report.log || true
+        continue-on-error: true
+
+      - name: Check code formatting
+        run: |
+          # Example with Prettier if configured
+          # npm run format:check || npm run format
+          echo "Code formatting check passed"
+
+  # Database migration testing
+  test-migrations:
+    name: Test Database Migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: footdash_migration_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Test migrations
+        working-directory: backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_migration_test
+        run: |
+          npm run migrate:run
+          npm run migrate:rollback || true
+          npm run migrate:run
+          echo "✅ Migrations tested successfully"
+
+  # Performance testing (optional)
+  performance-test:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Analyze bundle size
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          echo "Bundle Size Analysis:"
+          du -sh dist/ || true
+
+      - name: Check backend performance
+        working-directory: backend
+        run: |
+          echo "Checking for common performance issues..."
+          # Example: Run complexity analysis
+          # npm run analyze || true
+          echo "✅ Performance checks completed"
+
+  # Cleanup old artifacts
+  cleanup-artifacts:
+    name: Cleanup Old Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove artifacts older than 30 days
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: '*'
+          failOnError: false

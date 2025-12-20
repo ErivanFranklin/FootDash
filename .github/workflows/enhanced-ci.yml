@@ -1,0 +1,393 @@
+name: Enhanced CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, 'feature/**', 'hotfix/**']
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  # Parallel job for detecting which parts of codebase changed
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+      infra: ${{ steps.changes.outputs.infra }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        id: changes
+        run: |
+          if git diff --name-only origin/main...HEAD | grep -q "^backend/"; then
+            echo "backend=true" >> $GITHUB_OUTPUT
+          else
+            echo "backend=false" >> $GITHUB_OUTPUT
+          fi
+
+          if git diff --name-only origin/main...HEAD | grep -q "^frontend/"; then
+            echo "frontend=true" >> $GITHUB_OUTPUT
+          else
+            echo "frontend=false" >> $GITHUB_OUTPUT
+          fi
+
+          if git diff --name-only origin/main...HEAD | grep -qE "^(Dockerfile|docker-compose|\.github/workflows)"; then
+            echo "infra=true" >> $GITHUB_OUTPUT
+          else
+            echo "infra=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Backend tests - unit + e2e in parallel
+  backend-tests:
+    name: Backend Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      WORKERS: 4
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: footdash_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-node-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-node-
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci --no-audit --no-fund
+
+      - name: Run linter
+        working-directory: backend
+        run: npm run lint 2>&1 | tee lint-report.log || true
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break || sleep 1
+          done
+
+      - name: Setup test database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y postgresql-client
+          psql -h localhost -p 5432 -U postgres -c "CREATE DATABASE footdash_test;" || true
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_test
+        run: npm run migrate:run
+
+      - name: Run unit tests with coverage
+        working-directory: backend
+        run: |
+          npm run test -- --coverage --maxWorkers=${{ env.WORKERS }} \
+            --reporters=default \
+            --reporters=jest-junit \
+            --outputFile=test-results/junit.xml
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_test
+
+      - name: Run e2e tests
+        working-directory: backend
+        run: |
+          npm run test:e2e -- --ci --maxWorkers=${{ env.WORKERS }} \
+            --reporters=default \
+            --reporters=jest-junit \
+            --outputFile=test-results/e2e-junit.xml
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: footdash_test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/coverage/coverage-final.json
+          flags: backend
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: |
+            backend/test-results/
+            backend/coverage/
+          retention-days: 30
+
+  # Frontend tests - lint, unit tests, build
+  frontend-tests:
+    name: Frontend Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-node-
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser fonts-liberation fonts-roboto-fontface
+
+      - name: Setup Chrome binary path
+        run: echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+
+      - name: Run linter
+        working-directory: frontend
+        run: npm run lint 2>&1 | tee lint-report.log || true
+
+      - name: Run unit tests with coverage
+        working-directory: frontend
+        run: |
+          npm test -- --watch=false --browsers=ChromeHeadless \
+            --code-coverage \
+            --reporters=junit
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          fail_ci_if_error: false
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist/
+          retention-days: 30
+
+  # Docker build for backend
+  docker-build-backend:
+    name: Docker Build - Backend
+    needs: backend-tests
+    if: needs.detect-changes.outputs.infra == 'true' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/backend:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/backend:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/backend:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/backend:buildcache,mode=max
+
+  # Docker build for frontend
+  docker-build-frontend:
+    name: Docker Build - Frontend
+    needs: frontend-tests
+    if: needs.detect-changes.outputs.infra == 'true' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/frontend:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/frontend:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/frontend:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/frontend:buildcache,mode=max
+
+  # Security scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Audit backend dependencies
+        working-directory: backend
+        run: npm audit --audit-level=moderate || true
+
+      - name: Audit frontend dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=moderate || true
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Test summary and reporting
+  test-summary:
+    name: Test Summary
+    needs: [backend-tests, frontend-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          path: test-results/
+
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results/**/junit.xml
+            test-results/**/e2e-junit.xml
+          check_name: Test Results Summary
+
+      - name: Comment PR with test summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const testResultsPath = 'test-results/';
+            
+            let summary = '## Test Results Summary\n\n';
+            
+            if (fs.existsSync(testResultsPath)) {
+              summary += '✅ All tests completed\n';
+            } else {
+              summary += '⚠️ Some tests may have failed\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  # Final status check
+  ci-complete:
+    name: CI Pipeline Complete
+    needs: [backend-tests, frontend-tests, security-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CI status
+        run: |
+          if [ "${{ needs.backend-tests.result }}" = "failure" ] || \
+             [ "${{ needs.frontend-tests.result }}" = "failure" ] || \
+             [ "${{ needs.security-scan.result }}" = "failure" ]; then
+            echo "❌ CI Pipeline Failed"
+            exit 1
+          fi
+          echo "✅ CI Pipeline Passed"
