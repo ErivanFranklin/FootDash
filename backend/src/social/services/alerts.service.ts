@@ -175,4 +175,27 @@ export class AlertsService {
 
     return await this.alertRepository.save(alerts);
   }
+
+  /**
+   * Helper to create a mention alert for a user with contextual snippet
+   */
+  async createMentionAlert(params: {
+    mentionedUserId: number;
+    authorUserId: number;
+    commentId: number;
+    snippet?: string;
+  }): Promise<Alert> {
+    const dto: CreateAlertDto = {
+      userId: params.mentionedUserId,
+      alertType: AlertType.MENTION,
+      title: 'You were mentioned in a comment',
+      message:
+        params.snippet?.trim() ||
+        'You were mentioned by another user in a comment.',
+      relatedUserId: params.authorUserId,
+      relatedEntityType: 'comment',
+      relatedEntityId: params.commentId,
+    };
+    return this.createAlert(dto);
+  }
 }

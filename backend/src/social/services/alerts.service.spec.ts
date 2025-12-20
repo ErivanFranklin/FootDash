@@ -380,4 +380,27 @@ describe('AlertsService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('createMentionAlert', () => {
+    it('creates a mention alert with context', async () => {
+      mockAlertRepository.create.mockImplementation((a) => a);
+      mockAlertRepository.save.mockImplementation((a) =>
+        Promise.resolve({ id: 1, ...a }),
+      );
+
+      const alert = await service.createMentionAlert({
+        mentionedUserId: 5,
+        authorUserId: 2,
+        commentId: 42,
+        snippet: 'Hi @user',
+      });
+
+      expect(alertRepository.save).toHaveBeenCalled();
+      expect(alert.userId).toBe(5);
+      expect(alert.alertType).toBe(AlertType.MENTION);
+      expect(alert.relatedEntityType).toBe('comment');
+      expect(alert.relatedEntityId).toBe(42);
+      expect(alert.relatedUserId).toBe(2);
+    });
+  });
 });
