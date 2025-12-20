@@ -237,6 +237,26 @@ describe('AlertsService', () => {
     });
   });
 
+  describe('deleteAlertForUser', () => {
+    it('should delete alert when owned by user', async () => {
+      mockAlertRepository.delete.mockResolvedValue({ affected: 1 });
+
+      const result = await service.deleteAlertForUser(1, 1);
+
+      expect(alertRepository.delete).toHaveBeenCalledWith({ id: 1, userId: 1 });
+      expect(result).toBe(true);
+    });
+
+    it('should return false when alert not owned by user', async () => {
+      mockAlertRepository.delete.mockResolvedValue({ affected: 0 });
+
+      const result = await service.deleteAlertForUser(1, 2);
+
+      expect(alertRepository.delete).toHaveBeenCalledWith({ id: 1, userId: 2 });
+      expect(result).toBe(false);
+    });
+  });
+
   describe('deleteOldAlerts', () => {
     it('should delete alerts older than 30 days', async () => {
       const mockQueryBuilder = {
@@ -277,12 +297,10 @@ describe('AlertsService', () => {
         addSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         groupBy: jest.fn().mockReturnThis(),
-        getRawMany: jest
-          .fn()
-          .mockResolvedValue([
-            { type: AlertType.FOLLOWER, count: '5' },
-            { type: AlertType.COMMENT, count: '3' },
-          ]),
+        getRawMany: jest.fn().mockResolvedValue([
+          { type: AlertType.FOLLOWER, count: '5' },
+          { type: AlertType.COMMENT, count: '3' },
+        ]),
       };
 
       mockAlertRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
@@ -332,7 +350,11 @@ describe('AlertsService', () => {
         },
       ];
 
-      const alerts = dtos.map((dto, i) => ({ ...mockAlert, id: i + 1, ...dto }));
+      const alerts = dtos.map((dto, i) => ({
+        ...mockAlert,
+        id: i + 1,
+        ...dto,
+      }));
       mockAlertRepository.create.mockReturnValue(alerts);
       mockAlertRepository.save.mockResolvedValue(alerts);
 

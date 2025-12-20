@@ -33,7 +33,14 @@ import { WebsocketsModule } from '../websockets/websockets.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment, Reaction, Follow, UserActivity, Report, Alert]),
+    TypeOrmModule.forFeature([
+      Comment,
+      Reaction,
+      Follow,
+      UserActivity,
+      Report,
+      Alert,
+    ]),
     UsersModule,
     MatchesModule,
     WebsocketsModule,

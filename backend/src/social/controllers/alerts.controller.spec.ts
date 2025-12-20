@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { AlertsController } from './alerts.controller';
 import { AlertsService } from '../services/alerts.service';
 import { Alert, AlertType } from '../entities/alert.entity';
@@ -31,7 +32,7 @@ describe('AlertsController', () => {
     getUserAlerts: jest.fn(),
     markAsRead: jest.fn(),
     markAllAsRead: jest.fn(),
-    deleteAlert: jest.fn(),
+    deleteAlertForUser: jest.fn(),
     getAlertCountByType: jest.fn(),
     createBulkAlerts: jest.fn(),
   };
@@ -156,7 +157,9 @@ describe('AlertsController', () => {
     it('should mark all alerts as read', async () => {
       mockAlertsService.markAllAsRead.mockResolvedValue(undefined);
 
-      const result = await controller.markAllAsRead({ user: { sub: 1 } } as any);
+      const result = await controller.markAllAsRead({
+        user: { sub: 1 },
+      } as any);
 
       expect(service.markAllAsRead).toHaveBeenCalledWith(1);
       expect(result.success).toBe(true);
@@ -166,15 +169,23 @@ describe('AlertsController', () => {
 
   describe('deleteAlert', () => {
     it('should delete an alert', async () => {
-      mockAlertsService.deleteAlert.mockResolvedValue(undefined);
+      mockAlertsService.deleteAlertForUser.mockResolvedValue(true);
 
       const result = await controller.deleteAlert(
         { user: { sub: 1 } } as any,
         '1',
       );
 
-      expect(service.deleteAlert).toHaveBeenCalledWith(1);
+      expect(service.deleteAlertForUser).toHaveBeenCalledWith(1, 1);
       expect(result.success).toBe(true);
+    });
+
+    it('should throw NotFound when alert not owned or not found', async () => {
+      mockAlertsService.deleteAlertForUser.mockResolvedValue(false);
+
+      await expect(
+        controller.deleteAlert({ user: { sub: 1 } } as any, '99'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -189,9 +200,9 @@ describe('AlertsController', () => {
       };
       mockAlertsService.getAlertCountByType.mockResolvedValue(counts);
 
-      const result = await controller.getAlertCountByType(
-        { user: { sub: 1 } } as any,
-      );
+      const result = await controller.getAlertCountByType({
+        user: { sub: 1 },
+      } as any);
 
       expect(service.getAlertCountByType).toHaveBeenCalledWith(1);
       expect(result.success).toBe(true);
@@ -208,9 +219,9 @@ describe('AlertsController', () => {
       };
       mockAlertsService.getAlertCountByType.mockResolvedValue(counts);
 
-      const result = await controller.getAlertCountByType(
-        { user: { sub: 1 } } as any,
-      );
+      const result = await controller.getAlertCountByType({
+        user: { sub: 1 },
+      } as any);
 
       expect(result.counts[AlertType.FOLLOWER]).toBe(0);
     });

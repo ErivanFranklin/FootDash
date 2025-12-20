@@ -46,7 +46,10 @@ describe('UserProfileService', () => {
 
   describe('findByUserId', () => {
     it('should return a user profile when found', async () => {
-      const profileWithUser = { ...mockUserProfile, user: { email: 'test@example.com' } };
+      const profileWithUser = {
+        ...mockUserProfile,
+        user: { email: 'test@example.com' },
+      };
       mockRepository.findOne.mockResolvedValue(profileWithUser);
 
       const result = await service.findByUserId(1);

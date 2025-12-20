@@ -21,13 +21,13 @@ export class FeedController {
     @Query() query: FeedQueryDto,
   ) {
     const userId = req.user.sub;
-    
+
     // Route to global or personalized feed based on feedType query param
     if (query.feedType === FeedType.GLOBAL) {
       const result = await this.feedService.getGlobalFeed(query);
       return { success: true, ...result };
     }
-    
+
     const result = await this.feedService.getUserFeed(userId, query);
     return { success: true, ...result };
   }

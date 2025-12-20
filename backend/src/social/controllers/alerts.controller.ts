@@ -9,6 +9,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { AlertsService } from '../services/alerts.service';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
@@ -89,10 +90,16 @@ export class AlertsController {
     @Request() req: { user: { sub: number } },
     @Param('id') id: string,
   ) {
-    // Verify alert belongs to user before deletion
+    const userId = req.user.sub;
     const alertId = parseInt(id, 10);
 
-    await this.alertsService.deleteAlert(alertId);
+    const deleted = await this.alertsService.deleteAlertForUser(
+      alertId,
+      userId,
+    );
+    if (!deleted) {
+      throw new NotFoundException('Alert not found');
+    }
     return { success: true };
   }
 

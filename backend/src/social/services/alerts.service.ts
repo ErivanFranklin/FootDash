@@ -89,7 +89,10 @@ export class AlertsService {
    * Mark all alerts as read for a user
    */
   async markAllAsRead(userId: number): Promise<void> {
-    await this.alertRepository.update({ userId, isRead: false }, { isRead: true });
+    await this.alertRepository.update(
+      { userId, isRead: false },
+      { isRead: true },
+    );
   }
 
   /**
@@ -97,6 +100,15 @@ export class AlertsService {
    */
   async deleteAlert(alertId: number): Promise<void> {
     await this.alertRepository.delete({ id: alertId });
+  }
+
+  /**
+   * Delete a single alert only if it belongs to the given user
+   * Returns true when an alert was deleted, false otherwise
+   */
+  async deleteAlertForUser(alertId: number, userId: number): Promise<boolean> {
+    const result = await this.alertRepository.delete({ id: alertId, userId });
+    return (result.affected ?? 0) > 0;
   }
 
   /**
