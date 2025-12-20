@@ -1,0 +1,45 @@
+.report-info {
+  padding: 8px 0;
+  flex: 1;
+
+  p {
+    margin: 4px 0;
+    font-size: 14px;
+
+    &.reported-by,
+    &.reported-user {
+      color: var(--ion-color-medium);
+      font-size: 12px;
+    }
+  }
+}
+
+.details-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+
+  ion-card {
+    width: 100%;
+    margin: 0;
+    border-radius: 16px 16px 0 0;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}
+
+ion-button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+
+  ion-button {
+    flex: 1;
+  }
+}

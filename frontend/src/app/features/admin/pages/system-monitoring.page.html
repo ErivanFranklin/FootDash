@@ -1,0 +1,90 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin"></ion-back-button>
+    </ion-buttons>
+    <ion-title>System Monitoring</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadSystemHealth()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <div *ngIf="!loading && systemHealth">
+    <!-- Database Status -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          Database Status
+          <ion-badge [color]="getDbStatusColor()" slot="end">
+            {{ systemHealth.database.status | uppercase }}
+          </ion-badge>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item>
+            <ion-label>Total Users</ion-label>
+            <ion-text slot="end"><strong>{{ systemHealth.database.users.total }}</strong></ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Admin Users</ion-label>
+            <ion-text slot="end"><strong>{{ systemHealth.database.users.admins }}</strong></ion-text>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Reports Status -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Reports</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item>
+            <ion-label>Total Reports</ion-label>
+            <ion-text slot="end"><strong>{{ systemHealth.reports.total }}</strong></ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Pending Reports</ion-label>
+            <ion-badge [color]="systemHealth.reports.pending > 0 ? 'warning' : 'success'" slot="end">
+              {{ systemHealth.reports.pending }}
+            </ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- WebSocket Status -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>WebSocket Connections</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item>
+            <ion-label>Active Connections</ion-label>
+            <ion-text slot="end"><strong>{{ systemHealth.websockets.activeConnections }}</strong></ion-text>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Last Refresh -->
+    <div class="last-refresh">
+      <p>Last updated: {{ lastRefresh | date: 'short' }}</p>
+    </div>
+
+    <!-- Auto Refresh -->
+    <ion-item>
+      <ion-label>Auto Refresh (5s)</ion-label>
+      <ion-toggle slot="start" [(ngModel)]="autoRefresh" (ionChange)="toggleAutoRefresh()"></ion-toggle>
+    </ion-item>
+  </div>
+</ion-content>

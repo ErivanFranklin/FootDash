@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -37,11 +38,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
-  },
-  {
     path: 'user-profile/:id',
     loadComponent: () => import('./features/social/user-profile/user-profile.page').then( m => m.UserProfilePage),
     canActivate: [authGuard],
@@ -55,5 +51,30 @@ export const routes: Routes = [
     path: 'match-discussion/:id',
     loadComponent: () => import('./features/social/match-discussion/match-discussion.page').then( m => m.MatchDiscussionPage),
     canActivate: [authGuard],
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/pages/admin-dashboard.page').then(m => m.AdminDashboardPage),
+    canActivate: [authGuard, AdminGuard],
+  },
+  {
+    path: 'admin/users',
+    loadComponent: () => import('./features/admin/pages/user-management.page').then(m => m.UserManagementPage),
+    canActivate: [authGuard, AdminGuard],
+  },
+  {
+    path: 'admin/reports',
+    loadComponent: () => import('./features/admin/pages/moderation-queue.page').then(m => m.ModerationQueuePage),
+    canActivate: [authGuard, AdminGuard],
+  },
+  {
+    path: 'admin/system',
+    loadComponent: () => import('./features/admin/pages/system-monitoring.page').then(m => m.SystemMonitoringPage),
+    canActivate: [authGuard, AdminGuard],
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
   },
 ];
