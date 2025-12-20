@@ -80,7 +80,7 @@ export class AlertsService {
   /**
    * Mark a single alert as read
    */
-  async markAsRead(alertId: number): Promise<Alert> {
+  async markAsRead(alertId: number): Promise<Alert | null> {
     await this.alertRepository.update({ id: alertId }, { isRead: true });
     return await this.alertRepository.findOne({ where: { id: alertId } });
   }
@@ -136,7 +136,8 @@ export class AlertsService {
     };
 
     result.forEach((row) => {
-      counts[row.type] = parseInt(row.count, 10);
+      const alertType = row.type as AlertType;
+      counts[alertType] = parseInt(row.count, 10);
     });
 
     return counts;

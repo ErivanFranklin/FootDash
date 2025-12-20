@@ -9,23 +9,12 @@ describe('AlertsService', () => {
   let service: AlertsService;
   let alertRepository: Repository<Alert>;
 
-  const mockUser: User = {
+  const mockUser = {
     id: 1,
     email: 'test@example.com',
-    password: 'hashed_password',
+    password_hash: 'hashed',
     createdAt: new Date(),
-    updatedAt: new Date(),
-    role: 'USER' as any,
-    blockedAt: null,
-    userProfile: null,
-    activities: [],
-    following: [],
-    followers: [],
-    reactions: [],
-    comments: [],
-    predictions: [],
-    teams: [],
-  };
+  } as User;
 
   const mockAlert: Alert = {
     id: 1,
@@ -37,8 +26,8 @@ describe('AlertsService', () => {
     actionUrl: '/user/2',
     relatedUserId: 2,
     relatedUser: undefined,
-    relatedEntityType: null,
-    relatedEntityId: null,
+    relatedEntityType: undefined,
+    relatedEntityId: undefined,
     isRead: false,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -225,7 +214,7 @@ describe('AlertsService', () => {
       expect(alertRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
       });
-      expect(result.isRead).toBe(true);
+      expect(result?.isRead).toBe(true);
     });
   });
 

@@ -38,7 +38,7 @@ describe('ProfanityFilterService', () => {
     });
 
     it('should return false for null content', () => {
-      const result = service.isProfane(null);
+      const result = service.isProfane(null as any);
       expect(result).toBe(false);
     });
 

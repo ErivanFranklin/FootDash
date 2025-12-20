@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AlertsController } from './alerts.controller';
 import { AlertsService } from '../services/alerts.service';
 import { Alert, AlertType } from '../entities/alert.entity';
+import { User } from '../../users/user.entity';
 
 describe('AlertsController', () => {
   let controller: AlertsController;
@@ -10,15 +11,15 @@ describe('AlertsController', () => {
   const mockAlert: Alert = {
     id: 1,
     userId: 1,
-    user: undefined,
+    user: {} as User,
     alertType: AlertType.FOLLOWER,
     title: 'New Follower',
     message: 'User followed you',
     actionUrl: '/user/2',
     relatedUserId: 2,
     relatedUser: undefined,
-    relatedEntityType: null,
-    relatedEntityId: null,
+    relatedEntityType: undefined,
+    relatedEntityId: undefined,
     isRead: false,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -134,7 +135,7 @@ describe('AlertsController', () => {
 
       expect(service.markAsRead).toHaveBeenCalledWith(1);
       expect(result.success).toBe(true);
-      expect(result.alert.isRead).toBe(true);
+      expect(result.alert?.isRead).toBe(true);
     });
 
     it('should reject if alert does not belong to user', async () => {

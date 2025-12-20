@@ -63,7 +63,7 @@ export class AlertsController {
     // Verify alert belongs to user
     const userId = req.user.sub;
     const alert = await this.alertsService.markAsRead(parseInt(id, 10));
-    if (alert.userId !== userId) {
+    if (!alert || alert.userId !== userId) {
       return { success: false, message: 'Unauthorized' };
     }
     return { success: true, alert };
