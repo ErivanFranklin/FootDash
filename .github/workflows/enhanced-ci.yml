@@ -149,13 +149,23 @@ jobs:
         working-directory: frontend
         run: npm ci --no-audit --no-fund
 
-      - name: Install Chromium
+      - name: Install Chromium for headless tests
         run: |
           sudo apt-get update
-          sudo apt-get install -y chromium-browser fonts-liberation fonts-roboto-fontface
+          # Install Chromium and common fonts used by headless browsers in CI
+          sudo apt-get install -y --no-install-recommends chromium-browser fonts-liberation fonts-roboto-fontface
 
-      - name: Setup Chrome binary path
-        run: echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+      - name: Detect and export CHROME_BIN
+        run: |
+          if command -v chromium-browser >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v chromium-browser)" >> $GITHUB_ENV
+          elif command -v chromium >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v chromium)" >> $GITHUB_ENV
+          elif command -v google-chrome >/dev/null 2>&1; then
+            echo "CHROME_BIN=$(command -v google-chrome)" >> $GITHUB_ENV
+          else
+            echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+          fi
 
       - name: Run linter
         working-directory: frontend
@@ -305,6 +315,7 @@ jobs:
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
+        continue-on-error: true
         with:
           files: |
             test-results/**/junit.xml
@@ -316,22 +327,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-            const testResultsPath = 'test-results/';
-            
-            let summary = '## Test Results Summary\n\n';
-            
-            if (fs.existsSync(testResultsPath)) {
-              summary += '✅ All tests completed\n';
-            } else {
-              summary += '⚠️ Some tests may have failed\n';
-            }
-            
-            github.rest.issues.createComment({
+            const backend = '${{ needs.backend-tests.result }}';
+            const frontend = '${{ needs.frontend-tests.result }}';
+            const passed = backend === 'success' && frontend === 'success';
+            const summary = `## CI Status\n\n- Backend: ${backend}\n- Frontend: ${frontend}\n\n${passed ? '✅ All required checks passed' : '❌ Some checks failed'}`;
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: summary
+              body: summary,
             });
 
   # Final status check
@@ -343,12 +347,9 @@ jobs:
     steps:
       - name: Check CI status
         run: |
-          if [ "${{ needs.backend-tests.result }}" = "failure" ] || \
-             [ "${{ needs.frontend-tests.result }}" = "failure" ]; then
+          if [ "${{ needs.backend-tests.result }}" = "failure" ] || [ "${{ needs.frontend-tests.result }}" = "failure" ]; then
             echo "❌ CI Pipeline Failed"
             exit 1
           else
             echo "✅ CI Pipeline Passed"
           fi
-          fi
-          echo "✅ CI Pipeline Passed"
