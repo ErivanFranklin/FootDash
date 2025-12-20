@@ -93,4 +93,21 @@ export class UserProfileService {
     }
     return map;
   }
+
+  /**
+   * Return displayName if available, else fallback to email local-part or 'Unknown'.
+   * Does not throw if profile missing.
+   */
+  async getDisplayNameFallback(
+    userId: number,
+    email?: string,
+  ): Promise<string> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+    if (profile?.displayName) return profile.displayName;
+    if (email) {
+      const local = email.split('@')[0];
+      if (local) return local;
+    }
+    return 'Unknown';
+  }
 }

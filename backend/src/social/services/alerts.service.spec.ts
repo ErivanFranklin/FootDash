@@ -59,6 +59,7 @@ describe('AlertsService', () => {
     alertRepository = module.get<Repository<Alert>>(getRepositoryToken(Alert));
 
     jest.clearAllMocks();
+    mockAlertRepository.findOne.mockResolvedValue(undefined);
   });
 
   describe('createAlert', () => {
@@ -383,6 +384,7 @@ describe('AlertsService', () => {
 
   describe('createMentionAlert', () => {
     it('creates a mention alert with context', async () => {
+      const spy = jest.spyOn(service, 'createAlert');
       mockAlertRepository.create.mockImplementation((a) => a);
       mockAlertRepository.save.mockImplementation((a) =>
         Promise.resolve({ id: 1, ...a }),
@@ -395,12 +397,31 @@ describe('AlertsService', () => {
         snippet: 'Hi @user',
       });
 
-      expect(alertRepository.save).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalled();
       expect(alert.userId).toBe(5);
       expect(alert.alertType).toBe(AlertType.MENTION);
       expect(alert.relatedEntityType).toBe('comment');
       expect(alert.relatedEntityId).toBe(42);
       expect(alert.relatedUserId).toBe(2);
+    });
+
+    it('returns existing alert when duplicate mention detected', async () => {
+      const existing = {
+        id: 99,
+        userId: 5,
+        alertType: AlertType.MENTION,
+      } as any;
+      mockAlertRepository.findOne.mockResolvedValue(existing);
+
+      const alert = await service.createMentionAlert({
+        mentionedUserId: 5,
+        authorUserId: 2,
+        commentId: 42,
+      });
+
+      expect(alertRepository.findOne).toHaveBeenCalled();
+      expect(alertRepository.save).not.toHaveBeenCalled();
+      expect(alert).toBe(existing);
     });
   });
 });

@@ -27,6 +27,7 @@ describe('CommentsService mentions', () => {
 
   const mockProfiles = {
     findUserIdsByDisplayNames: jest.fn(),
+    getDisplayNameFallback: jest.fn(),
   } as unknown as UserProfileService;
 
   beforeEach(async () => {
@@ -44,6 +45,7 @@ describe('CommentsService mentions', () => {
     repo = module.get(getRepositoryToken(Comment));
     jest.clearAllMocks();
     (repo.count as any).mockResolvedValue(0);
+    (mockProfiles.getDisplayNameFallback as any).mockResolvedValue('user');
   });
 
   it('creates mention alerts for resolved display names', async () => {

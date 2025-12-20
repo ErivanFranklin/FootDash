@@ -185,6 +185,20 @@ export class AlertsService {
     commentId: number;
     snippet?: string;
   }): Promise<Alert> {
+    // Dedupe: avoid duplicate alerts for the same mention on the same comment
+    const existing = await this.alertRepository.findOne({
+      where: {
+        userId: params.mentionedUserId,
+        alertType: AlertType.MENTION,
+        relatedUserId: params.authorUserId,
+        relatedEntityType: 'comment',
+        relatedEntityId: params.commentId,
+      },
+    });
+    if (existing) {
+      return existing;
+    }
+
     const dto: CreateAlertDto = {
       userId: params.mentionedUserId,
       alertType: AlertType.MENTION,

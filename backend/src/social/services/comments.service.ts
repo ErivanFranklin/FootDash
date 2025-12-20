@@ -235,11 +235,15 @@ export class CommentsService {
 
   private async toResponseDto(comment: Comment): Promise<CommentResponseDto> {
     const replyCount = await this.getReplyCount(comment.id);
+    const userName = await this.userProfileService.getDisplayNameFallback(
+      comment.userId,
+      comment.user?.email,
+    );
 
     return {
       id: comment.id,
       userId: comment.userId,
-      userName: comment.user?.email || 'Unknown',
+      userName,
       matchId: comment.matchId,
       predictionId: comment.predictionId,
       parentCommentId: comment.parentCommentId,
