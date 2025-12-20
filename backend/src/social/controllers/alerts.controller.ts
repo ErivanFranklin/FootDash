@@ -90,9 +90,8 @@ export class AlertsController {
     @Param('id') id: string,
   ) {
     // Verify alert belongs to user before deletion
-    const userId = req.user.sub;
     const alertId = parseInt(id, 10);
-    
+
     await this.alertsService.deleteAlert(alertId);
     return { success: true };
   }
