@@ -38,6 +38,13 @@
           <ion-button
             fill="clear"
             size="small"
+            (click)="reportComment(comment)"
+            color="medium">
+            <ion-icon name="flag-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button
+            fill="clear"
+            size="small"
             (click)="toggleReplies(comment.id)"
             *ngIf="comment.replyCount > 0">
             <ion-icon name="chatbubble-outline" slot="start"></ion-icon>

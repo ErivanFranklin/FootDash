@@ -81,7 +81,7 @@ export class FeedPage implements OnInit, OnDestroy {
     this.loading = true;
     const serviceMethod = this.feedType === 'global'
       ? this.feedService.getGlobalFeed({ page: this.currentPage, limit: this.pageSize })
-      : this.feedService.getUserFeed({ page: this.currentPage, limit: this.pageSize }); // TODO: Implement personalized feed
+      : this.feedService.getUserFeed({ page: this.currentPage, limit: this.pageSize });
 
     serviceMethod.subscribe({
       next: (result: PaginatedActivities) => {

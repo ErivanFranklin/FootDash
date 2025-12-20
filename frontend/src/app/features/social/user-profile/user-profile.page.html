@@ -4,6 +4,11 @@
       <ion-back-button defaultHref="/tabs/feed"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ user?.username || 'User Profile' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="reportUser()" color="medium">
+        <ion-icon name="flag-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

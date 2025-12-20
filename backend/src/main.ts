@@ -17,7 +17,6 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-
   app.enableCors();
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
   const isProd = process.env.NODE_ENV === 'production';

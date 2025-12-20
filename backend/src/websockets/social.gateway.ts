@@ -93,6 +93,30 @@ export class SocialGateway implements OnModuleInit {
     });
   }
 
+  @SubscribeMessage('subscribe-user')
+  handleSubscribeUser(
+    @MessageBody() data: { userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!data || !data.userId) return;
+    const roomName = `user-${data.userId}`;
+    this.logger.log(`Client ${client.id} subscribed to user room ${roomName}`);
+    client.join(roomName);
+  }
+
+  @SubscribeMessage('unsubscribe-user')
+  handleUnsubscribeUser(
+    @MessageBody() data: { userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!data || !data.userId) return;
+    const roomName = `user-${data.userId}`;
+    this.logger.log(
+      `Client ${client.id} unsubscribed from user room ${roomName}`,
+    );
+    client.leave(roomName);
+  }
+
   // Broadcast social events to subscribed clients
   broadcastSocialEvent(eventData: SocialEventData) {
     const roomName = `${eventData.targetType}-${eventData.targetId}`;
@@ -100,6 +124,15 @@ export class SocialGateway implements OnModuleInit {
 
     if (this.server) {
       this.server.to(roomName).emit('social-event', eventData);
+    }
+  }
+
+  // Broadcast to a specific user (for personal notifications)
+  emitToUser(userId: number, event: string, data: any) {
+    const roomName = `user-${userId}`;
+    this.logger.log(`Emitting ${event} to user room ${roomName}`);
+    if (this.server) {
+      this.server.to(roomName).emit(event, data);
     }
   }
 
