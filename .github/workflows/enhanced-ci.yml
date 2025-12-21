@@ -187,6 +187,14 @@ jobs:
           path: frontend/test-results
           retention-days: 30
 
+      - name: Upload frontend coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          retention-days: 30
+
       - name: Build frontend
         working-directory: frontend
         run: npm run build
@@ -351,7 +359,38 @@ jobs:
             const backend = '${{ needs.backend-tests.result }}';
             const frontend = '${{ needs.frontend-tests.result }}';
             const passed = backend === 'success' && frontend === 'success';
-            const summary = `## CI Status\n\n- Backend: ${backend}\n- Frontend: ${frontend}\n\n${passed ? '✅ All required checks passed' : '❌ Some checks failed'}`;
+            const fs = require('fs');
+            const path = require('path');
+            function collectFiles(startDir, filename) {
+              const matches = [];
+              const stack = [startDir];
+              while (stack.length) {
+                const dir = stack.pop();
+                let entries;
+                try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { continue; }
+                for (const e of entries) {
+                  const full = path.join(dir, e.name);
+                  if (e.isDirectory()) stack.push(full);
+                  else if (e.isFile() && e.name === filename) matches.push(full);
+                }
+              }
+              return matches;
+            }
+            const root = path.join(process.cwd(), 'test-results');
+            const summaries = collectFiles(root, 'coverage-summary.json');
+            const backendSummaryPath = summaries.find(p => p.includes('backend')) || summaries[0];
+            const frontendSummaryPath = summaries.find(p => p.includes('frontend')) || summaries[1] || summaries[0];
+            let backendCov = null;
+            let frontendCov = null;
+            try { backendCov = JSON.parse(fs.readFileSync(backendSummaryPath, 'utf8')); } catch {}
+            try { frontendCov = JSON.parse(fs.readFileSync(frontendSummaryPath, 'utf8')); } catch {}
+            function fmtTotals(cov) {
+              if (!cov || !cov.total) return 'n/a';
+              const t = cov.total;
+              return `statements ${t.statements.pct}% | branches ${t.branches.pct}% | functions ${t.functions.pct}% | lines ${t.lines.pct}%`;
+            }
+            const coverageSection = `\n### Coverage\n- Backend: ${fmtTotals(backendCov)}\n- Frontend: ${fmtTotals(frontendCov)}`;
+            const summary = `## CI Status\n\n- Backend: ${backend}\n- Frontend: ${frontend}\n${coverageSection}\n\n${passed ? '✅ All required checks passed' : '❌ Some checks failed'}`;
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
