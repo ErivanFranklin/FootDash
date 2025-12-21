@@ -2,6 +2,7 @@
 
 [![Backend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
 [![Frontend CI](https://github.com/ErivanFranklin/FootDash/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions)
+[![CodeQL](https://github.com/ErivanFranklin/FootDash/actions/workflows/codeql.yml/badge.svg)](https://github.com/ErivanFranklin/FootDash/actions/workflows/codeql.yml)
 
 A football dashboard application providing real-time match data, team statistics, and user authentication.
 
@@ -87,6 +88,14 @@ See `backend/README.md` for full configuration options.
 ## CI / Testing
 
 CI workflows for backend and frontend are in `.github/workflows/`. For troubleshooting and local reproduction, see `.github/CI-README.md`.
+
+### CI Workflows
+- Enhanced CI/CD: `.github/workflows/enhanced-ci.yml` (parallel tests, coverage, Docker builds, security scan)
+- Code Scanning: `.github/workflows/codeql.yml`
+- k6 Smoke: `.github/workflows/loadtest-k6.yml` (manual dispatch)
+  - Usage: set `base_url` (e.g., `https://staging.footdash.example.com`)
+- Backup Verification: `.github/workflows/backup-verify.yml` (manual dispatch)
+  - Produces `backup-verification` artifact with `footdash_full.backup` and `restore_validation.txt`
 
 ### E2E testing (local and CI)
 

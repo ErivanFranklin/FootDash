@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+  checks: write
+
 env:
   NODE_VERSION: '20'
   REGISTRY: ghcr.io
@@ -405,6 +411,49 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          path: coverage-artifacts/
+
+      - name: Append coverage summary to job summary
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            function collectFiles(startDir, filename) {
+              const matches = [];
+              const stack = [startDir];
+              while (stack.length) {
+                const dir = stack.pop();
+                let entries;
+                try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { continue; }
+                for (const e of entries) {
+                  const full = path.join(dir, e.name);
+                  if (e.isDirectory()) stack.push(full);
+                  else if (e.isFile() && e.name === filename) matches.push(full);
+                }
+              }
+              return matches;
+            }
+            function fmtTotals(cov) {
+              if (!cov || !cov.total) return 'n/a';
+              const t = cov.total;
+              return `statements ${t.statements.pct}% | branches ${t.branches.pct}% | functions ${t.functions.pct}% | lines ${t.lines.pct}%`;
+            }
+            const root = path.join(process.cwd(), 'coverage-artifacts');
+            const summaries = collectFiles(root, 'coverage-summary.json');
+            const backendSummaryPath = summaries.find(p => p.includes('backend')) || summaries[0];
+            const frontendSummaryPath = summaries.find(p => p.includes('frontend')) || summaries[1] || summaries[0];
+            let backendCov = null, frontendCov = null;
+            try { backendCov = JSON.parse(fs.readFileSync(backendSummaryPath, 'utf8')); } catch {}
+            try { frontendCov = JSON.parse(fs.readFileSync(frontendSummaryPath, 'utf8')); } catch {}
+            const summary = `### Coverage Summary\n- Backend: ${fmtTotals(backendCov)}\n- Frontend: ${fmtTotals(frontendCov)}`;
+            core.summary.addRaw(summary).write();
+
       - name: Check CI status
         run: |
           if [ "${{ needs.backend-tests.result }}" = "failure" ] || [ "${{ needs.frontend-tests.result }}" = "failure" ]; then

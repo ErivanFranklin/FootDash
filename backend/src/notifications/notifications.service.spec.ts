@@ -89,4 +89,56 @@ describe('NotificationsService', () => {
       );
     });
   });
+
+  describe('diagnostics and sendMatchNotice', () => {
+    it('getTokenDiagnostics reports short tokens correctly', async () => {
+      const sampleTokens = [
+        { id: 1, token: 'a'.repeat(10) },
+        { id: 2, token: 'b'.repeat(60) },
+      ];
+      mockTokenRepository.find = jest.fn().mockResolvedValue(sampleTokens);
+
+      const diag = await service.getTokenDiagnostics();
+      expect(diag.total).toBe(2);
+      expect(diag.shortCount).toBe(1);
+      expect(Array.isArray(diag.short)).toBe(true);
+      expect(diag.short[0].id).toBe(1);
+    });
+
+    it('sendMatchNotice cleans up invalid tokens when response indicates invalid token', async () => {
+      // Prepare tokens
+      const tokens = [
+        { id: 1, token: 'validtoken1' },
+        { id: 2, token: 'invalidtoken' },
+      ];
+      mockTokenRepository.find = jest.fn().mockResolvedValue(tokens);
+      mockTokenRepository.remove = jest.fn().mockResolvedValue(true);
+
+      // Force service to consider messaging enabled and inject a fake messaging implementation
+      (service as any).enabled = true;
+      (service as any).debugEnabled = false;
+      const fakeResponse = {
+        successCount: 1,
+        failureCount: 1,
+        responses: [
+          { success: true },
+          { success: false, error: { message: 'Not registered', code: 'messaging/registration-token-not-registered' } },
+        ],
+      } as any;
+
+      (service as any).messaging = {
+        sendEachForMulticast: jest.fn().mockResolvedValue(fakeResponse),
+      };
+
+      // No webhook configured
+      (mockConfigService.get as jest.Mock).mockReturnValueOnce(null);
+
+      // Call sendMatchNotice
+      const match = { id: 123, homeTeam: { name: 'Home' }, awayTeam: { name: 'Away' } } as any;
+      await service.sendMatchNotice(match, 'result', 'Match ended');
+
+      // Should remove the invalid token
+      expect(mockTokenRepository.remove).toHaveBeenCalled();
+    });
+  });
 });

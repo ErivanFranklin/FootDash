@@ -87,6 +87,15 @@ export class InsightsGeneratorService {
       );
     }
 
+    // Win streak insights (moved up so it appears among the most relevant insights)
+    if (homeForm.recentForm.startsWith('W-W-W')) {
+      insights.push(`${homeTeamName} are on a winning streak`);
+    }
+
+    if (awayForm.recentForm.startsWith('W-W-W')) {
+      insights.push(`${awayTeamName} are on a winning streak`);
+    }
+
     // Defensive insights
     const homeDefense =
       homeStats.played > 0 ? homeStats.goalsAgainst / homeStats.played : 0;

@@ -164,6 +164,122 @@ describe('FormCalculatorService', () => {
     });
   });
 
+  describe('calculateHomeForm', () => {
+    it('should calculate form for home matches only', () => {
+      const matches = createMockMatches([
+        { homeScore: 3, awayScore: 1, isHome: true }, // Home win
+        { homeScore: 1, awayScore: 2, isHome: false }, // Away match (should be ignored)
+        { homeScore: 2, awayScore: 0, isHome: true }, // Home win
+        { homeScore: 0, awayScore: 1, isHome: true }, // Home loss
+      ]);
+
+      const result = service.calculateHomeForm(matches, 1, 5);
+
+      // Should only consider home matches: WWL
+      expect(result.matches).toHaveLength(3);
+      expect(result.form).toBe('WWL');
+    });
+  });
+
+  describe('calculateAwayForm', () => {
+    it('should calculate form for away matches only', () => {
+      const matches = createMockMatches([
+        { homeScore: 1, awayScore: 3, isHome: false }, // Away win
+        { homeScore: 3, awayScore: 1, isHome: true }, // Home match (should be ignored)
+        { homeScore: 2, awayScore: 0, isHome: false }, // Away loss
+        { homeScore: 0, awayScore: 1, isHome: false }, // Away win
+      ]);
+
+      const result = service.calculateAwayForm(matches, 1, 5);
+
+      // Should only consider away matches: WLW
+      expect(result.matches).toHaveLength(3);
+      expect(result.form).toBe('WLW');
+    });
+  });
+
+  describe('determineFormTrend', () => {
+    it('should return stable for insufficient data', () => {
+      expect(service.determineFormTrend([70])).toBe('stable');
+      expect(service.determineFormTrend([])).toBe('stable');
+    });
+
+    it('should detect upward trend', () => {
+      // First half: [30, 40] avg = 35, Second half: [60, 70] avg = 65, diff = 30 > 10
+      const result = service.determineFormTrend([30, 40, 60, 70]);
+      expect(result).toBe('up');
+    });
+
+    it('should detect downward trend', () => {
+      // First half: [70, 80] avg = 75, Second half: [40, 50] avg = 45, diff = -30 < -10
+      const result = service.determineFormTrend([70, 80, 40, 50]);
+      expect(result).toBe('down');
+    });
+
+    it('should detect stable trend', () => {
+      // First half: [50, 60] avg = 55, Second half: [55, 65] avg = 60, diff = 5 (not > 10 or < -10)
+      const result = service.determineFormTrend([50, 60, 55, 65]);
+      expect(result).toBe('stable');
+    });
+
+    it('should handle odd number of ratings', () => {
+      // First half: [40] avg = 40, Second half: [50, 60] avg = 55, diff = 15 > 10
+      const result = service.determineFormTrend([40, 50, 60]);
+      expect(result).toBe('up');
+    });
+  });
+
+  describe('getConfidenceLevel', () => {
+    it('should return low confidence for few matches', () => {
+      expect(service.getConfidenceLevel(2, 10)).toBe('low');
+      expect(service.getConfidenceLevel(1, 5)).toBe('low');
+    });
+
+    it('should return medium confidence for moderate matches', () => {
+      expect(service.getConfidenceLevel(4, 20)).toBe('medium');
+      expect(service.getConfidenceLevel(3, 15)).toBe('medium');
+    });
+
+    it('should return medium confidence for high variance', () => {
+      expect(service.getConfidenceLevel(10, 35)).toBe('medium'); // High variance
+      expect(service.getConfidenceLevel(8, 40)).toBe('medium'); // High variance
+    });
+
+    it('should return high confidence for many matches with low variance', () => {
+      expect(service.getConfidenceLevel(10, 20)).toBe('high');
+      expect(service.getConfidenceLevel(6, 15)).toBe('high');
+    });
+  });
+
+  describe('edge cases and trend coverage', () => {
+    it('should handle no recent matches trend', () => {
+      const result = service.calculateForm([], 1, 5);
+      expect(result.trend).toBe('No recent matches');
+    });
+
+    it('should cover line 108 with empty matches', () => {
+      // This specifically tests the matchDetails.length === 0 condition on line 108
+      const result = service.calculateForm([], 1, 5);
+      expect(result.trend).toBe('No recent matches');
+      expect(result.formRating).toBe(50);
+      expect(result.form).toBe('');
+    });
+
+    it('should handle less than 4 matches for trend analysis', () => {
+      const matches = createMockMatches([
+        { homeScore: 3, awayScore: 1, isHome: true }, // Win (3 points)
+        { homeScore: 2, awayScore: 2, isHome: true }, // Draw (1 point)
+        { homeScore: 0, awayScore: 1, isHome: true }, // Loss (0 points)
+      ]);
+
+      const result = service.calculateForm(matches, 1, 5);
+
+      // Should not analyze trend with < 4 matches, should classify by rating
+      // WDL = 4 points out of 9 = 44.44% -> 'consistent' category (40-74%)
+      expect(result.trend).toBe('consistent');
+    });
+  });
+
   // Helper functions
   function createMockMatches(
     configs: Array<{
