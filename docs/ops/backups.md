@@ -324,6 +324,13 @@ sftp user@backup-server <<< "put backup.sql"
 - Storage utilization
 - Recovery test results
 
+### CI Verification
+- A GitHub Actions workflow (`.github/workflows/backup-verify.yml`) performs automated backup and restore verification:
+  - Runs database migrations against a fresh Postgres service
+  - Creates a compressed `pg_dump` backup
+  - Restores into a new database and uploads verification artifacts
+  - Trigger via "Run workflow" with `workflow_dispatch` in GitHub
+
 ## Emergency Procedures
 
 ### Data Loss Incident Response
