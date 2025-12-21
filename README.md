@@ -11,7 +11,7 @@ A football dashboard application providing real-time match data, team statistics
 - **frontend/**: Ionic/Angular frontend (currently static scaffold)
 - **docker-compose.yml**: Local development composition with backend, frontend (nginx), and PostgreSQL database
 
-> **Note**: The legacy Express backend has been archived to `archive/backend-legacy/` after Phase B completion. See tag `v1.0.0-legacy-backend` for the last version with both backends.
+> **Note**: The legacy Express backend has been removed from the repo. See tag `v1.0.0-legacy-backend` for the last archived version.
 
 ## Quick Start (Local Development)
 

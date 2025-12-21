@@ -1,0 +1,23 @@
+name: k6 Smoke Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL of the API (e.g., https://api.example.com)'
+        required: true
+        default: 'http://localhost:3000'
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run k6 smoke
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: scripts/k6/smoke.js
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }}

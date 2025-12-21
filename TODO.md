@@ -201,3 +201,9 @@
 - [x] Troubleshooting guide
 - [x] Performance optimization tips
 - [x] Future enhancements roadmap
+
+### 🔼 Coverage Gates Roadmap
+- [x] Establish initial coverage thresholds (backend/frontend): statements 60%, branches 50%, functions 60%, lines 60%
+- [x] Add CI PR comment coverage summary (backend + frontend)
+- [ ] Raise thresholds to statements 70%, branches 60%, functions 70%, lines 70% after 3 consecutive green CI runs
+- [ ] Track coverage trend via Codecov dashboards; document baseline in `docs/ci-cd-pipeline.md`

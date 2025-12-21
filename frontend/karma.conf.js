@@ -30,8 +30,17 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' }
-      ]
+        { type: 'text-summary' },
+        { type: 'json-summary' }
+      ],
+      check: {
+        global: {
+          statements: 60,
+          branches: 50,
+          functions: 60,
+          lines: 60
+        }
+      }
     },
     reporters: ['progress', 'kjhtml', 'junit'],
     junitReporter: {

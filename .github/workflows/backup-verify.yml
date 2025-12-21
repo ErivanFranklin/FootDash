@@ -1,0 +1,69 @@
+name: Backup Verification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: footdash
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run migrations against service DB
+        working-directory: backend
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: password
+          DB_NAME: footdash
+        run: npm run migrate:run
+
+      - name: Create backup dump
+        env:
+          PGPASSWORD: password
+        run: |
+          pg_dump -h 127.0.0.1 -U postgres -d footdash -F c -b -v -f footdash_full.backup
+          ls -lh footdash_full.backup
+
+      - name: Restore into new database and validate
+        env:
+          PGPASSWORD: password
+        run: |
+          createdb -h 127.0.0.1 -U postgres footdash_restore
+          pg_restore -h 127.0.0.1 -U postgres -d footdash_restore footdash_full.backup
+          echo "Tables restored:" > restore_validation.txt
+          psql -h 127.0.0.1 -U postgres -d footdash_restore -c "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name;" >> restore_validation.txt
+
+      - name: Upload verification artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-verification
+          path: |
+            footdash_full.backup
+            restore_validation.txt

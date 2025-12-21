@@ -2,40 +2,17 @@
 
 This directory contains archived code from previous phases of the FootDash project.
 
-## `backend-legacy/`
+## Legacy Express Backend (Removed)
 
-The original Express.js backend implementation, archived after Phase B completion.
+The original Express.js backend implementation was archived after Phase B and has now been removed from the repository to reduce maintenance overhead.
 
-- **Archive Date**: January 2025
-- **Last Working Version**: See tag `v1.0.0-legacy-backend`
-- **Reason for Archive**: Fully replaced by the NestJS backend (`backend/`)
-- **Status**: No longer maintained, kept for historical reference
+- Last Working Version: See tag `v1.0.0-legacy-backend`
+- Replacement: Fully replaced by the NestJS backend (`backend/`)
 
-### Key Features (Historical)
-
-The legacy backend provided:
-- JWT authentication (register, login, refresh, logout)
-- User management
-- Match and team data integration with football-data.org API
-- Basic REST API endpoints
-
-All functionality has been migrated to the NestJS backend with:
-- Better type safety (TypeScript)
-- Improved architecture (modules, dependency injection)
-- Enhanced testing (e2e test coverage)
-- Better documentation (Swagger/OpenAPI)
-
-### Reference
-
-If you need to reference the legacy implementation:
+To reference the legacy code, use the tag:
 ```bash
 # View the last working version
 git checkout v1.0.0-legacy-backend
-
-# Compare with current implementation
-git diff v1.0.0-legacy-backend:backend/ main:backend/
 ```
-
----
 
 For current development, see `backend/` directory and the main project README.
