@@ -171,6 +171,7 @@
 - [x] Security scanning with Trivy and npm audit
 - [x] Code coverage reporting with Codecov integration
 - [x] Test result publishing and PR comments
+- [x] Coverage summaries in PR comments and CI job summary
 - [x] Final CI status aggregation
 
 **Production Deployment Workflow (`deploy-production.yml`):**
@@ -207,3 +208,7 @@
 - [x] Add CI PR comment coverage summary (backend + frontend)
 - [ ] Raise thresholds to statements 70%, branches 60%, functions 70%, lines 70% after 3 consecutive green CI runs
 - [ ] Track coverage trend via Codecov dashboards; document baseline in `docs/ci-cd-pipeline.md`
+
+### ✅ CI Utility Workflows (COMPLETE)
+- [x] k6 Smoke Test Workflow (`.github/workflows/loadtest-k6.yml`) — manual dispatch with `base_url`
+- [x] Backup Verification Workflow (`.github/workflows/backup-verify.yml`) — manual dispatch, uploads `backup-verification` artifact
