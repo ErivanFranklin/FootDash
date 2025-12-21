@@ -7,6 +7,7 @@ import { Reaction } from './entities/reaction.entity';
 import { Follow } from './entities/follow.entity';
 import { UserActivity } from './entities/user-activity.entity';
 import { Report } from './entities/report.entity';
+import { Alert } from './entities/alert.entity';
 
 // Services
 import { CommentsService } from './services/comments.service';
@@ -14,6 +15,8 @@ import { ReactionsService } from './services/reactions.service';
 import { FollowService } from './services/follow.service';
 import { FeedService } from './services/feed.service';
 import { ReportsService } from './services/reports.service';
+import { ProfanityFilterService } from './services/profanity-filter.service';
+import { AlertsService } from './services/alerts.service';
 
 // Controllers
 import { CommentsController } from './controllers/comments.controller';
@@ -21,6 +24,7 @@ import { ReactionsController } from './controllers/reactions.controller';
 import { FollowController } from './controllers/follow.controller';
 import { FeedController } from './controllers/feed.controller';
 import { ReportsController } from './controllers/reports.controller';
+import { AlertsController } from './controllers/alerts.controller';
 
 // External dependencies
 import { UsersModule } from '../users/users.module';
@@ -29,7 +33,14 @@ import { WebsocketsModule } from '../websockets/websockets.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment, Reaction, Follow, UserActivity, Report]),
+    TypeOrmModule.forFeature([
+      Comment,
+      Reaction,
+      Follow,
+      UserActivity,
+      Report,
+      Alert,
+    ]),
     UsersModule,
     MatchesModule,
     WebsocketsModule,
@@ -40,6 +51,7 @@ import { WebsocketsModule } from '../websockets/websockets.module';
     FollowController,
     FeedController,
     ReportsController,
+    AlertsController,
   ],
   providers: [
     CommentsService,
@@ -47,6 +59,8 @@ import { WebsocketsModule } from '../websockets/websockets.module';
     FollowService,
     FeedService,
     ReportsService,
+    ProfanityFilterService,
+    AlertsService,
   ],
   exports: [
     CommentsService,
@@ -54,6 +68,8 @@ import { WebsocketsModule } from '../websockets/websockets.module';
     FollowService,
     FeedService,
     ReportsService,
+    ProfanityFilterService,
+    AlertsService,
   ],
 })
 export class SocialModule {}

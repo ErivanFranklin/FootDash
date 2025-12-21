@@ -13,6 +13,9 @@ import {
   PaginatedCommentsDto,
 } from '../dto/comment.dto';
 import { PaginationQueryDto } from '../dto/pagination.dto';
+import { AlertsService } from './alerts.service';
+import { UserProfileService } from '../../users/services/user-profile.service';
+import { extractMentions, snippetAround } from '../utils/mention-parser';
 import { SocialGateway } from '../../websockets/social.gateway';
 
 @Injectable()
@@ -21,6 +24,8 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
     private readonly socialGateway: SocialGateway,
+    private readonly alertsService: AlertsService,
+    private readonly userProfileService: UserProfileService,
   ) {}
 
   async createComment(userId: number, dto: CreateCommentDto): Promise<Comment> {
@@ -50,6 +55,25 @@ export class CommentsService {
     });
 
     const savedComment = await this.commentRepository.save(comment);
+
+    // Detect mentions and create alerts for mentioned users
+    const mentions = extractMentions(dto.content);
+    if (mentions.length > 0) {
+      // Resolve display names to user IDs (case-insensitive)
+      const resolved =
+        await this.userProfileService.findUserIdsByDisplayNames(mentions);
+      for (const uname of mentions) {
+        const mentionedUserId = resolved.get(uname);
+        if (mentionedUserId && mentionedUserId !== userId) {
+          await this.alertsService.createMentionAlert({
+            mentionedUserId,
+            authorUserId: userId,
+            commentId: savedComment.id,
+            snippet: snippetAround(dto.content, uname),
+          });
+        }
+      }
+    }
 
     // Broadcast real-time comment event
     const targetType = dto.matchId ? 'match' : 'prediction';
@@ -211,11 +235,15 @@ export class CommentsService {
 
   private async toResponseDto(comment: Comment): Promise<CommentResponseDto> {
     const replyCount = await this.getReplyCount(comment.id);
+    const userName = await this.userProfileService.getDisplayNameFallback(
+      comment.userId,
+      comment.user?.email,
+    );
 
     return {
       id: comment.id,
       userId: comment.userId,
-      userName: comment.user?.email || 'Unknown',
+      userName,
       matchId: comment.matchId,
       predictionId: comment.predictionId,
       parentCommentId: comment.parentCommentId,

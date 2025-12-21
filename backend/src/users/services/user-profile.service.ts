@@ -72,4 +72,42 @@ export class UserProfileService {
     profile.avatarUrl = null;
     return this.profileRepository.save(profile);
   }
+
+  /**
+   * Resolve user IDs by display names (case-insensitive). Returns a map of lowercased displayName -> userId
+   */
+  async findUserIdsByDisplayNames(
+    displayNames: string[],
+  ): Promise<Map<string, number>> {
+    if (!displayNames.length) return new Map();
+    const namesLower = displayNames.map((n) => n.toLowerCase());
+    const qb = this.profileRepository
+      .createQueryBuilder('p')
+      .select(['p.userId as userId', 'LOWER(p.displayName) as name'])
+      .where('p.displayName IS NOT NULL')
+      .andWhere('LOWER(p.displayName) IN (:...names)', { names: namesLower });
+    const rows = await qb.getRawMany();
+    const map = new Map<string, number>();
+    for (const r of rows) {
+      map.set(r.name, Number(r.userId));
+    }
+    return map;
+  }
+
+  /**
+   * Return displayName if available, else fallback to email local-part or 'Unknown'.
+   * Does not throw if profile missing.
+   */
+  async getDisplayNameFallback(
+    userId: number,
+    email?: string,
+  ): Promise<string> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+    if (profile?.displayName) return profile.displayName;
+    if (email) {
+      const local = email.split('@')[0];
+      if (local) return local;
+    }
+    return 'Unknown';
+  }
 }

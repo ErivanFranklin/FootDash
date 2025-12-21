@@ -5,6 +5,11 @@ import {
   ActivityTargetType,
 } from '../entities/user-activity.entity';
 
+export enum FeedType {
+  FOLLOWING = 'following',
+  GLOBAL = 'global',
+}
+
 export class ActivityResponseDto {
   id: number;
   userId: number;
@@ -42,6 +47,10 @@ export class FeedQueryDto {
   @IsOptional()
   @IsEnum(ActivityType)
   activityType?: ActivityType;
+
+  @IsOptional()
+  @IsEnum(FeedType)
+  feedType?: FeedType = FeedType.FOLLOWING;
 }
 
 export class CreateActivityDto {

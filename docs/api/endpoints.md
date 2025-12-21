@@ -16,6 +16,92 @@ security:
   - bearerAuth: []
 
 paths:
+  /alerts/unread:
+    get:
+      summary: Get unread alerts for current user
+      tags:
+        - Alerts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Unread alerts including mention alerts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  alerts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 101
+                        alertType:
+                          type: string
+                          example: mention
+                        title:
+                          type: string
+                          example: You were mentioned in a comment
+                        message:
+                          type: string
+                          example: "Hi @alice, check this match"
+                        relatedEntityType:
+                          type: string
+                          example: comment
+                        relatedEntityId:
+                          type: integer
+                          example: 42
+                        relatedUserId:
+                          type: integer
+                          example: 7
+                        isRead:
+                          type: boolean
+                          example: false
+
+  /alerts/counts/by-type:
+    get:
+      summary: Get alert counts grouped by type
+      tags:
+        - Alerts
+      responses:
+        '200':
+          description: Counts per type including mention
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  counts:
+                    type: object
+                    properties:
+                      follower:
+                        type: integer
+                        example: 2
+                      reaction:
+                        type: integer
+                        example: 5
+                      comment:
+                        type: integer
+                        example: 3
+                      mention:
+                        type: integer
+                        example: 1
+                      system:
+                        type: integer
+                        example: 0
   /auth/register:
     post:
       summary: Register a new user

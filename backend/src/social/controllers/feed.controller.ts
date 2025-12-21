@@ -7,7 +7,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { FeedService } from '../services/feed.service';
-import { FeedQueryDto } from '../dto/activity.dto';
+import { FeedQueryDto, FeedType } from '../dto/activity.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('feed')
@@ -21,6 +21,13 @@ export class FeedController {
     @Query() query: FeedQueryDto,
   ) {
     const userId = req.user.sub;
+
+    // Route to global or personalized feed based on feedType query param
+    if (query.feedType === FeedType.GLOBAL) {
+      const result = await this.feedService.getGlobalFeed(query);
+      return { success: true, ...result };
+    }
+
     const result = await this.feedService.getUserFeed(userId, query);
     return { success: true, ...result };
   }
