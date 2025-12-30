@@ -44,8 +44,12 @@ describe('MatchPredictionService', () => {
         {
           provide: StatisticalAnalysisService,
           useValue: {
-            calculatePerformanceStats: jest.fn().mockReturnValue({ winPercentage: 50 }),
-            analyzeHeadToHead: jest.fn().mockReturnValue({ homeWins: 1, awayWins: 1, draws: 1 }),
+            calculatePerformanceStats: jest
+              .fn()
+              .mockReturnValue({ winPercentage: 50 }),
+            analyzeHeadToHead: jest
+              .fn()
+              .mockReturnValue({ homeWins: 1, awayWins: 1, draws: 1 }),
           },
         },
         {

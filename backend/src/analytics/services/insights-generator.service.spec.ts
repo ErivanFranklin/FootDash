@@ -20,7 +20,9 @@ describe('InsightsGeneratorService', () => {
 
     // Expect multiple insights including form, h2h dominance, scoring and win streak
     expect(insights.some((s) => s.includes('excellent form'))).toBe(true);
-    expect(insights.some((s) => s.includes('dominated recent meetings'))).toBe(true);
+    expect(insights.some((s) => s.includes('dominated recent meetings'))).toBe(
+      true,
+    );
     expect(insights.some((s) => s.includes('prolific scorers'))).toBe(true);
     expect(insights.some((s) => s.includes('winning streak'))).toBe(true);
     expect(insights.length).toBeGreaterThan(0);
@@ -28,15 +30,30 @@ describe('InsightsGeneratorService', () => {
 
   it('determines confidence levels correctly', () => {
     expect(
-      service.determineConfidence({ homeMatchCount: 1, awayMatchCount: 5, h2hCount: 0, formConsistency: 50 }),
+      service.determineConfidence({
+        homeMatchCount: 1,
+        awayMatchCount: 5,
+        h2hCount: 0,
+        formConsistency: 50,
+      }),
     ).toBe('low');
 
     expect(
-      service.determineConfidence({ homeMatchCount: 12, awayMatchCount: 11, h2hCount: 4, formConsistency: 80 }),
+      service.determineConfidence({
+        homeMatchCount: 12,
+        awayMatchCount: 11,
+        h2hCount: 4,
+        formConsistency: 80,
+      }),
     ).toBe('high');
 
     expect(
-      service.determineConfidence({ homeMatchCount: 5, awayMatchCount: 5, h2hCount: 0, formConsistency: 50 }),
+      service.determineConfidence({
+        homeMatchCount: 5,
+        awayMatchCount: 5,
+        h2hCount: 0,
+        formConsistency: 50,
+      }),
     ).toBe('medium');
   });
 
@@ -52,11 +69,19 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'up', average: 2.5 },
       });
 
-      expect(insights.some(s => s.includes('TestFC are in excellent form'))).toBe(true);
-      expect(insights.some(s => s.includes('Much stronger at home'))).toBe(true);
-      expect(insights.some(s => s.includes('Goals scoring is trending upward'))).toBe(true);
-      expect(insights.some(s => s.includes('Exceptional goal difference'))).toBe(true);
-      expect(insights.some(s => s.includes('Impressive'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('TestFC are in excellent form')),
+      ).toBe(true);
+      expect(insights.some((s) => s.includes('Much stronger at home'))).toBe(
+        true,
+      );
+      expect(
+        insights.some((s) => s.includes('Goals scoring is trending upward')),
+      ).toBe(true);
+      expect(
+        insights.some((s) => s.includes('Exceptional goal difference')),
+      ).toBe(true);
+      expect(insights.some((s) => s.includes('Impressive'))).toBe(true);
     });
 
     it('generates insights for struggling team form', () => {
@@ -69,11 +94,21 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'down', average: 0.8 },
       });
 
-      expect(insights.some(s => s.includes('PoorFC are struggling for form'))).toBe(true);
-      expect(insights.some(s => s.includes('Surprisingly better away from home'))).toBe(true);
-      expect(insights.some(s => s.includes('Struggling to find the net recently'))).toBe(true);
-      expect(insights.some(s => s.includes('Poor goal difference'))).toBe(true);
-      expect(insights.some(s => s.includes('Struggling with only'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('PoorFC are struggling for form')),
+      ).toBe(true);
+      expect(
+        insights.some((s) => s.includes('Surprisingly better away from home')),
+      ).toBe(true);
+      expect(
+        insights.some((s) => s.includes('Struggling to find the net recently')),
+      ).toBe(true);
+      expect(insights.some((s) => s.includes('Poor goal difference'))).toBe(
+        true,
+      );
+      expect(insights.some((s) => s.includes('Struggling with only'))).toBe(
+        true,
+      );
     });
 
     it('generates insights for stable scoring trend', () => {
@@ -87,14 +122,18 @@ describe('InsightsGeneratorService', () => {
       });
 
       // Should not include form, home/away advantage, scoring trend, goal difference, or win percentage insights
-      expect(insights.some(s => s.includes('excellent form'))).toBe(false);
-      expect(insights.some(s => s.includes('struggling for form'))).toBe(false);
-      expect(insights.some(s => s.includes('stronger at home'))).toBe(false);
-      expect(insights.some(s => s.includes('better away'))).toBe(false);
-      expect(insights.some(s => s.includes('trending'))).toBe(false);
-      expect(insights.some(s => s.includes('Struggling to find'))).toBe(false);
-      expect(insights.some(s => s.includes('goal difference'))).toBe(false);
-      expect(insights.some(s => s.includes('win rate'))).toBe(false);
+      expect(insights.some((s) => s.includes('excellent form'))).toBe(false);
+      expect(insights.some((s) => s.includes('struggling for form'))).toBe(
+        false,
+      );
+      expect(insights.some((s) => s.includes('stronger at home'))).toBe(false);
+      expect(insights.some((s) => s.includes('better away'))).toBe(false);
+      expect(insights.some((s) => s.includes('trending'))).toBe(false);
+      expect(insights.some((s) => s.includes('Struggling to find'))).toBe(
+        false,
+      );
+      expect(insights.some((s) => s.includes('goal difference'))).toBe(false);
+      expect(insights.some((s) => s.includes('win rate'))).toBe(false);
     });
 
     it('limits team insights to maximum of 5', () => {
@@ -120,7 +159,9 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'stable', average: 1.5 },
       });
 
-      expect(insights1.some(s => s.includes('Much stronger at home'))).toBe(true);
+      expect(insights1.some((s) => s.includes('Much stronger at home'))).toBe(
+        true,
+      );
 
       const insights2 = service.generateTeamInsights({
         teamName: 'EdgeFC',
@@ -131,7 +172,9 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'stable', average: 1.5 },
       });
 
-      expect(insights2.some(s => s.includes('Surprisingly better away from home'))).toBe(true);
+      expect(
+        insights2.some((s) => s.includes('Surprisingly better away from home')),
+      ).toBe(true);
     });
 
     it('handles edge cases for goal difference', () => {
@@ -144,7 +187,9 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'stable', average: 1.5 },
       });
 
-      expect(insights1.some(s => s.includes('Exceptional goal difference'))).toBe(true);
+      expect(
+        insights1.some((s) => s.includes('Exceptional goal difference')),
+      ).toBe(true);
 
       const insights2 = service.generateTeamInsights({
         teamName: 'EdgeFC',
@@ -155,7 +200,9 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'stable', average: 1.5 },
       });
 
-      expect(insights2.some(s => s.includes('Poor goal difference'))).toBe(true);
+      expect(insights2.some((s) => s.includes('Poor goal difference'))).toBe(
+        true,
+      );
     });
 
     it('handles edge cases for win percentage', () => {
@@ -168,7 +215,7 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'stable', average: 1.5 },
       });
 
-      expect(insights1.some(s => s.includes('Impressive'))).toBe(true);
+      expect(insights1.some((s) => s.includes('Impressive'))).toBe(true);
 
       const insights2 = service.generateTeamInsights({
         teamName: 'EdgeFC',
@@ -179,7 +226,9 @@ describe('InsightsGeneratorService', () => {
         scoringTrend: { trend: 'stable', average: 1.5 },
       });
 
-      expect(insights2.some(s => s.includes('Struggling with only'))).toBe(true);
+      expect(insights2.some((s) => s.includes('Struggling with only'))).toBe(
+        true,
+      );
     });
   });
 
@@ -196,7 +245,9 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('AwayFC are in excellent form'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('AwayFC are in excellent form')),
+      ).toBe(true);
     });
 
     it('generates insights for struggling teams', () => {
@@ -210,8 +261,16 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('HomeFC are struggling with recent form'))).toBe(true);
-      expect(insights.some((s) => s.includes('AwayFC are struggling with recent form'))).toBe(true);
+      expect(
+        insights.some((s) =>
+          s.includes('HomeFC are struggling with recent form'),
+        ),
+      ).toBe(true);
+      expect(
+        insights.some((s) =>
+          s.includes('AwayFC are struggling with recent form'),
+        ),
+      ).toBe(true);
     });
 
     it('generates head-to-head insights for away team dominance', () => {
@@ -225,7 +284,11 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('AwayFC have the upper hand historically'))).toBe(true);
+      expect(
+        insights.some((s) =>
+          s.includes('AwayFC have the upper hand historically'),
+        ),
+      ).toBe(true);
     });
 
     it('generates insights for closely contested matches', () => {
@@ -239,7 +302,11 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('Recent meetings have been closely contested'))).toBe(true);
+      expect(
+        insights.some((s) =>
+          s.includes('Recent meetings have been closely contested'),
+        ),
+      ).toBe(true);
     });
 
     it('generates defensive insights for strong defenses', () => {
@@ -253,8 +320,12 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('HomeFC have a strong defense'))).toBe(true);
-      expect(insights.some((s) => s.includes('AwayFC have a solid defense'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('HomeFC have a strong defense')),
+      ).toBe(true);
+      expect(
+        insights.some((s) => s.includes('AwayFC have a solid defense')),
+      ).toBe(true);
     });
 
     it('generates defensive insights for poor defenses', () => {
@@ -268,8 +339,12 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('HomeFC have defensive concerns'))).toBe(true);
-      expect(insights.some((s) => s.includes('AwayFC have been leaking goals'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('HomeFC have defensive concerns')),
+      ).toBe(true);
+      expect(
+        insights.some((s) => s.includes('AwayFC have been leaking goals')),
+      ).toBe(true);
     });
 
     it('generates away team winning streak insight', () => {
@@ -283,7 +358,9 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('AwayFC are on a winning streak'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('AwayFC are on a winning streak')),
+      ).toBe(true);
     });
 
     it('handles teams with no played matches', () => {
@@ -316,8 +393,12 @@ describe('InsightsGeneratorService', () => {
       });
 
       // Should not contain any h2h insights
-      expect(insights.some((s) => s.includes('dominated recent meetings'))).toBe(false);
-      expect(insights.some((s) => s.includes('upper hand historically'))).toBe(false);
+      expect(
+        insights.some((s) => s.includes('dominated recent meetings')),
+      ).toBe(false);
+      expect(insights.some((s) => s.includes('upper hand historically'))).toBe(
+        false,
+      );
       expect(insights.some((s) => s.includes('closely contested'))).toBe(false);
     });
 
@@ -332,7 +413,9 @@ describe('InsightsGeneratorService', () => {
         awayTeamName: 'AwayFC',
       });
 
-      expect(insights.some((s) => s.includes('AwayFC are prolific scorers'))).toBe(true);
+      expect(
+        insights.some((s) => s.includes('AwayFC are prolific scorers')),
+      ).toBe(true);
     });
 
     it('limits insights to maximum of 5', () => {

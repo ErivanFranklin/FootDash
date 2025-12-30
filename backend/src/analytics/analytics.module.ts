@@ -20,10 +20,20 @@ import { DataExportController } from './controllers/data-export.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MatchPrediction, TeamAnalytics, PredictionPerformance, Match, Team]),
+    TypeOrmModule.forFeature([
+      MatchPrediction,
+      TeamAnalytics,
+      PredictionPerformance,
+      Match,
+      Team,
+    ]),
     HttpModule,
   ],
-  controllers: [PredictionsController, TeamAnalyticsController, DataExportController],
+  controllers: [
+    PredictionsController,
+    TeamAnalyticsController,
+    DataExportController,
+  ],
   providers: [
     FormCalculatorService,
     StatisticalAnalysisService,
@@ -34,6 +44,11 @@ import { DataExportController } from './controllers/data-export.controller';
     PredictionStrategyService,
     DataExportService,
   ],
-  exports: [MatchPredictionService, TeamAnalyticsService, PredictionStrategyService, DataExportService],
+  exports: [
+    MatchPredictionService,
+    TeamAnalyticsService,
+    PredictionStrategyService,
+    DataExportService,
+  ],
 })
 export class AnalyticsModule {}

@@ -33,7 +33,7 @@ export class PredictionStrategyService {
     forceRecalculate = false,
   ): Promise<PredictionResult> {
     const strategy = this.determineStrategy(matchId);
-    
+
     this.logger.debug(`Using ${strategy} strategy for match ${matchId}`);
 
     try {
@@ -44,11 +44,17 @@ export class PredictionStrategyService {
           prediction = await this.getMLPrediction(matchId);
           break;
         case PredictionStrategy.HYBRID:
-          prediction = await this.getHybridPrediction(matchId, forceRecalculate);
+          prediction = await this.getHybridPrediction(
+            matchId,
+            forceRecalculate,
+          );
           break;
         case PredictionStrategy.STATISTICAL:
         default:
-          prediction = await this.getStatisticalPrediction(matchId, forceRecalculate);
+          prediction = await this.getStatisticalPrediction(
+            matchId,
+            forceRecalculate,
+          );
           break;
       }
 
@@ -57,13 +63,24 @@ export class PredictionStrategyService {
 
       return prediction;
     } catch (error) {
-      this.logger.error(`${strategy} prediction failed for match ${matchId}: ${error.message}`);
-      
+      this.logger.error(
+        `${strategy} prediction failed for match ${matchId}: ${error.message}`,
+      );
+
       // Fallback to statistical prediction
       if (strategy !== PredictionStrategy.STATISTICAL) {
-        this.logger.log(`Falling back to statistical prediction for match ${matchId}`);
-        const fallbackPrediction = await this.getStatisticalPrediction(matchId, forceRecalculate);
-        await this.trackPrediction(matchId, PredictionStrategy.STATISTICAL, fallbackPrediction);
+        this.logger.log(
+          `Falling back to statistical prediction for match ${matchId}`,
+        );
+        const fallbackPrediction = await this.getStatisticalPrediction(
+          matchId,
+          forceRecalculate,
+        );
+        await this.trackPrediction(
+          matchId,
+          PredictionStrategy.STATISTICAL,
+          fallbackPrediction,
+        );
         return fallbackPrediction;
       }
 
@@ -78,7 +95,10 @@ export class PredictionStrategyService {
     matchId: number,
     forceRecalculate: boolean,
   ): Promise<PredictionResult> {
-    const prediction = await this.statisticalService.getPrediction(matchId, forceRecalculate);
+    const prediction = await this.statisticalService.getPrediction(
+      matchId,
+      forceRecalculate,
+    );
     prediction.metadata = {
       ...prediction.metadata,
       model_type: 'statistical',
@@ -90,9 +110,7 @@ export class PredictionStrategyService {
   /**
    * Get ML prediction
    */
-  private async getMLPrediction(
-    matchId: number,
-  ): Promise<PredictionResult> {
+  private async getMLPrediction(matchId: number): Promise<PredictionResult> {
     // Check if ML service is available
     const isMLHealthy = await this.mlService.checkMLServiceHealth();
     if (!isMLHealthy) {
@@ -100,28 +118,35 @@ export class PredictionStrategyService {
     }
 
     // Get match data (similar to statistical service)
-    const matchData = await this.statisticalService.getMatchDataForPrediction(matchId);
+    const matchData =
+      await this.statisticalService.getMatchDataForPrediction(matchId);
     const mlRequest = this.mlService.prepareMLRequest(matchData);
-    
-    const predictionResult = await this.mlService.generateMLPrediction(mlRequest);
+
+    const predictionResult =
+      await this.mlService.generateMLPrediction(mlRequest);
 
     const match = matchData.match;
 
-    const mostLikely = (Object.keys(predictionResult) as (keyof typeof predictionResult)[]).reduce((a, b) => predictionResult[a] > predictionResult[b] ? a : b);
+    const mostLikely = (
+      Object.keys(predictionResult) as (keyof typeof predictionResult)[]
+    ).reduce((a, b) => (predictionResult[a] > predictionResult[b] ? a : b));
 
     const finalPrediction: PredictionResult = {
       ...predictionResult,
       matchId: match.id,
       homeTeam: match.homeTeam.name,
       awayTeam: match.awayTeam.name,
-      mostLikely: mostLikely.replace('Probability', '').replace('Win', '').toLowerCase() as 'home' | 'draw' | 'away',
+      mostLikely: mostLikely
+        .replace('Probability', '')
+        .replace('Win', '')
+        .toLowerCase() as 'home' | 'draw' | 'away',
       createdAt: new Date(),
       metadata: {
         ...(predictionResult.metadata || {}),
         strategy: PredictionStrategy.ML,
       },
     };
-    
+
     return finalPrediction;
   }
 
@@ -140,7 +165,10 @@ export class PredictionStrategyService {
       ]);
 
       // If both succeed, blend the results
-      if (statisticalPred.status === 'fulfilled' && mlPred.status === 'fulfilled') {
+      if (
+        statisticalPred.status === 'fulfilled' &&
+        mlPred.status === 'fulfilled'
+      ) {
         return this.blendPredictions(statisticalPred.value, mlPred.value);
       }
 
@@ -155,7 +183,9 @@ export class PredictionStrategyService {
       // If both fail, throw error
       throw new Error('Both statistical and ML predictions failed');
     } catch (error) {
-      this.logger.error(`Hybrid prediction failed for match ${matchId}: ${error.message}`);
+      this.logger.error(
+        `Hybrid prediction failed for match ${matchId}: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -172,15 +202,20 @@ export class PredictionStrategyService {
     const statWeight = 1 - mlWeight;
 
     const blendedProbs = {
-      homeWinProbability: 
-        ml.homeWinProbability * mlWeight + statistical.homeWinProbability * statWeight,
-      drawProbability: 
-        ml.drawProbability * mlWeight + statistical.drawProbability * statWeight,
-      awayWinProbability: 
-        ml.awayWinProbability * mlWeight + statistical.awayWinProbability * statWeight,
+      homeWinProbability:
+        ml.homeWinProbability * mlWeight +
+        statistical.homeWinProbability * statWeight,
+      drawProbability:
+        ml.drawProbability * mlWeight +
+        statistical.drawProbability * statWeight,
+      awayWinProbability:
+        ml.awayWinProbability * mlWeight +
+        statistical.awayWinProbability * statWeight,
     };
 
-    const mostLikely = (Object.keys(blendedProbs) as (keyof typeof blendedProbs)[]).reduce((a, b) => blendedProbs[a] > blendedProbs[b] ? a : b);
+    const mostLikely = (
+      Object.keys(blendedProbs) as (keyof typeof blendedProbs)[]
+    ).reduce((a, b) => (blendedProbs[a] > blendedProbs[b] ? a : b));
 
     return {
       ...blendedProbs,
@@ -188,8 +223,14 @@ export class PredictionStrategyService {
       homeTeam: ml.homeTeam,
       awayTeam: ml.awayTeam,
       confidence: this.blendConfidence(ml.confidence, statistical.confidence),
-      insights: [...(ml.insights || []).slice(0, 3), ...(statistical.insights || []).slice(0, 2)],
-      mostLikely: mostLikely.replace('Probability', '').replace('Win', '').toLowerCase() as 'home' | 'draw' | 'away',
+      insights: [
+        ...(ml.insights || []).slice(0, 3),
+        ...(statistical.insights || []).slice(0, 2),
+      ],
+      mostLikely: mostLikely
+        .replace('Probability', '')
+        .replace('Win', '')
+        .toLowerCase() as 'home' | 'draw' | 'away',
       createdAt: new Date(),
       metadata: {
         model_type: 'hybrid',
@@ -206,17 +247,23 @@ export class PredictionStrategyService {
    * Determine which strategy to use for a given match
    */
   private determineStrategy(matchId: number): PredictionStrategy {
-    const abTestEnabled = this.configService.get<boolean>('ML_AB_TEST_ENABLED', false);
+    const abTestEnabled = this.configService.get<boolean>(
+      'ML_AB_TEST_ENABLED',
+      false,
+    );
     if (!abTestEnabled) {
       return PredictionStrategy.STATISTICAL;
     }
 
-    const strategy = this.configService.get<string>('DEFAULT_PREDICTION_STRATEGY', 'statistical');
-    
+    const strategy = this.configService.get<string>(
+      'DEFAULT_PREDICTION_STRATEGY',
+      'statistical',
+    );
+
     // A/B testing logic
     if (strategy === 'ab_test') {
       const mlPercentage = this.configService.get<number>('ML_PERCENTAGE', 50);
-      const useML = (matchId % 100) < mlPercentage;
+      const useML = matchId % 100 < mlPercentage;
       return useML ? PredictionStrategy.ML : PredictionStrategy.STATISTICAL;
     }
 
@@ -259,7 +306,9 @@ export class PredictionStrategyService {
 
       await this.performanceRepository.save(performance);
     } catch (error) {
-      this.logger.error(`Failed to track prediction performance: ${error.message}`);
+      this.logger.error(
+        `Failed to track prediction performance: ${error.message}`,
+      );
       // Don't throw error, as this shouldn't fail the prediction
     }
   }
@@ -314,14 +363,17 @@ export class PredictionStrategyService {
     }
 
     const results = await query.getRawMany();
-    
-    return results.map(result => ({
+
+    return results.map((result) => ({
       model_type: result.model_type,
       total_predictions: parseInt(result.total_predictions),
       correct_predictions: parseInt(result.correct_predictions || 0),
-      accuracy: result.total_predictions > 0 
-        ? (parseInt(result.correct_predictions || 0) / parseInt(result.total_predictions)) * 100 
-        : 0,
+      accuracy:
+        result.total_predictions > 0
+          ? (parseInt(result.correct_predictions || 0) /
+              parseInt(result.total_predictions)) *
+            100
+          : 0,
       avg_confidence: parseFloat(result.avg_confidence || 0),
     }));
   }

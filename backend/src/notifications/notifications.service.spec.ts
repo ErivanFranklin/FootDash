@@ -122,7 +122,13 @@ describe('NotificationsService', () => {
         failureCount: 1,
         responses: [
           { success: true },
-          { success: false, error: { message: 'Not registered', code: 'messaging/registration-token-not-registered' } },
+          {
+            success: false,
+            error: {
+              message: 'Not registered',
+              code: 'messaging/registration-token-not-registered',
+            },
+          },
         ],
       } as any;
 
@@ -134,7 +140,11 @@ describe('NotificationsService', () => {
       (mockConfigService.get as jest.Mock).mockReturnValueOnce(null);
 
       // Call sendMatchNotice
-      const match = { id: 123, homeTeam: { name: 'Home' }, awayTeam: { name: 'Away' } } as any;
+      const match = {
+        id: 123,
+        homeTeam: { name: 'Home' },
+        awayTeam: { name: 'Away' },
+      } as any;
       await service.sendMatchNotice(match, 'result', 'Match ended');
 
       // Should remove the invalid token

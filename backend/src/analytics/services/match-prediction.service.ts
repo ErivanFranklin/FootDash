@@ -425,7 +425,7 @@ export class MatchPredictionService {
         league: match.league,
         season: match.season,
         kickOff: match.kickOff,
-      }
+      },
     };
   }
 }

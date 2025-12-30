@@ -79,6 +79,9 @@ export class PredictionsController {
     @Query('strategy') strategy?: string,
     @Query('limit', ParseIntPipe) limit = 100,
   ) {
-    return await this.strategyService.getPredictionStats(strategy as any, limit);
+    return await this.strategyService.getPredictionStats(
+      strategy as any,
+      limit,
+    );
   }
 }

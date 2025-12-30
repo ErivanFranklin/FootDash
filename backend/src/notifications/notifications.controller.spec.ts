@@ -1,14 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../app.module';
+import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from './notifications.service';
 
 describe('NotificationsController (e2e-like)', () => {
   let app: INestApplication;
+  const mockDiagnostics = { total: 10, shortCount: 2, short: [] };
+  const notificationsServiceMock = {
+    getTokenDiagnostics: jest.fn().mockResolvedValue(mockDiagnostics),
+    registerToken: jest.fn(),
+  } as Partial<NotificationsService>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      controllers: [NotificationsController],
+      providers: [
+        {
+          provide: NotificationsService,
+          useValue: notificationsServiceMock,
+        },
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();

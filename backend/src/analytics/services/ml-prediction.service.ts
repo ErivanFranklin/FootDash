@@ -2,7 +2,6 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import { PredictionResult } from '../interfaces/analytics.interface';
 
 export interface MLPredictionRequest {
   home_form_rating: number;
@@ -66,7 +65,10 @@ export class MLPredictionService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.mlApiUrl = this.configService.get<string>('ML_SERVICE_URL', 'http://localhost:8000');
+    this.mlApiUrl = this.configService.get<string>(
+      'ML_SERVICE_URL',
+      'http://localhost:8000',
+    );
     this.logger.log(`ML Service URL configured: ${this.mlApiUrl}`);
   }
 
@@ -99,7 +101,7 @@ export class MLPredictionService {
       return this.transformMLResponse(response.data, request);
     } catch (error) {
       this.logger.error(`ML prediction failed: ${error.message}`);
-      
+
       if (error instanceof HttpException) {
         throw error;
       }
@@ -129,18 +131,21 @@ export class MLPredictionService {
         }),
       );
 
-      const isHealthy = response.data.status === 'healthy' && response.data.model_loaded;
-      
+      const isHealthy =
+        response.data.status === 'healthy' && response.data.model_loaded;
+
       this.healthCheckCache = {
         isHealthy,
         lastCheck: now,
       };
 
-      this.logger.debug(`ML service health check: ${isHealthy ? 'healthy' : 'unhealthy'}`);
+      this.logger.debug(
+        `ML service health check: ${isHealthy ? 'healthy' : 'unhealthy'}`,
+      );
       return isHealthy;
     } catch (error) {
       this.logger.warn(`ML service health check failed: ${error.message}`);
-      
+
       this.healthCheckCache = {
         isHealthy: false,
         lastCheck: now,
@@ -179,8 +184,14 @@ export class MLPredictionService {
     originalRequest: MLPredictionRequest,
   ): MLPredictionCore {
     const confidence = mlResponse.confidence.toLowerCase();
-    if (confidence !== 'low' && confidence !== 'medium' && confidence !== 'high') {
-      this.logger.warn(`Invalid confidence value received from ML service: ${mlResponse.confidence}`);
+    if (
+      confidence !== 'low' &&
+      confidence !== 'medium' &&
+      confidence !== 'high'
+    ) {
+      this.logger.warn(
+        `Invalid confidence value received from ML service: ${mlResponse.confidence}`,
+      );
     }
 
     return {
@@ -229,37 +240,50 @@ export class MLPredictionService {
       prediction = 'away win';
     }
 
-    insights.push(`ML model predicts ${prediction} with ${maxProb.toFixed(1)}% probability`);
+    insights.push(
+      `ML model predicts ${prediction} with ${maxProb.toFixed(1)}% probability`,
+    );
 
     // Add confidence insight
-    insights.push(`Prediction confidence: ${mlResponse.confidence.toUpperCase()}`);
+    insights.push(
+      `Prediction confidence: ${mlResponse.confidence.toUpperCase()}`,
+    );
 
     // Form comparison
     const formDiff = request.home_form_rating - request.away_form_rating;
     if (Math.abs(formDiff) > 10) {
       const betterTeam = formDiff > 0 ? 'Home team' : 'Away team';
-      insights.push(`${betterTeam} has significantly better recent form (${Math.abs(formDiff).toFixed(1)} points difference)`);
+      insights.push(
+        `${betterTeam} has significantly better recent form (${Math.abs(formDiff).toFixed(1)} points difference)`,
+      );
     }
 
     // Goals comparison
     const goalsDiff = request.home_goals_avg - request.away_goals_avg;
     if (Math.abs(goalsDiff) > 0.5) {
       const betterAttack = goalsDiff > 0 ? 'Home team' : 'Away team';
-      insights.push(`${betterAttack} averages ${Math.abs(goalsDiff).toFixed(1)} more goals per game`);
+      insights.push(
+        `${betterAttack} averages ${Math.abs(goalsDiff).toFixed(1)} more goals per game`,
+      );
     }
 
     // Feature importance insights (if available)
     if (mlResponse.feature_importance) {
-      const topFeature = Object.entries(mlResponse.feature_importance)
-        .sort(([, a], [, b]) => b - a)[0];
-      
+      const topFeature = Object.entries(mlResponse.feature_importance).sort(
+        ([, a], [, b]) => b - a,
+      )[0];
+
       if (topFeature) {
-        insights.push(`Key factor: ${topFeature[0].replace(/_/g, ' ')} (${(topFeature[1] * 100).toFixed(1)}% importance)`);
+        insights.push(
+          `Key factor: ${topFeature[0].replace(/_/g, ' ')} (${(topFeature[1] * 100).toFixed(1)}% importance)`,
+        );
       }
     }
 
     // Model version info
-    insights.push(`Prediction generated using ${mlResponse.model_version} ML model`);
+    insights.push(
+      `Prediction generated using ${mlResponse.model_version} ML model`,
+    );
 
     return insights;
   }
@@ -275,7 +299,8 @@ export class MLPredictionService {
     h2h: any;
     matchDetails: any;
   }): MLPredictionRequest {
-    const { homeForm, awayForm, homeStats, awayStats, h2h, matchDetails } = matchData;
+    const { homeForm, awayForm, homeStats, awayStats, h2h, matchDetails } =
+      matchData;
 
     return {
       home_form_rating: homeForm.formRating || 50,
