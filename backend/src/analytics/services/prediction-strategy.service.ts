@@ -117,7 +117,7 @@ export class PredictionStrategyService {
       mostLikely: mostLikely.replace('Probability', '').replace('Win', '').toLowerCase() as 'home' | 'draw' | 'away',
       createdAt: new Date(),
       metadata: {
-        ...predictionResult.metadata,
+        ...(predictionResult.metadata || {}),
         strategy: PredictionStrategy.ML,
       },
     };
@@ -170,15 +170,26 @@ export class PredictionStrategyService {
     const mlWeight = this.configService.get<number>('ML_WEIGHT', 0.6);
     const statWeight = 1 - mlWeight;
 
-    return {
+    const blendedProbs = {
       homeWinProbability: 
         ml.homeWinProbability * mlWeight + statistical.homeWinProbability * statWeight,
       drawProbability: 
         ml.drawProbability * mlWeight + statistical.drawProbability * statWeight,
       awayWinProbability: 
         ml.awayWinProbability * mlWeight + statistical.awayWinProbability * statWeight,
+    };
+
+    const mostLikely = (Object.keys(blendedProbs) as (keyof typeof blendedProbs)[]).reduce((a, b) => blendedProbs[a] > blendedProbs[b] ? a : b);
+
+    return {
+      ...blendedProbs,
+      matchId: ml.matchId,
+      homeTeam: ml.homeTeam,
+      awayTeam: ml.awayTeam,
       confidence: this.blendConfidence(ml.confidence, statistical.confidence),
-      insights: [...ml.insights.slice(0, 3), ...statistical.insights.slice(0, 2)],
+      insights: [...(ml.insights || []).slice(0, 3), ...(statistical.insights || []).slice(0, 2)],
+      mostLikely: mostLikely.replace('Probability', '').replace('Win', '').toLowerCase() as 'home' | 'draw' | 'away',
+      createdAt: new Date(),
       metadata: {
         model_type: 'hybrid',
         strategy: PredictionStrategy.HYBRID,

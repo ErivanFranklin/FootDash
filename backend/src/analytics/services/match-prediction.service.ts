@@ -323,6 +323,7 @@ export class MatchPredictionService {
       insights: prediction.insights || [],
       mostLikely,
       createdAt: prediction.createdAt,
+      metadata: prediction.metadata,
     };
   }
 
