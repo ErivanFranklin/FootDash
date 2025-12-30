@@ -44,7 +44,7 @@ export class PredictionStrategyService {
           prediction = await this.getMLPrediction(matchId);
           break;
         case PredictionStrategy.HYBRID:
-          prediction = await this.getHybridPrediction(matchId);
+          prediction = await this.getHybridPrediction(matchId, forceRecalculate);
           break;
         case PredictionStrategy.STATISTICAL:
         default:
@@ -130,6 +130,7 @@ export class PredictionStrategyService {
    */
   private async getHybridPrediction(
     matchId: number,
+    forceRecalculate: boolean,
   ): Promise<PredictionResult> {
     try {
       // Get both predictions
@@ -266,15 +267,27 @@ export class PredictionStrategyService {
   /**
    * Blend confidence levels
    */
-  private blendConfidence(mlConfidence: string, statConfidence: string): string {
-    const confidenceMap = { low: 1, medium: 2, high: 3 };
-    const reverseMap = { 1: 'low', 2: 'medium', 3: 'high' };
-    
-    const mlScore = confidenceMap[mlConfidence] || 2;
-    const statScore = confidenceMap[statConfidence] || 2;
-    
+  private blendConfidence(
+    mlConfidence: 'low' | 'medium' | 'high',
+    statConfidence: 'low' | 'medium' | 'high',
+  ): 'low' | 'medium' | 'high' {
+    const toScore = (c: 'low' | 'medium' | 'high'): 1 | 2 | 3 => {
+      if (c === 'low') return 1;
+      if (c === 'medium') return 2;
+      return 3;
+    };
+
+    const toConfidence = (s: number): 'low' | 'medium' | 'high' => {
+      if (s <= 1) return 'low';
+      if (s === 2) return 'medium';
+      return 'high';
+    };
+
+    const mlScore = toScore(mlConfidence);
+    const statScore = toScore(statConfidence);
     const blended = Math.round((mlScore + statScore) / 2);
-    return reverseMap[blended] || 'medium';
+
+    return toConfidence(blended);
   }
 
   /**

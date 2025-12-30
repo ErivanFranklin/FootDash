@@ -34,6 +34,24 @@ export interface MLPredictionResponse {
   feature_importance?: Record<string, number>;
 }
 
+// Core shape returned from the ML service before we attach
+// match-specific fields like ids and team names.
+interface MLPredictionCore {
+  homeWinProbability: number;
+  drawProbability: number;
+  awayWinProbability: number;
+  confidence: 'low' | 'medium' | 'high';
+  insights: string[];
+  metadata: {
+    model_type: string;
+    model_version: string;
+    features_used: string[];
+    feature_importance?: Record<string, number>;
+    confidence_score: number;
+    timestamp: string;
+  };
+}
+
 @Injectable()
 export class MLPredictionService {
   private readonly logger = new Logger(MLPredictionService.name);
@@ -55,7 +73,9 @@ export class MLPredictionService {
   /**
    * Generate ML-based prediction for a match
    */
-  async generateMLPrediction(request: MLPredictionRequest): Promise<Omit<PredictionResult, 'matchId' | 'homeTeam' | 'awayTeam' | 'mostLikely' | 'createdAt'>> {
+  async generateMLPrediction(
+    request: MLPredictionRequest,
+  ): Promise<MLPredictionCore> {
     try {
       // Check if ML service is healthy
       const isHealthy = await this.checkMLServiceHealth();
@@ -157,7 +177,7 @@ export class MLPredictionService {
   private transformMLResponse(
     mlResponse: MLPredictionResponse,
     originalRequest: MLPredictionRequest,
-  ): Omit<PredictionResult, 'matchId' | 'homeTeam' | 'awayTeam' | 'mostLikely' | 'createdAt'> {
+  ): MLPredictionCore {
     const confidence = mlResponse.confidence.toLowerCase();
     if (confidence !== 'low' && confidence !== 'medium' && confidence !== 'high') {
       this.logger.warn(`Invalid confidence value received from ML service: ${mlResponse.confidence}`);
