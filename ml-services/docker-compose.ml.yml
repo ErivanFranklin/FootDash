@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  ml-prediction:
+    build:
+      context: ./prediction-model
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    volumes:
+      # Mount models directory for easy model updates
+      - ./prediction-model/models:/app/models
+      # Mount for development (optional)
+      - ./prediction-model/app:/app/app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+networks:
+  ml-network:
+    driver: bridge
