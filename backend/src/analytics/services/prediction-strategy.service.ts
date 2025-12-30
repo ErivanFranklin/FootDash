@@ -41,10 +41,10 @@ export class PredictionStrategyService {
 
       switch (strategy) {
         case PredictionStrategy.ML:
-          prediction = await this.getMLPrediction(matchId, forceRecalculate);
+          prediction = await this.getMLPrediction(matchId);
           break;
         case PredictionStrategy.HYBRID:
-          prediction = await this.getHybridPrediction(matchId, forceRecalculate);
+          prediction = await this.getHybridPrediction(matchId);
           break;
         case PredictionStrategy.STATISTICAL:
         default:
@@ -92,7 +92,6 @@ export class PredictionStrategyService {
    */
   private async getMLPrediction(
     matchId: number,
-    forceRecalculate: boolean,
   ): Promise<PredictionResult> {
     // Check if ML service is available
     const isMLHealthy = await this.mlService.checkMLServiceHealth();
@@ -118,13 +117,12 @@ export class PredictionStrategyService {
    */
   private async getHybridPrediction(
     matchId: number,
-    forceRecalculate: boolean,
   ): Promise<PredictionResult> {
     try {
       // Get both predictions
       const [statisticalPred, mlPred] = await Promise.allSettled([
         this.getStatisticalPrediction(matchId, forceRecalculate),
-        this.getMLPrediction(matchId, forceRecalculate),
+        this.getMLPrediction(matchId),
       ]);
 
       // If both succeed, blend the results

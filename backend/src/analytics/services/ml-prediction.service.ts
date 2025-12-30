@@ -267,7 +267,7 @@ export class MLPredictionService {
       is_home: true,
       league_id: matchDetails.league?.id || 1,
       season: matchDetails.season || new Date().getFullYear().toString(),
-      days_since_last_match: this.calculateDaysSinceLastMatch(homeStats, awayStats),
+      days_since_last_match: this.calculateDaysSinceLastMatch(),
       home_recent_form: homeForm.recentResults || [],
       away_recent_form: awayForm.recentResults || [],
     };
@@ -276,7 +276,7 @@ export class MLPredictionService {
   /**
    * Calculate days since last match (simplified)
    */
-  private calculateDaysSinceLastMatch(homeStats: any, awayStats: any): number {
+  private calculateDaysSinceLastMatch(): number {
     // This would normally calculate based on actual last match dates
     // For now, return a reasonable default
     return 7;

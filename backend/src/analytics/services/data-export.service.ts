@@ -95,7 +95,6 @@ export class DataExportService {
       startDate,
       endDate,
       minMatchesPerTeam = 5,
-      format = 'json'
     } = params;
 
     // Build query for finished matches
@@ -261,7 +260,7 @@ export class DataExportService {
       is_home: true,
       days_since_last_match: this.calculateDaysSinceLastMatch(homeMatches, awayMatches, match.kickOff),
       league_strength: this.getLeagueStrength(match.league?.id),
-      season_stage: this.getSeasonStage(match.kickOff, match.season)
+      season_stage: this.getSeasonStage(match.kickOff)
     };
   }
 
@@ -378,7 +377,7 @@ export class DataExportService {
   /**
    * Get season stage (0 = early, 0.5 = mid, 1 = late)
    */
-  private getSeasonStage(matchDate: Date, season: string): number {
+  private getSeasonStage(matchDate: Date): number {
     const month = matchDate.getMonth() + 1; // 1-12
     
     // Football season typically: Aug-Dec (0-0.5), Jan-May (0.5-1.0)
