@@ -55,7 +55,7 @@ export class MLPredictionService {
   /**
    * Generate ML-based prediction for a match
    */
-  async generateMLPrediction(request: MLPredictionRequest): Promise<PredictionResult> {
+  async generateMLPrediction(request: MLPredictionRequest): Promise<Omit<PredictionResult, 'matchId' | 'homeTeam' | 'awayTeam' | 'mostLikely' | 'createdAt'>> {
     try {
       // Check if ML service is healthy
       const isHealthy = await this.checkMLServiceHealth();
@@ -157,12 +157,17 @@ export class MLPredictionService {
   private transformMLResponse(
     mlResponse: MLPredictionResponse,
     originalRequest: MLPredictionRequest,
-  ): PredictionResult {
+  ): Omit<PredictionResult, 'matchId' | 'homeTeam' | 'awayTeam' | 'mostLikely' | 'createdAt'> {
+    const confidence = mlResponse.confidence.toLowerCase();
+    if (confidence !== 'low' && confidence !== 'medium' && confidence !== 'high') {
+      this.logger.warn(`Invalid confidence value received from ML service: ${mlResponse.confidence}`);
+    }
+
     return {
       homeWinProbability: mlResponse.home_win_probability,
       drawProbability: mlResponse.draw_probability,
       awayWinProbability: mlResponse.away_win_probability,
-      confidence: mlResponse.confidence,
+      confidence: confidence as 'low' | 'medium' | 'high',
       insights: this.generateMLInsights(mlResponse, originalRequest),
       metadata: {
         model_type: 'ml',

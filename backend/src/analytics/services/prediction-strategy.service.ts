@@ -103,13 +103,26 @@ export class PredictionStrategyService {
     const matchData = await this.statisticalService.getMatchDataForPrediction(matchId);
     const mlRequest = this.mlService.prepareMLRequest(matchData);
     
-    const prediction = await this.mlService.generateMLPrediction(mlRequest);
-    prediction.metadata = {
-      ...prediction.metadata,
-      strategy: PredictionStrategy.ML,
+    const predictionResult = await this.mlService.generateMLPrediction(mlRequest);
+
+    const match = matchData.match;
+
+    const mostLikely = (Object.keys(predictionResult) as (keyof typeof predictionResult)[]).reduce((a, b) => predictionResult[a] > predictionResult[b] ? a : b);
+
+    const finalPrediction: PredictionResult = {
+      ...predictionResult,
+      matchId: match.id,
+      homeTeam: match.homeTeam.name,
+      awayTeam: match.awayTeam.name,
+      mostLikely: mostLikely.replace('Probability', '').replace('Win', '').toLowerCase() as 'home' | 'draw' | 'away',
+      createdAt: new Date(),
+      metadata: {
+        ...predictionResult.metadata,
+        strategy: PredictionStrategy.ML,
+      },
     };
     
-    return prediction;
+    return finalPrediction;
   }
 
   /**
