@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class CreatePredictionPerformanceTable1703000000000
   implements MigrationInterface
@@ -88,7 +88,7 @@ export class CreatePredictionPerformanceTable1703000000000
     // Create indexes for performance
     await queryRunner.createIndex(
       'prediction_performance',
-      new Index({
+      new TableIndex({
         name: 'IDX_prediction_performance_match_id',
         columnNames: ['match_id'],
       }),
@@ -96,7 +96,7 @@ export class CreatePredictionPerformanceTable1703000000000
 
     await queryRunner.createIndex(
       'prediction_performance',
-      new Index({
+      new TableIndex({
         name: 'IDX_prediction_performance_model_type',
         columnNames: ['model_type'],
       }),
@@ -104,7 +104,7 @@ export class CreatePredictionPerformanceTable1703000000000
 
     await queryRunner.createIndex(
       'prediction_performance',
-      new Index({
+      new TableIndex({
         name: 'IDX_prediction_performance_predicted_at',
         columnNames: ['predicted_at'],
       }),
@@ -112,7 +112,7 @@ export class CreatePredictionPerformanceTable1703000000000
 
     await queryRunner.createIndex(
       'prediction_performance',
-      new Index({
+      new TableIndex({
         name: 'IDX_prediction_performance_evaluated_at',
         columnNames: ['evaluated_at'],
       }),
@@ -121,7 +121,7 @@ export class CreatePredictionPerformanceTable1703000000000
     // Composite index for analytics queries
     await queryRunner.createIndex(
       'prediction_performance',
-      new Index({
+      new TableIndex({
         name: 'IDX_prediction_performance_type_evaluated',
         columnNames: ['model_type', 'evaluated_at'],
       }),
