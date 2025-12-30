@@ -58,7 +58,7 @@ export class MatchPredictionService {
     // Fetch the match
     const match = await this.matchRepository.findOne({
       where: { id: matchId },
-      relations: ['homeTeam', 'awayTeam'],
+      relations: ['homeTeam', 'awayTeam', 'league'],
     });
 
     if (!match) {
@@ -323,6 +323,7 @@ export class MatchPredictionService {
       insights: prediction.insights || [],
       mostLikely,
       createdAt: prediction.createdAt,
+      metadata: prediction.metadata,
     };
   }
 
@@ -359,5 +360,72 @@ export class MatchPredictionService {
     }
 
     return predictions;
+  }
+
+  /**
+   * Get match data for ML prediction service
+   */
+  async getMatchDataForPrediction(matchId: number) {
+    const match = await this.matchRepository.findOne({
+      where: { id: matchId },
+      relations: ['homeTeam', 'awayTeam', 'league'],
+    });
+
+    if (!match) {
+      throw new NotFoundException(`Match with ID ${matchId} not found`);
+    }
+
+    const homeTeamId = match.homeTeam.id;
+    const awayTeamId = match.awayTeam.id;
+
+    // Fetch recent matches for both teams
+    const homeMatches = await this.getRecentMatches(homeTeamId, 10);
+    const awayMatches = await this.getRecentMatches(awayTeamId, 10);
+    const h2hMatches = await this.getHeadToHeadMatches(homeTeamId, awayTeamId);
+
+    // Calculate form ratings
+    const homeForm = this.formCalculator.calculateForm(
+      homeMatches,
+      homeTeamId,
+      5,
+    );
+    const awayForm = this.formCalculator.calculateForm(
+      awayMatches,
+      awayTeamId,
+      5,
+    );
+
+    // Calculate performance stats
+    const homeStats = this.statisticalAnalysis.calculatePerformanceStats(
+      homeMatches,
+      homeTeamId,
+    );
+    const awayStats = this.statisticalAnalysis.calculatePerformanceStats(
+      awayMatches,
+      awayTeamId,
+    );
+
+    // Analyze head-to-head
+    const h2h = this.statisticalAnalysis.analyzeHeadToHead(
+      h2hMatches,
+      homeTeamId,
+      awayTeamId,
+    );
+
+    return {
+      match,
+      homeForm,
+      awayForm,
+      homeStats,
+      awayStats,
+      h2h,
+      matchDetails: {
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        league: match.league,
+        season: match.season,
+        kickOff: match.kickOff,
+      },
+    };
   }
 }

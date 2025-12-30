@@ -9,6 +9,7 @@ export interface PredictionResult {
   insights: string[];
   mostLikely: 'home' | 'draw' | 'away';
   createdAt: Date;
+  metadata?: any;
 }
 
 export interface FormData {

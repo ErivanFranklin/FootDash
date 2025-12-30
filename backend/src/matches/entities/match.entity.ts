@@ -49,4 +49,7 @@ export class Match {
     logo?: string | null;
     season?: number | null;
   } | null;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  season?: string;
 }
