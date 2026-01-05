@@ -4,5 +4,6 @@ export const environment = {
   // so the browser hits /api and Nginx forwards to the backend container.
   apiBaseUrl: '/api',
   authPath: '/auth',
-  websocketUrl: '/'
+  websocketUrl: '/',
+  pushPublicKey: 'BDqGD_yDIznkf3hEDXAp2YlErNyAphXBwLE7mgiOq2qsqRi6KYoIWJIA3LrSLg6wpQUyQKhKZYeTSYJsUuxsq7U'
 };

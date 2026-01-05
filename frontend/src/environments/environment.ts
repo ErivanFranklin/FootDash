@@ -7,7 +7,8 @@ export const environment = {
   // Use Angular dev-server proxy: requests to /api/* will be proxied to backend (see proxy.conf.json)
   apiBaseUrl: '/api',
   authPath: '/auth',
-  websocketUrl: 'http://localhost:3000'
+  websocketUrl: 'http://localhost:3000',
+  pushPublicKey: 'BDqGD_yDIznkf3hEDXAp2YlErNyAphXBwLE7mgiOq2qsqRi6KYoIWJIA3LrSLg6wpQUyQKhKZYeTSYJsUuxsq7U'
 };
 
 /*
