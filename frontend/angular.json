@@ -42,10 +42,9 @@
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": [],
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "serviceWorker": "ngsw-config.json"
           },
-          "serviceWorker": true,
-          "ngswConfigPath": "ngsw-config.json",
           "configurations": {
             "production": {
               "budgets": [
