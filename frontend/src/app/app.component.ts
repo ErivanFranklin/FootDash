@@ -3,6 +3,7 @@ import { IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonC
 import { NavigationMenuComponent } from './shared/components/navigation-menu.component';
 import { WebsocketService } from './services/websocket.service';
 import { AuthService } from './core/services/auth.service';
+import { PwaService } from './core/services/pwa.service';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +15,11 @@ export class AppComponent implements OnInit {
   private websocketService = inject(WebsocketService);
   private authService = inject(AuthService);
   private toastController = inject(ToastController);
+  private pwaService = inject(PwaService);
 
   ngOnInit() {
     this.setupSocialNotifications();
+    this.pwaService.initPushNotifications();
   }
 
   private setupSocialNotifications() {
