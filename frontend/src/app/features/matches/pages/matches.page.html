@@ -57,12 +57,12 @@
     <app-match-skeleton *ngFor="let i of [1,2,3,4,5]"></app-match-skeleton>
   </div>
 
-  <!-- Virtual Scrolling for Performance -->
-  <ion-virtual-scroll [items]="fixtures" approxItemHeight="120px" *ngIf="fixtures.length && !loading">
-    <a *virtualItem="let match" [routerLink]="['/match', match.fixture.id]" style="display: block; padding: 8px 12px;">
+  <!-- Matches List -->
+  <div *ngIf="fixtures.length && !loading">
+    <a *ngFor="let match of fixtures" [routerLink]="['/match', match.fixture.id]" style="display: block; padding: 8px 12px;">
       <app-match-card [match]="match"></app-match-card>
     </a>
-  </ion-virtual-scroll>
+  </div>
 
   <!-- Infinite Scroll -->
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreMatches($event)" *ngIf="fixtures.length && !loading">

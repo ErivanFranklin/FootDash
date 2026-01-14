@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonVirtualScroll, IonInfiniteScroll, IonInfiniteScrollContent, IonChip } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonChip } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
@@ -12,7 +12,7 @@ import { PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSke
   standalone: true,
   templateUrl: './matches.page.html',
   styleUrls: ['./matches.page.scss'],
-  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonVirtualScroll, IonInfiniteScroll, IonInfiniteScrollContent, IonChip, PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSkeletonComponent, RouterModule]
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonChip, PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSkeletonComponent, RouterModule]
 })
 export class MatchesPage implements OnInit {
   private route = inject(ActivatedRoute);

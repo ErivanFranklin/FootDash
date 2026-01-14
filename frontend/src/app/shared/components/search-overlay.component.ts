@@ -37,7 +37,7 @@ export interface FilterChip {
         </ion-searchbar>
 
         <!-- Filter Chips -->
-        <div class="filter-chips" *ngIf="filterChips?.length">
+        <div class="filter-chips" *ngIf="filterChips.length">
           <ion-chip
             *ngFor="let chip of filterChips"
             [class.chip-selected]="chip.selected"

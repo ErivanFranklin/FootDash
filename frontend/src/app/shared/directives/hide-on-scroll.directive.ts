@@ -31,7 +31,7 @@ export class HideOnScrollDirective implements OnInit {
     this.renderer.addClass(this.el.nativeElement, 'header-hide-on-scroll');
   }
 
-  @HostListener('window:scroll', ['$event'])
+  @HostListener('window:scroll')
   onWindowScroll() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
