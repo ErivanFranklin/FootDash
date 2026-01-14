@@ -1,0 +1,78 @@
+/**
+ * Mobile Tab Bar Styles
+ * Bottom navigation optimized for mobile devices
+ */
+
+ion-app {
+  .mobile-tabs {
+    ion-tab-bar {
+      --background: var(--ion-background-color);
+      --border: 1px solid var(--ion-border-color);
+      height: 60px;
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+      ion-tab-button {
+        --color: var(--ion-color-medium);
+        --color-selected: var(--ion-color-primary);
+        --padding-top: 8px;
+        --padding-bottom: 8px;
+        
+        ion-icon {
+          font-size: 24px;
+          margin-bottom: 4px;
+        }
+
+        ion-label {
+          font-size: 12px;
+          font-weight: 500;
+          margin-top: 2px;
+        }
+
+        // Active state
+        &.tab-selected {
+          ion-icon,
+          ion-label {
+            color: var(--ion-color-primary);
+          }
+        }
+
+        // Touch feedback
+        &:active {
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+
+  // Hide tabs on desktop
+  @media (min-width: 768px) {
+    .mobile-tabs {
+      display: none;
+    }
+  }
+}
+
+/**
+ * Hide-on-Scroll Header Directive Support
+ * Applied to page headers for better mobile UX
+ * Using transform for GPU-accelerated animations (60fps)
+ */
+.header-hidden {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.header-visible {
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out;
+}
+
+ion-header {
+  &.header-hide-on-scroll {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    will-change: transform; // Hint to browser for GPU acceleration
+  }
+}

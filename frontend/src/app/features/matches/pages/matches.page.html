@@ -7,6 +7,26 @@
 </app-page-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Quick Filter Chips -->
+  <div class="quick-filters">
+    <ion-chip
+      *ngFor="let filter of quickFilters"
+      [class.chip-selected]="filter.active"
+      (click)="toggleQuickFilter(filter)">
+      <ion-icon [name]="filter.icon"></ion-icon>
+      {{ filter.label }}
+    </ion-chip>
+  </div>
+
   <app-form-section title="Match Filters">
     <ion-item>
       <ion-label position="stacked">Season</ion-label>
@@ -31,13 +51,31 @@
   </app-form-section>
 
   <div style="padding: 12px;" *ngIf="!fixtures.length && !loading">No fixtures loaded yet.</div>
-  <div style="padding: 12px;" *ngIf="loading">Loading fixtures…</div>
-
-  <div style="padding: 12px;">
-    <a *ngFor="let match of fixtures" [routerLink]="['/match', match.fixture.id]">
-      <app-match-card
-        [match]="match">
-      </app-match-card>
-    </a>
+  
+  <!-- Loading skeletons -->
+  <div *ngIf="loading">
+    <app-match-skeleton *ngFor="let i of [1,2,3,4,5]"></app-match-skeleton>
   </div>
+
+  <!-- Virtual Scrolling for Performance -->
+  <ion-virtual-scroll [items]="fixtures" approxItemHeight="120px" *ngIf="fixtures.length && !loading">
+    <a *virtualItem="let match" [routerLink]="['/match', match.fixture.id]" style="display: block; padding: 8px 12px;">
+      <app-match-card [match]="match"></app-match-card>
+    </a>
+  </ion-virtual-scroll>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreMatches($event)" *ngIf="fixtures.length && !loading">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more matches...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Floating Action Button -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="loadMatches()">
+      <ion-icon name="refresh"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
