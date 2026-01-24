@@ -6,13 +6,14 @@ import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSkeletonComponent } from '../../../shared/components';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-matches',
   standalone: true,
   templateUrl: './matches.page.html',
   styleUrls: ['./matches.page.scss'],
-  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonChip, PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSkeletonComponent, RouterModule]
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonChip, PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSkeletonComponent, RouterModule, TranslocoPipe]
 })
 export class MatchesPage implements OnInit {
   private route = inject(ActivatedRoute);

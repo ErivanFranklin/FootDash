@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/feed"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ user?.username || 'User Profile' }}</ion-title>
+    <ion-title>{{ user?.username || ('NAV.PROFILE' | transloco) }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="reportUser()" color="medium">
         <ion-icon name="flag-outline" slot="icon-only"></ion-icon>
@@ -23,7 +23,7 @@
 
     <div class="profile-info">
       <h1>{{ user.username }}</h1>
-      <p class="join-date">Joined {{ user.createdAt | date:'mediumDate' }}</p>
+      <p class="join-date">{{ 'PROFILE.JOINED' | transloco }} {{ user.createdAt | date:'mediumDate' }}</p>
     </div>
 
     <div class="profile-actions">

@@ -1,0 +1,46 @@
+{
+  "COMMON": {
+    "LOADING": "Loading...",
+    "ERROR": "Something went wrong",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "SHARE": "Share",
+    "SEARCH": "Search",
+    "REFRESH": "Refresh",
+    "REFRESHING": "Refreshing...",
+    "PULL_TO_REFRESH": "Pull to refresh"
+  },
+  "NAV": {
+    "HOME": "Home",
+    "TEAMS": "Teams",
+    "MATCHES": "Matches",
+    "FEED": "Feed",
+    "PROFILE": "Profile",
+    "SETTINGS": "Settings"
+  },
+  "MATCH_STATUS": {
+    "LIVE": "Live",
+    "FT": "Full Time",
+    "HT": "Half Time",
+    "UPCOMING": "Scheduled",
+    "PAUSED": "Paused",
+    "POSTPONED": "Postponed",
+    "CANCELLED": "Cancelled",
+    "UNKNOWN": "Unknown"
+  },
+  "AUTH": {
+    "LOGIN": "Sign In",
+    "REGISTER": "Create Account",
+    "EMAIL_PLACEHOLDER": "Enter your email",
+    "PASSWORD_PLACEHOLDER": "Enter your password",
+    "SUBMIT": "Submit"
+  },
+  "MATCH_DETAILS": {
+    "STATS": "Stats",
+    "LINEUPS": "Lineups",
+    "EVENTS": "Events"
+  },
+  "PROFILE": {
+    "JOINED": "Joined"
+  }
+}

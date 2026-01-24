@@ -1,5 +1,5 @@
 <app-page-header
-  title="Matches"
+  [title]="'NAV.MATCHES' | transloco"
   [actions]="[
     { label: 'Fetch', handler: loadMatches.bind(this), icon: 'download', loading: loading },
     { label: 'Sync Fixtures', handler: syncFixtures.bind(this), icon: 'sync', color: 'medium', loading: loading }
@@ -10,9 +10,9 @@
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content
       pullingIcon="chevron-down-circle-outline"
-      pullingText="Pull to refresh"
+      [pullingText]="'COMMON.PULL_TO_REFRESH' | transloco"
       refreshingSpinner="circles"
-      refreshingText="Refreshing...">
+      [refreshingText]="'COMMON.REFRESHING' | transloco">
     </ion-refresher-content>
   </ion-refresher>
 
