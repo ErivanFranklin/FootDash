@@ -51,6 +51,14 @@
       <div class="meta-row" *ngIf="match.leagueName"><strong>{{ 'MATCH_DETAILS.COMPETITION' | transloco }}</strong> <span>{{ match.leagueName }}</span></div>
     </section>
 
+    <section class="voting-section" style="padding: 16px;">
+      <app-prediction-voting 
+        [matchId]="matchId" 
+        [homeTeamName]="match.homeName" 
+        [awayTeamName]="match.awayName">
+      </app-prediction-voting>
+    </section>
+
     <section class="actions">
       <a [routerLink]="['/analytics/match', matchId]" class="view-prediction-btn">
         <ion-button expand="block" color="secondary">

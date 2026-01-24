@@ -1,0 +1,25 @@
+.filter-container {
+  padding: 10px;
+  background: var(--ion-background-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.rank-label {
+  font-weight: bold;
+  font-size: 1.2rem;
+  width: 40px;
+  text-align: center;
+  color: var(--ion-color-medium);
+
+  &.top-3 {
+    color: var(--ion-color-warning); // Gold/Yellowish
+    font-size: 1.4rem;
+  }
+}
+
+.points-label {
+  font-weight: bold;
+  font-size: 1.1rem;
+}

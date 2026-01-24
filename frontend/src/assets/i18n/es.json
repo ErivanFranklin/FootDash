@@ -70,7 +70,17 @@
     "LOW": "Baja",
     "MOST_LIKELY": "Resultado Más Probable",
     "REGENERATE": "Regenerar Predicción",
-    "WIN": "Victoria"
+    "WIN": "Victoria",
+    "MAKE_YOUR_PICK": "Haz tu predicción",
+    "GUESS_SCORE": "Adivina el marcador final",
+    "SUBMIT": "Enviar Predicción",
+    "VOTE_SUBMITTED": "Predicción Enviada"
+  },
+  "LEADERBOARD": {
+    "TITLE": "Clasificación",
+    "WEEKLY": "Semanal",
+    "MONTHLY": "Mensual",
+    "ALL_TIME": "Histórico"
   },
   "ANALYTICS": {
     "TITLE": "Análisis del Partido",

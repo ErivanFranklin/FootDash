@@ -9,13 +9,14 @@ import { ApiService } from '../../../core/services/api.service';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { normalizeMatch, NormalizedMatch } from '../../../core/adapters/match-adapter';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { PredictionVotingComponent } from '../../../components/prediction-voting/prediction-voting.component';
 
 @Component({
   selector: 'app-match-details',
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, PageHeaderComponent, LiveIndicatorComponent, RouterModule, TranslocoPipe],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, PageHeaderComponent, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

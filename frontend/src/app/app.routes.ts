@@ -37,6 +37,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },
   {
+    path: 'leaderboard',
+    loadComponent: () => import('./features/gamification/pages/leaderboard/leaderboard.page').then(m => m.LeaderboardPage),
+    canActivate: [authGuard],
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',

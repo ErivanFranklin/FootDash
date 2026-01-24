@@ -1,0 +1,39 @@
+<app-page-header [title]="'LEADERBOARD.TITLE' | transloco" />
+
+<ion-content>
+  <div class="filter-container">
+    <ion-segment [value]="selectedPeriod" (ionChange)="onPeriodChange($event)">
+      <ion-segment-button value="weekly">
+        <ion-label>{{ 'LEADERBOARD.WEEKLY' | transloco }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="monthly">
+        <ion-label>{{ 'LEADERBOARD.MONTHLY' | transloco }}</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="all-time">
+        <ion-label>{{ 'LEADERBOARD.ALL_TIME' | transloco }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <div *ngIf="isLoading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>{{ 'COMMON.LOADING' | transloco }}</p>
+  </div>
+
+  <ion-list *ngIf="!isLoading">
+    <ion-item *ngFor="let entry of leaderboard">
+      <ion-label slot="start" class="rank-label" [class.top-3]="entry.rank <= 3">
+        #{{ entry.rank }}
+      </ion-label>
+      <ion-avatar slot="start">
+        <img [src]="entry.avatarUrl || 'assets/default-avatar.png'" alt="avatar" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ entry.userName }}</h2>
+      </ion-label>
+      <ion-note slot="end" color="primary" class="points-label">
+        {{ entry.points }} pts
+      </ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>

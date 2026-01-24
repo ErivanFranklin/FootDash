@@ -78,8 +78,19 @@
     "LOW": "Low",
     "MOST_LIKELY": "Most Likely Outcome",
     "REGENERATE": "Regenerate Prediction",
-    "WIN": "Win"
+    "WIN": "Win",
+    "MAKE_YOUR_PICK": "Make Your Pick",
+    "GUESS_SCORE": "Guess the final score",
+    "SUBMIT": "Submit Prediction",
+    "VOTE_SUBMITTED": "Prediction Submitted"
   },
+  "LEADERBOARD": {
+    "TITLE": "Leaderboard",
+    "WEEKLY": "Weekly",
+    "MONTHLY": "Monthly",
+    "ALL_TIME": "All Time"
+  }
+},
   "COMPARISON": {
     "TITLE": "Team Stats Comparison",
     "ATTACK": "Attack",
