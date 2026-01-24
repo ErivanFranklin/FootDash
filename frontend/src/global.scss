@@ -38,3 +38,162 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/**
+ * Mobile Touch Target Improvements
+ * -----------------------------------------------------
+ * Ensures all interactive elements meet minimum 44x44pt touch target size
+ * for better mobile UX and accessibility
+ */
+
+/* Buttons - minimum 44px height with adequate padding */
+ion-button {
+  --min-height: 44px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+}
+
+/* List items - minimum 44px height */
+ion-item {
+  --min-height: 44px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+/* Cards - increased padding for better touch areas */
+ion-card {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  margin: 12px;
+}
+
+/* Interactive card elements - GPU-accelerated animations */
+ion-card[button],
+ion-card[routerLink],
+a > ion-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform; // Hint for GPU acceleration
+  
+  &:active {
+    transform: scale(0.98); // Use transform instead of position changes
+  }
+}
+
+ion-card[button]:active,
+ion-card[routerLink]:active,
+a > ion-card:active {
+  transform: scale(0.98);
+}
+
+/* Input fields - increased touch area */
+ion-input,
+ion-textarea,
+ion-select {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  min-height: 44px;
+}
+
+/* Checkbox and radio - larger touch targets */
+ion-checkbox,
+ion-radio {
+  --size: 24px;
+  margin: 10px;
+}
+
+/* Toggle switch - adequate sizing */
+ion-toggle {
+  --handle-width: 26px;
+  --handle-height: 26px;
+  padding: 9px;
+}
+
+/* Fab buttons - ensure adequate size */
+ion-fab-button {
+  --size: 56px;
+}
+
+/* Icon buttons in toolbar */
+ion-toolbar ion-button {
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+/* Segment buttons */
+ion-segment-button {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  min-height: 44px;
+}
+
+/* Chip buttons */
+ion-chip {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  min-height: 32px;
+  margin: 4px;
+}
+
+/* Links and anchors */
+a {
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  padding: 0 8px;
+  text-decoration: none;
+  
+  &:not([href]) {
+    display: inline;
+    min-height: auto;
+    line-height: inherit;
+    padding: 0;
+  }
+}
+
+/* Match cards - custom component touch improvement */
+app-match-card {
+  display: block;
+  margin: 8px 0;
+  min-height: 80px; // Larger touch target for match cards
+}
+
+/* Team cards */
+app-team-card {
+  display: block;
+  margin: 8px 0;
+  min-height: 72px;
+}
+
+/* Action buttons in headers */
+app-page-header ion-button {
+  --min-height: 40px;
+  margin: 4px;
+}
+
+/* Lazy Image Loading States */
+img.lazy-loading {
+  opacity: 0.5;
+  filter: blur(5px);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+img.lazy-loaded {
+  opacity: 1;
+  filter: blur(0);
+}
+
+img.lazy-error {
+  opacity: 0.3;
+}
+
+/* Ensure smooth image transitions */
+img {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}

@@ -1,0 +1,42 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: var(--ion-background-color, #fff);
+    --border-width: 0 0 1px 0;
+    --border-style: solid;
+    --border-color: var(--ion-border-color, #e0e0e0);
+  }
+
+  ion-title {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  ion-button {
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+}
+
+ion-content {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+// Add a drag handle indicator at the top
+ion-header::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: var(--ion-color-medium, #ccc);
+  border-radius: 2px;
+  margin: 8px auto;
+  opacity: 0.5;
+}

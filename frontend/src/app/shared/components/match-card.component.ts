@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { LiveIndicatorComponent } from './live-indicator.component';
+import { ShareService } from '../../core/services/share.service';
 
 @Component({
   selector: 'app-match-card',
@@ -64,19 +65,43 @@ import { LiveIndicatorComponent } from './live-indicator.component';
             {{ action.label }}
           </ion-button>
         </div>
+        
+        <!-- Share button (always visible) -->
+        <div class="match-share" *ngIf="showShare">
+          <ion-button fill="clear" size="small" (click)="onShare()">
+            <ion-icon slot="icon-only" name="share-social-outline"></ion-icon>
+          </ion-button>
+        </div>
       </ion-card-content>
     </ion-card>
   `,
   styles: [`
+    ion-card {
+      margin: 8px 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    ion-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    }
+
     .card-header-content {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: var(--spacing-sm);
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
     }
 
     .card-header-content ion-card-title {
       flex: 1;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      word-break: break-word;
     }
 
     .live-badge {
@@ -85,65 +110,132 @@ import { LiveIndicatorComponent } from './live-indicator.component';
 
     .score-container {
       text-align: center;
-      margin-bottom: var(--spacing-md);
-      padding: var(--spacing-md) 0;
+      margin: 16px 0;
+      padding: 16px 0;
+      border-top: 1px solid var(--ion-color-light-shade);
       border-bottom: 1px solid var(--ion-color-light-shade);
     }
 
     .score-display {
-      font-size: 2rem;
-      font-weight: var(--font-weight-bold);
+      font-size: 2.5rem;
+      font-weight: 700;
       color: var(--ion-color-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-sm);
+      gap: 16px;
+      line-height: 1;
+    }
+
+    .home-score,
+    .away-score {
+      min-width: 48px;
+      text-align: center;
     }
 
     .score-separator {
       color: var(--ion-color-medium);
-      font-weight: var(--font-weight-normal);
+      font-weight: 400;
+      font-size: 1.8rem;
     }
 
     .score-label {
-      font-size: var(--font-size-sm);
+      font-size: 14px;
       color: var(--ion-color-medium);
-      margin-top: var(--spacing-xs);
+      margin-top: 8px;
+      font-weight: 500;
     }
 
     .match-info {
-      margin-bottom: var(--spacing-md);
+      margin: 12px 0;
     }
 
     .match-info > div {
       display: flex;
       align-items: center;
-      gap: var(--spacing-xs);
-      margin-bottom: var(--spacing-xs);
-      font-size: var(--font-size-sm);
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--ion-color-step-600);
+      line-height: 1.5;
+    }
+
+    .match-info ion-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      color: var(--ion-color-medium);
     }
 
     .match-actions {
       display: flex;
-      gap: var(--spacing-sm);
+      gap: 8px;
       flex-wrap: wrap;
-      margin-top: var(--spacing-md);
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--ion-color-light-shade);
+    }
+
+    .match-actions ion-button {
+      flex: 1;
+      min-width: 120px;
+      --border-radius: 8px;
+    }
+
+    .match-share {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--ion-color-light-shade);
+    }
+
+    .match-share ion-button {
+      --color: var(--ion-color-medium);
     }
 
     @keyframes scoreUpdate {
       0% { transform: scale(1); }
-      50% { transform: scale(1.1); color: var(--ion-color-success); }
+      50% { transform: scale(1.15); color: var(--ion-color-success); }
       100% { transform: scale(1); }
     }
 
     .score-display.updated {
       animation: scoreUpdate 0.6s ease-in-out;
+      will-change: transform; // GPU acceleration hint
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 576px) {
+      ion-card {
+        margin: 8px 8px;
+      }
+
+      .card-header-content ion-card-title {
+        font-size: 15px;
+      }
+
+      .score-display {
+        font-size: 2.2rem;
+        gap: 12px;
+      }
+
+      .match-info > div {
+        font-size: 13px;
+      }
+
+      .match-actions ion-button {
+        min-width: 100px;
+        font-size: 13px;
+      }
     }
   `],
   imports: [IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, CommonModule, DatePipe, LiveIndicatorComponent]
 })
 export class MatchCardComponent {
+  private shareService = inject(ShareService);
+  
   @Input() match: any;
+  @Input() showShare = true;
   @Input() actions?: Array<{
     label: string;
     handler: (match: any) => void;
@@ -208,5 +300,9 @@ export class MatchCardComponent {
 
   getMatchMinute(): number | undefined {
     return this.match?.minute;
+  }
+
+  onShare() {
+    this.shareService.shareMatch(this.match);
   }
 }
