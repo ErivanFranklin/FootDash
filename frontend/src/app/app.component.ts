@@ -4,12 +4,13 @@ import { NavigationMenuComponent } from './shared/components/navigation-menu.com
 import { WebsocketService } from './services/websocket.service';
 import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
-  imports: [IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, NavigationMenuComponent],
+  imports: [IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, NavigationMenuComponent, TranslocoPipe],
 })
 export class AppComponent implements OnInit {
   private websocketService = inject(WebsocketService);

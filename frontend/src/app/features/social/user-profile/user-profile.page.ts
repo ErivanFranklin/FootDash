@@ -11,6 +11,7 @@ import { ReportsService } from '../../../services/social/reports.service';
 import { User } from '../../../models/user.model';
 import { Activity, PaginatedActivities, ReportTargetType, ReportReason } from '../../../models/social';
 import { AlertController, ToastController } from '@ionic/angular';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-user-profile',
@@ -22,7 +23,8 @@ import { AlertController, ToastController } from '@ionic/angular';
     FormsModule,
     IonicModule,
     FollowButtonComponent,
-    FeedItemComponent
+    FeedItemComponent,
+    TranslocoPipe
   ]
 })
 export class UserProfilePage implements OnInit {

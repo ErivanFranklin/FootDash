@@ -1,0 +1,46 @@
+{
+  "COMMON": {
+    "LOADING": "Carregando...",
+    "ERROR": "Algo deu errado",
+    "CANCEL": "Cancelar",
+    "CONFIRM": "Confirmar",
+    "SHARE": "Compartilhar",
+    "SEARCH": "Buscar",
+    "REFRESH": "Atualizar",
+    "REFRESHING": "Atualizando...",
+    "PULL_TO_REFRESH": "Puxe para atualizar"
+  },
+  "NAV": {
+    "HOME": "Início",
+    "TEAMS": "Times",
+    "MATCHES": "Partidas",
+    "FEED": "Feed",
+    "PROFILE": "Perfil",
+    "SETTINGS": "Configurações"
+  },
+  "MATCH_STATUS": {
+    "LIVE": "Ao Vivo",
+    "FT": "Fim de Jogo",
+    "HT": "Intervalo",
+    "UPCOMING": "Agendado",
+    "PAUSED": "Pausado",
+    "POSTPONED": "Adiado",
+    "CANCELLED": "Cancelado",
+    "UNKNOWN": "Desconhecido"
+  },
+  "AUTH": {
+    "LOGIN": "Entrar",
+    "REGISTER": "Criar Conta",
+    "EMAIL_PLACEHOLDER": "Digite seu email",
+    "PASSWORD_PLACEHOLDER": "Digite sua senha",
+    "SUBMIT": "Enviar"
+  },
+  "MATCH_DETAILS": {
+    "STATS": "Estatísticas",
+    "LINEUPS": "Escalações",
+    "EVENTS": "Eventos"
+  },
+  "PROFILE": {
+    "JOINED": "Entrou em"
+  }
+}
