@@ -239,9 +239,10 @@
 
 ### Sprint 1: Gamification Foundation (In Progress)
 - [x] Database Schema (UserPrediction, Badge, Leaderboard)
-- [ ] Backend: Prediction Logic & Scoring Job
-- [ ] Frontend: Prediction UI (Vote on Match Result)
-- [ ] Frontend: Leaderboard Display
+- [x] Backend: Prediction Logic
+- [ ] Backend: Scoring Job (Cron)
+- [x] Frontend: Prediction UI (Vote on Match Result)
+- [x] Frontend: Leaderboard Display
 
 ### Sprint 2: Social Features
 - [ ] WebSocket Match Chat Rooms
