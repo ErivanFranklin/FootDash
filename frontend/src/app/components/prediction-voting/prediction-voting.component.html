@@ -1,0 +1,34 @@
+<ion-card *ngIf="!hasVoted; else votedTemplate">
+  <ion-card-header>
+    <ion-card-title>{{ 'PREDICTION.MAKE_YOUR_PICK' | transloco }}</ion-card-title>
+    <ion-card-subtitle>{{ 'PREDICTION.GUESS_SCORE' | transloco }}</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <div class="score-input-container">
+      <div class="team-input">
+        <ion-label>{{ homeTeamName }}</ion-label>
+        <ion-input type="number" [(ngModel)]="homeScore" placeholder="0" class="score-input"></ion-input>
+      </div>
+      <div class="separator">-</div>
+      <div class="team-input">
+        <ion-label>{{ awayTeamName }}</ion-label>
+        <ion-input type="number" [(ngModel)]="awayScore" placeholder="0" class="score-input"></ion-input>
+      </div>
+    </div>
+
+    <ion-button expand="block" (click)="submitVote()" [disabled]="homeScore === null || awayScore === null">
+      {{ 'PREDICTION.SUBMIT' | transloco }}
+    </ion-button>
+  </ion-card-content>
+</ion-card>
+
+<ng-template #votedTemplate>
+  <ion-card color="success">
+    <ion-card-content class="voted-content">
+      <ion-icon name="checkmark-circle-outline" size="large"></ion-icon>
+      <h2>{{ 'PREDICTION.VOTE_SUBMITTED' | transloco }}</h2>
+      <p>{{ homeTeamName }} {{ homeScore }} - {{ awayScore }} {{ awayTeamName }}</p>
+    </ion-card-content>
+  </ion-card>
+</ng-template>

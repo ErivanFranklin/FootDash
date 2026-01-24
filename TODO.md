@@ -232,3 +232,22 @@
   - [x] `TeamComparisonComponent` (Radar Chart)
   - [x] `TeamAnalyticsCardComponent` (Trend & Performance Charts)
   - [x] Localization of Charts & Insights
+
+## Phase 6 - Game On: Engagement & Monetization (In Progress) 🚀
+**Status:** In Progress
+**Start Date:** January 24, 2026
+
+### Sprint 1: Gamification Foundation (In Progress)
+- [x] Database Schema (UserPrediction, Badge, Leaderboard)
+- [x] Backend: Prediction Logic
+- [ ] Backend: Scoring Job (Cron)
+- [x] Frontend: Prediction UI (Vote on Match Result)
+- [x] Frontend: Leaderboard Display
+
+### Sprint 2: Social Features
+- [ ] WebSocket Match Chat Rooms
+- [ ] Live Match Reactions
+
+### Sprint 3: Monetization (Pro)
+- [ ] Stripe Integration
+- [ ] Pro Subscription Guard / Paywall

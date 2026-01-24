@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { UsersModule } from './users/users.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { SocialModule } from './social/social.module';
+import { GamificationModule } from './gamification/gamification.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -59,6 +60,7 @@ const isProd = process.env.NODE_ENV === 'production';
     UsersModule,
     AnalyticsModule,
     SocialModule,
+    GamificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
