@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { PredictionResult } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -21,7 +22,7 @@ Chart.register(...registerables);
   templateUrl: './prediction-card.component.html',
   styleUrls: ['./prediction-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, TranslocoPipe],
 })
 export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() matchId!: number;
@@ -158,7 +159,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
     this.chart = new Chart(ctx, config);
   }
 
-  getMostLikelyOutcome(): { outcome: string; probability: number } | null {
+  getMostLikelyOutcome(): { type: 'home' | 'away' | 'draw'; probability: number } | null {
     if (!this.prediction) return null;
     return this.analyticsService.getMostLikelyOutcome(this.prediction);
   }

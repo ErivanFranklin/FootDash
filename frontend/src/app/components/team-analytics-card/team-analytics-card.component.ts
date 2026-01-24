@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { TeamAnalytics } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -21,7 +22,7 @@ Chart.register(...registerables);
   templateUrl: './team-analytics-card.component.html',
   styleUrls: ['./team-analytics-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, TranslocoModule],
 })
 export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() teamId!: number;
@@ -32,10 +33,11 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
   analytics: TeamAnalytics | null = null;
   loading = true;
   error: string | null = null;
-  formChart: Chart | null = null;
-  performanceChart: Chart | null = null;
+  private formChart: Chart | null = null;
+  private performanceChart: Chart | null = null;
 
   private analyticsService = inject(AnalyticsService);
+  private translocoService = inject(TranslocoService);
 
   ngOnInit() {
     this.loadAnalytics();
@@ -88,13 +90,17 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
     const ctx = this.formChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    if (this.formChart) this.formChart.destroy();
+    
+    const t = (key: string) => this.translocoService.translate(`ANALYTICS.CHARTS.${key}`);
+
     const config: ChartConfiguration = {
       type: 'line',
       data: {
-        labels: ['Match 1', 'Match 2', 'Match 3', 'Match 4', 'Match 5'],
+        labels: ['M-5', 'M-4', 'M-3', 'M-2', 'M-1'],
         datasets: [
           {
-            label: 'Goals Scored',
+            label: t('GOALS'),
             data: this.analytics.scoringTrend.last5Matches,
             borderColor: 'rgba(52, 199, 89, 1)',
             backgroundColor: 'rgba(52, 199, 89, 0.1)',
@@ -112,7 +118,7 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
           },
           tooltip: {
             callbacks: {
-              label: (context) => `Goals: ${context.parsed.y}`,
+              label: (context) => `${t('GOALS')}: ${context.parsed.y}`,
             },
           },
         },
@@ -138,13 +144,17 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
     const ctx = this.performanceChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    if (this.performanceChart) this.performanceChart.destroy();
+    
+    const t = (key: string) => this.translocoService.translate(`ANALYTICS.CHARTS.${key}`);
+
     const config: ChartConfiguration = {
       type: 'bar',
       data: {
-        labels: ['Home', 'Away'],
+        labels: [t('HOME'), t('AWAY')],
         datasets: [
           {
-            label: 'Wins',
+            label: t('WINS'),
             data: [
               this.analytics.homePerformance.won,
               this.analytics.awayPerformance.won,
@@ -152,7 +162,7 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
             backgroundColor: 'rgba(52, 199, 89, 0.8)',
           },
           {
-            label: 'Draws',
+            label: t('DRAWS'),
             data: [
               this.analytics.homePerformance.drawn,
               this.analytics.awayPerformance.drawn,
@@ -160,7 +170,7 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
             backgroundColor: 'rgba(255, 204, 0, 0.8)',
           },
           {
-            label: 'Losses',
+            label: t('LOSSES'),
             data: [
               this.analytics.homePerformance.lost,
               this.analytics.awayPerformance.lost,

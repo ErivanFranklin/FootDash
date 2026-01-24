@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/matches"></ion-back-button>
     </ion-buttons>
-    <ion-title>Match Prediction</ion-title>
+    <ion-title>{{ 'ANALYTICS.TITLE' | transloco }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -12,7 +12,7 @@
     <!-- Loading State -->
     <div *ngIf="loading" class="loading-container">
       <ion-spinner name="crescent"></ion-spinner>
-      <p>Loading match data...</p>
+      <p>{{ 'ANALYTICS.LOADING' | transloco }}</p>
     </div>
 
     <!-- Match Content -->
@@ -23,7 +23,7 @@
           {{ match.kickOff | date: 'medium' }}
         </p>
         <p *ngIf="match.status" class="match-status">
-          Status: {{ match.status }}
+          {{ 'ANALYTICS.STATUS' | transloco }} {{ match.status }}
         </p>
       </div>
 
@@ -40,6 +40,33 @@
         [homeTeamId]="match.homeTeam.id"
         [awayTeamId]="match.awayTeam.id"
       ></app-team-comparison>
+
+      <!-- Detailed Team Analysis -->
+      <ion-accordion-group expand="inset" class="team-details-accordion">
+        <ion-accordion value="home">
+          <ion-item slot="header" color="light">
+            <ion-label>{{ match.homeTeam.name }} - {{ 'ANALYTICS.ANALYSIS' | transloco }}</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <app-team-analytics-card
+              [teamId]="match.homeTeam.id"
+              [showCharts]="true"
+            ></app-team-analytics-card>
+          </div>
+        </ion-accordion>
+
+        <ion-accordion value="away">
+          <ion-item slot="header" color="light">
+            <ion-label>{{ match.awayTeam.name }} - {{ 'ANALYTICS.ANALYSIS' | transloco }}</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <app-team-analytics-card
+              [teamId]="match.awayTeam.id"
+              [showCharts]="true"
+            ></app-team-analytics-card>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
     </ng-container>
 
     <!-- Error State -->

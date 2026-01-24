@@ -38,9 +38,64 @@
   "MATCH_DETAILS": {
     "STATS": "Estadísticas",
     "LINEUPS": "Alineaciones",
-    "EVENTS": "Eventos"
+    "EVENTS": "Eventos",
+    "TITLE": "Detalles del Partido",
+    "CONNECTION": "Conexión:",
+    "KICKOFF": "Inicio:",
+    "VENUE": "Estadio:",
+    "REFEREE": "Árbitro:",
+    "COMPETITION": "Competición:",
+    "VIEW_PREDICTION": "Ver Predicción del Partido"
+  },
+  "ANALYTICS": {
+    "TITLE": "Predicción del Partido",
+    "LOADING": "Cargando datos...",
+    "STATUS": "Estado:"
   },
   "PROFILE": {
     "JOINED": "Se unió en"
-  }
+  },
+  "PREDICTION": {
+    "TITLE": "Predicción del Partido",
+    "LOADING": "Analizando Datos...",
+    "RETRY": "Reintentar",
+    "CONFIDENCE": "Confianza: {{level}}",
+    "PROBABILITY": "Probabilidad de Victoria",
+    "HOME_WIN": "Victoria Local",
+    "DRAW": "Empate",
+    "AWAY_WIN": "Victoria Visitante",
+    "KEY_FACTORS": "Factores Clave",
+    "HIGH": "Alta",
+    "MEDIUM": "Media",
+    "LOW": "Baja",
+    "MOST_LIKELY": "Resultado Más Probable",
+    "REGENERATE": "Regenerar Predicción",
+    "WIN": "Victoria"
+  },
+  "ANALYTICS": {
+    "TITLE": "Análisis del Partido",
+    "LOADING": "Cargando Datos...",
+    "STATUS": "Estado:"
+  },
+  "COMPARISON": {
+    "TITLE": "Comparación de Estadísticas",
+    "ATTACK": "Ataque",
+    "DEFENSE": "Defensa",
+    "FORM": "Forma",
+    "WIN_RATE": "Tasa de Victoria",
+    "POINTS": "Eficiencia de Puntos",
+    "ADVANTAGE": "Ventaja",
+    "HOME_ADVANTAGE": "Ventaja Local",
+    "AWAY_ADVANTAGE": "Ventaja Visitante",
+    "NEUTRAL": "Equilibrado"
+  },
+  "CHARTS": {
+    "GOALS": "Goles Marcados",
+    "WINS": "Victorias",
+    "DRAWS": "Empates",
+    "LOSSES": "Derrotas",
+    "HOME": "Local",
+    "AWAY": "Visitante"
+  },
+  "ANALYSIS": "Análisis"
 }

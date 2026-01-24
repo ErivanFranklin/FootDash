@@ -38,9 +38,61 @@
   "MATCH_DETAILS": {
     "STATS": "Stats",
     "LINEUPS": "Lineups",
-    "EVENTS": "Events"
+    "EVENTS": "Events",
+    "TITLE": "Match Details",
+    "CONNECTION": "Connection:",
+    "KICKOFF": "Kickoff:",
+    "VENUE": "Venue:",
+    "REFEREE": "Referee:",
+    "COMPETITION": "Competition:",
+    "VIEW_PREDICTION": "View Match Prediction"
+  },
+  "ANALYTICS": {
+    "TITLE": "Match Analysis",
+    "LOADING": "Loading Match Data...",
+    "STATUS": "Status:",
+    "CHARTS": {
+      "GOALS": "Goals Scored",
+      "WINS": "Wins",
+      "DRAWS": "Draws",
+      "LOSSES": "Losses",
+      "HOME": "Home",
+      "AWAY": "Away"
+    }
   },
   "PROFILE": {
     "JOINED": "Joined"
+  },
+  "PREDICTION": {
+    "TITLE": "Match Prediction",
+    "LOADING": "Analyzing Data...",
+    "RETRY": "Retry Analysis",
+    "CONFIDENCE": "Confidence: {{level}}",
+    "PROBABILITY": "Win Probability",
+    "HOME_WIN": "Home Win",
+    "DRAW": "Draw",
+    "AWAY_WIN": "Away Win",
+    "KEY_FACTORS": "Key Factors",
+    "HIGH": "High",
+    "MEDIUM": "Medium",
+    "LOW": "Low",
+    "MOST_LIKELY": "Most Likely Outcome",
+    "REGENERATE": "Regenerate Prediction",
+    "WIN": "Win"
+  },
+  "COMPARISON": {
+    "TITLE": "Team Stats Comparison",
+    "ATTACK": "Attack",
+    "DEFENSE": "Defense",
+    "FORM": "Form",
+    "WIN_RATE": "Win Rate",
+    "POINTS": "Points Efficiency",
+    "ADVANTAGE": "Advantage",
+    "HOME_ADVANTAGE": "Home Advantage",
+    "AWAY_ADVANTAGE": "Away Advantage",
+    "NEUTRAL": "Even Match"
+  },
+  "ANALYSIS": {
+    "TITLE": "Analysis"
   }
 }
