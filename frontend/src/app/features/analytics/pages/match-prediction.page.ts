@@ -1,12 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonAccordion, IonAccordionGroup, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { PredictionCardComponent } from '../../../components/prediction-card/prediction-card.component';
 import { TeamComparisonComponent } from '../../../components/team-comparison/team-comparison.component';
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TeamAnalyticsCardComponent } from '../../../components/team-analytics-card/team-analytics-card.component';
 
 interface Match {
   id: number;
@@ -30,8 +32,14 @@ interface Match {
     IonButtons,
     IonBackButton,
     IonSpinner,
+    IonAccordion,
+    IonAccordionGroup,
+    IonItem,
+    IonLabel,
+    TranslocoPipe,
     PredictionCardComponent,
     TeamComparisonComponent,
+    TeamAnalyticsCardComponent
   ],
 })
 export class MatchPredictionPage implements OnInit {

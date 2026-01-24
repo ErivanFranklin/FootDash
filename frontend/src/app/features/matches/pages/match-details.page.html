@@ -1,8 +1,8 @@
-<app-page-header title="Match Details" />
+<app-page-header [title]="'MATCH_DETAILS.TITLE' | transloco" />
 
 <ion-content>
   <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;">
-    <ion-badge *ngIf="(connectionStatus$ | async) as status">Connection: {{ status }}</ion-badge>
+    <ion-badge *ngIf="(connectionStatus$ | async) as status">{{ 'MATCH_DETAILS.CONNECTION' | transloco }} {{ status }}</ion-badge>
     <ion-spinner *ngIf="(connectionStatus$ | async) === 'connecting'" name="dots"></ion-spinner>
   </div>
 
@@ -43,18 +43,18 @@
     </section>
 
     <section class="meta">
-      <div class="meta-row"><strong>Kickoff:</strong>
+      <div class="meta-row"><strong>{{ 'MATCH_DETAILS.KICKOFF' | transloco }}</strong>
         <span>{{ match.kickOff | date:'short' }}</span>
       </div>
-      <div class="meta-row" *ngIf="match.venueName"><strong>Venue:</strong> <span>{{ match.venueName }}</span></div>
-      <div class="meta-row" *ngIf="match.referee"><strong>Referee:</strong> <span>{{ match.referee }}</span></div>
-      <div class="meta-row" *ngIf="match.leagueName"><strong>Competition:</strong> <span>{{ match.leagueName }}</span></div>
+      <div class="meta-row" *ngIf="match.venueName"><strong>{{ 'MATCH_DETAILS.VENUE' | transloco }}</strong> <span>{{ match.venueName }}</span></div>
+      <div class="meta-row" *ngIf="match.referee"><strong>{{ 'MATCH_DETAILS.REFEREE' | transloco }}</strong> <span>{{ match.referee }}</span></div>
+      <div class="meta-row" *ngIf="match.leagueName"><strong>{{ 'MATCH_DETAILS.COMPETITION' | transloco }}</strong> <span>{{ match.leagueName }}</span></div>
     </section>
 
     <section class="actions">
       <a [routerLink]="['/analytics/match', matchId]" class="view-prediction-btn">
         <ion-button expand="block" color="secondary">
-          View Match Prediction
+          {{ 'MATCH_DETAILS.VIEW_PREDICTION' | transloco }}
         </ion-button>
       </a>
     </section>

@@ -171,34 +171,25 @@ export class AnalyticsService {
    * Get confidence badge text
    */
   getConfidenceText(confidence: 'low' | 'medium' | 'high'): string {
-    switch (confidence) {
-      case 'high':
-        return 'High Confidence';
-      case 'medium':
-        return 'Medium Confidence';
-      case 'low':
-        return 'Low Confidence';
-      default:
-        return 'Unknown';
-    }
+    return confidence.toUpperCase();
   }
 
   /**
    * Get the most likely outcome
    */
   getMostLikelyOutcome(prediction: PredictionResult): {
-    outcome: string;
+    type: 'home' | 'away' | 'draw';
     probability: number;
   } {
-    const { homeWinProbability, drawProbability, awayWinProbability, homeTeam, awayTeam } = prediction;
+    const { homeWinProbability, drawProbability, awayWinProbability } = prediction;
     
     if (homeWinProbability > drawProbability && homeWinProbability > awayWinProbability) {
-      return { outcome: `${homeTeam} Win`, probability: homeWinProbability };
+      return { type: 'home', probability: homeWinProbability };
     }
     if (awayWinProbability > homeWinProbability && awayWinProbability > drawProbability) {
-      return { outcome: `${awayTeam} Win`, probability: awayWinProbability };
+      return { type: 'away', probability: awayWinProbability };
     }
-    return { outcome: 'Draw', probability: drawProbability };
+    return { type: 'draw', probability: drawProbability };
   }
 
   /**

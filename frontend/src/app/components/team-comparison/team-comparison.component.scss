@@ -248,6 +248,14 @@ h3 {
   }
 }
 
+// Chart Container
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
 // Dark mode support
 @media (prefers-color-scheme: dark) {
   .team-comparison-card {
