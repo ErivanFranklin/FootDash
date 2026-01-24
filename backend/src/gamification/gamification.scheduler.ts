@@ -48,7 +48,7 @@ export class GamificationScheduler {
 
     // 3. Process each match
     for (const match of finishedMatches) {
-        if (match.homeScore !== null && match.awayScore !== null) {
+        if (match.homeScore != null && match.awayScore != null) {
             await this.gamificationService.processMatchResult(match.id, match.homeScore, match.awayScore);
             this.logger.log(`Processed results for match ${match.id}`);
         }
