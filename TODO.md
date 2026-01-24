@@ -237,10 +237,10 @@
 **Status:** In Progress
 **Start Date:** January 24, 2026
 
-### Sprint 1: Gamification Foundation (In Progress)
+### Sprint 1: Gamification Foundation (COMPLETE)
 - [x] Database Schema (UserPrediction, Badge, Leaderboard)
 - [x] Backend: Prediction Logic
-- [ ] Backend: Scoring Job (Cron)
+- [x] Backend: Scoring Job (Cron)
 - [x] Frontend: Prediction UI (Vote on Match Result)
 - [x] Frontend: Leaderboard Display
 
