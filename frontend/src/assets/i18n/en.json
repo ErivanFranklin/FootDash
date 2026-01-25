@@ -89,8 +89,7 @@
     "WEEKLY": "Weekly",
     "MONTHLY": "Monthly",
     "ALL_TIME": "All Time"
-  }
-},
+  },
   "COMPARISON": {
     "TITLE": "Team Stats Comparison",
     "ATTACK": "Attack",
