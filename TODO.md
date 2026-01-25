@@ -248,8 +248,12 @@
 - [x] WebSocket Match Chat Rooms
 - [x] Backend: Chat Entity & Service
 - [x] Frontend: Chat UI in Match Details
-- [ ] Live Match Reactions (Deferred to refinement)
+- [x] Live Match Reactions (Deferred to refinement)
 
-### Sprint 3: Monetization (Pro)
-- [ ] Stripe Integration
-- [ ] Pro Subscription Guard / Paywall
+### Sprint 3: Monetization (Pro) (COMPLETE)
+- [x] Stripe Integration (Backend & Frontend)
+- [x] Pro Subscription Guard / Paywall
+- [x] Pro Page & Payment Success Page
+- [x] Update User Entity with isPro flag
+
+## Phase 7

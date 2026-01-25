@@ -112,6 +112,18 @@
     "PLACEHOLDER": "Type a message...",
     "SEND": "Send"
   },
+  "SUBSCRIPTION": {
+    "TITLE": "Go Pro",
+    "SUBTITLE": "Unlock the ultimate football experience",
+    "FEATURE_1_TITLE": "Advanced Analytics",
+    "FEATURE_1_DESC": "Deep dive into match stats and player performance",
+    "FEATURE_2_TITLE": "Ad-Free",
+    "FEATURE_2_DESC": "Enjoy matches without interruptions",
+    "FEATURE_3_TITLE": "Exclusive Badges",
+    "FEATURE_3_DESC": "Stand out in chat and leaderboards",
+    "SUBSCRIBE_BTN": "Start 7-Day Free Trial",
+    "DISCLAIMER": "Cancel anytime. Billed monthly thereafter."
+  },
   "TEAMS": {
     "STANDINGS": "Standings",
     "SCHEDULE": "Schedule",
