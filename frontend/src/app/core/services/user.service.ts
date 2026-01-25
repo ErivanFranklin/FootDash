@@ -9,7 +9,7 @@ import { User } from '../models/user.model';
 })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiBaseUrl;
   
   // Using Signals for state management
   currentUser = signal<User | null>(null);

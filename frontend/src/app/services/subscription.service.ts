@@ -8,7 +8,7 @@ import { switchMap } from 'rxjs/operators';
 })
 export class SubscriptionService {
   private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiBaseUrl;
 
   startSubscription(priceId?: string) {
     return this.http.post<{ url: string }>(`${this.apiUrl}/payments/create-checkout-session`, { priceId })

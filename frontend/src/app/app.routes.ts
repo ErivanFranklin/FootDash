@@ -39,7 +39,7 @@ export const routes: Routes = [
   },
   {
     path: 'leaderboard',
-    loadComponent: () => import('./features/gamification/pages/leaderboard.page').then(m => m.LeaderboardPage),
+    loadComponent: () => import('./features/gamification/pages/leaderboard/leaderboard.page').then(m => m.LeaderboardPage),
     canActivate: [authGuard],
   },
   {
