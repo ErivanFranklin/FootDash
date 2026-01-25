@@ -59,6 +59,10 @@
       </app-prediction-voting>
     </section>
 
+    <section class="chat-section" style="padding: 16px;">
+      <app-match-chat [matchId]="matchId"></app-match-chat>
+    </section>
+
     <section class="actions">
       <a [routerLink]="['/analytics/match', matchId]" class="view-prediction-btn">
         <ion-button expand="block" color="secondary">
