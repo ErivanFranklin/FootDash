@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { proGuard } from './core/guards/pro.guard';
 
 export const routes: Routes = [
   {
@@ -25,7 +26,7 @@ export const routes: Routes = [
   {
     path: 'analytics/match/:matchId',
     loadComponent: () => import('./features/analytics/pages/match-prediction.page').then(m => m.MatchPredictionPage),
-    canActivate: [authGuard],
+    canActivate: [authGuard, proGuard],
   },
   {
     path: 'analytics/team/:teamId',
@@ -38,7 +39,17 @@ export const routes: Routes = [
   },
   {
     path: 'leaderboard',
-    loadComponent: () => import('./features/gamification/pages/leaderboard/leaderboard.page').then(m => m.LeaderboardPage),
+    loadComponent: () => import('./features/gamification/pages/leaderboard.page').then(m => m.LeaderboardPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'pro',
+    loadComponent: () => import('./features/subscription/pages/pro-page/pro-page.component').then(m => m.ProPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'payments/success',
+    loadComponent: () => import('./features/subscription/pages/payment-success.page').then(m => m.PaymentSuccessPage),
     canActivate: [authGuard],
   },
   {
