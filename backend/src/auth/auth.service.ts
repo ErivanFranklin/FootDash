@@ -159,7 +159,6 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
   }
-  }
 
   private async createTokens(user: AuthUser): Promise<AuthTokens> {
     const accessToken = this.jwtService.sign(

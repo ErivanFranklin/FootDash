@@ -20,7 +20,7 @@ export class PaymentsService {
         this.logger.warn('STRIPE_SECRET_KEY is not set. Payments will not work.');
     }
     this.stripe = new Stripe(apiKey || 'sk_test_placeholder', {
-      apiVersion: '2025-01-27.acacia', // Latest API version
+      apiVersion: '2025-12-15.clover' as any, // Latest API version mismatch workaround
     });
   }
 
@@ -64,6 +64,9 @@ export class PaymentsService {
 
   async handleWebhook(signature: string, payload: Buffer) {
     const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      throw new Error('STRIPE_WEBHOOK_SECRET is not set');
+    }
     let event: Stripe.Event;
 
     try {
