@@ -105,5 +105,22 @@
   },
   "ANALYSIS": {
     "TITLE": "Analysis"
+  },
+  "CHAT": {
+    "TITLE": "Live Chat",
+    "EMPTY": "No messages yet. Be the first to say hi!",
+    "PLACEHOLDER": "Type a message...",
+    "SEND": "Send"
+  },
+  "TEAMS": {
+    "STANDINGS": "Standings",
+    "SCHEDULE": "Schedule",
+    "RESULTS": "Results",
+    "NEXT_MATCH": "Next Match",
+    "LAST_MATCH": "Last Match",
+    "HOME": "Home",
+    "AWAY": "Away",
+    "PERCENTAGE": "{{percent}}% Win Rate",
+    "POINTS": "Points: {{points}}"
   }
 }

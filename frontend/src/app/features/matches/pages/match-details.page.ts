@@ -10,13 +10,14 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { normalizeMatch, NormalizedMatch } from '../../../core/adapters/match-adapter';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PredictionVotingComponent } from '../../../components/prediction-voting/prediction-voting.component';
+import { MatchChatComponent } from '../../../components/match-chat/match-chat.component';
 
 @Component({
   selector: 'app-match-details',
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, PageHeaderComponent, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, PageHeaderComponent, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent, MatchChatComponent],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

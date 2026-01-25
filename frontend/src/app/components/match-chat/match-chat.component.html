@@ -1,0 +1,33 @@
+<div class="chat-container">
+  <div class="header">
+    <h3>{{ 'CHAT.TITLE' | transloco }}</h3>
+    <span class="live-dot"></span>
+  </div>
+
+  <div class="messages-area">
+    <div class="empty-state" *ngIf="messages.length === 0">
+      <p>{{ 'CHAT.EMPTY' | transloco }}</p>
+    </div>
+    
+    <div class="message" *ngFor="let msg of messages" [class.own-message]="msg.userId === currentUserI">
+      <div class="bubble">
+        <span class="sender" *ngIf="msg.userId !== currentUserI">User {{ msg.userId }}</span>
+        <p>{{ msg.content }}</p>
+        <span class="time">{{ msg.createdAt | date:'shortTime' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <ion-item lines="none" class="input-item">
+      <ion-input 
+        [(ngModel)]="newMessage" 
+        (keyup.enter)="sendMessage()" 
+        placeholder="{{ 'CHAT.PLACEHOLDER' | transloco }}">
+      </ion-input>
+      <ion-button fill="clear" (click)="sendMessage()" slot="end" [disabled]="!newMessage.trim()">
+        <ion-icon name="send"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </div>
+</div>

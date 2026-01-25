@@ -8,6 +8,7 @@ import { Follow } from './entities/follow.entity';
 import { UserActivity } from './entities/user-activity.entity';
 import { Report } from './entities/report.entity';
 import { Alert } from './entities/alert.entity';
+import { ChatMsg } from './entities/chat-msg.entity';
 
 // Services
 import { CommentsService } from './services/comments.service';
@@ -17,6 +18,8 @@ import { FeedService } from './services/feed.service';
 import { ReportsService } from './services/reports.service';
 import { ProfanityFilterService } from './services/profanity-filter.service';
 import { AlertsService } from './services/alerts.service';
+import { ChatService } from './services/chat.service';
+import { ChatGateway } from './gateways/chat.gateway';
 
 // Controllers
 import { CommentsController } from './controllers/comments.controller';
@@ -25,6 +28,7 @@ import { FollowController } from './controllers/follow.controller';
 import { FeedController } from './controllers/feed.controller';
 import { ReportsController } from './controllers/reports.controller';
 import { AlertsController } from './controllers/alerts.controller';
+
 
 // External dependencies
 import { UsersModule } from '../users/users.module';
@@ -40,6 +44,7 @@ import { WebsocketsModule } from '../websockets/websockets.module';
       UserActivity,
       Report,
       Alert,
+      ChatMsg, 
     ]),
     UsersModule,
     MatchesModule,
@@ -61,6 +66,8 @@ import { WebsocketsModule } from '../websockets/websockets.module';
     ReportsService,
     ProfanityFilterService,
     AlertsService,
+    ChatService,
+    ChatGateway,
   ],
   exports: [
     CommentsService,
