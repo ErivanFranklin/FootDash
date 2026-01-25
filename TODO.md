@@ -244,9 +244,11 @@
 - [x] Frontend: Prediction UI (Vote on Match Result)
 - [x] Frontend: Leaderboard Display
 
-### Sprint 2: Social Features
-- [ ] WebSocket Match Chat Rooms
-- [ ] Live Match Reactions
+### Sprint 2: Social Features (COMPLETE)
+- [x] WebSocket Match Chat Rooms
+- [x] Backend: Chat Entity & Service
+- [x] Frontend: Chat UI in Match Details
+- [ ] Live Match Reactions (Deferred to refinement)
 
 ### Sprint 3: Monetization (Pro)
 - [ ] Stripe Integration
