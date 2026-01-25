@@ -9,4 +9,7 @@ export class ProfileDto {
 
   @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty({ example: false })
+  isPro: boolean;
 }

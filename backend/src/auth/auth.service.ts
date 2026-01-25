@@ -146,20 +146,19 @@ export class AuthService {
       }
     }
 
-    // Fallback to user record if profile service not available or profile not found
+        // Fallback to user record if profile service not available or profile not found
     try {
-      const user = await this.usersRepo.findOneBy({ id: userId });
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
+      const user = await this.usersRepo.findOneByOrFail({ id: userId });
       return {
         id: user.id,
         email: user.email,
-        createdAt: (user as any).createdAt,
+        createdAt: user.createdAt,
+        isPro: user.isPro,
       } as ProfileDto;
-    } catch (err) {
-      throw err;
+    } catch {
+      throw new UnauthorizedException('User not found');
     }
+  }
   }
 
   private async createTokens(user: AuthUser): Promise<AuthTokens> {
