@@ -115,17 +115,10 @@ export class AuthController {
   async getProfile(
     @Request() req: { user: { id: number } },
   ): Promise<ProfileDto> {
-    // If JWT includes email (set during token creation), prefer returning that
-    // directly for stability in tests/environments where profile mapping may vary.
     const userPayload: any = req.user || {};
     const userId = userPayload.id ?? userPayload.sub;
-    if (userId && userPayload.email) {
-      return {
-        id: userId,
-        email: userPayload.email,
-        createdAt: (userPayload.createdAt as Date) || new Date(),
-      } as ProfileDto;
-    }
+    
+    // Always fetch from DB to ensure fresh subscription status (isPro)
     return this.authService.getProfile(userId);
   }
 }
