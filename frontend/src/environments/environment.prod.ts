@@ -1,9 +1,8 @@
 export const environment = {
   production: true,
-  // In containerized prod image served by Nginx, call the backend via Nginx proxy
-  // so the browser hits /api and Nginx forwards to the backend container.
-  apiBaseUrl: '/api',
+  // In Docker on localhost, call the backend directly on port 4000.
+  apiBaseUrl: 'http://localhost:4000/api',
   authPath: '/auth',
-  websocketUrl: '/',
+  websocketUrl: 'http://localhost:4000',
   pushPublicKey: 'BDqGD_yDIznkf3hEDXAp2YlErNyAphXBwLE7mgiOq2qsqRi6KYoIWJIA3LrSLg6wpQUyQKhKZYeTSYJsUuxsq7U'
 };

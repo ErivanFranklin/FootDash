@@ -8,6 +8,8 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
     build: ./backend
@@ -27,6 +29,7 @@ services:
       # Optional Football API config (leave empty for local dev without external calls)
       - FOOTBALL_API_URL=https://v3.football.api-sports.io
       - FOOTBALL_API_KEY=86fab59f8a111466351853e50973561c
+      - FOOTBALL_API_MOCK=true
     ports:
       - "4000:4000"
     depends_on:
@@ -61,3 +64,6 @@ services:
       - "3000:80"
     depends_on:
       - backend
+
+volumes:
+  postgres_data:

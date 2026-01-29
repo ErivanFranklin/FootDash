@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -42,24 +43,30 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterAuthDto): Promise<AuthResult> {
-    const email = dto.email.toLowerCase();
-    const existing = await this.usersRepo.findOneBy({ email });
-    if (existing) {
-      throw new ConflictException('Email already registered');
+    try {
+      const email = dto.email.toLowerCase();
+      const existing = await this.usersRepo.findOneBy({ email });
+      if (existing) {
+        throw new ConflictException('Email already registered');
+      }
+
+      const passwordHash = await bcrypt.hash(dto.password, 10);
+      const created = this.usersRepo.create({
+        email,
+        password_hash: passwordHash,
+      });
+      const saved = await this.usersRepo.save(created);
+
+      const tokens = await this.createTokens({
+        id: saved.id,
+        email: saved.email,
+      });
+      return { user: { id: saved.id, email: saved.email }, tokens };
+    } catch (error) {
+       if (error instanceof ConflictException) throw error;
+       console.error('Registration error details:', error);
+       throw new InternalServerErrorException(error.message);
     }
-
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-    const created = this.usersRepo.create({
-      email,
-      password_hash: passwordHash,
-    });
-    const saved = await this.usersRepo.save(created);
-
-    const tokens = await this.createTokens({
-      id: saved.id,
-      email: saved.email,
-    });
-    return { user: { id: saved.id, email: saved.email }, tokens };
   }
 
   async login(dto: LoginAuthDto): Promise<AuthResult> {

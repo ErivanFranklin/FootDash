@@ -13,16 +13,36 @@ async function seed() {
     const existing = await ds.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
     if (existing && existing.length > 0) {
       console.log(`User ${email} already exists (id=${existing[0].id})`);
-      await ds.destroy();
-      return;
+    } else {
+      const hash = await bcrypt.hash(password, 10);
+      const res = await ds.query(
+        'INSERT INTO users (email, password_hash, created_at) VALUES ($1, $2, NOW()) RETURNING id',
+        [email.toLowerCase(), hash]
+      );
+      console.log('Inserted seed user id=', res[0]?.id || '(unknown)');
     }
 
-    const hash = await bcrypt.hash(password, 10);
-    const res = await ds.query(
-      'INSERT INTO users (email, password_hash, created_at) VALUES ($1, $2, NOW()) RETURNING id',
-      [email.toLowerCase(), hash]
-    );
-    console.log('Inserted seed user id=', res[0]?.id || '(unknown)');
+    const teamRows = await ds.query('SELECT id FROM teams LIMIT 1');
+    if (!teamRows || teamRows.length === 0) {
+      await ds.query(
+        'INSERT INTO teams ("externalId", name, "shortCode") VALUES ($1, $2, $3), ($4, $5, $6), ($7, $8, $9)',
+        [
+          140,
+          'LA Galaxy',
+          'LAG',
+          33,
+          'Manchester United',
+          'MUN',
+          49,
+          'Chelsea',
+          'CHE',
+        ]
+      );
+      console.log('Inserted seed teams');
+    } else {
+      console.log('Teams already exist; skipping team seed');
+    }
+
     await ds.destroy();
   } catch (err) {
     console.error('Seeding error', err);

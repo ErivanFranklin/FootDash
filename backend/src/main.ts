@@ -16,6 +16,8 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
+  
+  app.setGlobalPrefix('api'); // Standardize all endpoints under /api/*
 
   app.enableCors();
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
@@ -74,10 +76,6 @@ async function bootstrap() {
       displayRequestDuration: true,
     },
   });
-  // Initialize the Nest app internals (register routes) so we can mount
-  // static middleware afterwards and let Nest API routes take precedence.
-  await app.init();
-
   // Serve frontend production build (www) and provide SPA fallback for client-side routing.
   // Exclude API and uploads routes from the fallback so API routes continue to work.
   // Try two candidate paths for the built frontend (dist vs source run modes)
