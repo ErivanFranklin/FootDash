@@ -45,13 +45,21 @@ export class ChatGateway {
 
   @SubscribeMessage('send-message')
   async handleMessage(
-    @MessageBody() payload: { userId: number; matchId: number; content: string },
-    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    payload: {
+      userId: number;
+      matchId: number;
+      content: string;
+    },
   ) {
     // In real app, userId should be extracted from Auth token in socket handshake
     // For now we accept it from payload for simplicity/MVP
-    const savedMsg = await this.chatService.saveMessage(payload.userId, payload.matchId, payload.content);
-    
+    const savedMsg = await this.chatService.saveMessage(
+      payload.userId,
+      payload.matchId,
+      payload.content,
+    );
+
     // Broadcast to room
     const room = `match-${payload.matchId}`;
     this.server.to(room).emit('new-message', savedMsg);
