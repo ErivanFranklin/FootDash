@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShareService {
-  constructor(private toast: ToastController) {}
+  private toast = inject(ToastController);
+
+  constructor() {}
 
   /**
    * Share content using native Web Share API if available,

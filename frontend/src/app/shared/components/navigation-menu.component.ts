@@ -45,7 +45,7 @@ import { AuthService } from '../../core/services/auth.service';
       
       <ion-item button lines="none" color="danger" (click)="logout()">
         <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        <ion-label>{{ 'NAV.LOGOUT' | transloco: 'Logout' }}</ion-label>
+        <ion-label>{{ 'NAV.LOGOUT' | transloco }}</ion-label>
       </ion-item>
     </ion-list>
   `,

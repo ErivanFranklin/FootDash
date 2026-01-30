@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular';
@@ -37,7 +37,9 @@ export class BottomSheetComponent {
   @Input() closeIcon = 'close';
   @Output() dismissed = new EventEmitter<void>();
 
-  constructor(private modalCtrl: ModalController) {}
+  private modalCtrl = inject(ModalController);
+
+  constructor() {}
 
   dismiss() {
     this.dismissed.emit();

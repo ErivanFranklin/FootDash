@@ -1,12 +1,95 @@
 <?xml version="1.0"?>
-<testsuite name="Chrome Headless 144.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-01-30T09:32:56" id="0" hostname="ERIVANS-IMAC.station" tests="2" errors="0" failures="0" time="0.732">
+<testsuite name="Chrome Headless 144.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-01-30T10:05:50" id="0" hostname="ERIVANS-IMAC.station" tests="59" errors="0" failures="0" time="0.666">
   <properties>
     <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/144.0.0.0 Safari/537.36"/>
   </properties>
-  <testcase name="Navigation (Router) should navigate to login if unauthenticated" time="0.727" classname="Navigation (Router)"/>
-  <testcase name="Navigation (Router) should have correct route paths configured" time="0.005" classname="Navigation (Router)"/>
+  <testcase name="UserProfilePage should create" time="0.133" classname="UserProfilePage"/>
+  <testcase name="authInterceptor should be created" time="0" classname="authInterceptor"/>
+  <testcase name="HomePage should create" time="0.062" classname="HomePage"/>
+  <testcase name="AppComponent should create the app" time="0.024" classname="AppComponent"/>
+  <testcase name="FeedItemComponent should create" time="0.043" classname="FeedItemComponent"/>
+  <testcase name="MatchDetailsPage Cleanup should unsubscribe from WebSocket on destroy" time="0.036" classname="MatchDetailsPage Cleanup"/>
+  <testcase name="MatchDetailsPage Initialization should subscribe to WebSocket match updates and normalize them" time="0.006" classname="MatchDetailsPage Initialization"/>
+  <testcase name="MatchDetailsPage Initialization should fetch initial match data and normalize it" time="0.005" classname="MatchDetailsPage Initialization"/>
+  <testcase name="MatchDetailsPage Initialization should subscribe to WebSocket connection status" time="0.006" classname="MatchDetailsPage Initialization"/>
+  <testcase name="MatchDetailsPage Initialization should extract matchId from route params" time="0.005" classname="MatchDetailsPage Initialization"/>
+  <testcase name="MatchDetailsPage Logo Loading should set logo loaded flags correctly for matches without logos" time="0.006" classname="MatchDetailsPage Logo Loading"/>
+  <testcase name="MatchDetailsPage Logo Loading should update logo loaded flag when onLogoLoaded is called" time="0.006" classname="MatchDetailsPage Logo Loading"/>
+  <testcase name="MatchDetailsPage should create" time="0.005" classname="MatchDetailsPage"/>
+  <testcase name="StatCardComponent shows trending-up for positive change" time="0.003" classname="StatCardComponent"/>
+  <testcase name="StatCardComponent applies aria attributes" time="0.003" classname="StatCardComponent"/>
+  <testcase name="StatCardComponent renders subtitle when provided" time="0.003" classname="StatCardComponent"/>
+  <testcase name="StatCardComponent renders label and value" time="0.002" classname="StatCardComponent"/>
+  <testcase name="StatCardComponent shows trending-down for negative change" time="0.003" classname="StatCardComponent"/>
+  <testcase name="Navigation (Router) should navigate to login if unauthenticated" time="0.004" classname="Navigation (Router)"/>
+  <testcase name="Navigation (Router) should have correct route paths configured" time="0.002" classname="Navigation (Router)"/>
+  <testcase name="FollowButtonComponent should create" time="0.035" classname="FollowButtonComponent"/>
+  <testcase name="CommentListComponent should create" time="0.059" classname="CommentListComponent"/>
+  <testcase name="CommentFormComponent should create" time="0.039" classname="CommentFormComponent"/>
+  <testcase name="PageHeaderComponent External Loading State should hide spinner when loading is false" time="0.006" classname="PageHeaderComponent External Loading State"/>
+  <testcase name="PageHeaderComponent External Loading State should respond to observable loading state changes" time="0.007" classname="PageHeaderComponent External Loading State"/>
+  <testcase name="PageHeaderComponent External Loading State should combine external and internal loading states" time="0.007" classname="PageHeaderComponent External Loading State"/>
+  <testcase name="PageHeaderComponent External Loading State should show spinner when loading is true" time="0.004" classname="PageHeaderComponent External Loading State"/>
+  <testcase name="PageHeaderComponent Component Lifecycle should clean up subscriptions on destroy" time="0.003" classname="PageHeaderComponent Component Lifecycle"/>
+  <testcase name="PageHeaderComponent Async Promise Handlers should show loading spinner while promise is pending" time="0.005" classname="PageHeaderComponent Async Promise Handlers"/>
+  <testcase name="PageHeaderComponent Async Promise Handlers should disable button while promise is pending" time="0.004" classname="PageHeaderComponent Async Promise Handlers"/>
+  <testcase name="PageHeaderComponent Async Promise Handlers should handle promise rejection gracefully" time="0.005" classname="PageHeaderComponent Async Promise Handlers"/>
+  <testcase name="PageHeaderComponent Async Observable Handlers should show loading spinner while observable is emitting" time="0.005" classname="PageHeaderComponent Async Observable Handlers"/>
+  <testcase name="PageHeaderComponent Async Observable Handlers should handle observable errors gracefully" time="0.004" classname="PageHeaderComponent Async Observable Handlers"/>
+  <testcase name="PageHeaderComponent should create" time="0.002" classname="PageHeaderComponent"/>
+  <testcase name="PageHeaderComponent Basic Rendering should render action buttons when actions provided" time="0.004" classname="PageHeaderComponent Basic Rendering"/>
+  <testcase name="PageHeaderComponent Basic Rendering should render title" time="0.003" classname="PageHeaderComponent Basic Rendering"/>
+  <testcase name="PageHeaderComponent Basic Rendering should render translucent header by default" time="0.002" classname="PageHeaderComponent Basic Rendering"/>
+  <testcase name="PageHeaderComponent Basic Rendering should render non-translucent header when specified" time="0.002" classname="PageHeaderComponent Basic Rendering"/>
+  <testcase name="PageHeaderComponent Basic Rendering should not render action buttons when no actions provided" time="0.002" classname="PageHeaderComponent Basic Rendering"/>
+  <testcase name="PageHeaderComponent Action Button Properties should apply custom size to button" time="0.003" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Action Button Properties should apply default size when not specified" time="0.003" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Action Button Properties should apply aria-label to button" time="0.003" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Action Button Properties should use label as aria-label when ariaLabel not provided" time="0.004" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Action Button Properties should render icon when provided" time="0.003" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Action Button Properties should disable button when disabled is true" time="0.004" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Action Button Properties should apply custom color to button" time="0.004" classname="PageHeaderComponent Action Button Properties"/>
+  <testcase name="PageHeaderComponent Synchronous Handlers should call handler when button clicked" time="0.003" classname="PageHeaderComponent Synchronous Handlers"/>
+  <testcase name="PageHeaderComponent Synchronous Handlers should not show loading spinner for sync handlers" time="0.003" classname="PageHeaderComponent Synchronous Handlers"/>
+  <testcase name="ReactionButtonComponent should create" time="0.037" classname="ReactionButtonComponent"/>
+  <testcase name="Auth should be created" time="0.002" classname="Auth"/>
+  <testcase name="LiveMatchService should be created" time="0.001" classname="LiveMatchService"/>
+  <testcase name="LiveMatchService should track live match IDs" time="0.001" classname="LiveMatchService"/>
+  <testcase name="LiveMatchService should initialize match state" time="0.002" classname="LiveMatchService"/>
+  <testcase name="LiveMatchService should subscribe to a match" time="0.001" classname="LiveMatchService"/>
+  <testcase name="LiveMatchService should detect live matches correctly" time="0.001" classname="LiveMatchService"/>
+  <testcase name="authGuard should be created" time="0" classname="authGuard"/>
+  <testcase name="MatchDiscussionPage should create" time="0.017" classname="MatchDiscussionPage"/>
+  <testcase name="WebSocketService should be created" time="0.002" classname="WebSocketService"/>
+  <testcase name="FeedPage should create" time="0.017" classname="FeedPage"/>
   <system-out>
-    <![CDATA[
+    <![CDATA[Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Connected to main WebSocket'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Social WebSocket connection error:', Error: Invalid namespace
+Error: Invalid namespace
+    at Socket.apply [as onpacket] (http://localhost:9876/_karma_webpack_/webpack:/node_modules/socket.io-client/build/esm/socket.js:506:29)
+    at Manager.emitReserved [as emit] (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@socket.io/component-emitter/lib/esm/index.js:136:20)
+    at apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/socket.io-client/build/esm/manager.js:209:18)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at Object.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/debug_node.mjs:7850:33)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+    at http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2537:40
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Connected to main WebSocket'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Social WebSocket connection error:', Error: Invalid namespace
+Error: Invalid namespace
+    at Socket.apply [as onpacket] (http://localhost:9876/_karma_webpack_/webpack:/node_modules/socket.io-client/build/esm/socket.js:506:29)
+    at Manager.emitReserved [as emit] (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@socket.io/component-emitter/lib/esm/index.js:136:20)
+    at apply (http://localhost:9876/_karma_webpack_/webpack:/node_modules/socket.io-client/build/esm/manager.js:209:18)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at Object.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/debug_node.mjs:7850:33)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+    at http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2537:40
+
 ]]>
   </system-out>
   <system-err/>

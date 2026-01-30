@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Renderer2, OnInit } from '@angular/core';
+import { Directive, ElementRef, HostListener, Renderer2, OnInit, Input, OnDestroy, inject } from '@angular/core';
 
 /**
  * HideOnScrollDirective
@@ -22,10 +22,10 @@ export class HideOnScrollDirective implements OnInit {
   private scrollThreshold = 5; // Minimum scroll distance to trigger
   private isHidden = false;
 
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2
-  ) {}
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+
+  constructor() {}
 
   ngOnInit() {
     this.renderer.addClass(this.el.nativeElement, 'header-hide-on-scroll');
