@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, IonList, IonItem, IonSkeletonText } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { PageHeaderComponent, TeamCardComponent } from '../../../shared/components';
@@ -11,7 +11,7 @@ import { PageHeaderComponent, TeamCardComponent } from '../../../shared/componen
   standalone: true,
   templateUrl: './teams.page.html',
   styleUrls: ['./teams.page.scss'],
-  imports: [CommonModule, IonContent, PageHeaderComponent, TeamCardComponent]
+  imports: [CommonModule, IonContent, PageHeaderComponent, TeamCardComponent, IonList, IonItem, IonSkeletonText]
 })
 export class TeamsPage implements OnInit {
   private api = inject(ApiService);

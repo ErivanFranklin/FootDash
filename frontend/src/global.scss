@@ -197,3 +197,11 @@ img.lazy-error {
 img {
   transition: opacity 0.3s ease, filter 0.3s ease;
 }
+
+/* Responsive Design */
+@media (min-width: 992px) {
+  /* Hide Mobile Tabs on Desktop (Large Screens) */
+  .mobile-tabs {
+    display: none !important;
+  }
+}
