@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, Renderer2, inject } from '@angular/core';
 
 @Directive({
   selector: '[appLazyImage]',
@@ -8,10 +8,10 @@ export class LazyImageDirective implements OnInit {
   @Input() appLazyImage = ''; // The actual image URL
   @Input() placeholder = 'assets/placeholder.png'; // Placeholder image
 
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2
-  ) {}
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+
+  constructor() {}
 
   ngOnInit() {
     // Set placeholder initially

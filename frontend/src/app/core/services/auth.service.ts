@@ -1,4 +1,3 @@
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
@@ -16,6 +15,7 @@ export class AuthService {
   private authUrl = buildAuthUrl();
   private currentTokenSubject = new BehaviorSubject<string | null>(this.getToken());
   public currentToken$ = this.currentTokenSubject.asObservable();
+  public isAuthenticated$ = this.currentToken$.pipe(map(token => !!token && !this.jwtHelper.isTokenExpired(token)));
 
   // prefer functional inject() per angular-eslint/prefer-inject
   private http = inject(HttpClient);

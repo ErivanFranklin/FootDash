@@ -1,38 +1,44 @@
 <ion-app>
-  <ion-menu contentId="main-content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>FootDash</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <app-navigation-menu></app-navigation-menu>
-    </ion-content>
-  </ion-menu>
-  <ion-router-outlet id="main-content"></ion-router-outlet>
+  <ion-split-pane contentId="main-content" when="lg" [disabled]="(authService.isAuthenticated$ | async) === false">
+    
+    <ion-menu contentId="main-content" *ngIf="authService.isAuthenticated$ | async">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>FootDash</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <app-navigation-menu></app-navigation-menu>
+      </ion-content>
+    </ion-menu>
   
-  <!-- Mobile Bottom Tab Bar -->
-  <ion-tabs class="mobile-tabs">
-    <ion-tab-bar slot="bottom">
-      <ion-tab-button tab="home" href="/home">
-        <ion-icon name="home"></ion-icon>
-        <ion-label>{{ 'NAV.HOME' | transloco }}</ion-label>
-      </ion-tab-button>
+    <div class="ion-page" id="main-content">
+      <ion-router-outlet></ion-router-outlet>
+      
+      <!-- Mobile Bottom Tab Bar -->
+      <ion-tabs class="mobile-tabs" *ngIf="authService.isAuthenticated$ | async">
+        <ion-tab-bar slot="bottom">
+          <ion-tab-button tab="home" href="/home">
+            <ion-icon name="home"></ion-icon>
+            <ion-label>{{ 'NAV.HOME' | transloco }}</ion-label>
+          </ion-tab-button>
+    
+          <ion-tab-button tab="matches" href="/teams">
+            <ion-icon name="football"></ion-icon>
+            <ion-label>{{ 'NAV.MATCHES' | transloco }}</ion-label>
+          </ion-tab-button>
+    
+          <ion-tab-button tab="feed" href="/feed">
+            <ion-icon name="chatbubbles"></ion-icon>
+            <ion-label>{{ 'NAV.FEED' | transloco }}</ion-label>
+          </ion-tab-button>
 
-      <ion-tab-button tab="matches" href="/teams">
-        <ion-icon name="football"></ion-icon>
-        <ion-label>{{ 'NAV.MATCHES' | transloco }}</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button tab="feed" href="/feed">
-        <ion-icon name="chatbubbles"></ion-icon>
-        <ion-label>{{ 'NAV.FEED' | transloco }}</ion-label>
-      </ion-tab-button>
-
-      <ion-tab-button tab="profile" href="/profile">
-        <ion-icon name="person"></ion-icon>
-        <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
-      </ion-tab-button>
-    </ion-tab-bar>
-  </ion-tabs>
+          <ion-tab-button tab="profile" [href]="'/user-profile/' + currentUserId">
+            <ion-icon name="person"></ion-icon>
+            <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
+          </ion-tab-button>
+        </ion-tab-bar>
+      </ion-tabs>
+    </div>
+  </ion-split-pane>
 </ion-app>

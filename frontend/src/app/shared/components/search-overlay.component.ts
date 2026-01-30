@@ -109,14 +109,14 @@ export interface FilterChip {
 })
 export class SearchOverlayComponent {
   @Input() filterChips: FilterChip[] = [];
-  @Output() search = new EventEmitter<string>();
+  @Output() searchQuery = new EventEmitter<string>();
   @Output() filterChange = new EventEmitter<FilterChip[]>();
-  @Output() close = new EventEmitter<void>();
+  @Output() closeOverlay = new EventEmitter<void>();
 
   searchText = '';
 
   onSearchChange() {
-    this.search.emit(this.searchText);
+    this.searchQuery.emit(this.searchText);
   }
 
   onChipToggle(chip: FilterChip) {
@@ -127,12 +127,12 @@ export class SearchOverlayComponent {
   onClearFilters() {
     this.searchText = '';
     this.filterChips.forEach(chip => chip.selected = false);
-    this.search.emit('');
+    this.searchQuery.emit('');
     this.filterChange.emit(this.filterChips);
   }
 
   onClose() {
-    this.close.emit();
+    this.closeOverlay.emit();
   }
 
   hasActiveFilters(): boolean {

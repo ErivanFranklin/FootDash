@@ -5,9 +5,10 @@ export default defineConfig({
   fullyParallel: true,
   retries: 0,
   use: {
-    baseURL: 'http://localhost:4200',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
+  /*
   webServer: {
     command: 'npm start',
     cwd: __dirname,
@@ -15,6 +16,7 @@ export default defineConfig({
     reuseExistingServer: true,
     timeout: 120 * 1000,
   },
+  */
   projects: [
     {
       name: 'chromium',

@@ -1,4 +1,14 @@
-<app-page-header [title]="'MATCH_DETAILS.TITLE' | transloco" />
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+       <ion-back-button defaultHref="/teams"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'MATCH_DETAILS.TITLE' | transloco }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content>
   <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;">

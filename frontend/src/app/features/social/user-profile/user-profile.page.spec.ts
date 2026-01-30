@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserProfilePage } from './user-profile.page';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 
 describe('UserProfilePage', () => {
   let component: UserProfilePage;
@@ -9,7 +10,7 @@ describe('UserProfilePage', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HttpClientTestingModule, UserProfilePage]
+      imports: [RouterTestingModule, HttpClientTestingModule, UserProfilePage, TranslocoTestingModule.forRoot({ langs: { en: {}, es: {} }, translocoConfig: { availableLangs: ['en', 'es'], defaultLang: 'en' } })]
     });
     fixture = TestBed.createComponent(UserProfilePage);
     component = fixture.componentInstance;

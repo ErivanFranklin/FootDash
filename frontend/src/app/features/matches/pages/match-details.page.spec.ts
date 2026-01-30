@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { MatchDetailsPage } from './match-details.page';
 import { WebSocketService } from '../../../core/services/web-socket.service';
 import { ApiService } from '../../../core/services/api.service';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 
 describe('MatchDetailsPage', () => {
   let component: MatchDetailsPage;
@@ -25,7 +26,7 @@ describe('MatchDetailsPage', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [MatchDetailsPage],
+      imports: [MatchDetailsPage, TranslocoTestingModule.forRoot({ langs: { en: {}, es: {} }, translocoConfig: { availableLangs: ['en', 'es'], defaultLang: 'en' } })],
       providers: [
         { provide: WebSocketService, useValue: wsSpy },
         { provide: ApiService, useValue: apiSpy },

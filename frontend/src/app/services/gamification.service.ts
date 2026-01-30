@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -25,8 +25,9 @@ export interface LeaderboardEntry {
 })
 export class GamificationService {
   private apiUrl = `${environment.apiBaseUrl}/gamification`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   submitPrediction(matchId: number, homeScore: number, awayScore: number): Observable<UserPrediction> {
     return this.http.post<UserPrediction>(`${this.apiUrl}/predict`, {
