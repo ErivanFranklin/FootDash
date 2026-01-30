@@ -38,8 +38,19 @@ export async function show(): Promise<void> {
     }
 
     // applied migrations recorded in the DB
-    const rows: Array<{ name: string }> = await ds.query(`SELECT name FROM migrations ORDER BY id`);
-    const applied = rows.map(r => r.name);
+    let applied: string[] = [];
+    try {
+      const rows: Array<{ name: string }> = await ds.query(`SELECT name FROM migrations ORDER BY id`);
+      applied = rows.map(r => r.name);
+    } catch (err) {
+      const pgError = err as { code?: string; message?: string };
+      if (pgError?.code === '42P01') {
+        console.warn('Migrations table not found; treating as no migrations applied.');
+        applied = [];
+      } else {
+        throw err;
+      }
+    }
 
     // Determine pending: for each file-base, derive candidate recorded names and check if applied
     const pending: string[] = [];
