@@ -3,7 +3,7 @@ import { IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButt
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IonContent, IonBadge, IonSpinner, IonButton } from '@ionic/angular/standalone';
-import { PageHeaderComponent, LiveIndicatorComponent } from '../../../shared/components';
+import { LiveIndicatorComponent } from '../../../shared/components';
 import { WebSocketService } from '../../../core/services/web-socket.service';
 import { LiveMatchService, MatchState } from '../../../core/services/live-match.service';
 import { ApiService } from '../../../core/services/api.service';
@@ -18,7 +18,7 @@ import { MatchChatComponent } from '../../../components/match-chat/match-chat.co
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, PageHeaderComponent, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent, MatchChatComponent, IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent, MatchChatComponent, IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

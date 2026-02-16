@@ -1,15 +1,15 @@
 import { Component, inject } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonButtons, IonMenuButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
-import { PageHeaderComponent, MatchCardComponent, FormSectionComponent, StatCardComponent } from '../../../shared/components';
+import { MatchCardComponent, FormSectionComponent, StatCardComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, FormsModule, PageHeaderComponent, MatchCardComponent, FormSectionComponent, StatCardComponent],
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonButtons, IonMenuButton, FormsModule, MatchCardComponent, FormSectionComponent, StatCardComponent],
 })
 export class HomePage {
   private api = inject(ApiService);

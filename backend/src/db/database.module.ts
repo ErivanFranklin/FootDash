@@ -14,7 +14,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             type: 'postgres',
             url: databaseUrl,
             autoLoadEntities: true,
-            synchronize: false,
+            synchronize: false, // Use migrations for production
           } as any;
         }
 
@@ -26,7 +26,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           password: String(config.get<string>('DB_PASSWORD', '')),
           database: config.get<string>('DB_NAME', 'footdash'),
           autoLoadEntities: true,
-          synchronize: false,
+          synchronize: false, // Use migrations for production
         } as any;
       },
     }),

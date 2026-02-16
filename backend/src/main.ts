@@ -10,7 +10,9 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 
 async function bootstrap() {
+  console.log('[STARTUP] Creating Nest application...');
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  console.log('[STARTUP] Nest application created successfully');
 
   // Configure static file serving for avatars
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
@@ -103,10 +105,16 @@ async function bootstrap() {
   }
 
   const port = Number(process.env.PORT) || 3000;
+  console.log(`[STARTUP] Starting server on port ${port}...`);
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`[STARTUP] ✅ Application is running on: http://localhost:${port}`);
   console.log(
-    `Swagger documentation available at: http://localhost:${port}/api`,
+    `[STARTUP] ✅ Swagger documentation available at: http://localhost:${port}/api`,
   );
 }
-bootstrap();
+
+bootstrap().catch((error) => {
+  console.error('[STARTUP] ❌ FATAL ERROR during bootstrap:');
+  console.error(error);
+  process.exit(1);
+});

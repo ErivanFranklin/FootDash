@@ -6,6 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { LanguageService } from '../../core/services/language.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-navigation-menu',
@@ -56,6 +57,7 @@ export class NavigationMenuComponent {
   private router = inject(Router);
   private languageService = inject(LanguageService);
   private authService = inject(AuthService);
+  private websocketService = inject(WebsocketService);
 
   currentLang = 'en';
 
@@ -78,6 +80,8 @@ export class NavigationMenuComponent {
   }
   
   logout() {
+    // Disconnect websockets before logout
+    this.websocketService.disconnect();
     this.authService.logout();
     this.navigateTo('/login');
   }

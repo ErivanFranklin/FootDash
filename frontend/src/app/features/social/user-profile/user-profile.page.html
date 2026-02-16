@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/feed"></ion-back-button>
+      <ion-back-button defaultHref="/feed" [text]="''"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ user?.username || ('NAV.PROFILE' | transloco) }}</ion-title>
     <ion-buttons slot="end">
@@ -17,7 +17,8 @@
   <div class="profile-header" *ngIf="user">
     <div class="profile-avatar">
       <ion-avatar>
-        <img [src]="user.avatar || '/assets/default-avatar.png'" [alt]="user.username">
+        <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.username">
+        <ion-icon *ngIf="!user.avatar" name="person-circle" style="font-size: 80px; width: 80px; height: 80px;"></ion-icon>
       </ion-avatar>
     </div>
 

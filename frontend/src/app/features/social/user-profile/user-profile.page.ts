@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FollowButtonComponent } from '../../../components/social/follow-button/follow-button.component';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FollowService } from '../../../services/social/follow.service';
@@ -40,6 +40,7 @@ export class UserProfilePage implements OnInit {
   followingCount: number = 0;
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private followService = inject(FollowService);
   private feedService = inject(FeedService);
   private reportsService = inject(ReportsService);

@@ -21,12 +21,22 @@ RUN npm run build
 FROM node:20-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=4000
+ENV PORT=80
+
+# Install required runtime dependencies
+RUN apk add --no-cache tini
 
 # Copy only what's needed to run
 COPY --from=base /app/package*.json ./
 RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
 COPY --from=base /app/dist ./dist
+COPY --from=base /app/data-source.ts ./
+COPY --from=base /app/migrations ./migrations
+COPY --from=base /app/scripts ./scripts
+COPY --from=base /app/tsconfig*.json ./
 
-EXPOSE 4000
-CMD ["npm", "run", "start:prod"]
+EXPOSE 80
+
+# Use tini for proper signal handling
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "dist/src/main.js"]
