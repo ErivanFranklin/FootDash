@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   console.log('[STARTUP] Creating Nest application...');
@@ -39,6 +41,11 @@ async function bootstrap() {
   const redisAdapter = new RedisIoAdapter(app, configService);
   await redisAdapter.connectToRedis();
   app.useWebSocketAdapter(redisAdapter);
+
+  // Register global error handlers
+  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

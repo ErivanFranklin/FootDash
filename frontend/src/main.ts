@@ -2,19 +2,23 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { provideServiceWorker } from '@angular/service-worker';
-import { isDevMode } from '@angular/core';
+import { isDevMode, ErrorHandler } from '@angular/core';
 import { provideTransloco } from '@jsverse/transloco';
 import { TranslocoHttpLoader } from './app/core/i18n/transloco.loader';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
-import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import { HttpErrorInterceptor } from './app/core/interceptors/http-error.interceptor';
+import { GlobalErrorHandler } from './app/core/handlers/global-error.handler';
 import { environment } from './environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
     // Ensure HttpClient is provided before other framework providers that may
     // instantiate services which depend on it (Ionic/router can create
     // components early). Placing provideHttpClient before provideIonicAngular
