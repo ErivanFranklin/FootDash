@@ -36,9 +36,15 @@ export class AuthService {
   register(email: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.authUrl}/register`, { email, password }).pipe(
       map(res => {
+        console.log('Register response:', res);
         // mirror login behavior: store token when provided
         const token = res?.tokens?.accessToken || res?.token || res?.accessToken;
-        if (token) this.setToken(token);
+        if (token) {
+          console.log('Setting token from registration');
+          this.setToken(token);
+        } else {
+          console.warn('No token received from registration response');
+        }
         return res;
       })
     );
