@@ -82,7 +82,7 @@ export class LiveIndicatorComponent implements OnInit, OnChanges {
   }
 
   private updateDisplay(): void {
-    const normalizedStatus = (this.status || '').toUpperCase();
+    const normalizedStatus = String(this.status ?? '').toUpperCase();
     
     // Check if match is live
     this.isLive = ['IN_PLAY', 'LIVE', 'HALFTIME', 'PAUSED', 'IN PLAY'].some(

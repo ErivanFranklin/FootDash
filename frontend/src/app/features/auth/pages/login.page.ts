@@ -23,9 +23,11 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
     // If already authenticated, redirect to home
+    // Use Promise.resolve to defer until after the current navigation completes
     if (this.auth.isAuthenticated()) {
-      console.log('Already authenticated, redirecting to home');
-      this.router.navigate(['/home']);
+      Promise.resolve().then(() => {
+        this.router.navigate(['/home'], { replaceUrl: true });
+      });
     }
   }
 
