@@ -7,7 +7,23 @@ import { PwaService } from './core/services/pwa.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { home, football, chatbubbles, person, people, heart, globe, logOutOutline, cloudDone, checkmarkCircle } from 'ionicons/icons';
+import { 
+  home, 
+  football, 
+  chatbubbles, 
+  person, 
+  people, 
+  heart, 
+  globe, 
+  logOutOutline, 
+  cloudDone, 
+  checkmarkCircle,
+  locationOutline,
+  shareSocialOutline,
+  trophyOutline,
+  timeOutline,
+  calendarOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-root',
@@ -22,8 +38,24 @@ export class AppComponent implements OnInit {
   private pwaService = inject(PwaService);
 
   constructor() {
-    // Register icons
-    addIcons({ home, football, chatbubbles, person, people, heart, globe, logOutOutline, cloudDone, checkmarkCircle });
+    // Register all icons used across the application
+    addIcons({ 
+      home, 
+      football, 
+      chatbubbles, 
+      person, 
+      people, 
+      heart, 
+      globe, 
+      logOutOutline, 
+      cloudDone, 
+      checkmarkCircle,
+      locationOutline,
+      shareSocialOutline,
+      trophyOutline,
+      timeOutline,
+      calendarOutline
+    });
   }
 
   get currentUserId() {
