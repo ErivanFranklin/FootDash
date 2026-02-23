@@ -22,7 +22,21 @@ import {
   shareSocialOutline,
   trophyOutline,
   timeOutline,
-  calendarOutline
+  calendarOutline,
+  flagOutline,
+  personCircle,
+  starOutline,
+  starHalf,
+  star,
+  chevronForwardOutline,
+  chevronBackOutline,
+  addCircleOutline,
+  pencilOutline,
+  trashOutline,
+  closeCircleOutline,
+  searchOutline,
+  filterOutline,
+  notificationsOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -54,7 +68,21 @@ export class AppComponent implements OnInit {
       shareSocialOutline,
       trophyOutline,
       timeOutline,
-      calendarOutline
+      calendarOutline,
+      flagOutline,
+      personCircle,
+      starOutline,
+      starHalf,
+      star,
+      chevronForwardOutline,
+      chevronBackOutline,
+      addCircleOutline,
+      pencilOutline,
+      trashOutline,
+      closeCircleOutline,
+      searchOutline,
+      filterOutline,
+      notificationsOutline
     });
   }
 
