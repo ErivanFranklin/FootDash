@@ -6,6 +6,8 @@ import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { home, football, chatbubbles, person, people, heart, globe, logOutOutline, cloudDone, checkmarkCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +20,11 @@ export class AppComponent implements OnInit {
   public authService = inject(AuthService); // Make public for template access
   private toastController = inject(ToastController);
   private pwaService = inject(PwaService);
+
+  constructor() {
+    // Register icons
+    addIcons({ home, football, chatbubbles, person, people, heart, globe, logOutOutline, cloudDone, checkmarkCircle });
+  }
 
   get currentUserId() {
     return this.authService.getCurrentUserId();
