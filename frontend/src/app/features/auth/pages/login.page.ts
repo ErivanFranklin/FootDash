@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, FormsModule],
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   email = '';
   password = '';
   loading = false;
@@ -20,6 +20,14 @@ export class LoginPage {
   private auth = inject(AuthService);
   private router = inject(Router);
   private toast = inject(ToastController);
+
+  ngOnInit() {
+    // If already authenticated, redirect to home
+    if (this.auth.isAuthenticated()) {
+      console.log('Already authenticated, redirecting to home');
+      this.router.navigate(['/home']);
+    }
+  }
 
   submit() {
     // call the AuthService to login and redirect on success
@@ -40,7 +48,18 @@ export class LoginPage {
       next: (response) => {
         this.loading = false;
         console.log('Login successful', response);
-        this.router.navigate(['/home']);
+        
+        // Show success toast
+        this.toast.create({
+          message: 'Login successful! Welcome back!',
+          duration: 2000,
+          color: 'success'
+        }).then((toastEl: any) => toastEl.present());
+        
+        // Navigate to home after a brief delay to ensure token is stored
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 100);
       },
       error: (err: any) => {
         this.loading = false;
