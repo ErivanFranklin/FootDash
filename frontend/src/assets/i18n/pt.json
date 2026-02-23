@@ -12,11 +12,12 @@
   },
   "NAV": {
     "HOME": "Início",
-    "TEAMS": "Times",
+    "TEAMS": "Equipes",
     "MATCHES": "Partidas",
     "FEED": "Feed",
     "PROFILE": "Perfil",
-    "SETTINGS": "Configurações"
+    "SETTINGS": "Configurações",
+    "LOGOUT": "Sair"
   },
   "MATCH_STATUS": {
     "LIVE": "Ao Vivo",

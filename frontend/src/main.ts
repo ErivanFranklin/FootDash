@@ -14,6 +14,16 @@ import { HttpErrorInterceptor } from './app/core/interceptors/http-error.interce
 import { GlobalErrorHandler } from './app/core/handlers/global-error.handler';
 import { environment } from './environments/environment';
 
+// Initialize Ionicons with asset path
+import { addIcons } from 'ionicons';
+import { setAssetPath } from '@ionic/core/components';
+import { home, people, heart, person, globe, logOutOutline, football, chatbubbles } from 'ionicons/icons';
+
+// Set the path for Ionicons SVG assets
+setAssetPath('/assets');
+
+addIcons({ home, people, heart, person, globe, logOutOutline, football, chatbubbles });
+
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

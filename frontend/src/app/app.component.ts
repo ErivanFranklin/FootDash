@@ -5,7 +5,7 @@ import { WebsocketService } from './services/websocket.service';
 import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { CommonModule } from '@angular/common'; // Import CommonModule for ngIf
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',

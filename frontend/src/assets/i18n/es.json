@@ -16,7 +16,8 @@
     "MATCHES": "Partidos",
     "FEED": "Feed",
     "PROFILE": "Perfil",
-    "SETTINGS": "Ajustes"
+    "SETTINGS": "Ajustes",
+    "LOGOUT": "Cerrar sesión"
   },
   "MATCH_STATUS": {
     "LIVE": "En Vivo",

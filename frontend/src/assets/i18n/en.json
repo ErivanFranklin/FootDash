@@ -16,7 +16,8 @@
     "MATCHES": "Matches",
     "FEED": "Feed",
     "PROFILE": "Profile",
-    "SETTINGS": "Settings"
+    "SETTINGS": "Settings",
+    "LOGOUT": "Logout"
   },
   "MATCH_STATUS": {
     "LIVE": "Live",
