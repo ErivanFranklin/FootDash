@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonButtons, IonMenuButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ import { MatchCardComponent, FormSectionComponent, StatCardComponent } from '../
   styleUrls: ['home.page.scss'],
   imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonButtons, IonMenuButton, FormsModule, MatchCardComponent, FormSectionComponent, StatCardComponent],
 })
-export class HomePage {
+export class HomePage implements OnInit {
   private api = inject(ApiService);
 
   pingResult: any = null;
@@ -21,6 +21,13 @@ export class HomePage {
   range = 'recent';
   loading = false;
   fixtures: any[] = [];
+
+  ngOnInit() {
+    // Auto-ping backend on page load
+    this.pingBackend();
+    // Auto-fetch some matches
+    this.fetchMatches();
+  }
 
   pingBackend() {
     this.loading = true;
