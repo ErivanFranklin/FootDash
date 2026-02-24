@@ -5,10 +5,12 @@ export default defineConfig({
   fullyParallel: true,
   retries: 0,
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:4200',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
-  /*
+  /* Uncomment to auto-start the dev server before tests:
   webServer: {
     command: 'npm start',
     cwd: __dirname,
