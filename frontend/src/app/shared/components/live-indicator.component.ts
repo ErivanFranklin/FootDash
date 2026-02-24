@@ -65,7 +65,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   imports: [CommonModule, IonBadge, TranslocoPipe]
 })
 export class LiveIndicatorComponent implements OnInit, OnChanges {
-  @Input() status: string = '';
+  @Input() status: any = '';
   @Input() minute?: number;
   @Input() animate: boolean = true;
 
@@ -82,7 +82,11 @@ export class LiveIndicatorComponent implements OnInit, OnChanges {
   }
 
   private updateDisplay(): void {
-    const normalizedStatus = String(this.status ?? '').toUpperCase();
+    // Guard: if status is an object (e.g. the full match object was passed by mistake), extract a string
+    const rawStatus = (this.status && typeof this.status === 'object')
+      ? ((this.status as any)?.status ?? (this.status as any)?.short ?? '')
+      : (this.status ?? '');
+    const normalizedStatus = String(rawStatus).toUpperCase();
     
     // Check if match is live
     this.isLive = ['IN_PLAY', 'LIVE', 'HALFTIME', 'PAUSED', 'IN PLAY'].some(
@@ -113,7 +117,7 @@ export class LiveIndicatorComponent implements OnInit, OnChanges {
       this.displayText = 'MATCH_STATUS.CANCELLED';
     } else {
       this.badgeColor = 'medium';
-      this.displayText = this.status || 'MATCH_STATUS.UNKNOWN';
+      this.displayText = (rawStatus as string) || 'MATCH_STATUS.UNKNOWN';
     }
   }
 
