@@ -32,7 +32,7 @@
                 <ion-icon name="chatbubbles"></ion-icon>
                 <span>{{ 'NAV.FEED' | transloco }}</span>
               </a>
-              <a class="tab-button" [routerLink]="'/user-profile/' + currentUserId" routerLinkActive="tab-active">
+              <a class="tab-button" *ngIf="currentUserId" [routerLink]="['/user-profile', currentUserId]" routerLinkActive="tab-active" [routerLinkActiveOptions]="{ exact: true }">
                 <ion-icon name="person"></ion-icon>
                 <span>{{ 'NAV.PROFILE' | transloco }}</span>
               </a>

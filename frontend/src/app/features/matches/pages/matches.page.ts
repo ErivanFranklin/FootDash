@@ -27,6 +27,7 @@ export class MatchesPage implements OnInit {
   from: string | null = null; // YYYY-MM-DD
   to: string | null = null;   // YYYY-MM-DD
   fixtures: any[] = [];
+  allFixtures: any[] = [];  // full dataset for client-side pagination
   loading = false;
   currentPage = 0;
   hasMoreData = true;
@@ -48,7 +49,10 @@ export class MatchesPage implements OnInit {
     this.loading = true;
     this.api.getTeamMatches(this.teamId, { season: this.season, range: this.range, limit: this.limit ?? undefined, from: this.from || undefined, to: this.to || undefined }).subscribe({
       next: (res) => {
-        this.fixtures = Array.isArray(res) ? res : (res?.data || res?.matches || []);
+        this.allFixtures = Array.isArray(res) ? res : (res?.data || res?.matches || []);
+        this.currentPage = 0;
+        this.fixtures = this.allFixtures.slice(0, this.pageSize);
+        this.hasMoreData = this.allFixtures.length > this.pageSize;
         this.loading = false;
       },
       error: async () => {
@@ -93,28 +97,16 @@ export class MatchesPage implements OnInit {
 
     this.currentPage++;
     const offset = this.currentPage * this.pageSize;
+    const nextPage = this.allFixtures.slice(offset, offset + this.pageSize);
 
-    this.api.getTeamMatches(this.teamId, { 
-      season: this.season, 
-      range: this.range, 
-      limit: this.pageSize, 
-      from: this.from || undefined, 
-      to: this.to || undefined 
-    }).subscribe({
-      next: (res) => {
-        const newMatches = Array.isArray(res) ? res : (res?.data || res?.matches || []);
-        
-        if (newMatches.length < this.pageSize) {
-          this.hasMoreData = false;
-        }
-        
-        this.fixtures = [...this.fixtures, ...newMatches];
-        event.target.complete();
-      },
-      error: () => {
-        event.target.complete();
-      }
-    });
+    if (nextPage.length === 0) {
+      this.hasMoreData = false;
+    } else {
+      this.fixtures = [...this.fixtures, ...nextPage];
+      this.hasMoreData = offset + this.pageSize < this.allFixtures.length;
+    }
+
+    event.target.complete();
   }
 
   toggleQuickFilter(filter: any) {

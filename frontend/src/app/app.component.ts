@@ -6,7 +6,7 @@ import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -53,6 +53,7 @@ export class AppComponent implements OnInit {
   public authService = inject(AuthService);
   private toastController = inject(ToastController);
   private pwaService = inject(PwaService);
+  private router = inject(Router);
 
   constructor() {
     // Register all icons used across the application
@@ -118,7 +119,9 @@ export class AppComponent implements OnInit {
           {
             text: 'View',
             handler: () => {
-              // Navigate to followers page or profile
+              if (data?.followerId) {
+                this.router.navigate(['/user-profile', data.followerId]);
+              }
             }
           }
         ]
