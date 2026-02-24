@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GamificationService, LeaderboardEntry } from '../../../../services/gamification.service';
 import { PageHeaderComponent } from '../../../../shared/components';
@@ -8,7 +8,7 @@ import { PageHeaderComponent } from '../../../../shared/components';
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslocoPipe, PageHeaderComponent],
+  imports: [CommonModule, IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote, TranslocoPipe, PageHeaderComponent],
   templateUrl: './leaderboard.page.html',
   styleUrls: ['./leaderboard.page.scss']
 })

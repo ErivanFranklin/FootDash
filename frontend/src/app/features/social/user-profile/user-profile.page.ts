@@ -1,13 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonAvatar, IonGrid, IonRow, IonCol, IonText, IonList, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FollowButtonComponent } from '../../../components/social/follow-button/follow-button.component';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FollowService } from '../../../services/social/follow.service';
 import { FeedService } from '../../../services/social/feed.service';
 import { ReportsService } from '../../../services/social/reports.service';
+import { ApiService } from '../../../core/services/api.service';
 import { User } from '../../../models/user.model';
 import { Activity, PaginatedActivities, ReportTargetType, ReportReason } from '../../../models/social';
 import { AlertController, ToastController } from '@ionic/angular';
@@ -21,7 +22,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonAvatar, IonGrid, IonRow, IonCol, IonText, IonList, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner,
     FollowButtonComponent,
     FeedItemComponent,
     TranslocoPipe
@@ -41,6 +42,7 @@ export class UserProfilePage implements OnInit {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private apiService = inject(ApiService);
   private followService = inject(FollowService);
   private feedService = inject(FeedService);
   private reportsService = inject(ReportsService);
@@ -56,19 +58,31 @@ export class UserProfilePage implements OnInit {
   }
 
   private loadUserProfile() {
-    // TODO: Implement user service to get user details
-    // For now, we'll use a placeholder
-    this.user = {
-      id: this.userId,
-      username: `user${this.userId}`,
-      email: `user${this.userId}@example.com`,
-      avatar: undefined,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    // Load follow stats
-    this.loadFollowStats();
+    this.apiService.getUserProfile(this.userId).subscribe({
+      next: (profile) => {
+        this.user = {
+          id: this.userId,
+          email: profile.email || '',
+          username: profile.displayName || profile.username || `user${this.userId}`,
+          avatar: profile.avatarUrl || profile.avatar,
+          createdAt: profile.createdAt || new Date(),
+          isPro: profile.isPro ?? false
+        };
+        this.loadFollowStats();
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+        // Fallback to minimal data so the page still renders
+        this.user = {
+          id: this.userId,
+          email: '',
+          username: `User ${this.userId}`,
+          createdAt: new Date(),
+          isPro: false
+        };
+        this.loadFollowStats();
+      }
+    });
   }
 
   private loadFollowStats() {
@@ -160,18 +174,25 @@ export class UserProfilePage implements OnInit {
   }
 
   onActivityClicked(activity: Activity) {
-    // TODO: Navigate to relevant page based on activity type
-    console.log('Activity clicked:', activity);
+    switch (activity.targetType) {
+      case 'match':
+        this.router.navigate(['/match', activity.targetId]);
+        break;
+      case 'user':
+        this.router.navigate(['/user-profile', activity.targetId]);
+        break;
+      default:
+        this.router.navigate(['/match', activity.targetId]);
+        break;
+    }
   }
 
   onUserClicked(userId: number) {
-    // TODO: Navigate to user profile
-    console.log('User clicked:', userId);
+    this.router.navigate(['/user-profile', userId]);
   }
 
   onMatchClicked(matchId: number) {
-    // TODO: Navigate to match details
-    console.log('Match clicked:', matchId);
+    this.router.navigate(['/match', matchId]);
   }
 
   trackByActivityId(index: number, activity: Activity): number {

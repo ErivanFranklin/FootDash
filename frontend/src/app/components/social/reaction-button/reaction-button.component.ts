@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { IonButton, IonIcon, IonSpinner, IonContent, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
+import { PopoverController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import { ReactionType, ReactionSummary, ReactionTargetType } from '../../../models/social';
 import { ReactionsService } from '../../../services/social/reactions.service';
@@ -12,7 +13,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './reaction-button.component.html',
   styleUrls: ['./reaction-button.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule]
+  imports: [CommonModule, IonButton, IonIcon, IonSpinner]
 })
 export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
   @Input() targetType!: ReactionTargetType;
@@ -238,7 +239,7 @@ export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
     </ion-content>
   `,
   standalone: true,
-  imports: [CommonModule, IonicModule]
+  imports: [CommonModule, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon]
 })
 export class ReactionPickerComponent {
   @Input() currentReaction?: ReactionType;

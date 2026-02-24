@@ -1,11 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, ToastController, IonSplitPane } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonFooter, IonSplitPane } from '@ionic/angular/standalone';
 import { NavigationMenuComponent } from './shared/components/navigation-menu.component';
 import { WebsocketService } from './services/websocket.service';
 import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   home, 
@@ -42,12 +44,13 @@ import {
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, NavigationMenuComponent, TranslocoPipe, IonSplitPane],
+  imports: [CommonModule, IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonFooter, IonSplitPane, NavigationMenuComponent, TranslocoPipe, RouterLink, RouterLinkActive],
 })
 export class AppComponent implements OnInit {
   private websocketService = inject(WebsocketService);
-  public authService = inject(AuthService); // Make public for template access
+  public authService = inject(AuthService);
   private toastController = inject(ToastController);
   private pwaService = inject(PwaService);
 

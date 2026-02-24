@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, IonRefresher, IonRefresherContent, IonList, IonButton, IonCard, IonCardContent, IonText, IonSpinner, IonItem } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FeedService } from '../../../services/social/feed.service';
 import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
@@ -16,7 +17,7 @@ import { Subscription } from 'rxjs';
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule,
+    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, IonRefresher, IonRefresherContent, IonList, IonButton, IonCard, IonCardContent, IonText, IonSpinner, IonItem,
     FeedItemComponent
   ]
 })
@@ -32,6 +33,7 @@ export class FeedPage implements OnInit, OnDestroy {
 
   private globalEventSubscription?: Subscription;
 
+  private router = inject(Router);
   private feedService = inject(FeedService);
   private websocketService = inject(WebsocketService);
 
@@ -125,18 +127,27 @@ export class FeedPage implements OnInit, OnDestroy {
   }
 
   onActivityClicked(activity: Activity) {
-    // TODO: Navigate to relevant page based on activity type
-    console.log('Activity clicked:', activity);
+    switch (activity.targetType) {
+      case ActivityTargetType.MATCH:
+        this.router.navigate(['/match', activity.targetId]);
+        break;
+      case ActivityTargetType.USER:
+        this.router.navigate(['/user-profile', activity.targetId]);
+        break;
+      case ActivityTargetType.PREDICTION:
+        this.router.navigate(['/match', activity.targetId]);
+        break;
+      default:
+        break;
+    }
   }
 
   onUserClicked(userId: number) {
-    // TODO: Navigate to user profile
-    console.log('User clicked:', userId);
+    this.router.navigate(['/user-profile', userId]);
   }
 
   onMatchClicked(matchId: number) {
-    // TODO: Navigate to match details
-    console.log('Match clicked:', matchId);
+    this.router.navigate(['/match', matchId]);
   }
 
   trackByActivityId(index: number, activity: Activity): number {

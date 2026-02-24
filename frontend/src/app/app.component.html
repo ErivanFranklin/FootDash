@@ -17,29 +17,28 @@
         <ion-router-outlet></ion-router-outlet>
 
         <!-- Mobile Bottom Tab Bar -->
-        <ion-tabs class="mobile-tabs">
-          <ion-tab-bar slot="bottom">
-            <ion-tab-button tab="home" href="/home">
-              <ion-icon name="home"></ion-icon>
-              <ion-label>{{ 'NAV.HOME' | transloco }}</ion-label>
-            </ion-tab-button>
-
-            <ion-tab-button tab="matches" href="/teams">
-              <ion-icon name="football"></ion-icon>
-              <ion-label>{{ 'NAV.MATCHES' | transloco }}</ion-label>
-            </ion-tab-button>
-
-            <ion-tab-button tab="feed" href="/feed">
-              <ion-icon name="chatbubbles"></ion-icon>
-              <ion-label>{{ 'NAV.FEED' | transloco }}</ion-label>
-            </ion-tab-button>
-
-            <ion-tab-button tab="profile" [href]="'/user-profile/' + currentUserId">
-              <ion-icon name="person"></ion-icon>
-              <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
-            </ion-tab-button>
-          </ion-tab-bar>
-        </ion-tabs>
+        <ion-footer class="mobile-tabs ion-hide-lg-up ion-no-border">
+          <ion-toolbar>
+            <div class="tab-bar">
+              <a class="tab-button" routerLink="/home" routerLinkActive="tab-active">
+                <ion-icon name="home"></ion-icon>
+                <span>{{ 'NAV.HOME' | transloco }}</span>
+              </a>
+              <a class="tab-button" routerLink="/teams" routerLinkActive="tab-active">
+                <ion-icon name="people"></ion-icon>
+                <span>{{ 'NAV.TEAMS' | transloco }}</span>
+              </a>
+              <a class="tab-button" routerLink="/feed" routerLinkActive="tab-active">
+                <ion-icon name="chatbubbles"></ion-icon>
+                <span>{{ 'NAV.FEED' | transloco }}</span>
+              </a>
+              <a class="tab-button" [routerLink]="'/user-profile/' + currentUserId" routerLinkActive="tab-active">
+                <ion-icon name="person"></ion-icon>
+                <span>{{ 'NAV.PROFILE' | transloco }}</span>
+              </a>
+            </div>
+          </ion-toolbar>
+        </ion-footer>
       </div>
 
     </ion-split-pane>

@@ -51,4 +51,9 @@ export class ApiService {
   getMatch(matchId: number | string): Observable<any> {
     return this.http.get(`${this.base}/matches/${matchId}`);
   }
+
+  // User profile
+  getUserProfile(userId: number | string): Observable<any> {
+    return this.http.get(`${this.base}/users/${userId}/profile`);
+  }
 }

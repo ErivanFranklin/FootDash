@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonItem, IonIcon, IonLabel, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 import { SubscriptionService } from '../../../../services/subscription.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-pro-page',
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslocoPipe],
+  imports: [CommonModule, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonItem, IonIcon, IonLabel, IonButton, IonSpinner, TranslocoPipe],
   template: `
     <ion-header>
       <ion-toolbar>
@@ -57,8 +58,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
             <span class="amount">4.99</span>
             <span class="period">/mo</span>
           </div>
-          <ion-button expand="block" (click)="subscribe()">
-            {{ 'SUBSCRIPTION.SUBSCRIBE_BTN' | transloco }}
+          <ion-button expand="block" (click)="subscribe()" [disabled]="subscribing">
+            <ion-spinner *ngIf="subscribing" name="crescent" slot="start"></ion-spinner>
+            {{ subscribing ? 'Processing...' : ('SUBSCRIPTION.SUBSCRIBE_BTN' | transloco) }}
           </ion-button>
           <p class="disclaimer">{{ 'SUBSCRIPTION.DISCLAIMER' | transloco }}</p>
         </div>
@@ -92,8 +94,34 @@ import { TranslocoPipe } from '@jsverse/transloco';
 })
 export class ProPage {
   private subscriptionService = inject(SubscriptionService);
+  private toastController = inject(ToastController);
+
+  subscribing = false;
 
   subscribe() {
-    this.subscriptionService.startSubscription().subscribe();
+    if (this.subscribing) return;
+    this.subscribing = true;
+
+    this.subscriptionService.startSubscription().subscribe({
+      next: async () => {
+        this.subscribing = false;
+        const toast = await this.toastController.create({
+          message: 'Subscription started! Redirecting to payment...',
+          duration: 2000,
+          color: 'success'
+        });
+        await toast.present();
+      },
+      error: async (error) => {
+        this.subscribing = false;
+        const toast = await this.toastController.create({
+          message: 'Error starting subscription. Please try again.',
+          duration: 3000,
+          color: 'danger'
+        });
+        await toast.present();
+        console.error('Subscription error:', error);
+      }
+    });
   }
 }

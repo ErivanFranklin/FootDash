@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonItem, IonAvatar, IonLabel, IonChip, IonIcon } from '@ionic/angular/standalone';
 import { RouterModule } from '@angular/router';
 import { Activity, ActivityType } from '../../../models/social';
 
@@ -9,7 +9,7 @@ import { Activity, ActivityType } from '../../../models/social';
   templateUrl: './feed-item.component.html',
   styleUrls: ['./feed-item.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule]
+  imports: [CommonModule, IonItem, IonAvatar, IonLabel, IonChip, IonIcon, RouterModule]
 })
 export class FeedItemComponent {
   @Input() activity!: Activity;

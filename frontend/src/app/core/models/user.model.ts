@@ -1,6 +1,8 @@
 export interface User {
   id: number;
   email: string;
-  createdAt: string;
+  username?: string;
+  avatar?: string;
+  createdAt: string | Date;
   isPro: boolean;
 }

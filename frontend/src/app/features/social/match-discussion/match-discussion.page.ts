@@ -1,8 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { ActivatedRoute } from '@angular/router';
+import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonAvatar, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner } from '@ionic/angular/standalone';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ApiService } from '../../../core/services/api.service';
 import { CommentListComponent } from '../../../components/social/comment-list/comment-list.component';
 import { ReactionButtonComponent } from '../../../components/social/reaction-button/reaction-button.component';
 import { ReactionsService } from '../../../services/social/reactions.service';
@@ -16,7 +17,7 @@ import { ReactionSummary, ReactionTargetType } from '../../../models/social';
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonAvatar, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner,
     CommentListComponent,
     ReactionButtonComponent
   ]
@@ -31,6 +32,8 @@ export class MatchDiscussionPage implements OnInit {
   ReactionTargetType = ReactionTargetType;
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private apiService = inject(ApiService);
   private reactionsService = inject(ReactionsService);
 
   ngOnInit() {
@@ -42,16 +45,39 @@ export class MatchDiscussionPage implements OnInit {
   }
 
   private loadMatchDetails() {
-    // TODO: Implement match service to get match details
-    // For now, we'll use a placeholder
-    this.match = {
-      id: this.matchId,
-      homeTeam: { name: 'Home Team', logo: null },
-      awayTeam: { name: 'Away Team', logo: null },
-      date: new Date(),
-      status: 'scheduled',
-      score: null
-    };
+    this.loading = true;
+    this.apiService.getMatch(this.matchId).subscribe({
+      next: (data) => {
+        this.match = {
+          id: this.matchId,
+          homeTeam: {
+            name: data.teams?.home?.name || data.homeTeam?.name || 'Home Team',
+            logo: data.teams?.home?.logo || data.homeTeam?.logo || null
+          },
+          awayTeam: {
+            name: data.teams?.away?.name || data.awayTeam?.name || 'Away Team',
+            logo: data.teams?.away?.logo || data.awayTeam?.logo || null
+          },
+          date: data.fixture?.date || data.date || new Date(),
+          status: data.fixture?.status?.short || data.status || 'scheduled',
+          score: data.goals ? { home: data.goals.home, away: data.goals.away } : data.score || null
+        };
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading match details:', error);
+        // Fallback so page still renders
+        this.match = {
+          id: this.matchId,
+          homeTeam: { name: 'Home Team', logo: null },
+          awayTeam: { name: 'Away Team', logo: null },
+          date: new Date(),
+          status: 'scheduled',
+          score: null
+        };
+        this.loading = false;
+      }
+    });
   }
 
   private loadReactionSummary() {

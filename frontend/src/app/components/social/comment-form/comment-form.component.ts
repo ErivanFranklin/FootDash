@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonItem, IonTextarea, IonButtons, IonButton, IonIcon, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { Comment as SocialComment, CreateCommentRequest } from '../../../models/social';
 import { CommentsService } from '../../../services/social/comments.service';
 
@@ -10,7 +10,7 @@ import { CommentsService } from '../../../services/social/comments.service';
   templateUrl: './comment-form.component.html',
   styleUrls: ['./comment-form.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IonicModule]
+  imports: [CommonModule, ReactiveFormsModule, IonItem, IonTextarea, IonButtons, IonButton, IonIcon, IonSpinner, IonText]
 })
 export class CommentFormComponent {
   @Input() targetType: 'match' | 'prediction' = 'match';

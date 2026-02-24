@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonItem, IonInput, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ChatService, ChatMessage } from '../../services/chat.service';
 import { Subscription } from 'rxjs';
@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-match-chat',
   standalone: true,
-  imports: [CommonModule, IonicModule, FormsModule, TranslocoPipe],
+  imports: [CommonModule, IonItem, IonInput, IonButton, IonIcon, FormsModule, TranslocoPipe],
   templateUrl: './match-chat.component.html',
   styleUrls: ['./match-chat.component.scss'],
 })

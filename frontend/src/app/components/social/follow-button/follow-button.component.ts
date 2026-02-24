@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { FollowService } from '../../../services/social/follow.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { FollowService } from '../../../services/social/follow.service';
   templateUrl: './follow-button.component.html',
   styleUrls: ['./follow-button.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule]
+  imports: [CommonModule, IonButton, IonIcon, IonSpinner]
 })
 export class FollowButtonComponent implements OnInit, OnChanges {
   @Input() targetUserId!: number;

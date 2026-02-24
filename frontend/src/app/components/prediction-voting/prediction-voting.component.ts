@@ -1,14 +1,14 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonLabel, IonInput, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GamificationService } from '../../services/gamification.service';
 
 @Component({
   selector: 'app-prediction-voting',
   standalone: true,
-  imports: [CommonModule, IonicModule, FormsModule, TranslocoPipe],
+  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonLabel, IonInput, IonButton, IonIcon, FormsModule, TranslocoPipe],
   templateUrl: './prediction-voting.component.html',
   styleUrls: ['./prediction-voting.component.scss'],
 })

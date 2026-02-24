@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonContent, IonList, IonItemGroup, IonItem, IonAvatar, IonLabel, IonButtons, IonButton, IonIcon, IonText, IonCard, IonCardContent, IonSpinner } from '@ionic/angular/standalone';
 import { CommentFormComponent } from '../comment-form/comment-form.component';
 import { ReactionButtonComponent } from '../reaction-button/reaction-button.component';
 import { CommentsService } from '../../../services/social/comments.service';
@@ -18,7 +18,7 @@ import { AlertController, ToastController } from '@ionic/angular';
   templateUrl: './comment-list.component.html',
   styleUrls: ['./comment-list.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, CommentFormComponent, ReactionButtonComponent]
+  imports: [CommonModule, FormsModule, IonContent, IonList, IonItemGroup, IonItem, IonAvatar, IonLabel, IonButtons, IonButton, IonIcon, IonText, IonCard, IonCardContent, IonSpinner, CommentFormComponent, ReactionButtonComponent]
 })
 export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() targetType: 'match' | 'prediction' = 'match';

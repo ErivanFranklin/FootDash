@@ -5,50 +5,55 @@
 
 ion-app {
   .mobile-tabs {
-    ion-tab-bar {
+    ion-toolbar {
       --background: var(--ion-background-color);
-      --border: 1px solid var(--ion-border-color);
-      height: 60px;
-      padding-bottom: env(safe-area-inset-bottom);
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-
-      ion-tab-button {
-        --color: var(--ion-color-medium);
-        --color-selected: var(--ion-color-primary);
-        --padding-top: 8px;
-        --padding-bottom: 8px;
-        
-        ion-icon {
-          font-size: 24px;
-          margin-bottom: 4px;
-        }
-
-        ion-label {
-          font-size: 12px;
-          font-weight: 500;
-          margin-top: 2px;
-        }
-
-        // Active state
-        &.tab-selected {
-          ion-icon,
-          ion-label {
-            color: var(--ion-color-primary);
-          }
-        }
-
-        // Touch feedback
-        &:active {
-          opacity: 0.7;
-        }
-      }
+      --border-width: 0;
+      --padding-start: 0;
+      --padding-end: 0;
+      --padding-top: 0;
+      --padding-bottom: 0;
     }
-  }
 
-  // Hide tabs on desktop
-  @media (min-width: 768px) {
-    .mobile-tabs {
-      display: none;
+    .tab-bar {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 56px;
+      padding-bottom: env(safe-area-inset-bottom);
+      border-top: 1px solid var(--ion-border-color, rgba(255,255,255,0.1));
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      background: var(--ion-background-color);
+    }
+
+    .tab-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 6px 0;
+      text-decoration: none;
+      color: var(--ion-color-medium);
+      transition: color 0.2s;
+      cursor: pointer;
+
+      ion-icon {
+        font-size: 24px;
+        margin-bottom: 2px;
+      }
+
+      span {
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      &.tab-active {
+        color: var(--ion-color-primary);
+      }
+
+      &:active {
+        opacity: 0.7;
+      }
     }
   }
 }

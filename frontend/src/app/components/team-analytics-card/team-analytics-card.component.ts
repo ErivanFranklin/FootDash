@@ -9,7 +9,7 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonSpinner, IonIcon, IonButton, IonBadge, IonGrid, IonRow, IonCol, IonProgressBar } from '@ionic/angular/standalone';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { TeamAnalytics } from '../../models/analytics.model';
@@ -22,7 +22,7 @@ Chart.register(...registerables);
   templateUrl: './team-analytics-card.component.html',
   styleUrls: ['./team-analytics-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslocoModule],
+  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonSpinner, IonIcon, IonButton, IonBadge, IonGrid, IonRow, IonCol, IonProgressBar, TranslocoModule],
 })
 export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() teamId!: number;

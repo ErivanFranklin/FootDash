@@ -3,6 +3,7 @@ export interface User {
   username: string;
   email: string;
   avatar?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  isPro?: boolean;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
 }

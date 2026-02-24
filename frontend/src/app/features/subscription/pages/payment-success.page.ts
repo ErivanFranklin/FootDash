@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton } from '@ionic/angular/standalone';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-payment-success',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule],
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, RouterModule],
   template: `
     <ion-header>
       <ion-toolbar>

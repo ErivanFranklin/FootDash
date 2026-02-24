@@ -9,7 +9,7 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonSpinner, IonIcon, IonButton, IonBadge, IonProgressBar, IonList, IonItem, IonLabel, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { PredictionResult } from '../../models/analytics.model';
@@ -22,7 +22,7 @@ Chart.register(...registerables);
   templateUrl: './prediction-card.component.html',
   styleUrls: ['./prediction-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslocoPipe],
+  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonSpinner, IonIcon, IonButton, IonBadge, IonProgressBar, IonList, IonItem, IonLabel, IonGrid, IonRow, IonCol, TranslocoPipe],
 })
 export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() matchId!: number;
