@@ -1,44 +1,54 @@
 <ion-app>
-  <ion-split-pane contentId="main-content" when="lg" [disabled]="(authService.isAuthenticated$ | async) === false">
-    
-    <ion-menu contentId="main-content" *ngIf="authService.isAuthenticated$ | async">
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>FootDash</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <app-navigation-menu></app-navigation-menu>
-      </ion-content>
-    </ion-menu>
-  
-    <div class="ion-page" id="main-content">
-      <ion-router-outlet></ion-router-outlet>
-      
-      <!-- Mobile Bottom Tab Bar -->
-      <ion-tabs class="mobile-tabs" *ngIf="authService.isAuthenticated$ | async">
-        <ion-tab-bar slot="bottom">
-          <ion-tab-button tab="home" href="/home">
-            <ion-icon name="home"></ion-icon>
-            <ion-label>{{ 'NAV.HOME' | transloco }}</ion-label>
-          </ion-tab-button>
-    
-          <ion-tab-button tab="matches" href="/teams">
-            <ion-icon name="football"></ion-icon>
-            <ion-label>{{ 'NAV.MATCHES' | transloco }}</ion-label>
-          </ion-tab-button>
-    
-          <ion-tab-button tab="feed" href="/feed">
-            <ion-icon name="chatbubbles"></ion-icon>
-            <ion-label>{{ 'NAV.FEED' | transloco }}</ion-label>
-          </ion-tab-button>
+  <ng-container *ngIf="authService.isAuthenticated$ | async; else unauthLayout">
+    <ion-split-pane contentId="main-content" when="lg">
 
-          <ion-tab-button tab="profile" [href]="'/user-profile/' + currentUserId">
-            <ion-icon name="person"></ion-icon>
-            <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
-          </ion-tab-button>
-        </ion-tab-bar>
-      </ion-tabs>
+      <ion-menu contentId="main-content">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>FootDash</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content>
+          <app-navigation-menu></app-navigation-menu>
+        </ion-content>
+      </ion-menu>
+
+      <div class="ion-page" id="main-content">
+        <ion-router-outlet></ion-router-outlet>
+
+        <!-- Mobile Bottom Tab Bar -->
+        <ion-tabs class="mobile-tabs">
+          <ion-tab-bar slot="bottom">
+            <ion-tab-button tab="home" href="/home">
+              <ion-icon name="home"></ion-icon>
+              <ion-label>{{ 'NAV.HOME' | transloco }}</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="matches" href="/teams">
+              <ion-icon name="football"></ion-icon>
+              <ion-label>{{ 'NAV.MATCHES' | transloco }}</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="feed" href="/feed">
+              <ion-icon name="chatbubbles"></ion-icon>
+              <ion-label>{{ 'NAV.FEED' | transloco }}</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="profile" [href]="'/user-profile/' + currentUserId">
+              <ion-icon name="person"></ion-icon>
+              <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
+            </ion-tab-button>
+          </ion-tab-bar>
+        </ion-tabs>
+      </div>
+
+    </ion-split-pane>
+  </ng-container>
+
+  <!-- Unauthenticated: plain router outlet with no menu/tabs -->
+  <ng-template #unauthLayout>
+    <div class="ion-page">
+      <ion-router-outlet></ion-router-outlet>
     </div>
-  </ion-split-pane>
+  </ng-template>
 </ion-app>

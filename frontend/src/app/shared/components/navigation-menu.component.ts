@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LanguageService } from '../../core/services/language.service';
@@ -51,7 +51,7 @@ import { WebsocketService } from '../../services/websocket.service';
     </ion-list>
   `,
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslocoPipe, FormsModule],
+  imports: [CommonModule, IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption, TranslocoPipe, FormsModule],
 })
 export class NavigationMenuComponent {
   private router = inject(Router);
