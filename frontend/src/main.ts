@@ -5,9 +5,6 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { isDevMode, ErrorHandler } from '@angular/core';
 import { provideTransloco } from '@jsverse/transloco';
 import { TranslocoHttpLoader } from './app/core/i18n/transloco.loader';
-// Set Ionicons asset path so named icons can be resolved via CDN
-import { setAssetPath } from 'ionicons';
-setAssetPath('https://cdn.jsdelivr.net/npm/ionicons/dist/');
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
