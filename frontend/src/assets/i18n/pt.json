@@ -49,9 +49,17 @@
     "VIEW_PREDICTION": "Ver Previsão da Partida"
   },
   "ANALYTICS": {
-    "TITLE": "Previsão da Partida",
-    "LOADING": "Carregando dados...",
-    "STATUS": "Status:"
+    "TITLE": "Análise da Partida",
+    "LOADING": "Carregando Dados...",
+    "STATUS": "Status:",
+    "CHARTS": {
+      "GOALS": "Gols Marcados",
+      "WINS": "Vitórias",
+      "DRAWS": "Empates",
+      "LOSSES": "Derrotas",
+      "HOME": "Casa",
+      "AWAY": "Fora"
+    }
   },
   "PROFILE": {
     "JOINED": "Entrou em"
@@ -83,11 +91,6 @@
     "MONTHLY": "Mensal",
     "ALL_TIME": "Geral"
   },
-  "ANALYTICS": {
-    "TITLE": "Análise da Partida",
-    "LOADING": "Carregando Dados...",
-    "STATUS": "Status:"
-  },
   "COMPARISON": {
     "TITLE": "Comparação de Estatísticas",
     "ATTACK": "Ataque",
@@ -100,13 +103,36 @@
     "AWAY_ADVANTAGE": "Vantagem Fora",
     "NEUTRAL": "Equilibrado"
   },
-  "CHARTS": {
-    "GOALS": "Gols Marcados",
-    "WINS": "Vitórias",
-    "DRAWS": "Empates",
-    "LOSSES": "Derrotas",
-    "HOME": "Casa",
-    "AWAY": "Fora"
+  "ANALYSIS": {
+    "TITLE": "Análise"
   },
-  "ANALYSIS": "Análise"
+  "CHAT": {
+    "TITLE": "Chat ao Vivo",
+    "EMPTY": "Nenhuma mensagem ainda. Seja o primeiro!",
+    "PLACEHOLDER": "Digite uma mensagem...",
+    "SEND": "Enviar"
+  },
+  "SUBSCRIPTION": {
+    "TITLE": "Assine o Pro",
+    "SUBTITLE": "Desbloqueie a experiência completa de futebol",
+    "FEATURE_1_TITLE": "Análises Avançadas",
+    "FEATURE_1_DESC": "Estatísticas detalhadas de partidas e jogadores",
+    "FEATURE_2_TITLE": "Sem Anúncios",
+    "FEATURE_2_DESC": "Assista partidas sem interrupções",
+    "FEATURE_3_TITLE": "Emblemas Exclusivos",
+    "FEATURE_3_DESC": "Destaque-se no chat e nas classificações",
+    "SUBSCRIBE_BTN": "Iniciar Teste Grátis de 7 Dias",
+    "DISCLAIMER": "Cancele a qualquer momento. Cobrado mensalmente."
+  },
+  "TEAMS": {
+    "STANDINGS": "Classificação",
+    "SCHEDULE": "Calendário",
+    "RESULTS": "Resultados",
+    "NEXT_MATCH": "Próxima Partida",
+    "LAST_MATCH": "Última Partida",
+    "HOME": "Casa",
+    "AWAY": "Fora",
+    "PERCENTAGE": "{{percent}}% Taxa de Vitória",
+    "POINTS": "Pontos: {{points}}"
+  }
 }

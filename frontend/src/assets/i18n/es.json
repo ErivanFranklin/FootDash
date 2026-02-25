@@ -49,9 +49,17 @@
     "VIEW_PREDICTION": "Ver Predicción del Partido"
   },
   "ANALYTICS": {
-    "TITLE": "Predicción del Partido",
-    "LOADING": "Cargando datos...",
-    "STATUS": "Estado:"
+    "TITLE": "Análisis del Partido",
+    "LOADING": "Cargando Datos...",
+    "STATUS": "Estado:",
+    "CHARTS": {
+      "GOALS": "Goles Marcados",
+      "WINS": "Victorias",
+      "DRAWS": "Empates",
+      "LOSSES": "Derrotas",
+      "HOME": "Local",
+      "AWAY": "Visitante"
+    }
   },
   "PROFILE": {
     "JOINED": "Se unió en"
@@ -83,11 +91,6 @@
     "MONTHLY": "Mensual",
     "ALL_TIME": "Histórico"
   },
-  "ANALYTICS": {
-    "TITLE": "Análisis del Partido",
-    "LOADING": "Cargando Datos...",
-    "STATUS": "Estado:"
-  },
   "COMPARISON": {
     "TITLE": "Comparación de Estadísticas",
     "ATTACK": "Ataque",
@@ -100,13 +103,36 @@
     "AWAY_ADVANTAGE": "Ventaja Visitante",
     "NEUTRAL": "Equilibrado"
   },
-  "CHARTS": {
-    "GOALS": "Goles Marcados",
-    "WINS": "Victorias",
-    "DRAWS": "Empates",
-    "LOSSES": "Derrotas",
-    "HOME": "Local",
-    "AWAY": "Visitante"
+  "ANALYSIS": {
+    "TITLE": "Análisis"
   },
-  "ANALYSIS": "Análisis"
+  "CHAT": {
+    "TITLE": "Chat en Vivo",
+    "EMPTY": "No hay mensajes aún. ¡Sé el primero!",
+    "PLACEHOLDER": "Escribe un mensaje...",
+    "SEND": "Enviar"
+  },
+  "SUBSCRIPTION": {
+    "TITLE": "Hazte Pro",
+    "SUBTITLE": "Desbloquea la experiencia completa de fútbol",
+    "FEATURE_1_TITLE": "Análisis Avanzados",
+    "FEATURE_1_DESC": "Estadísticas detalladas de partidos y jugadores",
+    "FEATURE_2_TITLE": "Sin Anuncios",
+    "FEATURE_2_DESC": "Disfruta de los partidos sin interrupciones",
+    "FEATURE_3_TITLE": "Insignias Exclusivas",
+    "FEATURE_3_DESC": "Destaca en el chat y clasificaciones",
+    "SUBSCRIBE_BTN": "Iniciar Prueba Gratis de 7 Días",
+    "DISCLAIMER": "Cancela en cualquier momento. Facturado mensualmente."
+  },
+  "TEAMS": {
+    "STANDINGS": "Clasificación",
+    "SCHEDULE": "Calendario",
+    "RESULTS": "Resultados",
+    "NEXT_MATCH": "Próximo Partido",
+    "LAST_MATCH": "Último Partido",
+    "HOME": "Local",
+    "AWAY": "Visitante",
+    "PERCENTAGE": "{{percent}}% Tasa de Victoria",
+    "POINTS": "Puntos: {{points}}"
+  }
 }

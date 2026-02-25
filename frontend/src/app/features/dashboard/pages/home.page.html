@@ -25,9 +25,9 @@
       </app-stat-card>
       <app-stat-card
         label="API Status"
-        [value]="pingResult ? 'Connected' : 'Not Tested'"
-        icon="cloud-done"
-        variant="success">
+        [value]="loading ? 'Checking...' : pingResult?.error ? 'Error' : pingResult ? 'Connected' : 'Not Tested'"
+        [icon]="pingResult?.error ? 'cloud-offline' : 'cloud-done'"
+        [variant]="pingResult?.error ? 'danger' : 'success'">
       </app-stat-card>
     </div>
 
@@ -53,14 +53,38 @@
         <ion-label position="stacked">Range</ion-label>
         <ion-input [(ngModel)]="range" placeholder="recent|upcoming|all"></ion-input>
       </ion-item>
-      <ion-button (click)="fetchMatches()" expand="block" style="margin-top: 12px;">Fetch Matches</ion-button>
+      <ion-button (click)="fetchMatches()" expand="block" style="margin-top: 12px;" [disabled]="loadingMatches">
+        <ion-spinner *ngIf="loadingMatches" name="dots" style="margin-right: 8px;"></ion-spinner>
+        {{ loadingMatches ? 'Fetching...' : 'Fetch Matches' }}
+      </ion-button>
     </app-form-section>
 
     <app-form-section title="API Results">
-      <ion-list>
-        <ion-item lines="full"><ion-label>Ping Result</ion-label></ion-item>
-        <pre style="white-space: pre-wrap;">{{ pingResult | json }}</pre>
-      </ion-list>
+      <!-- Ping Result -->
+      <div class="result-section">
+        <div class="result-header">
+          <span class="result-label">🏓 Ping Result</span>
+          <span *ngIf="pingResult" class="result-badge" [class.success]="!pingResult?.error" [class.error]="pingResult?.error">
+            {{ pingResult?.error ? 'ERROR' : 'OK' }}
+          </span>
+        </div>
+        <div *ngIf="pingResult" class="json-viewer" [innerHTML]="prettyJson(pingResult)"></div>
+        <div *ngIf="!pingResult && !loading" style="color: var(--ion-color-medium); padding: 8px;">Not tested yet</div>
+        <ion-spinner *ngIf="!pingResult && loading" name="dots"></ion-spinner>
+      </div>
+
+      <!-- Match Fetch Result -->
+      <div class="result-section">
+        <div class="result-header">
+          <span class="result-label">⚽ Match Fetch Result</span>
+          <span *ngIf="matchResult" class="result-badge" [class.success]="!matchResult?.error" [class.error]="matchResult?.error">
+            {{ matchResult?.error ? 'ERROR' : matchResult?.count + ' fixtures' }}
+          </span>
+        </div>
+        <div *ngIf="matchResult" class="json-viewer" [innerHTML]="prettyJson(matchResult)"></div>
+        <div *ngIf="!matchResult && !loadingMatches" style="color: var(--ion-color-medium); padding: 8px;">Click "Fetch Matches" to load data</div>
+        <ion-spinner *ngIf="loadingMatches" name="dots"></ion-spinner>
+      </div>
     </app-form-section>
 
     <app-form-section title="Fixtures ({{ fixtures.length || 0 }})">

@@ -153,10 +153,29 @@ export class FootballApiService implements FootballApiAdapter {
     if (params.status) query.status = params.status;
     if (params.from) query.from = params.from;
     if (params.to) query.to = params.to;
-    const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
+    let resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
       'fixtures',
       query,
     );
+
+    // Free plan does not support "last" / "next" params – retry without them
+    const raw = resp as any;
+    const hasPlanError =
+      raw?.errors &&
+      typeof raw.errors === 'object' &&
+      'plan' in raw.errors;
+    if (hasPlanError && (params.last || params.next)) {
+      this.logger.warn(
+        'Free plan limitation detected – retrying without last/next params',
+      );
+      delete query.last;
+      delete query.next;
+      resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
+        'fixtures',
+        query,
+      );
+    }
+
     return normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
   }
 

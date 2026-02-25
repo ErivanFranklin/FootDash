@@ -21,7 +21,11 @@ export class MatchesPage implements OnInit {
   private toast = inject(ToastController);
 
   teamId!: number;
-  season = new Date().getFullYear();
+  // Football seasons span two calendar years (e.g. 2024-2025).
+  // Before August, the current season started the previous year.
+  season = new Date().getMonth() < 7
+    ? new Date().getFullYear() - 1
+    : new Date().getFullYear();
   range = 'recent';
   limit: number | null = 10;
   from: string | null = null; // YYYY-MM-DD
