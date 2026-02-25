@@ -10,7 +10,10 @@ import { TranslocoPipe } from '@jsverse/transloco';
     <div class="live-indicator" [class.live]="isLive" [class.pulsing]="isLive && animate">
       <span class="live-dot" *ngIf="isLive"></span>
       <ion-badge [color]="badgeColor" [class.live-badge]="isLive">
-        {{ displayText | transloco }}
+        <ng-container *ngIf="isKey(displayText); else rawText">
+          {{ displayText | transloco }}
+        </ng-container>
+        <ng-template #rawText>{{ displayText }}</ng-template>
       </ion-badge>
       <span class="minute" *ngIf="isLive && minute !== undefined">'{{ minute }}</span>
     </div>
@@ -117,12 +120,17 @@ export class LiveIndicatorComponent implements OnInit, OnChanges {
       this.displayText = 'MATCH_STATUS.CANCELLED';
     } else {
       this.badgeColor = 'medium';
-      this.displayText = (rawStatus as string) || 'MATCH_STATUS.UNKNOWN';
+      // If rawStatus is a usable string, show it raw (not as a translation key).
+      if (typeof rawStatus === 'string' && rawStatus.trim()) {
+        this.displayText = rawStatus as string;
+      } else {
+        this.displayText = 'MATCH_STATUS.UNKNOWN';
+      }
     }
   }
 
   private isKey(text: string): boolean {
-    return text.startsWith('MATCH_STATUS.');
+    return !!text && text.startsWith('MATCH_STATUS.');
   }
 }
 

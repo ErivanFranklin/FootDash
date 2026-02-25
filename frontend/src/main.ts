@@ -1,4 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { setAssetPath } from 'ionicons';
 import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -13,6 +14,9 @@ import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { HttpErrorInterceptor } from './app/core/interceptors/http-error.interceptor';
 import { GlobalErrorHandler } from './app/core/handlers/global-error.handler';
 import { environment } from './environments/environment';
+
+// Configure ionicons to load assets from CDN (ensures getAssetPath works in dev/prod)
+setAssetPath('https://cdn.jsdelivr.net/npm/ionicons/dist/');
 
 bootstrapApplication(AppComponent, {
   providers: [
