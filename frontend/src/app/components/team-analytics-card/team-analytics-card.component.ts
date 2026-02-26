@@ -3,6 +3,8 @@ import {
   Input,
   OnInit,
   OnDestroy,
+  OnChanges,
+  SimpleChanges,
   ViewChild,
   ElementRef,
   AfterViewInit,
@@ -24,7 +26,7 @@ Chart.register(...registerables);
   standalone: true,
   imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonSpinner, IonIcon, IonButton, IonBadge, IonGrid, IonRow, IonCol, IonProgressBar, TranslocoModule],
 })
-export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class TeamAnalyticsCardComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() teamId!: number;
   @Input() showCharts = true;
   @ViewChild('formChart') formChartRef!: ElementRef<HTMLCanvasElement>;
@@ -40,7 +42,13 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
   private translocoService = inject(TranslocoService);
 
   ngOnInit() {
-    this.loadAnalytics();
+    // Initial load will be handled by ngOnChanges
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['teamId'] && changes['teamId'].currentValue) {
+      this.loadAnalytics();
+    }
   }
 
   ngAfterViewInit() {
@@ -62,6 +70,13 @@ export class TeamAnalyticsCardComponent implements OnInit, AfterViewInit, OnDest
   }
 
   loadAnalytics() {
+    if (!this.teamId) {
+      console.warn('TeamAnalyticsCard: teamId is required');
+      this.loading = false;
+      this.error = 'Team ID is required';
+      return;
+    }
+
     this.loading = true;
     this.error = null;
 

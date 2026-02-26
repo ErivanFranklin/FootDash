@@ -19,8 +19,6 @@ import { TeamAnalyticsDto } from '../dto/team-analytics.dto';
 
 @ApiTags('Analytics - Team Analytics')
 @Controller('analytics/team')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class TeamAnalyticsController {
   constructor(private readonly teamAnalyticsService: TeamAnalyticsService) {}
 
@@ -70,6 +68,8 @@ export class TeamAnalyticsController {
   }
 
   @Post('refresh-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Refresh analytics for all teams (admin operation)',
   })

@@ -225,10 +225,9 @@ export class AnalyticsService {
   // Private helper methods
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('access_token');
+    // Remove auth requirement for basic analytics - now public
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
     });
   }
 
