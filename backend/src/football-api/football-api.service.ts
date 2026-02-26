@@ -19,6 +19,7 @@ import {
   normalizeFixtures,
   normalizeTeamStats,
 } from './football-api.adapter';
+import { FootballApiCacheService } from './football-api-cache.service';
 
 interface TeamStatsParams {
   leagueId: number;
@@ -45,6 +46,7 @@ export class FootballApiService implements FootballApiAdapter {
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService,
+    private readonly cache: FootballApiCacheService,
   ) {
     const apiKey = this.config.get<string>('FOOTBALL_API_KEY');
     const apiUrl = this.config.get<string>('FOOTBALL_API_URL');
@@ -77,13 +79,20 @@ export class FootballApiService implements FootballApiAdapter {
         },
       };
     }
+
+    const cacheKey = this.cache.buildKey('team-info', { teamId });
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
+
     const resp = await this.makeRequest<ApiResponse<FootballTeamInfo[]>>(
       'teams',
       {
         team: teamId,
       },
     );
-    return normalizeTeamInfo(resp as ApiResponse<FootballTeamInfo[]>);
+    const result = normalizeTeamInfo(resp as ApiResponse<FootballTeamInfo[]>);
+    await this.cache.set(cacheKey, result, FootballApiCacheService.TTL.TEAM_INFO);
+    return result;
   }
 
   async getTeamStats(params: TeamStatsParams) {
@@ -100,6 +109,10 @@ export class FootballApiService implements FootballApiAdapter {
         lineups: [],
       } as any;
     }
+    const cacheKey = this.cache.buildKey('team-stats', params as unknown as Record<string, unknown>);
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
+
     const resp = await this.makeRequest<ApiResponse<FootballTeamStats>>(
       'teams/statistics',
       {
@@ -108,7 +121,9 @@ export class FootballApiService implements FootballApiAdapter {
         team: params.teamId,
       },
     );
-    return normalizeTeamStats(resp as ApiResponse<FootballTeamStats>);
+    const result = normalizeTeamStats(resp as ApiResponse<FootballTeamStats>);
+    await this.cache.set(cacheKey, result, FootballApiCacheService.TTL.TEAM_STATS);
+    return result;
   }
 
   async getTeamFixtures(params: TeamFixturesParams) {
@@ -153,6 +168,17 @@ export class FootballApiService implements FootballApiAdapter {
     if (params.status) query.status = params.status;
     if (params.from) query.from = params.from;
     if (params.to) query.to = params.to;
+
+    // Determine cache TTL based on request type
+    const fixtureTtl = params.next
+      ? FootballApiCacheService.TTL.FIXTURES_UPCOMING
+      : params.last
+        ? FootballApiCacheService.TTL.FIXTURES_RECENT
+        : FootballApiCacheService.TTL.FIXTURES_ALL;
+    const cacheKey = this.cache.buildKey('fixtures', query);
+    const cached = await this.cache.get<any[]>(cacheKey);
+    if (cached) return cached;
+
     let resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
       'fixtures',
       query,
@@ -176,7 +202,9 @@ export class FootballApiService implements FootballApiAdapter {
       );
     }
 
-    return normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
+    const result = normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
+    await this.cache.set(cacheKey, result, fixtureTtl);
+    return result;
   }
 
   async getMatch(matchId: number) {
@@ -219,6 +247,10 @@ export class FootballApiService implements FootballApiAdapter {
       };
     }
 
+    const cacheKey = this.cache.buildKey('match', { matchId });
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
+
     const resp = await this.makeRequest<ApiResponse<FootballFixture[]>>(
       'fixtures',
       {
@@ -228,7 +260,17 @@ export class FootballApiService implements FootballApiAdapter {
 
     // The API returns an array even for single fixture
     const fixtures = normalizeFixtures(resp as ApiResponse<FootballFixture[]>);
-    return fixtures && fixtures.length > 0 ? fixtures[0] : null;
+    const result = fixtures && fixtures.length > 0 ? fixtures[0] : null;
+
+    // Cache based on match status
+    if (result) {
+      const status = (result as any)?.status?.short ?? '';
+      const ttl = ['FT', 'AET', 'PEN'].includes(status)
+        ? FootballApiCacheService.TTL.MATCH_FINISHED
+        : FootballApiCacheService.TTL.MATCH_LIVE;
+      await this.cache.set(cacheKey, result, ttl);
+    }
+    return result;
   }
 
   private async makeRequest<T>(

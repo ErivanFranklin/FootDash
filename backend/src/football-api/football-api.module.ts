@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FootballApiService } from './football-api.service';
+import { FootballApiCacheService } from './football-api-cache.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { FootballApiService } from './football-api.service';
       }),
     }),
   ],
-  providers: [FootballApiService],
-  exports: [FootballApiService],
+  providers: [FootballApiCacheService, FootballApiService],
+  exports: [FootballApiService, FootballApiCacheService],
 })
 export class FootballApiModule {}

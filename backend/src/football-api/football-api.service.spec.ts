@@ -6,11 +6,13 @@ import { of, throwError } from 'rxjs';
 import { AxiosResponse } from 'axios';
 
 import { FootballApiService } from './football-api.service';
+import { FootballApiCacheService } from './football-api-cache.service';
 
 describe('FootballApiService', () => {
   let service: FootballApiService;
   let httpService: jest.Mocked<HttpService>;
   let configService: jest.Mocked<ConfigService>;
+  let cacheService: jest.Mocked<FootballApiCacheService>;
 
   const mockAxiosResponse = <T>(data: T): AxiosResponse<T> => ({
     data,
@@ -36,7 +38,18 @@ describe('FootballApiService', () => {
       get: jest.fn(),
     } as any;
 
-    service = new FootballApiService(httpService, configService);
+    cacheService = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue(undefined),
+      del: jest.fn().mockResolvedValue(undefined),
+      buildKey: jest.fn((_prefix: string, params: Record<string, unknown>) => {
+        return `test:${JSON.stringify(params)}`;
+      }),
+      invalidatePattern: jest.fn().mockResolvedValue(0),
+      isAvailable: jest.fn().mockReturnValue(false),
+    } as any;
+
+    service = new FootballApiService(httpService, configService, cacheService);
   }
 
   beforeEach(() => {

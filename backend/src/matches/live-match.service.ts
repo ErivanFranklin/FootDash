@@ -107,12 +107,12 @@ export class LiveMatchService implements OnModuleDestroy {
 
       // Check if match is finished
       if (
-        match.status === 'FINISHED' ||
-        match.status === 'POSTPONED' ||
-        match.status === 'CANCELLED'
+        (match as any).status === 'FINISHED' ||
+        (match as any).status === 'POSTPONED' ||
+        (match as any).status === 'CANCELLED'
       ) {
         this.logger.log(
-          `Match ${matchId} is ${match.status}, stopping polling`,
+          `Match ${matchId} is ${(match as any).status}, stopping polling`,
         );
 
         // Send final update

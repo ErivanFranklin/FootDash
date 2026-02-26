@@ -20,9 +20,13 @@ export class HomePage implements OnInit {
   matchResult: any = null;
   teamId: number | null = 33;
   // Football seasons span two calendar years; before August use previous year
-  season = new Date().getMonth() < 7
-    ? new Date().getFullYear() - 1
-    : new Date().getFullYear();
+  // Free API plan caps at 2024, so use min(computed, 2024)
+  season = Math.min(
+    new Date().getMonth() < 7
+      ? new Date().getFullYear() - 1
+      : new Date().getFullYear(),
+    2024
+  );
   limit: number | null = 5;
   range = 'all';
   loading = false;
