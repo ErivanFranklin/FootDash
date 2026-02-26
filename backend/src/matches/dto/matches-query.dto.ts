@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 export enum MatchRangeType {
   RECENT = 'recent',
   UPCOMING = 'upcoming',
+  ALL = 'all',
 }
 
 export class MatchesQueryDto {

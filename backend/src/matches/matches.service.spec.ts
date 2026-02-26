@@ -82,6 +82,25 @@ describe('MatchesService', () => {
     });
   });
 
+  it('requests all matches without last/next when range is ALL', async () => {
+    footballApiMock.getTeamFixtures.mockResolvedValue('matches');
+    await service.getTeamMatches(33, {
+      range: MatchRangeType.ALL,
+      season: 2025,
+      from: '2025-02-26',
+      to: '2025-02-26',
+    });
+
+    expect(footballApiMock.getTeamFixtures).toHaveBeenCalledWith({
+      teamId: 33,
+      season: 2025,
+      last: undefined,
+      next: undefined,
+      from: '2025-02-26',
+      to: '2025-02-26',
+    });
+  });
+
   it('passes through when no range provided', async () => {
     footballApiMock.getTeamFixtures.mockResolvedValue('matches');
     await service.getTeamMatches(1, { limit: 4 });
