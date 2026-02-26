@@ -29,12 +29,12 @@ export class WebsocketService {
 
   private initializeSockets() {
     // Main socket for general events
-    this.socket = io(environment.apiBaseUrl.replace('/api', ''), {
+    this.socket = io(environment.websocketUrl, {
       transports: ['websocket', 'polling'],
     });
 
     // Social socket for social events
-    this.socialSocket = io(`${environment.apiBaseUrl.replace('/api', '')}/social`, {
+    this.socialSocket = io(`${environment.websocketUrl}/social`, {
       transports: ['websocket', 'polling'],
     });
 
