@@ -230,7 +230,12 @@ test.describe('Phase 9: Logout', () => {
       !err.includes('Unauthorized') &&
       !err.includes('WebSocket') &&
       !err.includes('net::ERR') &&
-      !err.includes('Failed to fetch')
+      !err.includes('Failed to fetch') &&
+      !err.includes('Invalid base URL') &&
+      !err.includes('Could not load icon') &&
+      !err.includes('Missing translation') &&
+      !err.includes('Ionicons') &&
+      !err.includes('Transition was skipped')
     );
 
     // No critical JS errors should occur

@@ -129,7 +129,7 @@ export class LiveIndicatorComponent implements OnInit, OnChanges {
     }
   }
 
-  private isKey(text: string): boolean {
+  isKey(text: string): boolean {
     return !!text && text.startsWith('MATCH_STATUS.');
   }
 }
