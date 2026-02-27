@@ -289,18 +289,28 @@ export class MatchCardComponent {
   }
 
   isHalfTime(): boolean {
-    const status = (this.match?.status || '').toUpperCase();
+    const status = this.getStatusString().toUpperCase();
     return status.includes('HALFTIME') || status.includes('HALF');
   }
 
   getHalfTimeScore(): string {
-    const homeHT = this.match?.score?.halfTime?.home ?? '-';
-    const awayHT = this.match?.score?.halfTime?.away ?? '-';
+    const raw = this.match?.raw ?? this.match;
+    const homeHT = raw?.score?.halftime?.home ?? raw?.score?.halfTime?.home ?? '-';
+    const awayHT = raw?.score?.halftime?.away ?? raw?.score?.halfTime?.away ?? '-';
     return `${homeHT}-${awayHT}`;
   }
 
   getMatchMinute(): number | undefined {
-    return this.match?.minute;
+    // Normalized API format stores elapsed inside the status object
+    return this.match?.minute ?? this.match?.status?.elapsed;
+  }
+
+  /** Extract a plain status string regardless of whether status is a string or object */
+  private getStatusString(): string {
+    const s = this.match?.status;
+    if (!s) return '';
+    if (typeof s === 'string') return s;
+    return s.short || s.long || '';
   }
 
   onShare() {
