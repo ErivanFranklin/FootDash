@@ -250,8 +250,7 @@ export class TeamAnalyticsService {
 
     // Filter by season if provided
     if (season) {
-      // Assuming season is stored in match.league.season
-      query.andWhere("match.league->>'season' = :season", { season });
+      query.andWhere('match.season = :season', { season });
     }
 
     return await query.orderBy('match.kickOff', 'DESC').getMany();

@@ -36,7 +36,7 @@ export class TeamAnalytics {
   })
   formRating: number; // 0-100 rating based on recent results
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ name: 'home_performance', type: 'simple-json', nullable: true })
   homePerformance: {
     played: number;
     won: number;
@@ -47,7 +47,7 @@ export class TeamAnalytics {
     points: number;
   };
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ name: 'away_performance', type: 'simple-json', nullable: true })
   awayPerformance: {
     played: number;
     won: number;
@@ -58,7 +58,7 @@ export class TeamAnalytics {
     points: number;
   };
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ name: 'scoring_trend', type: 'simple-json', nullable: true })
   scoringTrend: {
     last5Matches: number[]; // goals scored in last 5
     average: number;
@@ -74,7 +74,7 @@ export class TeamAnalytics {
   })
   defensiveRating: number; // Lower is better, goals conceded per match
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ name: 'overall_stats', type: 'simple-json', nullable: true })
   overallStats: {
     totalPlayed: number;
     totalWon: number;

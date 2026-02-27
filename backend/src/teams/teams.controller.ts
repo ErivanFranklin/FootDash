@@ -197,6 +197,26 @@ export class TeamsController {
     return this.teamsService.createTeam(body);
   }
 
+  @Post(':teamId/sync')
+  @ApiOperation({ summary: 'Sync team data from external API' })
+  @ApiParam({
+    name: 'teamId',
+    description: 'Team ID (internal)',
+    type: 'integer',
+    example: 10,
+  })
+  @ApiResponse({ status: 200, description: 'Team synced successfully' })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  async syncTeam(@Param() params: TeamIdParamDto) {
+    // Look up team to get externalId, then sync
+    const team = await this.teamsService.findTeamById(params.teamId);
+    if (!team || !team.externalId) {
+      return { message: 'Team not found or has no external ID', teamId: params.teamId };
+    }
+    const synced = await this.teamsService.syncTeamFromApi(team.externalId);
+    return { message: 'Team synced successfully', team: synced };
+  }
+
   @Get(':teamId/db')
   @ApiOperation({ summary: 'Get persisted team data' })
   @ApiParam({
