@@ -76,7 +76,7 @@
         </div>
         <div class="trend-summary">
           <span class="average">
-            Average: <strong>{{ analytics.scoringTrend?.average.toFixed(1) || '0' }}</strong> goals/match
+            Average: <strong>{{ (analytics.scoringTrend?.average ?? 0).toFixed(1) }}</strong> goals/match
           </span>
         </div>
       </ion-card-content>
