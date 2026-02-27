@@ -1,0 +1,163 @@
+<div class="analytics-charts-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Loading charts...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Charts Content -->
+  <div *ngIf="analytics && !loading && !error" class="charts-grid">
+    
+    <!-- Form Rating Gauge -->
+    <ion-card class="chart-card form-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="stats-chart-outline"></ion-icon>
+          Current Form
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="gauge-container">
+          <canvas #formGaugeChart></canvas>
+          <div class="gauge-center">
+            <span class="gauge-value">{{ (+analytics.formRating).toFixed(0) }}</span>
+            <span class="gauge-label">{{ getFormLabel() }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Season Overview Doughnut -->
+    <ion-card class="chart-card overview-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="football-outline"></ion-icon>
+          Season Overview
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-wrapper">
+          <canvas #seasonOverviewChart></canvas>
+        </div>
+        <div class="stats-summary">
+          <div class="stat">
+            <span class="label">Played</span>
+            <span class="value">{{ analytics.overallStats.played }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Points</span>
+            <span class="value highlight">{{ analytics.overallStats.points }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Win Rate</span>
+            <span class="value">{{ analytics.overallStats.winPercentage.toFixed(0) }}%</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Scoring Trend Line Chart -->
+    <ion-card class="chart-card trend-card wide">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon [name]="getTrendIcon()" [color]="getTrendColor()"></ion-icon>
+          Scoring Trend
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-wrapper tall">
+          <canvas #scoringTrendChart></canvas>
+        </div>
+        <div class="trend-summary">
+          <span class="average">
+            Average: <strong>{{ analytics.scoringTrend?.average.toFixed(1) || '0' }}</strong> goals/match
+          </span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Goals Breakdown Bar Chart -->
+    <ion-card class="chart-card goals-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="football-outline"></ion-icon>
+          Goals Breakdown
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-wrapper">
+          <canvas #goalsChart></canvas>
+        </div>
+        <div class="goals-total">
+          <div class="total-item scored">
+            <span class="label">Total Scored</span>
+            <span class="value">{{ analytics.overallStats.goalsFor }}</span>
+          </div>
+          <div class="total-item conceded">
+            <span class="label">Total Conceded</span>
+            <span class="value">{{ analytics.overallStats.goalsAgainst }}</span>
+          </div>
+          <div class="total-item difference" [class.positive]="analytics.overallStats.goalDifference > 0" [class.negative]="analytics.overallStats.goalDifference < 0">
+            <span class="label">Difference</span>
+            <span class="value">{{ analytics.overallStats.goalDifference > 0 ? '+' : '' }}{{ analytics.overallStats.goalDifference }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Home vs Away Grouped Bar -->
+    <ion-card class="chart-card home-away-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="home-outline"></ion-icon>
+          Home vs Away
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-wrapper">
+          <canvas #homeAwayChart></canvas>
+        </div>
+        <ion-grid class="comparison-grid">
+          <ion-row>
+            <ion-col size="6">
+              <div class="location-stat home">
+                <span class="location-label">Home</span>
+                <span class="record">{{ analytics.homePerformance.won }}-{{ analytics.homePerformance.drawn }}-{{ analytics.homePerformance.lost }}</span>
+                <span class="win-rate">{{ analytics.homePerformance.winPercentage.toFixed(0) }}% wins</span>
+              </div>
+            </ion-col>
+            <ion-col size="6">
+              <div class="location-stat away">
+                <span class="location-label">Away</span>
+                <span class="record">{{ analytics.awayPerformance.won }}-{{ analytics.awayPerformance.drawn }}-{{ analytics.awayPerformance.lost }}</span>
+                <span class="win-rate">{{ analytics.awayPerformance.winPercentage.toFixed(0) }}% wins</span>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Defensive Performance Radar -->
+    <ion-card class="chart-card defensive-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="shield-outline"></ion-icon>
+          Performance Radar
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-wrapper radar">
+          <canvas #defensiveChart></canvas>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</div>

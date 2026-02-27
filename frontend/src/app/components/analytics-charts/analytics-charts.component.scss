@@ -1,0 +1,327 @@
+.analytics-charts-container {
+  padding: 8px;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 48px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.chart-card {
+  --background: var(--ion-card-background, #1e1e1e);
+  border-radius: 16px;
+  margin: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  &.wide {
+    grid-column: span 2;
+    
+    @media (max-width: 767px) {
+      grid-column: span 1;
+    }
+  }
+
+  ion-card-header {
+    padding: 16px 16px 8px;
+  }
+
+  ion-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+
+    ion-icon {
+      font-size: 20px;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  ion-card-content {
+    padding: 8px 16px 16px;
+  }
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 200px;
+  width: 100%;
+
+  &.tall {
+    height: 250px;
+  }
+
+  &.radar {
+    height: 280px;
+  }
+
+  canvas {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+// Form Gauge Card
+.form-card {
+  .gauge-container {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .gauge-center {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -40%);
+
+      .gauge-value {
+        font-size: 48px;
+        font-weight: 700;
+        color: var(--ion-text-color);
+        line-height: 1;
+      }
+
+      .gauge-label {
+        font-size: 14px;
+        color: var(--ion-color-medium);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    }
+  }
+}
+
+// Stats Summary
+.stats-summary {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .label {
+      font-size: 11px;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ion-text-color);
+
+      &.highlight {
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+}
+
+// Trend Summary
+.trend-summary {
+  text-align: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .average {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+
+    strong {
+      color: var(--ion-color-primary);
+      font-size: 16px;
+    }
+  }
+}
+
+// Goals Total
+.goals-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .total-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .label {
+      font-size: 10px;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    &.scored .value {
+      color: var(--ion-color-success);
+    }
+
+    &.conceded .value {
+      color: var(--ion-color-danger);
+    }
+
+    &.difference {
+      &.positive .value {
+        color: var(--ion-color-success);
+      }
+
+      &.negative .value {
+        color: var(--ion-color-danger);
+      }
+    }
+  }
+}
+
+// Comparison Grid
+.comparison-grid {
+  padding: 16px 0 0;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  ion-row {
+    --ion-grid-column-padding: 8px;
+  }
+
+  .location-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+
+    .location-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .record {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ion-text-color);
+    }
+
+    .win-rate {
+      font-size: 12px;
+      color: var(--ion-color-medium);
+    }
+
+    &.home {
+      border-left: 3px solid var(--ion-color-primary);
+
+      .location-label {
+        color: var(--ion-color-primary);
+      }
+    }
+
+    &.away {
+      border-left: 3px solid #af52de;
+
+      .location-label {
+        color: #af52de;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-wrapper {
+    height: 180px;
+
+    &.tall {
+      height: 220px;
+    }
+
+    &.radar {
+      height: 250px;
+    }
+  }
+
+  .form-card .gauge-container {
+    height: 180px;
+
+    .gauge-center .gauge-value {
+      font-size: 40px;
+    }
+  }
+}
+
+// Dark mode enhancements
+:host-context(body.dark) {
+  .chart-card {
+    --background: #1a1a1a;
+  }
+}

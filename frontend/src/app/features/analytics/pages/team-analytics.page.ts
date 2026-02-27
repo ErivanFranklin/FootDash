@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone';
 import { TeamAnalyticsCardComponent } from '../../../components/team-analytics-card/team-analytics-card.component';
+import { AnalyticsChartsComponent } from '../../../components/analytics-charts/analytics-charts.component';
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -31,6 +32,7 @@ interface Team {
     IonSegmentButton,
     IonLabel,
     TeamAnalyticsCardComponent,
+    AnalyticsChartsComponent,
   ],
 })
 export class TeamAnalyticsPage implements OnInit {

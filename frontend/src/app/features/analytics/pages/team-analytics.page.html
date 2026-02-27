@@ -32,12 +32,18 @@
         </ion-segment-button>
       </ion-segment>
 
-      <!-- Analytics Card -->
+      <!-- Analytics Card for Overview -->
       <app-team-analytics-card
-        *ngIf="team"
+        *ngIf="team && selectedView === 'overview'"
         [teamId]="team.id"
-        [showCharts]="selectedView === 'charts'"
+        [showCharts]="false"
       ></app-team-analytics-card>
+
+      <!-- Enhanced Charts for Charts tab -->
+      <app-analytics-charts
+        *ngIf="team && selectedView === 'charts'"
+        [teamId]="team.id"
+      ></app-analytics-charts>
     </ng-container>
 
     <!-- Error State -->
