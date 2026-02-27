@@ -32,11 +32,11 @@ export class TeamAnalyticsService {
     teamId: number,
     season?: string,
   ): Promise<TeamAnalyticsData> {
-    const currentSeason = season || this.getCurrentSeason();
+    const resolvedSeason = season || await this.resolveSeasonForTeam(teamId);
 
     // Check for existing analytics
     const existing = await this.analyticsRepository.findOne({
-      where: { teamId, season: currentSeason },
+      where: { teamId, season: resolvedSeason },
       relations: ['team'],
     });
 
@@ -45,7 +45,7 @@ export class TeamAnalyticsService {
     }
 
     // Calculate new analytics
-    return await this.calculateTeamAnalytics(teamId, currentSeason);
+    return await this.calculateTeamAnalytics(teamId, resolvedSeason);
   }
 
   /**
@@ -186,10 +186,9 @@ export class TeamAnalyticsService {
     team2Id: number,
     season?: string,
   ): Promise<any> {
-    const currentSeason = season || this.getCurrentSeason();
-
-    const team1Analytics = await this.getTeamAnalytics(team1Id, currentSeason);
-    const team2Analytics = await this.getTeamAnalytics(team2Id, currentSeason);
+    // getTeamAnalytics already resolves the season internally when none is passed
+    const team1Analytics = await this.getTeamAnalytics(team1Id, season);
+    const team2Analytics = await this.getTeamAnalytics(team2Id, season);
 
     // Get head-to-head
     const h2hMatches = await this.getHeadToHeadMatches(team1Id, team2Id);
@@ -280,19 +279,64 @@ export class TeamAnalyticsService {
   }
 
   /**
-   * Get current season (simple implementation)
+   * Get current season.
+   * Football API uses year-only format (e.g. "2024").
+   * If we're before August, the "current" season started last year.
    */
   private getCurrentSeason(): string {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
 
-    // Assume season starts in August (month 8)
+    // Seasons typically start in August; before August we're still in the previous year's season
     if (month >= 8) {
-      return `${year}-${year + 1}`;
+      return `${year}`;
     } else {
-      return `${year - 1}-${year}`;
+      return `${year - 1}`;
     }
+  }
+
+  /**
+   * Resolve the best season for a team.
+   * Tries getCurrentSeason() first; if no matches exist, falls back
+   * to the latest season that has finished matches for this team.
+   */
+  private async resolveSeasonForTeam(teamId: number): Promise<string> {
+    const defaultSeason = this.getCurrentSeason();
+
+    // Check if the default season has matches
+    const countForDefault = await this.matchRepository
+      .createQueryBuilder('match')
+      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', { teamId })
+      .andWhere('match.season = :season', { season: defaultSeason })
+      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .getCount();
+
+    if (countForDefault > 0) {
+      return defaultSeason;
+    }
+
+    // Fall back to the latest season with actual data for this team
+    const latestSeason = await this.matchRepository
+      .createQueryBuilder('match')
+      .select('match.season', 'season')
+      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', { teamId })
+      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .andWhere('match.season IS NOT NULL')
+      .groupBy('match.season')
+      .orderBy('match.season', 'DESC')
+      .limit(1)
+      .getRawOne();
+
+    if (latestSeason?.season) {
+      this.logger.log(
+        `No matches for team ${teamId} in season ${defaultSeason}, using latest season: ${latestSeason.season}`,
+      );
+      return latestSeason.season;
+    }
+
+    // No matches at all — return default and let calculation handle empty data
+    return defaultSeason;
   }
 
   /**

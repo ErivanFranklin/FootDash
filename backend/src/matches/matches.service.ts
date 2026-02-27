@@ -193,6 +193,14 @@ export class MatchesService {
         externalId: externalMatchId,
         homeTeam: home,
         awayTeam: away,
+        kickOff,
+        status,
+        homeScore,
+        awayScore,
+        referee,
+        venue,
+        league: (f as any)?.league ?? null,
+        season: String((f as any)?.league?.season ?? query.season ?? ''),
       });
 
       const saved = await this.matchRepository.save(newMatch);
