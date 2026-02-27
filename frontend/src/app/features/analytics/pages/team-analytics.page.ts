@@ -52,16 +52,23 @@ export class TeamAnalyticsPage implements OnInit {
     this.team$ = this.api.getTeam(this.teamId).pipe(
       map((team: any) => {
         this.loading = false;
+        // Handle case where API returns an array (e.g., from external Football API)
+        const t = Array.isArray(team) ? team[0] : team;
+        if (!t || !t.id) {
+          // Fallback: use the route teamId so analytics can still load
+          return { id: this.teamId, name: 'Team', logo: undefined };
+        }
         return {
-          id: team.id,
-          name: team.name,
-          logo: team.logo,
+          id: t.id,
+          name: t.name,
+          logo: t.logo,
         };
       }),
       catchError((error) => {
         console.error('Error loading team:', error);
         this.loading = false;
-        return of(null);
+        // Fallback: still allow analytics to load with the route teamId
+        return of({ id: this.teamId, name: 'Team', logo: undefined } as Team);
       })
     );
   }

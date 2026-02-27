@@ -42,12 +42,19 @@ export class TeamAnalyticsCardComponent implements OnInit, OnChanges, AfterViewI
   private translocoService = inject(TranslocoService);
 
   ngOnInit() {
-    // Initial load will be handled by ngOnChanges
+    // If teamId was set before ngOnChanges, load immediately
+    if (this.teamId) {
+      this.loadAnalytics();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['teamId'] && changes['teamId'].currentValue) {
       this.loadAnalytics();
+    } else if (changes['teamId'] && !changes['teamId'].currentValue) {
+      // teamId was cleared or set to a falsy value
+      this.loading = false;
+      this.error = 'Team ID is required';
     }
   }
 

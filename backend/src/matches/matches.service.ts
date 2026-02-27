@@ -46,11 +46,14 @@ export class MatchesService {
     });
   }
 
-  getTeamMatches(teamId: number, query: MatchesQueryDto) {
+  async getTeamMatches(teamId: number, query: MatchesQueryDto) {
     const { range, limit, season, from, to } = query;
 
+    // Resolve external ID: if the teamId matches a DB team, use its externalId for the API call
+    const resolvedTeamId = await this.resolveExternalTeamId(teamId);
+
     const request: any = {
-      teamId,
+      teamId: resolvedTeamId,
       season,
       last: range === MatchRangeType.RECENT ? (limit ?? 5) : undefined,
       next: range === MatchRangeType.UPCOMING ? (limit ?? 5) : undefined,
@@ -241,5 +244,17 @@ export class MatchesService {
     const prev = this.normalizeStatus(previous);
     const curr = this.normalizeStatus(next);
     return finished.has(curr) && !finished.has(prev);
+  }
+
+  /**
+   * If the given ID corresponds to a DB team, return its externalId for API calls.
+   * Otherwise, assume it's already an external ID and return it as-is.
+   */
+  private async resolveExternalTeamId(teamId: number): Promise<number> {
+    const dbTeam = await this.teamRepository.findOne({ where: { id: teamId } });
+    if (dbTeam?.externalId) {
+      return dbTeam.externalId;
+    }
+    return teamId;
   }
 }

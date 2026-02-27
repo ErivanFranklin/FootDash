@@ -69,7 +69,12 @@ export class TeamsController {
     },
   })
   @ApiResponse({ status: 404, description: 'Team not found' })
-  getTeamOverview(@Param() params: TeamIdParamDto) {
+  async getTeamOverview(@Param() params: TeamIdParamDto) {
+    // Try DB first (internal ID), fall back to external API
+    const dbTeam = await this.teamsService.findTeamById(params.teamId);
+    if (dbTeam) {
+      return dbTeam;
+    }
     return this.teamsService.getTeamOverview(params.teamId);
   }
 

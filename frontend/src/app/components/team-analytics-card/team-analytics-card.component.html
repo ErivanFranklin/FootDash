@@ -27,12 +27,12 @@
         <h3>Current Form</h3>
         <div class="form-rating-display">
           <div class="rating-circle" [attr.data-rating]="getFormRatingColor(analytics.formRating)">
-            <span class="rating-value">{{ analytics.formRating.toFixed(0) }}</span>
+            <span class="rating-value">{{ (+analytics.formRating).toFixed(0) }}</span>
             <span class="rating-max">/100</span>
           </div>
           <div class="rating-details">
-            <ion-badge [color]="getFormRatingColor(analytics.formRating)">
-              {{ analytics.formRating >= 70 ? 'Excellent' : analytics.formRating >= 50 ? 'Good' : 'Poor' }}
+            <ion-badge [color]="getFormRatingColor(+analytics.formRating)">
+              {{ +analytics.formRating >= 70 ? 'Excellent' : +analytics.formRating >= 50 ? 'Good' : 'Poor' }}
             </ion-badge>
           </div>
         </div>
@@ -138,11 +138,11 @@
       <div class="defensive-section">
         <h3>Defensive Rating</h3>
         <ion-progress-bar
-          [value]="analytics.defensiveRating / 100"
-          [color]="getDefensiveRatingColor(analytics.defensiveRating)"
+          [value]="(+analytics.defensiveRating) / 100"
+          [color]="getDefensiveRatingColor(+analytics.defensiveRating)"
         ></ion-progress-bar>
         <div class="rating-value-display">
-          {{ analytics.defensiveRating.toFixed(0) }}/100
+          {{ (+analytics.defensiveRating).toFixed(0) }}/100
         </div>
       </div>
 

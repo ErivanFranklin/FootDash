@@ -273,18 +273,19 @@ export class MatchCardComponent {
   }
 
   hasScore(): boolean {
-    return this.match?.homeScore !== null && 
-           this.match?.homeScore !== undefined || 
-           this.match?.awayScore !== null && 
-           this.match?.awayScore !== undefined;
+    // Support both flat entity format (homeScore/awayScore) and normalized API format (goals.home/goals.away)
+    const home = this.match?.homeScore ?? this.match?.goals?.home;
+    const away = this.match?.awayScore ?? this.match?.goals?.away;
+    return home !== null && home !== undefined ||
+           away !== null && away !== undefined;
   }
 
   getHomeScore(): number | string {
-    return this.match?.homeScore ?? this.match?.score?.fullTime?.home ?? '-';
+    return this.match?.homeScore ?? this.match?.goals?.home ?? this.match?.score?.fullTime?.home ?? '-';
   }
 
   getAwayScore(): number | string {
-    return this.match?.awayScore ?? this.match?.score?.fullTime?.away ?? '-';
+    return this.match?.awayScore ?? this.match?.goals?.away ?? this.match?.score?.fullTime?.away ?? '-';
   }
 
   isHalfTime(): boolean {

@@ -59,7 +59,7 @@
 
   <!-- Matches List -->
   <div *ngIf="fixtures.length && !loading">
-    <a *ngFor="let match of fixtures" [routerLink]="['/match', match.fixture.id]" style="display: block; padding: 8px 12px;">
+    <a *ngFor="let match of fixtures" [routerLink]="['/match', match.id ?? match.fixture?.id]" style="display: block; padding: 8px 12px;">
       <app-match-card [match]="match"></app-match-card>
     </a>
   </div>
