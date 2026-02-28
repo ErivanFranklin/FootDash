@@ -15,7 +15,13 @@ export class AuthService {
   private authUrl = buildAuthUrl();
   private currentTokenSubject = new BehaviorSubject<string | null>(this.getToken());
   public currentToken$ = this.currentTokenSubject.asObservable();
-  public isAuthenticated$ = this.currentToken$.pipe(map(token => !!token && !this.jwtHelper.isTokenExpired(token)));
+  public isAuthenticated$ = this.currentToken$.pipe(
+    map(token => {
+      const isValid = !!token && !this.jwtHelper.isTokenExpired(token);
+      console.log('Authentication check:', { token: !!token, isValid, hasToken: !!token });
+      return isValid;
+    })
+  );
 
   // prefer functional inject() per angular-eslint/prefer-inject
   private http = inject(HttpClient);
@@ -52,6 +58,11 @@ export class AuthService {
 
   logout(): void {
     this.removeToken();
+    // Clear any other auth-related data
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_data');
+    // Force observable to emit immediately
+    this.currentTokenSubject.next(null);
   }
 
   isAuthenticated(): boolean {
@@ -78,6 +89,7 @@ export class AuthService {
   removeToken(): void {
     localStorage.removeItem('access_token');
     this.currentTokenSubject.next(null);
+    console.log('Token removed, authentication state:', this.isAuthenticated());
   }
 }
 

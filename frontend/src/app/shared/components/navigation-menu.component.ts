@@ -83,7 +83,12 @@ export class NavigationMenuComponent {
     // Disconnect websockets before logout
     this.websocketService.disconnect();
     this.authService.logout();
-    this.navigateTo('/login');
+    // Small delay to ensure auth state propagates
+    setTimeout(() => {
+      this.router.navigate(['/login'], { replaceUrl: true });
+      // Force page reload to ensure clean state
+      window.location.reload();
+    }, 100);
   }
 
   changeLanguage(event: any) {

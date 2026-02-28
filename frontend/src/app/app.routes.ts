@@ -68,6 +68,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
+  {
     path: 'match-discussion/:id',
     loadComponent: () => import('./features/social/match-discussion/match-discussion.page').then( m => m.MatchDiscussionPage),
     canActivate: [authGuard],
