@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonSpinner, IonSegment, IonSegmentButton, IonLabel, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TeamAnalyticsCardComponent } from '../../../components/team-analytics-card/team-analytics-card.component';
 import { AnalyticsChartsComponent } from '../../../components/analytics-charts/analytics-charts.component';
 import { ApiService } from '../../../core/services/api.service';
@@ -31,6 +31,8 @@ interface Team {
     IonSegment,
     IonSegmentButton,
     IonLabel,
+    IonButton,
+    IonIcon,
     TeamAnalyticsCardComponent,
     AnalyticsChartsComponent,
   ],
@@ -38,6 +40,7 @@ interface Team {
 export class TeamAnalyticsPage implements OnInit {
   private route = inject(ActivatedRoute);
   private api = inject(ApiService);
+  private router = inject(Router);
 
   teamId!: number;
   team$!: Observable<Team | null>;
@@ -73,6 +76,14 @@ export class TeamAnalyticsPage implements OnInit {
         return of({ id: this.teamId, name: 'Team', logo: undefined } as Team);
       })
     );
+  }
+
+  goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/teams']);
+    }
   }
 
   onSegmentChange(event: any) {
