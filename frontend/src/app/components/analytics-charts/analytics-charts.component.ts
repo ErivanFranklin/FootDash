@@ -112,6 +112,9 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.chartCreationTimer) {
+      clearTimeout(this.chartCreationTimer);
+    }
     this.destroyAllCharts();
   }
 
@@ -177,20 +180,28 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     return canvas.getContext('2d');
   }
 
+  private chartCreationTimer: any = null;
+
   private createAllCharts() {
     if (!this.analytics) return;
 
+    // Cancel any pending chart creation
+    if (this.chartCreationTimer) {
+      clearTimeout(this.chartCreationTimer);
+    }
+
     this.destroyAllCharts();
 
-    // Use requestAnimationFrame for better timing
-    requestAnimationFrame(() => {
+    // Use setTimeout to ensure canvas elements are fully reset after destroy
+    this.chartCreationTimer = setTimeout(() => {
       this.createSeasonOverviewChart();
       this.createGoalsChart();
       this.createScoringTrendChart();
       this.createHomeAwayChart();
       this.createFormGaugeChart();
       this.createDefensiveChart();
-    });
+      this.chartCreationTimer = null;
+    }, 50);
   }
 
   private createSeasonOverviewChart() {
