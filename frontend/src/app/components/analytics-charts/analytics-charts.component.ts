@@ -95,7 +95,8 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit() {
     if (this.analytics) {
       this.loading = false;
-      setTimeout(() => this.createAllCharts(), 100);
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => this.createAllCharts());
     } else if (this.teamId) {
       this.loadAnalytics();
     }
@@ -104,7 +105,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['analytics'] && changes['analytics'].currentValue) {
       this.loading = false;
-      setTimeout(() => this.createAllCharts(), 100);
+      requestAnimationFrame(() => this.createAllCharts());
     } else if (changes['teamId'] && changes['teamId'].currentValue && !this.analytics) {
       this.loadAnalytics();
     }
@@ -122,7 +123,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
       next: (data) => {
         this.analytics = data;
         this.loading = false;
-        setTimeout(() => this.createAllCharts(), 100);
+        requestAnimationFrame(() => this.createAllCharts());
       },
       error: (err) => {
         this.error = 'Failed to load analytics';
@@ -133,8 +134,47 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private destroyAllCharts() {
-    this.charts.forEach((chart) => chart.destroy());
+    this.charts.forEach((chart) => {
+      if (chart) {
+        chart.destroy();
+      }
+    });
     this.charts = [];
+    
+    // Clear canvas contexts to prevent "Canvas is already in use" errors
+    this.clearCanvas(this.seasonOverviewRef);
+    this.clearCanvas(this.goalsChartRef);
+    this.clearCanvas(this.scoringTrendRef);
+    this.clearCanvas(this.homeAwayRef);
+    this.clearCanvas(this.formGaugeRef);
+    this.clearCanvas(this.defensiveRef);
+  }
+
+  private clearCanvas(canvasRef: ElementRef<HTMLCanvasElement> | undefined) {
+    if (canvasRef?.nativeElement) {
+      const ctx = canvasRef.nativeElement.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.nativeElement.width, canvasRef.nativeElement.height);
+        // Reset canvas size to force complete cleanup
+        const { width, height } = canvasRef.nativeElement.getBoundingClientRect();
+        canvasRef.nativeElement.width = width;
+        canvasRef.nativeElement.height = height;
+      }
+    }
+  }
+
+  private getCanvasContext(canvasRef: ElementRef<HTMLCanvasElement> | undefined): CanvasRenderingContext2D | null {
+    if (!canvasRef?.nativeElement) return null;
+
+    const canvas = canvasRef.nativeElement;
+    
+    // Check if chart already exists for this canvas and destroy it
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) {
+      existingChart.destroy();
+    }
+
+    return canvas.getContext('2d');
   }
 
   private createAllCharts() {
@@ -142,19 +182,21 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
 
     this.destroyAllCharts();
 
-    // Create all charts with slight delays to ensure canvas elements are ready
-    setTimeout(() => this.createSeasonOverviewChart(), 50);
-    setTimeout(() => this.createGoalsChart(), 100);
-    setTimeout(() => this.createScoringTrendChart(), 150);
-    setTimeout(() => this.createHomeAwayChart(), 200);
-    setTimeout(() => this.createFormGaugeChart(), 250);
-    setTimeout(() => this.createDefensiveChart(), 300);
+    // Use requestAnimationFrame for better timing
+    requestAnimationFrame(() => {
+      this.createSeasonOverviewChart();
+      this.createGoalsChart();
+      this.createScoringTrendChart();
+      this.createHomeAwayChart();
+      this.createFormGaugeChart();
+      this.createDefensiveChart();
+    });
   }
 
   private createSeasonOverviewChart() {
-    if (!this.analytics || !this.seasonOverviewRef?.nativeElement) return;
+    if (!this.analytics) return;
 
-    const ctx = this.seasonOverviewRef.nativeElement.getContext('2d');
+    const ctx = this.getCanvasContext(this.seasonOverviewRef);
     if (!ctx) return;
 
     const { won, drawn, lost } = this.analytics.overallStats;
@@ -222,9 +264,9 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createGoalsChart() {
-    if (!this.analytics || !this.goalsChartRef?.nativeElement) return;
+    if (!this.analytics) return;
 
-    const ctx = this.goalsChartRef.nativeElement.getContext('2d');
+    const ctx = this.getCanvasContext(this.goalsChartRef);
     if (!ctx) return;
 
     const { goalsFor, goalsAgainst } = this.analytics.overallStats;
@@ -304,9 +346,9 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createScoringTrendChart() {
-    if (!this.analytics?.scoringTrend || !this.scoringTrendRef?.nativeElement) return;
+    if (!this.analytics?.scoringTrend) return;
 
-    const ctx = this.scoringTrendRef.nativeElement.getContext('2d');
+    const ctx = this.getCanvasContext(this.scoringTrendRef);
     if (!ctx) return;
 
     const { last5Matches, average } = this.analytics.scoringTrend;
@@ -400,9 +442,9 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createHomeAwayChart() {
-    if (!this.analytics || !this.homeAwayRef?.nativeElement) return;
+    if (!this.analytics) return;
 
-    const ctx = this.homeAwayRef.nativeElement.getContext('2d');
+    const ctx = this.getCanvasContext(this.homeAwayRef);
     if (!ctx) return;
 
     const { homePerformance, awayPerformance } = this.analytics;
@@ -482,9 +524,9 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createFormGaugeChart() {
-    if (!this.analytics || !this.formGaugeRef?.nativeElement) return;
+    if (!this.analytics?.currentForm) return;
 
-    const ctx = this.formGaugeRef.nativeElement.getContext('2d');
+    const ctx = this.getCanvasContext(this.formGaugeRef);
     if (!ctx) return;
 
     const formRating = +this.analytics.formRating;
@@ -534,9 +576,9 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createDefensiveChart() {
-    if (!this.analytics || !this.defensiveRef?.nativeElement) return;
+    if (!this.analytics) return;
 
-    const ctx = this.defensiveRef.nativeElement.getContext('2d');
+    const ctx = this.getCanvasContext(this.defensiveRef);
     if (!ctx) return;
 
     const { homePerformance, awayPerformance, overallStats } = this.analytics;
