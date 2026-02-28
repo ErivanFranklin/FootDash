@@ -16,7 +16,7 @@ import { ShareService } from '../../core/services/share.service';
             {{ getHomeTeamName() }} vs {{ getAwayTeamName() }}
           </ion-card-title>
           <app-live-indicator 
-            [status]="match?.status || ''" 
+            [status]="getStatusString()" 
             [minute]="getMatchMinute()"
             class="live-badge">
           </app-live-indicator>
@@ -306,7 +306,7 @@ export class MatchCardComponent {
   }
 
   /** Extract a plain status string regardless of whether status is a string or object */
-  private getStatusString(): string {
+  getStatusString(): string {
     const s = this.match?.status;
     if (!s) return '';
     if (typeof s === 'string') return s;
