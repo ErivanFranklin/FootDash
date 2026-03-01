@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth.service';
@@ -11,7 +11,7 @@ import { LoggerService } from '../../../core/services/logger.service';
   templateUrl: 'login.page.html',
   styleUrls: ['login.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, FormsModule, RouterLink],
 })
 export class LoginPage implements OnInit {
   email = '';

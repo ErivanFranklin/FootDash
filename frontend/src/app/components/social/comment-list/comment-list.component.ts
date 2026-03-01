@@ -38,6 +38,11 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
   pageSize: number = 20;
 
   expandedReplies: Set<number> = new Set();
+  replyingTo: Set<number> = new Set();
+  repliesMap: Map<number, SocialComment[]> = new Map();
+  repliesLoadingSet: Set<number> = new Set();
+  repliesHasMore: Map<number, boolean> = new Map();
+  repliesPageMap: Map<number, number> = new Map();
   reactionSummaries: Map<number, ReactionSummary> = new Map();
 
   // Enum for template access
@@ -186,15 +191,72 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
       this.expandedReplies.delete(commentId);
     } else {
       this.expandedReplies.add(commentId);
-      // TODO: Load replies for this comment
+      // Load replies if not already loaded
+      if (!this.repliesMap.has(commentId)) {
+        this.loadReplies(commentId);
+      }
     }
+  }
+
+  toggleReplyForm(commentId: number) {
+    if (this.replyingTo.has(commentId)) {
+      this.replyingTo.delete(commentId);
+    } else {
+      this.replyingTo.add(commentId);
+      // Also expand replies when opening reply form
+      if (!this.expandedReplies.has(commentId)) {
+        this.expandedReplies.add(commentId);
+        if (!this.repliesMap.has(commentId)) {
+          this.loadReplies(commentId);
+        }
+      }
+    }
+  }
+
+  private loadReplies(commentId: number, page: number = 1) {
+    this.repliesLoadingSet.add(commentId);
+    this.commentsService.getReplies(commentId, page, this.pageSize).subscribe({
+      next: (result: PaginatedComments) => {
+        const existing = page > 1 ? (this.repliesMap.get(commentId) ?? []) : [];
+        this.repliesMap.set(commentId, [...existing, ...result.comments]);
+        this.repliesHasMore.set(commentId, result.hasMore);
+        this.repliesPageMap.set(commentId, page);
+        this.repliesLoadingSet.delete(commentId);
+        // Load reaction summaries for replies too
+        this.loadReactionSummaries(result.comments);
+      },
+      error: (error) => {
+        this.logger.error('Error loading replies:', error);
+        this.repliesLoadingSet.delete(commentId);
+      },
+    });
+  }
+
+  loadMoreReplies(commentId: number) {
+    const currentPage = this.repliesPageMap.get(commentId) ?? 1;
+    this.loadReplies(commentId, currentPage + 1);
   }
 
   onCommentAdded(comment: SocialComment) {
     this.commentAdded.emit(comment);
-    // Refresh comments if it's a top-level comment
     if (!comment.parentCommentId) {
+      // Top-level comment — refresh the list
       this.resetAndLoad();
+    } else {
+      // Reply added — add to the replies map and update parent's reply count
+      const parentId = comment.parentCommentId;
+      const existing = this.repliesMap.get(parentId) ?? [];
+      // Avoid duplicates
+      if (!existing.find((c) => c.id === comment.id)) {
+        this.repliesMap.set(parentId, [...existing, comment]);
+      }
+      // Update the parent comment's replyCount in the local array
+      const parent = this.comments.find((c) => c.id === parentId);
+      if (parent) {
+        parent.replyCount = (parent.replyCount ?? 0) + 1;
+      }
+      // Close reply form
+      this.replyingTo.delete(parentId);
     }
   }
 

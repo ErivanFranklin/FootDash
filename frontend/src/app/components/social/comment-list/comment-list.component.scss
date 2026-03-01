@@ -4,6 +4,14 @@
   padding-left: 16px;
 }
 
+.reply-item {
+  margin-bottom: 4px;
+}
+
+.reply-actions {
+  --min-height: 32px;
+}
+
 .comment-meta {
   font-size: 0.8em;
   color: var(--ion-color-medium);

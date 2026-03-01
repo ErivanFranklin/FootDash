@@ -28,10 +28,19 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
         <ion-icon name="person" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
       </ion-item>
+      <ion-item button (click)="navigateTo('/notifications')">
+        <ion-icon name="notifications-outline" slot="start"></ion-icon>
+        <ion-label>Notifications</ion-label>
+      </ion-item>
       
       <ion-item-divider>
         <ion-label>{{ 'NAV.SETTINGS' | transloco }}</ion-label>
       </ion-item-divider>
+
+      <ion-item button (click)="navigateTo('/settings')">
+        <ion-icon name="settings-outline" slot="start"></ion-icon>
+        <ion-label>Settings</ion-label>
+      </ion-item>
 
       <ion-item>
         <ion-icon name="globe" slot="start"></ion-icon>

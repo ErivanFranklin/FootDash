@@ -4,6 +4,7 @@ import { NavigationMenuComponent } from './shared/components/navigation-menu.com
 import { WebSocketService as WebsocketService } from './core/services/web-socket.service';
 import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
+import { NotificationCenterService } from './core/services/notification-center.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -61,6 +62,7 @@ export class AppComponent implements OnInit {
   public authService = inject(AuthService);
   private toastController = inject(ToastController);
   private pwaService = inject(PwaService);
+  private notificationCenter = inject(NotificationCenterService);
   private router = inject(Router);
 
   constructor() {
@@ -121,6 +123,7 @@ export class AppComponent implements OnInit {
         const userId = this.authService.getCurrentUserId();
         if (userId) {
           this.websocketService.subscribeToUser(userId);
+          this.notificationCenter.init(userId);
         }
       }
     });

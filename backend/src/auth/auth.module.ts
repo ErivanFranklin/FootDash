@@ -7,13 +7,16 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { JwtStrategy } from './jwt.strategy';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    TypeOrmModule.forFeature([User, RefreshToken]),
+    TypeOrmModule.forFeature([User, RefreshToken, PasswordResetToken]),
+    MailModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

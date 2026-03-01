@@ -13,12 +13,12 @@ import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 
 export interface SocialEvent {
-  type: 'comment' | 'reaction' | 'follow';
-  targetType: 'match' | 'prediction';
-  targetId: number;
-  userId: number;
-  userName: string;
-  data: any;
+  type: 'comment' | 'reaction' | 'follow' | 'new-alert' | 'alert';
+  targetType?: 'match' | 'prediction';
+  targetId?: number;
+  userId?: number;
+  userName?: string;
+  data?: any;
 }
 
 @Injectable({

@@ -32,6 +32,17 @@
             [targetId]="comment.id"
             [summary]="getReactionSummary(comment.id)">
           </app-reaction-button>
+
+          <!-- Reply Button (always visible when showReplies is true) -->
+          <ion-button
+            *ngIf="showReplies"
+            fill="clear"
+            size="small"
+            (click)="toggleReplyForm(comment.id)"
+            color="medium">
+            <ion-icon name="arrow-undo-outline" slot="start"></ion-icon>
+            Reply
+          </ion-button>
         </ion-buttons>
 
         <ion-buttons slot="end" *ngIf="showReplies">
@@ -61,14 +72,58 @@
       <ion-item-group
         *ngIf="expandedReplies.has(comment.id)"
         class="replies-container">
-        <!-- TODO: Load and display replies here -->
-        <ion-text color="medium" class="ion-padding">
-          <p>Replies functionality will be implemented with nested comment loading</p>
-        </ion-text>
+
+        <!-- Loading spinner for replies -->
+        <ion-spinner *ngIf="repliesLoadingSet.has(comment.id)" name="crescent"></ion-spinner>
+
+        <!-- Actual replies list -->
+        <div *ngFor="let reply of repliesMap.get(comment.id) || []" class="reply-item">
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              <img [src]="'/assets/default-avatar.png'" [alt]="reply.userName">
+            </ion-avatar>
+            <ion-label>
+              <h3>{{ reply.userName }}</h3>
+              <p>{{ reply.content }}</p>
+              <p class="comment-meta">
+                {{ reply.createdAt | date:'short' }}
+                <span *ngIf="reply.updatedAt && reply.updatedAt !== reply.createdAt">(edited)</span>
+              </p>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none" class="reply-actions">
+            <ion-buttons slot="start">
+              <app-reaction-button
+                [targetType]="ReactionTargetType.COMMENT"
+                [targetId]="reply.id"
+                [summary]="getReactionSummary(reply.id)">
+              </app-reaction-button>
+            </ion-buttons>
+            <ion-buttons slot="end">
+              <ion-button
+                fill="clear"
+                size="small"
+                (click)="reportComment(reply)"
+                color="medium">
+                <ion-icon name="flag-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-item>
+        </div>
+
+        <!-- Load more replies -->
+        <ion-button
+          *ngIf="repliesHasMore.get(comment.id)"
+          expand="block"
+          fill="clear"
+          size="small"
+          (click)="loadMoreReplies(comment.id)">
+          Load more replies
+        </ion-button>
       </ion-item-group>
 
-      <!-- Reply Form (when expanded) -->
-      <ion-item *ngIf="expandedReplies.has(comment.id)" lines="none">
+      <!-- Reply Form (when replying) -->
+      <ion-item *ngIf="replyingTo.has(comment.id)" lines="none" class="replies-container">
         <app-comment-form
           [targetType]="targetType"
           [targetId]="targetId"

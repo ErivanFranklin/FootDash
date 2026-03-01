@@ -214,7 +214,7 @@ This document is the single source of truth for all planned features, improvemen
 
 ---
 
-### 9.1 — Forgot Password / Reset Flow 🟠 P1
+### 9.1 — Forgot Password / Reset Flow ✅ DONE
 
 **Problem:** No way for users to recover their account if they forget their password.
 
@@ -269,7 +269,7 @@ Frontend:
 
 ---
 
-### 9.2 — Notification Center / Inbox 🟠 P1
+### 9.2 — Notification Center / Inbox ✅ DONE
 
 **Problem:** Alerts show as ephemeral toasts only. Users miss important notifications (new followers, reactions, match events).
 
@@ -338,7 +338,7 @@ Frontend:
 
 ---
 
-### 9.3 — User Settings & Preferences Page 🟠 P1
+### 9.3 — User Settings & Preferences Page ✅ DONE
 
 **Problem:** Backend has full User Profile and Preferences APIs, but the frontend has no settings page.
 
@@ -399,7 +399,7 @@ Frontend:
 
 ---
 
-### 9.4 — Search & Discovery 🟡 P2
+### 9.4 — Search & Discovery ✅ DONE
 
 **Problem:** `SearchOverlayComponent` exists but has no backend support or results page. Users can't discover teams, matches, or other users.
 
@@ -456,7 +456,7 @@ Frontend:
 
 ---
 
-### 9.5 — Comment Reply Threading 🟡 P2
+### 9.5 — Comment Reply Threading ✅ DONE
 
 **Problem:** `comment-list.component.ts` has `// TODO: Load replies for this comment`. Reply UI is stubbed but non-functional.
 
@@ -501,7 +501,7 @@ Frontend:
 
 ---
 
-### 9.6 — Proper Error & 404 Pages 🟡 P2
+### 9.6 — Proper Error & 404 Pages ✅ DONE
 
 **Problem:** Wildcard route redirects to home. Users hitting a bad URL get no feedback. Component errors are unhandled.
 

@@ -26,6 +26,7 @@
     "seed:dev": "node -r ts-node/register scripts/seed-dev.ts"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.2",
@@ -49,6 +50,7 @@
     "helmet": "^8.1.0",
     "ioredis": "^5.8.2",
     "joi": "^17.9.2",
+    "nodemailer": "^8.0.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.0",
@@ -69,6 +71,7 @@
     "@types/jest": "^29.5.2",
     "@types/multer": "^2.0.0",
     "@types/node": "^20.3.1",
+    "@types/nodemailer": "^7.0.11",
     "@types/passport-jwt": "^4.0.1",
     "@types/socket.io": "^3.0.1",
     "@types/supertest": "^6.0.0",

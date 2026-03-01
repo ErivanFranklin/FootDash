@@ -1,13 +1,26 @@
-import { ErrorHandler, Injectable, inject } from '@angular/core';
+import { ErrorHandler, Injectable, inject, NgZone } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { environment } from '../../../environments/environment';
 import { LoggerService } from '../services/logger.service';
+import { ErrorLoggingService } from '../services/error-logging.service';
+
+/** Error types that warrant navigating to the /error page */
+const CRITICAL_PATTERNS = [
+  'ChunkLoadError',
+  'Loading chunk',
+  'Cannot read properties of null',
+  'Maximum call stack size exceeded',
+];
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   private toast = inject(ToastController);
   private logger = inject(LoggerService);
+  private errorLogging = inject(ErrorLoggingService);
+  private router = inject(Router);
+  private zone = inject(NgZone);
   private readonly isDevelopment = !environment.production;
 
   async handleError(error: Error | HttpErrorResponse): Promise<void> {
@@ -27,6 +40,13 @@ export class GlobalErrorHandler implements ErrorHandler {
       // Client-side error
       errorMessage = error.message || 'Client error occurred';
       errorDetails = error.stack || '';
+
+      // Check if this is a critical / unrecoverable error
+      if (this.isCritical(error)) {
+        this.navigateToErrorPage();
+        this.errorLogging.logError(errorMessage, errorDetails);
+        return;
+      }
     }
 
     // Log error details in development
@@ -37,10 +57,8 @@ export class GlobalErrorHandler implements ErrorHandler {
     // Show user-friendly error message
     await this.showErrorToast(errorMessage);
 
-    // In production, you might want to send errors to a logging service
-    if (!this.isDevelopment) {
-      this.logErrorToService(error, errorMessage, errorDetails);
-    }
+    // Always log to error logging service
+    this.errorLogging.logError(errorMessage, errorDetails);
   }
 
   private getHttpErrorMessage(error: HttpErrorResponse): string {
@@ -109,16 +127,19 @@ export class GlobalErrorHandler implements ErrorHandler {
   }
 
   private logErrorToService(error: Error | HttpErrorResponse, message: string, details: string): void {
-    // TODO: Implement error logging service (e.g., Sentry, LogRocket, etc.)
-    // Example:
-    // this.errorLoggingService.logError({
-    //   message,
-    //   details,
-    //   timestamp: new Date().toISOString(),
-    //   userAgent: navigator.userAgent,
-    //   url: window.location.href
-    // });
-    
-    this.logger.warn('Error logging service not implemented. Error details:', { message, details });
+    this.errorLogging.logError(message, details);
+  }
+
+  /** Check whether the error is critical / unrecoverable */
+  private isCritical(error: Error): boolean {
+    const msg = error.message ?? '';
+    return CRITICAL_PATTERNS.some((p) => msg.includes(p));
+  }
+
+  /** Navigate to the /error page (runs inside NgZone so the Router works) */
+  private navigateToErrorPage(): void {
+    this.zone.run(() => {
+      this.router.navigateByUrl('/error', { replaceUrl: true });
+    });
   }
 }

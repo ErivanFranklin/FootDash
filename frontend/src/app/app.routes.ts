@@ -38,6 +38,37 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },
   {
+    path: 'auth/forgot-password',
+    loadComponent: () => import('./features/auth/pages/forgot-password.page').then((m) => m.ForgotPasswordPage),
+  },
+  {
+    path: 'auth/reset-password',
+    loadComponent: () => import('./features/auth/pages/reset-password.page').then((m) => m.ResetPasswordPage),
+  },
+  {
+    path: 'notifications',
+    loadComponent: () => import('./features/notifications/notifications.page').then((m) => m.NotificationsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'search',
+    loadComponent: () => import('./features/search/search-results.page').then((m) => m.SearchResultsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: '404',
+    loadComponent: () => import('./features/error/not-found.page').then((m) => m.NotFoundPage),
+  },
+  {
+    path: 'error',
+    loadComponent: () => import('./features/error/error.page').then((m) => m.ErrorPage),
+  },
+  {
     path: 'leaderboard',
     loadComponent: () => import('./features/gamification/pages/leaderboard/leaderboard.page').then(m => m.LeaderboardPage),
     canActivate: [authGuard],
@@ -79,6 +110,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'home',
+    redirectTo: '404',
   },
 ];

@@ -15,6 +15,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { SocialModule } from './social/social.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { PaymentsModule } from './payments/payments.module';
+import { SearchModule } from './search/search.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -53,6 +54,12 @@ const isProd = process.env.NODE_ENV === 'production';
         STRIPE_WEBHOOK_SECRET: isProd ? Joi.string().required() : Joi.string().optional(),
         STRIPE_PRO_PRICE_ID: isProd ? Joi.string().required() : Joi.string().optional(),
         FRONTEND_URL: Joi.string().uri().default('http://localhost:4200'),
+        // SMTP / Mail
+        SMTP_HOST: Joi.string().default('localhost'),
+        SMTP_PORT: Joi.number().default(587),
+        SMTP_USER: Joi.string().allow('').default(''),
+        SMTP_PASS: Joi.string().allow('').default(''),
+        MAIL_FROM: Joi.string().default('"FootDash" <noreply@footdash.app>'),
       }),
     }),
     ScheduleModule.forRoot(),
@@ -68,6 +75,7 @@ const isProd = process.env.NODE_ENV === 'production';
     SocialModule,
     GamificationModule,
     PaymentsModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

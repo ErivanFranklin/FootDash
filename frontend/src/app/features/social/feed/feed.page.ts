@@ -66,11 +66,11 @@ export class FeedPage implements OnInit, OnDestroy {
     // Create a follow activity and add it to the beginning of the feed
     const followActivity: Activity = {
       id: Date.now(), // Temporary ID for real-time updates
-      userId: event.userId,
+      userId: event.userId ?? 0,
       userName: event.userName || 'Unknown User',
       activityType: ActivityType.FOLLOW,
       targetType: ActivityTargetType.USER,
-      targetId: event.targetId,
+      targetId: event.targetId ?? 0,
       createdAt: new Date().toISOString(),
       metadata: event.data
     };

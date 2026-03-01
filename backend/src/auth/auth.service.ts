@@ -3,18 +3,25 @@ import {
   Injectable,
   UnauthorizedException,
   InternalServerErrorException,
+  BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThan } from 'typeorm';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { UserProfileService } from '../users/services/user-profile.service';
 import { Optional } from '@nestjs/common';
 import { ProfileDto } from './dto/profile.dto';
+import { MailService } from '../mail/mail.service';
 
 export interface AuthUser {
   id: number;
@@ -33,12 +40,17 @@ export interface AuthResult {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly usersRepo: Repository<User>,
     @InjectRepository(RefreshToken)
     private readonly refreshRepo: Repository<RefreshToken>,
+    @InjectRepository(PasswordResetToken)
+    private readonly resetRepo: Repository<PasswordResetToken>,
+    private readonly mailService: MailService,
     @Optional() private readonly profileService?: UserProfileService,
   ) {}
 
@@ -199,5 +211,92 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  // ─── Change Password (authenticated) ─────────────────────────
+
+  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+    const user = await this.usersRepo.findOneBy({ id: userId });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const valid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!valid) throw new BadRequestException('Current password is incorrect');
+
+    const hash = await bcrypt.hash(newPassword, 10);
+    await this.usersRepo.update(userId, { password_hash: hash });
+    this.logger.log(`Password changed for user ${userId}`);
+  }
+
+  // ─── Forgot / Reset Password ─────────────────────────────────
+
+  /**
+   * Generate a reset token, store its SHA-256 hash, and email the raw token.
+   * Always returns a success-like response to prevent email enumeration.
+   */
+  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
+    const email = dto.email.toLowerCase();
+    const user = await this.usersRepo.findOneBy({ email });
+    if (!user) {
+      // Silently return to prevent revealing whether an account exists.
+      this.logger.warn(`Forgot-password requested for unknown email: ${email}`);
+      return;
+    }
+
+    // Generate a cryptographically random UUID-v4 token
+    const rawToken = crypto.randomUUID();
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    await this.resetRepo.save(
+      this.resetRepo.create({
+        tokenHash,
+        userId: user.id,
+        expiresAt,
+      }),
+    );
+
+    await this.mailService.sendPasswordResetEmail(email, rawToken);
+  }
+
+  /**
+   * Verify the raw token, set a new password, and mark the token as used.
+   */
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(dto.token)
+      .digest('hex');
+
+    const stored = await this.resetRepo.findOne({
+      where: {
+        tokenHash,
+        usedAt: undefined as any, // IsNull() equivalent — usedAt is NULL
+        expiresAt: MoreThan(new Date()),
+      },
+      relations: ['user'],
+    });
+
+    if (!stored || stored.usedAt) {
+      throw new BadRequestException(
+        'Reset token is invalid or has expired. Please request a new one.',
+      );
+    }
+
+    // Hash the new password and update the user
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+    await this.usersRepo.update(stored.userId, { password_hash: passwordHash });
+
+    // Mark token as consumed
+    stored.usedAt = new Date();
+    await this.resetRepo.save(stored);
+
+    // Revoke all refresh tokens for this user (force re-login)
+    await this.refreshRepo.update(
+      { user: { id: stored.userId } as any },
+      { revoked: true },
+    );
+
+    this.logger.log(`Password reset completed for user ${stored.userId}`);
   }
 }

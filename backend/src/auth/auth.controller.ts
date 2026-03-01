@@ -18,6 +18,9 @@ import { AuthResult, AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshAuthDto } from './dto/refresh-auth.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ProfileDto } from './dto/profile.dto';
 
@@ -172,5 +175,40 @@ export class AuthController {
     
     // Always fetch from DB to ensure fresh subscription status (isPro)
     return this.authService.getProfile(userId);
+  }
+
+  // ─── Forgot / Reset Password ─────────────────────────────────
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Change password (authenticated user)' })
+  @ApiResponse({ status: 200, description: 'Password changed.' })
+  @ApiResponse({ status: 400, description: 'Current password incorrect or new password invalid.' })
+  async changePassword(
+    @Request() req: any,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    await this.authService.changePassword(userId, dto.currentPassword, dto.newPassword);
+    return { message: 'Password changed successfully.' };
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Request a password reset email' })
+  @ApiResponse({ status: 200, description: 'If the email exists, a reset link was sent.' })
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
+    await this.authService.forgotPassword(dto);
+    // Always return the same message to prevent email enumeration
+    return { message: 'If an account with that email exists, a reset link has been sent.' };
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset password using the emailed token' })
+  @ApiResponse({ status: 200, description: 'Password has been reset successfully.' })
+  @ApiResponse({ status: 400, description: 'Token invalid or expired.' })
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
+    await this.authService.resetPassword(dto);
+    return { message: 'Password has been reset successfully. You can now log in.' };
   }
 }

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Observable, of, isObservable, BehaviorSubject, from, Subject } from 'rxjs';
 import { takeUntil, finalize, catchError } from 'rxjs/operators';
 import { LoggerService } from '../../core/services/logger.service';
+import { NotificationBellComponent } from './notification-bell.component';
 
 @Component({
   selector: 'app-page-header',
@@ -15,8 +16,10 @@ import { LoggerService } from '../../core/services/logger.service';
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-title>{{ title }}</ion-title>
-        <ion-buttons slot="end" *ngIf="actions?.length">
-          <ion-button
+        <ion-buttons slot="end">
+          <app-notification-bell></app-notification-bell>
+          <ng-container *ngIf="actions?.length">
+            <ion-button
             *ngFor="let action of actions; let i = index"
             [size]="action.size || 'small'"
             [color]="action.color || 'primary'"
@@ -31,11 +34,12 @@ import { LoggerService } from '../../core/services/logger.service';
               <ion-spinner name="dots"></ion-spinner>
             </ng-template>
           </ion-button>
+          </ng-container>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
   `,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton, CommonModule]
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton, CommonModule, NotificationBellComponent]
 })
 export class PageHeaderComponent implements OnDestroy {
   @Input() title!: string;
