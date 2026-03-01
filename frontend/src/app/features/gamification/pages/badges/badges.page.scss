@@ -1,0 +1,94 @@
+.badges-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 16px;
+}
+
+.summary-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.summary-count {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ion-color-primary-contrast);
+}
+
+.summary-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ion-color-primary-contrast);
+  opacity: 0.8;
+}
+
+.summary-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-text-color);
+  margin: 0;
+}
+
+ion-segment {
+  margin: 8px 16px;
+}
+
+.tier-chips {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  ion-chip {
+    --background: var(--ion-color-light);
+    font-size: 12px;
+    height: 28px;
+  }
+
+  .chip-bronze {
+    --color: #cd7f32;
+    --background: rgba(205, 127, 50, 0.1);
+  }
+
+  .chip-silver {
+    --color: #808080;
+    --background: rgba(192, 192, 192, 0.15);
+  }
+
+  .chip-gold {
+    --color: #daa520;
+    --background: rgba(255, 215, 0, 0.1);
+  }
+
+  .chip-platinum {
+    --color: #6c63ff;
+    --background: rgba(108, 99, 255, 0.1);
+  }
+}
+
+ion-grid {
+  padding: 8px;
+}
+
+ion-col {
+  padding: 4px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 24px;
+}

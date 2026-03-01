@@ -49,6 +49,32 @@
       }
     },
     {
+      "name": "gamification-api",
+      "urls": [
+        "/api/gamification/**",
+        "/api/leaderboard/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 30,
+        "maxAge": "15m",
+        "timeout": "10s"
+      }
+    },
+    {
+      "name": "dashboard-api",
+      "urls": [
+        "/api/dashboard",
+        "/api/favorites/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 20,
+        "maxAge": "5m",
+        "timeout": "8s"
+      }
+    },
+    {
       "name": "live-api",
       "urls": [
         "/api/notifications/**",

@@ -74,6 +74,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'badges',
+    loadComponent: () => import('./features/gamification/pages/badges/badges.page').then(m => m.BadgesPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'export',
+    loadComponent: () => import('./features/export/export.page').then(m => m.ExportPage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'pro',
     loadComponent: () => import('./features/subscription/pages/pro-page/pro-page.component').then(m => m.ProPage),
     canActivate: [authGuard],

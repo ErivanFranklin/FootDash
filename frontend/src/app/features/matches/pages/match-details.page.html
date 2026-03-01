@@ -61,17 +61,36 @@
       <div class="meta-row" *ngIf="match.leagueName"><strong>{{ 'MATCH_DETAILS.COMPETITION' | transloco }}</strong> <span>{{ match.leagueName }}</span></div>
     </section>
 
-    <section class="voting-section" style="padding: 16px;">
-      <app-prediction-voting 
-        [matchId]="matchId" 
-        [homeTeamName]="match.homeName" 
-        [awayTeamName]="match.awayName">
-      </app-prediction-voting>
-    </section>
+    <!-- Tab Segment -->
+    <ion-segment [value]="selectedTab" (ionChange)="onTabChange($event)" mode="ios" style="margin: 12px 16px;">
+      <ion-segment-button value="info">
+        <ion-label>Info</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="lineups">
+        <ion-label>Lineups</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-    <section class="chat-section" style="padding: 16px;">
-      <app-match-chat [matchId]="matchId"></app-match-chat>
-    </section>
+    <!-- Info Tab -->
+    <div *ngIf="selectedTab === 'info'">
+      <section class="voting-section" style="padding: 16px;">
+        <app-prediction-voting 
+          [matchId]="matchId" 
+          [homeTeamName]="match.homeName" 
+          [awayTeamName]="match.awayName">
+        </app-prediction-voting>
+      </section>
+
+      <section class="chat-section" style="padding: 16px;">
+        <app-match-chat [matchId]="matchId"></app-match-chat>
+      </section>
+    </div>
+
+    <!-- Lineups Tab -->
+    <div *ngIf="selectedTab === 'lineups'" style="padding: 16px;">
+      <ion-spinner *ngIf="lineupsLoading" name="crescent" style="display:block;margin:24px auto;"></ion-spinner>
+      <app-lineup-view *ngIf="!lineupsLoading" [lineups]="lineups"></app-lineup-view>
+    </div>
 
     <section class="actions">
       <a [routerLink]="['/analytics/match', matchId]" class="view-prediction-btn">

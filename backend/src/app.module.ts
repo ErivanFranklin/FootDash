@@ -16,6 +16,9 @@ import { SocialModule } from './social/social.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { PaymentsModule } from './payments/payments.module';
 import { SearchModule } from './search/search.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { ExportModule } from './export/export.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -76,6 +79,9 @@ const isProd = process.env.NODE_ENV === 'production';
     GamificationModule,
     PaymentsModule,
     SearchModule,
+    FavoritesModule,
+    DashboardModule,
+    ExportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,0 +1,82 @@
+<app-page-header title="Export & Share"></app-page-header>
+
+<ion-content class="ion-padding">
+  <!-- Export Data Section -->
+  <ion-card class="export-card">
+    <ion-card-header>
+      <ion-card-title>Export My Data</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p class="section-desc">Download your predictions and stats in CSV or JSON format.</p>
+
+      <div class="export-group">
+        <h3>Predictions</h3>
+        <p class="sub-desc">All your match predictions with scores and points.</p>
+        <div class="button-row">
+          <ion-button fill="outline" (click)="exportPredictions('csv')" [disabled]="exporting">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            CSV
+          </ion-button>
+          <ion-button fill="outline" (click)="exportPredictions('json')" [disabled]="exporting">
+            <ion-icon name="code-slash-outline" slot="start"></ion-icon>
+            JSON
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="export-group">
+        <h3>Stats Summary</h3>
+        <p class="sub-desc">Your overall statistics: accuracy, points, streaks.</p>
+        <div class="button-row">
+          <ion-button fill="outline" (click)="exportStats('csv')" [disabled]="exporting">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            CSV
+          </ion-button>
+          <ion-button fill="outline" (click)="exportStats('json')" [disabled]="exporting">
+            <ion-icon name="code-slash-outline" slot="start"></ion-icon>
+            JSON
+          </ion-button>
+        </div>
+      </div>
+
+      @if (exporting) {
+        <div class="exporting-indicator">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Exporting...</span>
+        </div>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Social Sharing Section -->
+  <ion-card class="share-card">
+    <ion-card-header>
+      <ion-card-title>Share with Friends</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p class="section-desc">Challenge your friends to beat your prediction score!</p>
+
+      <div class="share-buttons">
+        <ion-button expand="block" class="twitter-btn" (click)="shareOnTwitter()">
+          <ion-icon name="logo-twitter" slot="start"></ion-icon>
+          Share on Twitter
+        </ion-button>
+
+        <ion-button expand="block" class="facebook-btn" (click)="shareOnFacebook()">
+          <ion-icon name="logo-facebook" slot="start"></ion-icon>
+          Share on Facebook
+        </ion-button>
+
+        <ion-button expand="block" class="whatsapp-btn" (click)="shareOnWhatsApp()">
+          <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+          Share on WhatsApp
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" (click)="copyLink()">
+          <ion-icon name="copy-outline" slot="start"></ion-icon>
+          Copy Link
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

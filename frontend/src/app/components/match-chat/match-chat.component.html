@@ -1,28 +1,58 @@
 <div class="chat-container">
   <div class="header">
     <h3>{{ 'CHAT.TITLE' | transloco }}</h3>
-    <span class="live-dot"></span>
+    <div class="header-right">
+      @if (onlineCount > 0) {
+        <ion-badge color="success" class="online-badge">
+          {{ onlineCount }} online
+        </ion-badge>
+      }
+      <span class="live-dot"></span>
+    </div>
   </div>
 
   <div class="messages-area">
-    <div class="empty-state" *ngIf="messages.length === 0">
-      <p>{{ 'CHAT.EMPTY' | transloco }}</p>
-    </div>
-    
-    <div class="message" *ngFor="let msg of messages" [class.own-message]="msg.userId === currentUserI">
-      <div class="bubble">
-        <span class="sender" *ngIf="msg.userId !== currentUserI">User {{ msg.userId }}</span>
-        <p>{{ msg.content }}</p>
-        <span class="time">{{ msg.createdAt | date:'shortTime' }}</span>
+    @if (!historyLoaded) {
+      <div class="loading-state">
+        <p>Loading messages...</p>
       </div>
-    </div>
+    }
+
+    @if (historyLoaded && messages.length === 0) {
+      <div class="empty-state">
+        <p>{{ 'CHAT.EMPTY' | transloco }}</p>
+      </div>
+    }
+
+    @for (msg of messages; track msg.id ?? $index) {
+      <div class="message" [class.own-message]="msg.userId === currentUserId">
+        <div class="bubble">
+          @if (msg.userId !== currentUserId) {
+            <span class="sender">{{ msg.user?.username || 'User ' + msg.userId }}</span>
+          }
+          <p>{{ msg.content }}</p>
+          <span class="time">{{ msg.createdAt | date:'shortTime' }}</span>
+        </div>
+      </div>
+    }
   </div>
+
+  <!-- Typing indicator -->
+  @if (typingUsers.length > 0) {
+    <div class="typing-indicator">
+      <span class="typing-dots">
+        <span></span><span></span><span></span>
+      </span>
+      {{ getTypingText() }}
+    </div>
+  }
 
   <div class="input-area">
     <ion-item lines="none" class="input-item">
-      <ion-input 
-        [(ngModel)]="newMessage" 
-        (keyup.enter)="sendMessage()" 
+      <ion-input
+        [(ngModel)]="newMessage"
+        (keyup.enter)="sendMessage()"
+        (ionInput)="onInput()"
         placeholder="{{ 'CHAT.PLACEHOLDER' | transloco }}">
       </ion-input>
       <ion-button fill="clear" (click)="sendMessage()" slot="end" [disabled]="!newMessage.trim()">

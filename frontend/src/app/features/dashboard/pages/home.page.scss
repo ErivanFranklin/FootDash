@@ -1,105 +1,125 @@
-#container {
-  text-align: left;
+.loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.welcome-card {
+  padding: 24px 16px;
+  text-align: center;
+
+  ion-icon {
+    display: block;
+    margin: 0 auto 16px;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin: 0 0 16px;
+  }
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  color: #8c8c8c;
-  margin: 0;
+.dashboard-content {
+  padding: 8px 16px 24px;
 }
 
-#container a {
-  text-decoration: none;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--spacing-md, 12px);
-  margin-bottom: var(--spacing-lg, 16px);
-}
-
-// Pretty JSON viewer styles
-// ::ng-deep needed because [innerHTML] creates elements outside Angular's view encapsulation
-:host ::ng-deep .json-viewer {
-  background: var(--ion-color-step-50, #1a1a2e);
-  border-radius: 8px;
-  padding: 16px;
+.quick-actions {
+  display: flex;
+  gap: 8px;
   overflow-x: auto;
-  max-height: 500px;
-  overflow-y: auto;
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-  border: 1px solid var(--ion-color-step-150, #2a2a4a);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
 
-  .json-key {
-    color: #82aaff;
-  }
-  .json-string {
-    color: #c3e88d;
-  }
-  .json-number {
-    color: #f78c6c;
-  }
-  .json-boolean {
-    color: #c792ea;
-  }
-  .json-null {
-    color: #ff5370;
-    font-style: italic;
-  }
-  .json-bracket {
-    color: #89ddff;
-  }
-  .json-comma {
-    color: #89ddff;
+  ion-chip {
+    flex-shrink: 0;
+    font-size: 13px;
   }
 }
 
-.result-header {
+.section {
+  margin-bottom: 20px;
+}
+
+.section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 
-  .result-label {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--ion-color-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .result-badge {
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: 600;
-
-    &.success {
-      background: rgba(46, 213, 115, 0.15);
-      color: #2ed573;
-    }
-    &.error {
-      background: rgba(255, 71, 87, 0.15);
-      color: #ff4757;
-    }
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
   }
 }
 
-.result-section {
-  margin-bottom: 16px;
+.teams-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+}
 
-  &:last-child {
-    margin-bottom: 0;
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-width: 72px;
+
+  ion-avatar {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--ion-color-primary);
+    padding: 2px;
+  }
+
+  .avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 50%;
+  }
+
+  .team-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.prompt-card {
+  text-align: center;
+
+  ion-icon {
+    display: block;
+    margin: 0 auto 12px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin: 0 0 16px;
+    font-size: 14px;
   }
 }

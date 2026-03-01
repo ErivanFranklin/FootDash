@@ -28,6 +28,7 @@ import { FollowController } from './controllers/follow.controller';
 import { FeedController } from './controllers/feed.controller';
 import { ReportsController } from './controllers/reports.controller';
 import { AlertsController } from './controllers/alerts.controller';
+import { ChatController } from './controllers/chat.controller';
 
 
 // External dependencies
@@ -57,6 +58,7 @@ import { WebsocketsModule } from '../websockets/websockets.module';
     FeedController,
     ReportsController,
     AlertsController,
+    ChatController,
   ],
   providers: [
     CommentsService,

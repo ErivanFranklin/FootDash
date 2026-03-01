@@ -1,87 +1,77 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonButtons, IonMenuButton } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner, IonButtons, IonMenuButton, IonIcon, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonText, IonBadge, IonAvatar, IonChip } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../../core/services/api.service';
-import { MatchCardComponent, FormSectionComponent, StatCardComponent } from '../../../shared/components';
+import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { MatchCardComponent, StatCardComponent } from '../../../shared/components';
+import { FavoriteButtonComponent } from '../../../components/favorite-button/favorite-button.component';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { LoggerService } from '../../../core/services/logger.service';
+import { AuthService } from '../../../core/services/auth.service';
+
+interface DashboardData {
+  favoriteTeams: any[];
+  recentResults: any[];
+  upcomingMatches: any[];
+  allRecentMatches: any[];
+  hasFavorites: boolean;
+}
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonButtons, IonMenuButton, FormsModule, MatchCardComponent, FormSectionComponent, StatCardComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner,
+    IonButtons, IonMenuButton, IonIcon, IonCard, IonCardContent,
+    IonCardHeader, IonCardTitle, IonText, IonBadge, IonAvatar, IonChip,
+    MatchCardComponent, StatCardComponent, FavoriteButtonComponent,
+    TranslocoPipe,
+  ],
 })
 export class HomePage implements OnInit {
-  private api = inject(ApiService);
-  private sanitizer = inject(DomSanitizer);
+  private http = inject(HttpClient);
+  private logger = inject(LoggerService);
+  private authService = inject(AuthService);
 
-  pingResult: any = null;
-  matchResult: any = null;
-  teamId: number | null = 33;
-  // Football seasons span two calendar years; before August use previous year
-  // Free API plan caps at 2024, so use min(computed, 2024)
-  season = Math.min(
-    new Date().getMonth() < 7
-      ? new Date().getFullYear() - 1
-      : new Date().getFullYear(),
-    2024
-  );
-  limit: number | null = 5;
-  range = 'all';
-  loading = false;
-  loadingMatches = false;
-  fixtures: any[] = [];
+  dashboard: DashboardData | null = null;
+  loading = true;
+  isLoggedIn = false;
 
   ngOnInit() {
-    this.pingBackend();
+    this.isLoggedIn = !!this.authService.getToken();
+    if (this.isLoggedIn) {
+      this.loadDashboard();
+    } else {
+      this.loading = false;
+    }
   }
 
-  pingBackend() {
+  loadDashboard() {
     this.loading = true;
-    this.api.ping().subscribe({
-      next: (res) => { this.pingResult = res; this.loading = false; },
-      error: (err) => { this.pingResult = { error: true, message: String(err?.message || err) }; this.loading = false; }
-    });
-  }
-
-  fetchMatches() {
-    if (!this.teamId) return;
-    this.loadingMatches = true;
-    this.matchResult = null;
-    this.api.getTeamMatches(this.teamId, { season: this.season, range: this.range, limit: this.limit ?? undefined }).subscribe({
-      next: (res) => {
-        this.fixtures = Array.isArray(res) ? res : (res?.data || res?.matches || []);
-        this.matchResult = { success: true, count: this.fixtures.length, sample: this.fixtures.slice(0, 3) };
-        this.loadingMatches = false;
+    this.http.get<DashboardData>(`${environment.apiBaseUrl}/dashboard`).subscribe({
+      next: (data) => {
+        this.dashboard = data;
+        this.loading = false;
       },
       error: (err) => {
-        this.fixtures = [];
-        this.matchResult = { error: true, message: String(err?.message || err) };
-        this.loadingMatches = false;
-      }
+        this.logger.error('Failed to load dashboard', err);
+        this.loading = false;
+      },
     });
   }
 
-  /** Syntax-highlight JSON for display in the template */
-  prettyJson(obj: any): SafeHtml {
-    if (obj == null) return '';
-    const json = JSON.stringify(obj, null, 2);
-    const highlighted = json.replace(
-      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")(\s*:)?|(\b(true|false)\b)|(\bnull\b)|(-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
-      (match: string, ...args: any[]) => {
-        let cls = 'json-number';
-        if (/^"/.test(match)) {
-          cls = args[2] ? 'json-key' : 'json-string';
-        } else if (/true|false/.test(match)) {
-          cls = 'json-boolean';
-        } else if (/null/.test(match)) {
-          cls = 'json-null';
-        }
-        return `<span class="${cls}">${match}</span>`;
-      }
-    ).replace(/([{}\[\]])/g, '<span class="json-bracket">$1</span>')
-     .replace(/,\s*\n/g, '<span class="json-comma">,</span>\n');
-    return this.sanitizer.bypassSecurityTrustHtml(highlighted);
+  getMatchScore(match: any): string {
+    if (match.homeScore != null && match.awayScore != null) {
+      return `${match.homeScore} - ${match.awayScore}`;
+    }
+    return 'vs';
+  }
+
+  getTeamInitials(name: string): string {
+    return (name || 'T').substring(0, 3).toUpperCase();
   }
 }

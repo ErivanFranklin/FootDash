@@ -2,9 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonAvatar, IonGrid, IonRow, IonCol, IonText, IonList, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner } from '@ionic/angular/standalone';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FollowButtonComponent } from '../../../components/social/follow-button/follow-button.component';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
+import { BadgeCardComponent } from '../../../components/gamification/badge-card/badge-card.component';
+import { GamificationService, BadgeResponse } from '../../../services/gamification.service';
 import { FollowService } from '../../../services/social/follow.service';
 import { FeedService } from '../../../services/social/feed.service';
 import { ReportsService } from '../../../services/social/reports.service';
@@ -26,6 +28,8 @@ import { LoggerService } from '../../../core/services/logger.service';
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonAvatar, IonGrid, IonRow, IonCol, IonText, IonList, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner,
     FollowButtonComponent,
     FeedItemComponent,
+    BadgeCardComponent,
+    RouterLink,
     TranslocoPipe
   ]
 })
@@ -40,6 +44,7 @@ export class UserProfilePage implements OnInit {
 
   followerCount: number = 0;
   followingCount: number = 0;
+  userBadges: BadgeResponse[] = [];
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -47,6 +52,7 @@ export class UserProfilePage implements OnInit {
   private followService = inject(FollowService);
   private feedService = inject(FeedService);
   private reportsService = inject(ReportsService);
+  private gamificationService = inject(GamificationService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private logger = inject(LoggerService);
@@ -71,6 +77,7 @@ export class UserProfilePage implements OnInit {
           isPro: profile.isPro ?? false
         };
         this.loadFollowStats();
+        this.loadUserBadges();
       },
       error: (error) => {
         this.logger.error('Error loading user profile:', error);
@@ -83,7 +90,19 @@ export class UserProfilePage implements OnInit {
           isPro: false
         };
         this.loadFollowStats();
+        this.loadUserBadges();
       }
+    });
+  }
+
+  private loadUserBadges() {
+    this.gamificationService.getUserBadges(this.userId).subscribe({
+      next: (badges) => {
+        this.userBadges = badges;
+      },
+      error: (err) => {
+        this.logger.error('Error loading user badges', err);
+      },
     });
   }
 

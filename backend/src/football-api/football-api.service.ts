@@ -273,6 +273,88 @@ export class FootballApiService implements FootballApiAdapter {
     return result;
   }
 
+  async getFixtureLineups(fixtureId: number) {
+    if (this.mock) {
+      return this.getMockLineups(fixtureId);
+    }
+
+    const cacheKey = this.cache.buildKey('lineups', { fixtureId });
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const resp = await this.makeRequest<any>('fixtures/lineups', {
+        fixture: fixtureId,
+      });
+
+      const data = resp?.response ?? [];
+      const result = data.map((teamLineup: any) => ({
+        team: {
+          id: teamLineup.team?.id,
+          name: teamLineup.team?.name,
+          logo: teamLineup.team?.logo,
+        },
+        formation: teamLineup.formation,
+        startXI: (teamLineup.startXI ?? []).map((entry: any) => ({
+          id: entry.player?.id,
+          name: entry.player?.name,
+          number: entry.player?.number,
+          pos: entry.player?.pos,
+          grid: entry.player?.grid,
+        })),
+        substitutes: (teamLineup.substitutes ?? []).map((entry: any) => ({
+          id: entry.player?.id,
+          name: entry.player?.name,
+          number: entry.player?.number,
+          pos: entry.player?.pos,
+        })),
+        coach: {
+          id: teamLineup.coach?.id,
+          name: teamLineup.coach?.name,
+          photo: teamLineup.coach?.photo,
+        },
+      }));
+
+      await this.cache.set(cacheKey, result, FootballApiCacheService.TTL.MATCH_FINISHED);
+      return result;
+    } catch (error) {
+      this.logger.warn(`Failed to fetch lineups for fixture ${fixtureId}: ${(error as Error).message}`);
+      return [];
+    }
+  }
+
+  private getMockLineups(fixtureId: number) {
+    const mockPlayers = (teamName: string, formation: string) => {
+      const positions = ['G', 'D', 'D', 'D', 'D', 'M', 'M', 'M', 'F', 'F', 'F'];
+      return {
+        team: { id: fixtureId * 10, name: teamName, logo: null },
+        formation,
+        startXI: positions.map((pos, i) => ({
+          id: fixtureId * 100 + i,
+          name: `${teamName} Player ${i + 1}`,
+          number: i + 1,
+          pos,
+          grid: `${Math.floor(i / 4) + 1}:${(i % 4) + 1}`,
+        })),
+        substitutes: Array.from({ length: 7 }, (_, i) => ({
+          id: fixtureId * 100 + 11 + i,
+          name: `${teamName} Sub ${i + 1}`,
+          number: 12 + i,
+          pos: ['D', 'M', 'F', 'M', 'D', 'F', 'G'][i],
+        })),
+        coach: {
+          id: fixtureId * 10 + 1,
+          name: `Coach ${teamName}`,
+          photo: null,
+        },
+      };
+    };
+    return [
+      mockPlayers('Mock Home', '4-3-3'),
+      mockPlayers('Mock Away', '4-4-2'),
+    ];
+  }
+
   private async makeRequest<T>(
     path: string,
     params?: Record<string, number | string>,

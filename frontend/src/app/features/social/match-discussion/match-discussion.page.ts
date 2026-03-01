@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { CommentListComponent } from '../../../components/social/comment-list/comment-list.component';
 import { ReactionButtonComponent } from '../../../components/social/reaction-button/reaction-button.component';
+import { MatchChatComponent } from '../../../components/match-chat/match-chat.component';
 import { ReactionsService } from '../../../services/social/reactions.service';
 import { ReactionSummary, ReactionTargetType } from '../../../models/social';
 import { LoggerService } from '../../../core/services/logger.service';
@@ -20,7 +21,8 @@ import { LoggerService } from '../../../core/services/logger.service';
     FormsModule,
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonAvatar, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner,
     CommentListComponent,
-    ReactionButtonComponent
+    ReactionButtonComponent,
+    MatchChatComponent,
   ]
 })
 export class MatchDiscussionPage implements OnInit {

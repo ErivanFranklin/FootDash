@@ -57,6 +57,21 @@
     </ion-row>
   </ion-grid>
 
+  <!-- User Badges -->
+  @if (userBadges.length > 0) {
+    <div class="badges-section">
+      <div class="section-header">
+        <ion-label>Badges</ion-label>
+        <ion-button fill="clear" size="small" routerLink="/badges">View All</ion-button>
+      </div>
+      <div class="badges-row">
+        @for (badge of userBadges.slice(0, 6); track badge.id) {
+          <app-badge-card [badge]="badge"></app-badge-card>
+        }
+      </div>
+    </div>
+  }
+
   <!-- Activity Feed -->
   <ion-list *ngIf="activities.length > 0">
     <ion-list-header>

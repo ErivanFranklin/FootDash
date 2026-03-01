@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Post } from '@nestjs/common';
+import { Controller, Get, Param, Query, Post, ParseIntPipe } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -10,11 +10,15 @@ import {
 import { MatchesService } from './matches.service';
 import { MatchesQueryDto } from './dto/matches-query.dto';
 import { TeamIdParamDto } from '../teams/dto/team-id-param.dto';
+import { FootballApiService } from '../football-api/football-api.service';
 
 @ApiTags('Matches')
 @Controller('matches')
 export class MatchesController {
-  constructor(private readonly matchesService: MatchesService) {}
+  constructor(
+    private readonly matchesService: MatchesService,
+    private readonly footballApiService: FootballApiService,
+  ) {}
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a single match by ID' })
@@ -30,6 +34,14 @@ export class MatchesController {
   })
   getMatch(@Param('id') id: number) {
     return this.matchesService.getMatch(id);
+  }
+
+  @Get(':id/lineups')
+  @ApiOperation({ summary: 'Get lineups for a match' })
+  @ApiParam({ name: 'id', description: 'Match/Fixture ID', type: 'integer' })
+  @ApiResponse({ status: 200, description: 'Array of team lineups' })
+  async getLineups(@Param('id', ParseIntPipe) id: number) {
+    return this.footballApiService.getFixtureLineups(id);
   }
 
   @Get('team/:teamId')

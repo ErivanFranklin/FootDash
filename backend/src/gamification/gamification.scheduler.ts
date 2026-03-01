@@ -5,6 +5,8 @@ import { Repository, IsNull } from 'typeorm';
 import { UserPrediction } from './entities/user-prediction.entity';
 import { Match } from '../matches/entities/match.entity';
 import { GamificationService } from './gamification.service';
+import { BadgeService } from './badge.service';
+import { BadgeCriteriaType } from './entities/badge.entity';
 
 @Injectable()
 export class GamificationScheduler {
@@ -16,6 +18,7 @@ export class GamificationScheduler {
     @InjectRepository(Match)
     private matchesRepository: Repository<Match>,
     private gamificationService: GamificationService,
+    private badgeService: BadgeService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -46,12 +49,33 @@ export class GamificationScheduler {
 
     this.logger.log(`Found ${finishedMatches.length} finished matches to process.`);
 
-    // 3. Process each match
+    // 3. Process each match and check badges for affected users
+    const affectedUserIds = new Set<number>();
+
     for (const match of finishedMatches) {
         if (match.homeScore != null && match.awayScore != null) {
+            // Collect user IDs from predictions for this match
+            const matchPredictions = await this.predictionsRepository.find({
+              where: { matchId: match.id, points: IsNull() },
+              select: ['userId'],
+            });
+            matchPredictions.forEach((p) => affectedUserIds.add(p.userId));
+
             await this.gamificationService.processMatchResult(match.id, match.homeScore, match.awayScore);
             this.logger.log(`Processed results for match ${match.id}`);
         }
+    }
+
+    // 4. Check badges for all affected users
+    if (affectedUserIds.size > 0) {
+      this.logger.log(`Checking badges for ${affectedUserIds.size} users...`);
+      for (const userId of affectedUserIds) {
+        try {
+          await this.badgeService.checkAndAward(userId, BadgeCriteriaType.PREDICTIONS_CORRECT);
+        } catch (err) {
+          this.logger.error(`Badge check failed for user ${userId}: ${(err as Error).message}`);
+        }
+      }
     }
   }
 }

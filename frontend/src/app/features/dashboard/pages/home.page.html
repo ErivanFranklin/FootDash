@@ -4,6 +4,14 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>FootDash</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/search">
+        <ion-icon name="search-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button routerLink="/notifications">
+        <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -14,85 +22,125 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container" style="padding: 12px;">
-    <!-- Statistics Cards -->
-    <div class="stats-grid">
-      <app-stat-card
-        label="Fixtures Loaded"
-        [value]="fixtures.length"
-        icon="football"
-        variant="primary">
-      </app-stat-card>
-      <app-stat-card
-        label="API Status"
-        [value]="loading ? 'Checking...' : pingResult?.error ? 'Error' : pingResult ? 'Connected' : 'Not Tested'"
-        [icon]="pingResult?.error ? 'cloud-offline' : 'cloud-done'"
-        [variant]="pingResult?.error ? 'danger' : 'success'">
-      </app-stat-card>
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-center">
+      <ion-spinner name="crescent"></ion-spinner>
     </div>
+  }
 
-    <app-form-section title="API Testing">
-      <ion-button (click)="pingBackend()" size="small">Ping API</ion-button>
-      <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
-    </app-form-section>
+  <!-- Not logged in -->
+  @if (!loading && !isLoggedIn) {
+    <div class="welcome-card">
+      <ion-card>
+        <ion-card-content>
+          <ion-icon name="football-outline" style="font-size: 64px; color: var(--ion-color-primary);"></ion-icon>
+          <h2>Welcome to FootDash</h2>
+          <p>Sign in to see your personalized dashboard with favorite teams, upcoming matches, and more.</p>
+          <ion-button expand="block" routerLink="/login">Sign In</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  }
 
-    <app-form-section title="Match Parameters">
-      <ion-item>
-        <ion-label position="stacked">Team ID</ion-label>
-        <ion-input type="number" [(ngModel)]="teamId"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Season</ion-label>
-        <ion-input type="number" [(ngModel)]="season"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Limit</ion-label>
-        <ion-input type="number" [(ngModel)]="limit"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Range</ion-label>
-        <ion-input [(ngModel)]="range" placeholder="recent|upcoming|all"></ion-input>
-      </ion-item>
-      <ion-button (click)="fetchMatches()" expand="block" style="margin-top: 12px;" [disabled]="loadingMatches">
-        <ion-spinner *ngIf="loadingMatches" name="dots" style="margin-right: 8px;"></ion-spinner>
-        {{ loadingMatches ? 'Fetching...' : 'Fetch Matches' }}
-      </ion-button>
-    </app-form-section>
+  <!-- Dashboard content -->
+  @if (!loading && isLoggedIn && dashboard) {
+    <div class="dashboard-content">
 
-    <app-form-section title="API Results">
-      <!-- Ping Result -->
-      <div class="result-section">
-        <div class="result-header">
-          <span class="result-label">🏓 Ping Result</span>
-          <span *ngIf="pingResult" class="result-badge" [class.success]="!pingResult?.error" [class.error]="pingResult?.error">
-            {{ pingResult?.error ? 'ERROR' : 'OK' }}
-          </span>
-        </div>
-        <div *ngIf="pingResult" class="json-viewer" [innerHTML]="prettyJson(pingResult)"></div>
-        <div *ngIf="!pingResult && !loading" style="color: var(--ion-color-medium); padding: 8px;">Not tested yet</div>
-        <ion-spinner *ngIf="!pingResult && loading" name="dots"></ion-spinner>
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <ion-chip routerLink="/leaderboard" color="primary">
+          <ion-icon name="trophy-outline"></ion-icon>
+          Leaderboard
+        </ion-chip>
+        <ion-chip routerLink="/badges" color="secondary">
+          <ion-icon name="ribbon-outline"></ion-icon>
+          Badges
+        </ion-chip>
+        <ion-chip routerLink="/feed" color="tertiary">
+          <ion-icon name="newspaper-outline"></ion-icon>
+          Feed
+        </ion-chip>
+        <ion-chip routerLink="/teams" color="success">
+          <ion-icon name="people-outline"></ion-icon>
+          Teams
+        </ion-chip>
       </div>
 
-      <!-- Match Fetch Result -->
-      <div class="result-section">
-        <div class="result-header">
-          <span class="result-label">⚽ Match Fetch Result</span>
-          <span *ngIf="matchResult" class="result-badge" [class.success]="!matchResult?.error" [class.error]="matchResult?.error">
-            {{ matchResult?.error ? 'ERROR' : matchResult?.count + ' fixtures' }}
-          </span>
+      <!-- Favorite Teams -->
+      @if (dashboard.hasFavorites && dashboard.favoriteTeams.length > 0) {
+        <div class="section">
+          <div class="section-header">
+            <h3>Your Teams</h3>
+            <ion-button fill="clear" size="small" routerLink="/teams">View All</ion-button>
+          </div>
+          <div class="teams-scroll">
+            @for (team of dashboard.favoriteTeams; track team.id) {
+              <div class="team-card" [routerLink]="['/matches', team.id]">
+                <ion-avatar>
+                  @if (team.logo) {
+                    <img [src]="team.logo" [alt]="team.name">
+                  } @else {
+                    <div class="avatar-fallback">{{ getTeamInitials(team.name) }}</div>
+                  }
+                </ion-avatar>
+                <span class="team-name">{{ team.shortCode || team.name }}</span>
+              </div>
+            }
+          </div>
         </div>
-        <div *ngIf="matchResult" class="json-viewer" [innerHTML]="prettyJson(matchResult)"></div>
-        <div *ngIf="!matchResult && !loadingMatches" style="color: var(--ion-color-medium); padding: 8px;">Click "Fetch Matches" to load data</div>
-        <ion-spinner *ngIf="loadingMatches" name="dots"></ion-spinner>
-      </div>
-    </app-form-section>
+      }
 
-    <app-form-section title="Fixtures ({{ fixtures.length || 0 }})">
-      <div *ngIf="!fixtures.length" style="padding: 8px; color: var(--ion-color-medium);">No fixtures loaded yet.</div>
-      <app-match-card
-        *ngFor="let match of fixtures"
-        [match]="match">
-      </app-match-card>
-    </app-form-section>
-  </div>
+      <!-- Upcoming Matches -->
+      @if (dashboard.upcomingMatches.length > 0) {
+        <div class="section">
+          <div class="section-header">
+            <h3>Upcoming</h3>
+          </div>
+          @for (match of dashboard.upcomingMatches; track match.id) {
+            <app-match-card [match]="match"></app-match-card>
+          }
+        </div>
+      }
+
+      <!-- Recent Results -->
+      @if (dashboard.recentResults.length > 0) {
+        <div class="section">
+          <div class="section-header">
+            <h3>Recent Results</h3>
+          </div>
+          @for (match of dashboard.recentResults; track match.id) {
+            <app-match-card [match]="match"></app-match-card>
+          }
+        </div>
+      }
+
+      <!-- No favorites prompt -->
+      @if (!dashboard.hasFavorites) {
+        <ion-card class="prompt-card">
+          <ion-card-content>
+            <ion-icon name="heart-outline" style="font-size: 48px; color: var(--ion-color-danger);"></ion-icon>
+            <h3>Add Your Favorite Teams</h3>
+            <p>Follow teams to see personalized matches, results, and recommendations right here.</p>
+            <ion-button expand="block" routerLink="/teams">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Browse Teams
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      }
+
+      <!-- All Recent Matches -->
+      @if (dashboard.allRecentMatches.length > 0) {
+        <div class="section">
+          <div class="section-header">
+            <h3>Latest Matches</h3>
+          </div>
+          @for (match of dashboard.allRecentMatches; track match.id) {
+            <app-match-card [match]="match"></app-match-card>
+          }
+        </div>
+      }
+    </div>
+  }
 </ion-content>

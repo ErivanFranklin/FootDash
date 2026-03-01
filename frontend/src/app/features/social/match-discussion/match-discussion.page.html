@@ -51,6 +51,14 @@
     </div>
   </div>
 
+  <!-- Live Chat -->
+  <div class="chat-section" *ngIf="match">
+    <ion-list-header>
+      <ion-label>Live Chat</ion-label>
+    </ion-list-header>
+    <app-match-chat [matchId]="matchId"></app-match-chat>
+  </div>
+
   <!-- Comments Section -->
   <div class="comments-section" *ngIf="match">
     <ion-list-header>

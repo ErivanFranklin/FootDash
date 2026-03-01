@@ -5,6 +5,10 @@ import { WebSocketService as WebsocketService } from './core/services/web-socket
 import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
 import { NotificationCenterService } from './core/services/notification-center.service';
+import { OfflineService } from './core/services/offline.service';
+import { OfflineQueueService } from './core/services/offline-queue.service';
+import { SwUpdateService } from './core/services/sw-update.service';
+import { OfflineBannerComponent } from './components/offline-banner/offline-banner.component';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -55,7 +59,7 @@ import {
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonFooter, IonSplitPane, NavigationMenuComponent, TranslocoPipe, RouterLink, RouterLinkActive],
+  imports: [CommonModule, IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonFooter, IonSplitPane, NavigationMenuComponent, TranslocoPipe, RouterLink, RouterLinkActive, OfflineBannerComponent],
 })
 export class AppComponent implements OnInit {
   private websocketService = inject(WebsocketService);
@@ -63,6 +67,9 @@ export class AppComponent implements OnInit {
   private toastController = inject(ToastController);
   private pwaService = inject(PwaService);
   private notificationCenter = inject(NotificationCenterService);
+  private offlineService = inject(OfflineService);
+  private offlineQueue = inject(OfflineQueueService);
+  private swUpdateService = inject(SwUpdateService);
   private router = inject(Router);
 
   constructor() {
@@ -115,6 +122,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.setupSocialNotifications();
     this.pwaService.initPushNotifications();
+    this.swUpdateService.init();
   }
 
   private setupSocialNotifications() {

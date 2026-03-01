@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton } from '@ionic/angular/standalone';
+import { IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IonContent, IonBadge, IonSpinner, IonButton } from '@ionic/angular/standalone';
@@ -12,21 +12,30 @@ import { normalizeMatch, NormalizedMatch } from '../../../core/adapters/match-ad
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PredictionVotingComponent } from '../../../components/prediction-voting/prediction-voting.component';
 import { MatchChatComponent } from '../../../components/match-chat/match-chat.component';
+import { LineupViewComponent, TeamLineup } from '../../../components/lineup-view/lineup-view.component';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-match-details',
   standalone: true,
   templateUrl: './match-details.page.html',
   styleUrls: ['./match-details.page.scss'],
-  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent, MatchChatComponent, IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton],
+  imports: [CommonModule, IonContent, IonBadge, IonSpinner, IonButton, IonSegment, IonSegmentButton, IonLabel, LiveIndicatorComponent, RouterModule, TranslocoPipe, PredictionVotingComponent, MatchChatComponent, LineupViewComponent, IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton],
 })
 export class MatchDetailsPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private wsService = inject(WebSocketService);
   private liveMatchService = inject(LiveMatchService);
   private api = inject(ApiService);
+  private http = inject(HttpClient);
+  private logger = inject(LoggerService);
 
   matchId!: number;
+  selectedTab: 'info' | 'lineups' = 'info';
+  lineups: TeamLineup[] = [];
+  lineupsLoading = false;
   private matchSubject = new BehaviorSubject<NormalizedMatch | null>(null);
   match$: Observable<NormalizedMatch | null> = this.matchSubject.asObservable();
   matchState$!: Observable<MatchState>;
@@ -111,6 +120,27 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
   onLogoLoaded(side: 'home' | 'away') {
     if (side === 'home') this.homeLogoLoaded = true;
     if (side === 'away') this.awayLogoLoaded = true;
+  }
+
+  onTabChange(event: any) {
+    this.selectedTab = event.detail.value;
+    if (this.selectedTab === 'lineups' && this.lineups.length === 0 && !this.lineupsLoading) {
+      this.loadLineups();
+    }
+  }
+
+  private loadLineups() {
+    this.lineupsLoading = true;
+    this.http.get<TeamLineup[]>(`${environment.apiBaseUrl}/matches/${this.matchId}/lineups`).subscribe({
+      next: (data) => {
+        this.lineups = data;
+        this.lineupsLoading = false;
+      },
+      error: (err) => {
+        this.logger.error('Failed to load lineups', err);
+        this.lineupsLoading = false;
+      },
+    });
   }
 
   private triggerScoreAnimation() {
