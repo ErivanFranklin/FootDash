@@ -4,6 +4,7 @@ import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GamificationService, LeaderboardEntry } from '../../../../services/gamification.service';
 import { PageHeaderComponent } from '../../../../shared/components';
+import { LoggerService } from '../../../../core/services/logger.service';
 
 @Component({
   selector: 'app-leaderboard',
@@ -18,6 +19,7 @@ export class LeaderboardPage implements OnInit {
   isLoading = false;
 
   private gamificationService = inject(GamificationService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.loadLeaderboard();
@@ -31,7 +33,7 @@ export class LeaderboardPage implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error(err);
+        this.logger.error('Error loading leaderboard', err);
         this.isLoading = false;
       }
     });

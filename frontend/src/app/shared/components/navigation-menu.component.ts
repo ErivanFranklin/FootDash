@@ -6,7 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { LanguageService } from '../../core/services/language.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
-import { WebsocketService } from '../../services/websocket.service';
+import { WebSocketService as WebsocketService } from '../../core/services/web-socket.service';
 
 @Component({
   selector: 'app-navigation-menu',

@@ -5,9 +5,10 @@ import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent,
 import { Router } from '@angular/router';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FeedService } from '../../../services/social/feed.service';
-import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
+import { WebSocketService as WebsocketService, SocialEvent } from '../../../core/services/web-socket.service';
 import { Activity, PaginatedActivities, FeedType, ActivityType, ActivityTargetType } from '../../../models/social';
 import { Subscription } from 'rxjs';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-feed',
@@ -36,6 +37,7 @@ export class FeedPage implements OnInit, OnDestroy {
   private router = inject(Router);
   private feedService = inject(FeedService);
   private websocketService = inject(WebsocketService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.loadActivities();
@@ -97,7 +99,7 @@ export class FeedPage implements OnInit, OnDestroy {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading feed:', error);
+        this.logger.error('Error loading feed:', error);
         this.loading = false;
       }
     });

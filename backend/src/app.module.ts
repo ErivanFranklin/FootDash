@@ -48,6 +48,11 @@ const isProd = process.env.NODE_ENV === 'production';
         FCM_PROJECT_ID: Joi.string().optional(),
         FCM_CLIENT_EMAIL: Joi.string().optional(),
         FCM_PRIVATE_KEY: Joi.string().optional(),
+        // Stripe payments
+        STRIPE_SECRET_KEY: isProd ? Joi.string().required() : Joi.string().optional(),
+        STRIPE_WEBHOOK_SECRET: isProd ? Joi.string().required() : Joi.string().optional(),
+        STRIPE_PRO_PRICE_ID: isProd ? Joi.string().required() : Joi.string().optional(),
+        FRONTEND_URL: Joi.string().uri().default('http://localhost:4200'),
       }),
     }),
     ScheduleModule.forRoot(),

@@ -5,8 +5,9 @@ import { PopoverController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import { ReactionType, ReactionSummary, ReactionTargetType } from '../../../models/social';
 import { ReactionsService } from '../../../services/social/reactions.service';
-import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
+import { WebSocketService as WebsocketService, SocialEvent } from '../../../core/services/web-socket.service';
 import { Subscription } from 'rxjs';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-reaction-button',
@@ -34,6 +35,7 @@ export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
   private reactionsService = inject(ReactionsService);
   private popoverController = inject(PopoverController);
   private websocketService = inject(WebsocketService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.updateReactionData();
@@ -135,7 +137,7 @@ export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
               this.reacting = false;
             },
             error: (error) => {
-              console.error('Error removing reaction:', error);
+              this.logger.error('Error removing reaction:', error);
               this.reacting = false;
             }
           });
@@ -159,7 +161,7 @@ export class ReactionButtonComponent implements OnInit, OnChanges, OnDestroy {
             this.reacting = false;
           },
           error: (error) => {
-            console.error('Error adding reaction:', error);
+            this.logger.error('Error adding reaction:', error);
             this.reacting = false;
           }
         });

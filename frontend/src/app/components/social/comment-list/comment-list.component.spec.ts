@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { CommentListComponent } from './comment-list.component';
 import { CommentsService } from '../../../services/social/comments.service';
 import { ReactionsService } from '../../../services/social/reactions.service';
-import { WebsocketService } from '../../../services/websocket.service';
+import { WebSocketService as WebsocketService } from '../../../core/services/web-socket.service';
 
 describe('CommentListComponent', () => {
   let component: CommentListComponent;

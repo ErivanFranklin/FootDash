@@ -16,6 +16,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { TeamAnalytics } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 Chart.register(...registerables);
 
@@ -40,6 +41,7 @@ export class TeamAnalyticsCardComponent implements OnInit, OnChanges, AfterViewI
 
   private analyticsService = inject(AnalyticsService);
   private translocoService = inject(TranslocoService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     // If teamId was set before ngOnChanges, load immediately
@@ -78,7 +80,7 @@ export class TeamAnalyticsCardComponent implements OnInit, OnChanges, AfterViewI
 
   loadAnalytics() {
     if (!this.teamId) {
-      console.warn('TeamAnalyticsCard: teamId is required');
+      this.logger.warn('TeamAnalyticsCard: teamId is required');
       this.loading = false;
       this.error = 'Team ID is required';
       return;
@@ -99,7 +101,7 @@ export class TeamAnalyticsCardComponent implements OnInit, OnChanges, AfterViewI
       error: (err) => {
         this.error = 'Failed to load team analytics';
         this.loading = false;
-        console.error('Analytics error:', err);
+        this.logger.error('Analytics error:', err);
       },
     });
   }

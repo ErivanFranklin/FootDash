@@ -14,6 +14,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { PredictionResult } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 Chart.register(...registerables);
 
@@ -35,6 +36,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
   chart: Chart | null = null;
 
   private analyticsService = inject(AnalyticsService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.loadPrediction();
@@ -67,7 +69,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
       error: (err) => {
         this.error = 'Failed to load prediction';
         this.loading = false;
-        console.error('Prediction error:', err);
+        this.logger.error('Prediction error:', err);
       },
     });
   }
@@ -88,7 +90,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
       error: (err) => {
         this.error = 'Failed to generate prediction';
         this.loading = false;
-        console.error('Generation error:', err);
+        this.logger.error('Generation error:', err);
       },
     });
   }

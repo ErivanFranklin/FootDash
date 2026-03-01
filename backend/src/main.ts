@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -23,7 +24,11 @@ async function bootstrap() {
   
   app.setGlobalPrefix('api'); // Standardize all endpoints under /api/*
 
-  app.enableCors();
+  app.use(cookieParser());
+  app.enableCors({
+    origin: true,
+    credentials: true, // Allow cookies to be sent cross-origin
+  });
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
   const isProd = process.env.NODE_ENV === 'production';
   app.use(

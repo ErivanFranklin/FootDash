@@ -2,16 +2,18 @@ import { ErrorHandler, Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastController } from '@ionic/angular';
 import { environment } from '../../../environments/environment';
+import { LoggerService } from '../services/logger.service';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   private toast = inject(ToastController);
+  private logger = inject(LoggerService);
   private readonly isDevelopment = !environment.production;
 
   async handleError(error: Error | HttpErrorResponse): Promise<void> {
     // Log to console in development
     if (this.isDevelopment) {
-      console.error('GlobalErrorHandler caught:', error);
+      this.logger.error('GlobalErrorHandler caught:', error);
     }
 
     let errorMessage = 'An unexpected error occurred';
@@ -29,7 +31,7 @@ export class GlobalErrorHandler implements ErrorHandler {
 
     // Log error details in development
     if (this.isDevelopment && errorDetails) {
-      console.error('Error details:', errorDetails);
+      this.logger.error('Error details:', errorDetails);
     }
 
     // Show user-friendly error message
@@ -117,6 +119,6 @@ export class GlobalErrorHandler implements ErrorHandler {
     //   url: window.location.href
     // });
     
-    console.warn('Error logging service not implemented. Error details:', { message, details });
+    this.logger.warn('Error logging service not implemented. Error details:', { message, details });
   }
 }

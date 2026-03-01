@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonFooter, IonSplitPane } from '@ionic/angular/standalone';
 import { NavigationMenuComponent } from './shared/components/navigation-menu.component';
-import { WebsocketService } from './services/websocket.service';
+import { WebSocketService as WebsocketService } from './core/services/web-socket.service';
 import { AuthService } from './core/services/auth.service';
 import { PwaService } from './core/services/pwa.service';
 import { TranslocoPipe } from '@jsverse/transloco';

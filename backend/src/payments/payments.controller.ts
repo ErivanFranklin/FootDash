@@ -7,37 +7,39 @@ import {
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators';
 import { Request } from 'express';
 
-// Helper decorator to get user from request
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-
-export const CurrentUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user;
-  },
-);
-
+@ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  private readonly defaultPriceId: string;
 
+  constructor(
+    private readonly paymentsService: PaymentsService,
+    private readonly configService: ConfigService,
+  ) {
+    this.defaultPriceId = this.configService.get<string>('STRIPE_PRO_PRICE_ID', '');
+  }
+
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Post('create-checkout-session')
   async createCheckoutSession(
-    @CurrentUser() user: any,
-    @Body('priceId') priceId: string,
+    @CurrentUser() user: { sub: number; email: string },
+    @Body('priceId') priceId?: string,
   ) {
-    // In a real app, priceId might be config or hardcoded for simple tiers
-    // Using a default test price if not provided
-    const actualPriceId = priceId || 'price_1Qj...'; // Placeholder
-    return this.paymentsService.createCheckoutSession(
-      user.userId,
-      actualPriceId,
-    );
+    const actualPriceId = priceId || this.defaultPriceId;
+    if (!actualPriceId) {
+      throw new BadRequestException(
+        'No price ID provided and STRIPE_PRO_PRICE_ID is not configured',
+      );
+    }
+    return this.paymentsService.createCheckoutSession(user.sub, actualPriceId);
   }
 
   @Post('webhook')
@@ -45,18 +47,10 @@ export class PaymentsController {
     @Headers('stripe-signature') signature: string,
     @Req() req: Request,
   ) {
-    // IMPORTANT: For this to work, the raw body must be available on the request.
-    // In default NestJS/Express, body is already parsed.
-    // We assume rawBody is preserved or we handle it via middleware.
-    // For now, typecasting req.body might fail if parsed JSON.
-    // Standard solution involves a raw-body middleware.
-
-    // Assuming 'rawBody' property exists on request from middleware
     const rawBody = (req as any).rawBody;
     if (!rawBody) {
       throw new BadRequestException('Raw body not available');
     }
-
     return this.paymentsService.handleWebhook(signature, rawBody);
   }
 }

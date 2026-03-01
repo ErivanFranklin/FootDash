@@ -417,7 +417,7 @@ export class TeamAnalyticsService {
       } catch (error) {
         this.logger.warn(
           `Failed to refresh analytics for team ${team.id}:`,
-          error.message,
+          error instanceof Error ? error.message : String(error),
         );
       }
     }

@@ -92,8 +92,8 @@ export class LiveMatchService implements OnDestroy {
   unsubscribeFromMatch(matchId: number | string): void {
     const id = String(matchId);
     const ws = this.wsService;
-    if (ws && typeof ws.unsubscribefromMatch === 'function') {
-      ws.unsubscribefromMatch(Number(id));
+    if (ws && typeof ws.unsubscribeFromMatch === 'function') {
+      ws.unsubscribeFromMatch(Number(id));
     }
     
     // Optional: Clean up the state if no longer needed

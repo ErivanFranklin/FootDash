@@ -7,6 +7,7 @@ import { AnalyticsChartsComponent } from '../../../components/analytics-charts/a
 import { ApiService } from '../../../core/services/api.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { LoggerService } from '../../../core/services/logger.service';
 
 interface Team {
   id: number;
@@ -41,6 +42,7 @@ export class TeamAnalyticsPage implements OnInit {
   private route = inject(ActivatedRoute);
   private api = inject(ApiService);
   private router = inject(Router);
+  private logger = inject(LoggerService);
 
   teamId!: number;
   team$!: Observable<Team | null>;
@@ -70,7 +72,7 @@ export class TeamAnalyticsPage implements OnInit {
         };
       }),
       catchError((error) => {
-        console.error('Error loading team:', error);
+        this.logger.error('Error loading team:', error);
         this.loading = false;
         // Fallback: still allow analytics to load with the route teamId
         return of({ id: this.teamId, name: 'Team', logo: undefined } as Team);

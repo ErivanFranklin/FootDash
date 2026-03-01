@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { ToastController } from '@ionic/angular';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShareService {
   private toast = inject(ToastController);
+  private logger = inject(LoggerService);
 
   constructor() {}
 
@@ -22,7 +24,7 @@ export class ShareService {
       } catch (error: any) {
         // User cancelled or error occurred
         if (error.name !== 'AbortError') {
-          console.error('Error sharing:', error);
+          this.logger.error('Error sharing:', error);
           await this.showToast('Failed to share', 'danger');
         }
         return false;
@@ -88,7 +90,7 @@ export class ShareService {
       await this.showToast('Copied to clipboard', 'success');
       return true;
     } catch (error) {
-      console.error('Error copying to clipboard:', error);
+      this.logger.error('Error copying to clipboard:', error);
       await this.showToast('Failed to copy', 'danger');
       return false;
     }

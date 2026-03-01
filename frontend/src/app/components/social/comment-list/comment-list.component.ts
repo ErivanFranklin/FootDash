@@ -7,11 +7,12 @@ import { ReactionButtonComponent } from '../reaction-button/reaction-button.comp
 import { CommentsService } from '../../../services/social/comments.service';
 import { ReactionsService } from '../../../services/social/reactions.service';
 import { ReportsService } from '../../../services/social/reports.service';
-import { WebsocketService, SocialEvent } from '../../../services/websocket.service';
+import { WebSocketService as WebsocketService, SocialEvent } from '../../../core/services/web-socket.service';
 import { Comment as SocialComment, PaginatedComments, ReactionTargetType, ReportTargetType, ReportReason } from '../../../models/social';
 import { ReactionSummary } from '../../../models/social/reaction.model';
 import { Subscription } from 'rxjs';
 import { AlertController, ToastController } from '@ionic/angular';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-comment-list',
@@ -50,6 +51,7 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
   private websocketService = inject(WebsocketService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.loadComments();
@@ -153,7 +155,7 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
         this.loadReactionSummaries(result.comments);
       },
       error: (error) => {
-        console.error('Error loading comments:', error);
+        this.logger.error('Error loading comments:', error);
         this.loading = false;
       }
     });
@@ -167,7 +169,7 @@ export class CommentListComponent implements OnInit, OnChanges, OnDestroy {
             this.reactionSummaries.set(comment.id, summary);
           },
           error: (error) => {
-            console.error('Error loading reaction summary:', error);
+            this.logger.error('Error loading reaction summary:', error);
           }
         });
     });

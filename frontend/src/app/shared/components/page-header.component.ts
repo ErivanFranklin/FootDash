@@ -1,8 +1,9 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { Observable, of, isObservable, BehaviorSubject, from, Subject } from 'rxjs';
 import { takeUntil, finalize, catchError } from 'rxjs/operators';
+import { LoggerService } from '../../core/services/logger.service';
 
 @Component({
   selector: 'app-page-header',
@@ -54,6 +55,7 @@ export class PageHeaderComponent implements OnDestroy {
 
   private actionLoadingStates = new Map<number, BehaviorSubject<boolean>>();
   private destroy$ = new Subject<void>();
+  private logger = inject(LoggerService);
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -123,7 +125,7 @@ export class PageHeaderComponent implements OnDestroy {
           takeUntil(this.destroy$),
           finalize(() => loadingState.next(false)),
           catchError(error => {
-            console.error('Action handler error:', error);
+            this.logger.error('Action handler error:', error);
             return of(void 0);
           })
         ).subscribe();

@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class PwaService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private logger = inject(LoggerService);
   private registering = false;
 
   async initPushNotifications(): Promise<void> {
@@ -20,7 +22,7 @@ export class PwaService {
     }
 
     if (!environment.pushPublicKey) {
-      console.warn('[PWA] Skipping push registration: pushPublicKey is not configured');
+      this.logger.warn('[PWA] Skipping push registration: pushPublicKey is not configured');
       return;
     }
 
@@ -28,13 +30,13 @@ export class PwaService {
       this.registering = true;
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        console.info('[PWA] Notification permission not granted');
+        this.logger.info('[PWA] Notification permission not granted');
         return;
       }
 
       const existingRegistration = await navigator.serviceWorker.getRegistration();
       if (!existingRegistration) {
-        console.warn('[PWA] No active service worker registration found');
+        this.logger.warn('[PWA] No active service worker registration found');
         return;
       }
 
@@ -46,7 +48,7 @@ export class PwaService {
 
       const payload = JSON.stringify(subscription);
       if (payload.length < 50) {
-        console.warn('[PWA] Subscription payload too short to register');
+        this.logger.warn('[PWA] Subscription payload too short to register');
         return;
       }
 
@@ -58,9 +60,9 @@ export class PwaService {
           userId
         })
       );
-      console.info('[PWA] Push subscription registered');
+      this.logger.info('[PWA] Push subscription registered');
     } catch (error) {
-      console.error('[PWA] Failed to initialize push notifications', error);
+      this.logger.error('[PWA] Failed to initialize push notifications', error);
     } finally {
       this.registering = false;
     }

@@ -8,6 +8,7 @@ import { ApiService } from '../../../core/services/api.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { LoggerService } from '../../../core/services/logger.service';
 import { TeamAnalyticsCardComponent } from '../../../components/team-analytics-card/team-analytics-card.component';
 
 interface Match {
@@ -45,6 +46,7 @@ interface Match {
 export class MatchPredictionPage implements OnInit {
   private route = inject(ActivatedRoute);
   private api = inject(ApiService);
+  private logger = inject(LoggerService);
 
   matchId!: number;
   match$!: Observable<Match | null>;
@@ -74,7 +76,7 @@ export class MatchPredictionPage implements OnInit {
         };
       }),
       catchError((error) => {
-        console.error('Error loading match:', error);
+        this.logger.error('Error loading match:', error);
         this.loading = false;
         return of(null);
       })

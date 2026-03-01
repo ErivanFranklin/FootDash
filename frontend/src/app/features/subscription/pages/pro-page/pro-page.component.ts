@@ -4,6 +4,7 @@ import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent,
 import { ToastController } from '@ionic/angular';
 import { SubscriptionService } from '../../../../services/subscription.service';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { LoggerService } from '../../../../core/services/logger.service';
 
 @Component({
   selector: 'app-pro-page',
@@ -95,6 +96,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 export class ProPage {
   private subscriptionService = inject(SubscriptionService);
   private toastController = inject(ToastController);
+  private logger = inject(LoggerService);
 
   subscribing = false;
 
@@ -120,7 +122,7 @@ export class ProPage {
           color: 'danger'
         });
         await toast.present();
-        console.error('Subscription error:', error);
+        this.logger.error('Subscription error:', error);
       }
     });
   }

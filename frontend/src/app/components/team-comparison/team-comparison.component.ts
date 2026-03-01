@@ -5,6 +5,7 @@ import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { TeamComparison } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 Chart.register(...registerables);
 
@@ -27,6 +28,7 @@ export class TeamComparisonComponent implements OnInit {
 
   private analyticsService = inject(AnalyticsService);
   private translocoService = inject(TranslocoService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.loadComparison();
@@ -46,7 +48,7 @@ export class TeamComparisonComponent implements OnInit {
       error: (err) => {
         this.error = 'Failed to load comparison';
         this.loading = false;
-        console.error('Comparison error:', err);
+        this.logger.error('Comparison error:', err);
       },
     });
   }

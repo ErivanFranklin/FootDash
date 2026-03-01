@@ -32,7 +32,7 @@ export async function show(): Promise<void> {
       configuredFromFiles = migrationFiles.map((f: string) => f.replace(/\.(ts|js)$/, ''));
     } catch (err) {
       // if reading the dir fails, fallback to ds.migrations
-      console.warn('Could not read migrations directory:', err.message || err);
+      console.warn('Could not read migrations directory:', err instanceof Error ? err.message : String(err));
       const configured: string[] = (ds.migrations || []).map((m: MigrationInterface & { name?: string }) => m.name).filter(Boolean) as string[];
       configuredFromFiles = configured.slice();
     }
@@ -110,7 +110,7 @@ export async function showFull(): Promise<void> {
       const migrationFiles = all.filter((f: string) => f.endsWith('.ts') || f.endsWith('.js')).sort();
       configuredFromFiles = migrationFiles.map((f: string) => f.replace(/\.(ts|js)$/, ''));
     } catch (err) {
-      console.warn('Could not read migrations directory:', err.message || err);
+      console.warn('Could not read migrations directory:', err instanceof Error ? err.message : String(err));
     }
 
     const rows: Array<{ name: string }> = await ds.query(`SELECT name FROM migrations ORDER BY id`);
@@ -171,7 +171,7 @@ export async function showFull(): Promise<void> {
           console.log('--- end file content ---\n');
         }
       } catch (err) {
-        console.warn('Could not read migration source:', err.message || err);
+        console.warn('Could not read migration source:', err instanceof Error ? err.message : String(err));
       }
     }
 

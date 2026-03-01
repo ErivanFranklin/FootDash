@@ -9,10 +9,11 @@ import { FollowService } from '../../../services/social/follow.service';
 import { FeedService } from '../../../services/social/feed.service';
 import { ReportsService } from '../../../services/social/reports.service';
 import { ApiService } from '../../../core/services/api.service';
-import { User } from '../../../models/user.model';
+import { User } from '../../../core/models/user.model';
 import { Activity, PaginatedActivities, ReportTargetType, ReportReason } from '../../../models/social';
 import { AlertController, ToastController } from '@ionic/angular';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -48,6 +49,7 @@ export class UserProfilePage implements OnInit {
   private reportsService = inject(ReportsService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -71,7 +73,7 @@ export class UserProfilePage implements OnInit {
         this.loadFollowStats();
       },
       error: (error) => {
-        console.error('Error loading user profile:', error);
+        this.logger.error('Error loading user profile:', error);
         // Fallback to minimal data so the page still renders
         this.user = {
           id: this.userId,
@@ -92,7 +94,7 @@ export class UserProfilePage implements OnInit {
         this.followingCount = stats.followingCount;
       },
       error: (error) => {
-        console.error('Error loading follow stats:', error);
+        this.logger.error('Error loading follow stats:', error);
       }
     });
   }
@@ -114,7 +116,7 @@ export class UserProfilePage implements OnInit {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading activities:', error);
+          this.logger.error('Error loading activities:', error);
           this.loading = false;
         }
       });

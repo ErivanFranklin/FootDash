@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { IonItem, IonTextarea, IonButtons, IonButton, IonIcon, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { Comment as SocialComment, CreateCommentRequest } from '../../../models/social';
 import { CommentsService } from '../../../services/social/comments.service';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-comment-form',
@@ -26,6 +27,7 @@ export class CommentFormComponent {
 
   private fb = inject(FormBuilder);
   private commentsService = inject(CommentsService);
+  private logger = inject(LoggerService);
 
   constructor() {
     this.commentForm = this.fb.group({
@@ -61,7 +63,7 @@ export class CommentFormComponent {
           this.submitting = false;
         },
         error: (error) => {
-          console.error('Error creating comment:', error);
+          this.logger.error('Error creating comment:', error);
           this.submitting = false;
           // TODO: Show error toast
         }

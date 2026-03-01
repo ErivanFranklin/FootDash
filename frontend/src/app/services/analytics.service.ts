@@ -9,6 +9,7 @@ import {
   TeamComparison,
 } from '../models/analytics.model';
 import { environment } from '../../environments/environment';
+import { LoggerService } from '../core/services/logger.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class AnalyticsService {
   private readonly ANALYTICS_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days for analytics
 
   private http = inject(HttpClient);
+  private logger = inject(LoggerService);
 
   /**
    * Get prediction for a specific match
@@ -248,7 +250,7 @@ export class AnalyticsService {
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-      console.error(`${operation} failed:`, error);
+      this.logger.error(`${operation} failed:`, error);
       
       // Let the app keep running by returning an empty result
       if (result !== undefined) {

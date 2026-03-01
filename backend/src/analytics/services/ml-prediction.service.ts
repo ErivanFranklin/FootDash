@@ -100,7 +100,7 @@ export class MLPredictionService {
       // Transform ML response to FootDash format
       return this.transformMLResponse(response.data, request);
     } catch (error) {
-      this.logger.error(`ML prediction failed: ${error.message}`);
+      this.logger.error(`ML prediction failed: ${error instanceof Error ? error.message : String(error)}`);
 
       if (error instanceof HttpException) {
         throw error;
@@ -144,7 +144,7 @@ export class MLPredictionService {
       );
       return isHealthy;
     } catch (error) {
-      this.logger.warn(`ML service health check failed: ${error.message}`);
+      this.logger.warn(`ML service health check failed: ${error instanceof Error ? error.message : String(error)}`);
 
       this.healthCheckCache = {
         isHealthy: false,
@@ -168,7 +168,7 @@ export class MLPredictionService {
 
       return response.data;
     } catch (error) {
-      this.logger.error(`Failed to get ML service info: ${error.message}`);
+      this.logger.error(`Failed to get ML service info: ${error instanceof Error ? error.message : String(error)}`);
       throw new HttpException(
         'ML service info unavailable',
         HttpStatus.SERVICE_UNAVAILABLE,

@@ -98,6 +98,7 @@ export class ErrorLoggingService {
       
       localStorage.setItem('error_logs', JSON.stringify(recentLogs));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to persist error log:', error);
     }
   }

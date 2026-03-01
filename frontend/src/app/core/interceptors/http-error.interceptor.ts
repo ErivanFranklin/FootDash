@@ -1,10 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { LoggerService } from '../services/logger.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
+  private logger = inject(LoggerService);
+
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       // Retry failed requests (except for auth endpoints and non-GET requests)
@@ -36,12 +39,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     const timestamp = new Date().toISOString();
     
     console.group(`🔴 HTTP Error [${timestamp}]`);
-    console.error('Request:', {
+    this.logger.error('Request:', {
       method: request.method,
       url: request.url,
       body: request.body
     });
-    console.error('Response:', {
+    this.logger.error('Response:', {
       status: error.status,
       statusText: error.statusText,
       error: error.error,

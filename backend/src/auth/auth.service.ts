@@ -65,7 +65,7 @@ export class AuthService {
     } catch (error) {
        if (error instanceof ConflictException) throw error;
        console.error('Registration error details:', error);
-       throw new InternalServerErrorException(error.message);
+       throw new InternalServerErrorException(error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -103,6 +103,13 @@ export class AuthService {
         relations: ['user'],
       });
       if (!stored || stored.revoked) {
+        // Possible token reuse attack — revoke entire family
+        if (stored) {
+          await this.refreshRepo.update(
+            { user: { id: userId } },
+            { revoked: true },
+          );
+        }
         throw new UnauthorizedException('Invalid refresh token');
       }
 
@@ -111,12 +118,17 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
+      // Rotate: revoke the old token before issuing a new pair
+      stored.revoked = true;
+      await this.refreshRepo.save(stored);
+
       const tokens = await this.createTokens({
         id: user.id,
         email: user.email,
       });
       return { user: { id: user.id, email: user.email }, tokens };
-    } catch {
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw err;
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

@@ -354,7 +354,7 @@ export class MatchPredictionService {
       } catch (error) {
         this.logger.warn(
           `Failed to generate prediction for match ${match.id}:`,
-          error.message,
+          error instanceof Error ? error.message : String(error),
         );
       }
     }

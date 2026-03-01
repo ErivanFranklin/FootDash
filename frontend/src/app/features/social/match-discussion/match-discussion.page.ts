@@ -8,6 +8,7 @@ import { CommentListComponent } from '../../../components/social/comment-list/co
 import { ReactionButtonComponent } from '../../../components/social/reaction-button/reaction-button.component';
 import { ReactionsService } from '../../../services/social/reactions.service';
 import { ReactionSummary, ReactionTargetType } from '../../../models/social';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-match-discussion',
@@ -35,6 +36,7 @@ export class MatchDiscussionPage implements OnInit {
   private router = inject(Router);
   private apiService = inject(ApiService);
   private reactionsService = inject(ReactionsService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -65,7 +67,7 @@ export class MatchDiscussionPage implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading match details:', error);
+        this.logger.error('Error loading match details:', error);
         // Fallback so page still renders
         this.match = {
           id: this.matchId,
@@ -87,7 +89,7 @@ export class MatchDiscussionPage implements OnInit {
           this.reactionSummary = summary;
         },
         error: (error) => {
-          console.error('Error loading reaction summary:', error);
+          this.logger.error('Error loading reaction summary:', error);
         }
       });
   }

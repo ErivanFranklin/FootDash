@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { FollowService } from '../../../services/social/follow.service';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-follow-button',
@@ -24,6 +25,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
   loading: boolean = false;
 
   private followService = inject(FollowService);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     this.loadFollowStatus();
@@ -47,7 +49,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error checking follow status:', error);
+        this.logger.error('Error checking follow status:', error);
         this.loading = false;
       }
     });
@@ -59,7 +61,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
         this.followingCount = stats.followingCount;
       },
       error: (error) => {
-        console.error('Error getting follow stats:', error);
+        this.logger.error('Error getting follow stats:', error);
       }
     });
   }
@@ -83,7 +85,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
           });
         },
         error: (err: any) => {
-          console.error('Error unfollowing user:', err);
+          this.logger.error('Error unfollowing user:', err);
           this.loading = false;
         }
       });
@@ -99,7 +101,7 @@ export class FollowButtonComponent implements OnInit, OnChanges {
           });
         },
         error: (err: any) => {
-          console.error('Error following user:', err);
+          this.logger.error('Error following user:', err);
           this.loading = false;
         }
       });

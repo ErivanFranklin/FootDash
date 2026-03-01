@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { ReactionButtonComponent } from './reaction-button.component';
 import { ReactionTargetType } from '../../../models/social';
 import { ReactionsService } from '../../../services/social/reactions.service';
-import { WebsocketService } from '../../../services/websocket.service';
+import { WebSocketService as WebsocketService } from '../../../core/services/web-socket.service';
 
 describe('ReactionButtonComponent', () => {
   let component: ReactionButtonComponent;

@@ -1,20 +1,23 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GamificationService } from './gamification.service';
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; // Assuming this exists
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators';
 
+@ApiTags('Gamification')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
 @Controller('gamification')
 export class GamificationController {
   constructor(private readonly gamificationService: GamificationService) {}
 
   @Post('predict')
-  // @UseGuards(JwtAuthGuard) // Uncomment when Auth is ready
   async predict(
+    @CurrentUser() user: { sub: number; email: string },
     @Body() body: { matchId: number; homeScore: number; awayScore: number },
   ) {
-    // const userId = req.user.id;
-    const userId = 1; // Temporary mock
     return this.gamificationService.submitPrediction(
-      userId,
+      user.sub,
       body.matchId,
       body.homeScore,
       body.awayScore,

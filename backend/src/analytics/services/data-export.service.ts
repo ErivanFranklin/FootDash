@@ -168,7 +168,7 @@ export class DataExportService {
         trainingData.push(dataPoint);
       } catch (error) {
         this.logger.warn(
-          `Failed to create training data for match ${match.id}: ${error.message}`,
+          `Failed to create training data for match ${match.id}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

@@ -10,6 +10,7 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  HttpException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserProfileService } from '../services/user-profile.service';
@@ -37,7 +38,7 @@ export class UserProfileController {
       return await this.profileService.update(userId, updateProfileDto);
     } catch (error) {
       // If profile doesn't exist, create it
-      if (error.status === 404) {
+      if (error instanceof HttpException && error.getStatus() === 404) {
         return this.profileService.create(userId, updateProfileDto);
       }
       throw error;
@@ -68,7 +69,7 @@ export class UserProfileController {
       return this.profileService.updateAvatar(userId, avatarUrl);
     } catch (error) {
       // If profile doesn't exist, create it with the avatar
-      if (error.status === 404) {
+      if (error instanceof HttpException && error.getStatus() === 404) {
         const avatarUrl = await this.avatarService.saveAvatar(file);
         await this.profileService.create(userId, {});
         return this.profileService.updateAvatar(userId, avatarUrl);

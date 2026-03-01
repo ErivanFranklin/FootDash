@@ -32,6 +32,7 @@ import {
 } from 'chart.js';
 import { TeamAnalytics } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
+import { LoggerService } from '../../core/services/logger.service';
 import { addIcons } from 'ionicons';
 import {
   footballOutline,
@@ -80,6 +81,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   private charts: Chart[] = [];
   private analyticsService = inject(AnalyticsService);
   private translocoService = inject(TranslocoService);
+  private logger = inject(LoggerService);
 
   constructor() {
     addIcons({
@@ -131,7 +133,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
       error: (err) => {
         this.error = 'Failed to load analytics';
         this.loading = false;
-        console.error('Analytics charts error:', err);
+        this.logger.error('Analytics charts error:', err);
       },
     });
   }
@@ -535,7 +537,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private createFormGaugeChart() {
-    if (!this.analytics?.currentForm) return;
+    if (!this.analytics?.formRating) return;
 
     const ctx = this.getCanvasContext(this.formGaugeRef);
     if (!ctx) return;

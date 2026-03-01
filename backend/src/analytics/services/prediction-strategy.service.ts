@@ -64,7 +64,7 @@ export class PredictionStrategyService {
       return prediction;
     } catch (error) {
       this.logger.error(
-        `${strategy} prediction failed for match ${matchId}: ${error.message}`,
+        `${strategy} prediction failed for match ${matchId}: ${error instanceof Error ? error.message : String(error)}`,
       );
 
       // Fallback to statistical prediction
@@ -184,7 +184,7 @@ export class PredictionStrategyService {
       throw new Error('Both statistical and ML predictions failed');
     } catch (error) {
       this.logger.error(
-        `Hybrid prediction failed for match ${matchId}: ${error.message}`,
+        `Hybrid prediction failed for match ${matchId}: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw error;
     }
@@ -307,7 +307,7 @@ export class PredictionStrategyService {
       await this.performanceRepository.save(performance);
     } catch (error) {
       this.logger.error(
-        `Failed to track prediction performance: ${error.message}`,
+        `Failed to track prediction performance: ${error instanceof Error ? error.message : String(error)}`,
       );
       // Don't throw error, as this shouldn't fail the prediction
     }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth.service';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginPage implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private toast = inject(ToastController);
+  private logger = inject(LoggerService);
 
   ngOnInit() {
     // If already authenticated, redirect to home
@@ -35,7 +37,7 @@ export class LoginPage implements OnInit {
     // call the AuthService to login and redirect on success
     if (!this.email || !this.password) {
       // quick client-side guard
-      console.log('login: missing credentials');
+      this.logger.log('login: missing credentials');
       this.toast.create({
         message: 'Please enter email and password',
         duration: 2000,
@@ -49,7 +51,7 @@ export class LoginPage implements OnInit {
     this.auth.login(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-        console.log('Login successful', response);
+        this.logger.log('Login successful', response);
         
         // Show success toast
         this.toast.create({
@@ -65,7 +67,7 @@ export class LoginPage implements OnInit {
       },
       error: (err: any) => {
         this.loading = false;
-        console.error('Login failed', err);
+        this.logger.error('Login failed', err);
         const errorMessage = err?.error?.message || err?.message || 'Login failed';
         this.toast.create({
           message: errorMessage,
@@ -78,14 +80,14 @@ export class LoginPage implements OnInit {
 
   register() {
     if (!this.email || !this.password) {
-      console.log('register: missing credentials');
+      this.logger.log('register: missing credentials');
       return;
     }
     this.loading = true;
     this.auth.register(this.email, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-        console.log('Registration successful', response);
+        this.logger.log('Registration successful', response);
         
         // Show success toast
         this.toast.create({
@@ -101,7 +103,7 @@ export class LoginPage implements OnInit {
       },
       error: (err: any) => {
         this.loading = false;
-        console.error('Register failed', err);
+        this.logger.error('Register failed', err);
         const errorMessage = err?.error?.message || err?.message || 'Registration failed';
         this.toast.create({
           message: errorMessage,

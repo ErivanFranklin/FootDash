@@ -140,7 +140,7 @@ export class MatchSchedulerService implements OnModuleInit {
         `Live matches: ${liveMatchIds.length}, Currently polling: ${currentlyPolled.length}`,
       );
     } catch (error) {
-      this.logger.error('Error in scheduled live match check:', error.message);
+      this.logger.error('Error in scheduled live match check:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -191,7 +191,7 @@ export class MatchSchedulerService implements OnModuleInit {
 
       return liveMatches;
     } catch (error) {
-      this.logger.error('Error finding live matches:', error.message);
+      this.logger.error('Error finding live matches:', error instanceof Error ? error.message : String(error));
       return [];
     }
   }

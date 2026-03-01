@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -12,12 +13,36 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import { AuthResult, AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshAuthDto } from './dto/refresh-auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ProfileDto } from './dto/profile.dto';
+
+/** Duration in milliseconds for the refresh-token cookie (7 days). */
+const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+
+/** Shared cookie options for the refresh token. */
+function refreshCookieOptions(isProd: boolean) {
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'strict' as const,
+    path: '/api/auth',
+    maxAge: REFRESH_COOKIE_MAX_AGE,
+  };
+}
+
+/** Helper to attach the refresh-token cookie and return only the access token. */
+function sendWithCookie(res: Response, result: AuthResult, isProd: boolean) {
+  res.cookie('refresh_token', result.tokens.refreshToken, refreshCookieOptions(isProd));
+  return res.json({
+    user: result.user,
+    tokens: { accessToken: result.tokens.accessToken },
+  });
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -43,8 +68,13 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 409, description: 'User already exists' })
-  register(@Body() dto: RegisterAuthDto): Promise<AuthResult> {
-    return this.authService.register(dto);
+  async register(
+    @Body() dto: RegisterAuthDto,
+    @Res() res: Response,
+  ): Promise<any> {
+    const result = await this.authService.register(dto);
+    const isProd = process.env.NODE_ENV === 'production';
+    return sendWithCookie(res, result, isProd);
   }
 
   @Post('login')
@@ -68,8 +98,13 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  login(@Body() dto: LoginAuthDto): Promise<AuthResult> {
-    return this.authService.login(dto);
+  async login(
+    @Body() dto: LoginAuthDto,
+    @Res() res: Response,
+  ): Promise<any> {
+    const result = await this.authService.login(dto);
+    const isProd = process.env.NODE_ENV === 'production';
+    return sendWithCookie(res, result, isProd);
   }
 
   @Post('refresh')
@@ -89,8 +124,16 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  refresh(@Body() dto: RefreshAuthDto): Promise<AuthResult> {
-    return this.authService.refresh(dto.refreshToken);
+  async refresh(
+    @Body() dto: RefreshAuthDto,
+    @Request() req: any,
+    @Res() res: Response,
+  ): Promise<any> {
+    // Prefer HttpOnly cookie, fall back to body for backward compatibility
+    const token = req.cookies?.refresh_token || dto.refreshToken;
+    const result = await this.authService.refresh(token);
+    const isProd = process.env.NODE_ENV === 'production';
+    return sendWithCookie(res, result, isProd);
   }
 
   @Post('revoke')
@@ -98,8 +141,17 @@ export class AuthController {
   @ApiOperation({ summary: 'Revoke refresh token' })
   @ApiResponse({ status: 200, description: 'Token revoked successfully' })
   @ApiResponse({ status: 401, description: 'Invalid token' })
-  async revoke(@Body() dto: RefreshAuthDto): Promise<void> {
-    await this.authService.revoke(dto.refreshToken);
+  async revoke(
+    @Body() dto: RefreshAuthDto,
+    @Request() req: any,
+    @Res() res: Response,
+  ): Promise<any> {
+    const token = req.cookies?.refresh_token || dto.refreshToken;
+    await this.authService.revoke(token);
+    // Clear the cookie
+    const isProd = process.env.NODE_ENV === 'production';
+    res.clearCookie('refresh_token', refreshCookieOptions(isProd));
+    return res.json({ message: 'Token revoked' });
   }
 
   @Get('profile')

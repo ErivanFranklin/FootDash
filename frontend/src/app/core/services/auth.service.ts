@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { map, tap, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -10,86 +10,120 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   private jwtHelper = new JwtHelperService();
-  // During local dev we call backend directly (dev server proxy was inconsistent).
-  // The base URL + auth path now come from Angular environment configuration.
   private authUrl = buildAuthUrl();
-  private currentTokenSubject = new BehaviorSubject<string | null>(this.getToken());
+
+  /**
+   * Access token is stored in memory only (not localStorage) to mitigate XSS.
+   * The refresh token is stored as an HttpOnly cookie managed by the backend.
+   */
+  private accessToken: string | null = null;
+  private currentTokenSubject = new BehaviorSubject<string | null>(null);
   public currentToken$ = this.currentTokenSubject.asObservable();
   public isAuthenticated$ = this.currentToken$.pipe(
-    map(token => {
-      const isValid = !!token && !this.jwtHelper.isTokenExpired(token);
-      console.log('Authentication check:', { token: !!token, isValid, hasToken: !!token });
-      return isValid;
-    })
+    map(token => !!token && !this.jwtHelper.isTokenExpired(token))
   );
 
-  // prefer functional inject() per angular-eslint/prefer-inject
+  /** True while a silent refresh is in-flight (prevents duplicate calls). */
+  private refreshInFlight = false;
+
   private http = inject(HttpClient);
 
+  /**
+   * Attempt to restore the session on app boot by calling /auth/refresh.
+   * The browser automatically sends the HttpOnly refresh_token cookie.
+   */
+  tryRestoreSession(): Observable<boolean> {
+    return this.http
+      .post<any>(`${this.authUrl}/refresh`, {}, { withCredentials: true })
+      .pipe(
+        tap(res => {
+          const token = res?.tokens?.accessToken;
+          if (token) this.setToken(token);
+        }),
+        map(res => !!res?.tokens?.accessToken),
+        catchError(() => of(false)),
+      );
+  }
+
   login(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.authUrl}/login`, { email, password }).pipe(
-      map(res => {
-        // backend returns { user, tokens: { accessToken, refreshToken } }
-        const token = res?.tokens?.accessToken || res?.token || res?.accessToken;
-        if (token) {
-          this.setToken(token);
-        }
-        return res;
-      })
-    );
+    return this.http
+      .post<any>(`${this.authUrl}/login`, { email, password }, { withCredentials: true })
+      .pipe(
+        tap(res => {
+          const token = res?.tokens?.accessToken;
+          if (token) this.setToken(token);
+        }),
+      );
   }
 
   register(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.authUrl}/register`, { email, password }).pipe(
-      map(res => {
-        console.log('Register response:', res);
-        // mirror login behavior: store token when provided
-        const token = res?.tokens?.accessToken || res?.token || res?.accessToken;
-        if (token) {
-          console.log('Setting token from registration');
-          this.setToken(token);
-        } else {
-          console.warn('No token received from registration response');
-        }
-        return res;
-      })
-    );
+    return this.http
+      .post<any>(`${this.authUrl}/register`, { email, password }, { withCredentials: true })
+      .pipe(
+        tap(res => {
+          const token = res?.tokens?.accessToken;
+          if (token) this.setToken(token);
+        }),
+      );
+  }
+
+  /**
+   * Calls /auth/refresh to get a new access token.
+   * The HttpOnly cookie is sent automatically.
+   */
+  refreshAccessToken(): Observable<string | null> {
+    if (this.refreshInFlight) {
+      // Return current token while another refresh is pending
+      return of(this.accessToken);
+    }
+    this.refreshInFlight = true;
+    return this.http
+      .post<any>(`${this.authUrl}/refresh`, {}, { withCredentials: true })
+      .pipe(
+        tap(res => {
+          const token = res?.tokens?.accessToken;
+          if (token) this.setToken(token);
+          this.refreshInFlight = false;
+        }),
+        map(res => res?.tokens?.accessToken || null),
+        catchError(err => {
+          this.refreshInFlight = false;
+          this.clearSession();
+          return throwError(() => err);
+        }),
+      );
   }
 
   logout(): void {
-    this.removeToken();
-    // Clear any other auth-related data
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_data');
-    // Force observable to emit immediately
-    this.currentTokenSubject.next(null);
+    // Tell backend to revoke + clear the cookie
+    this.http
+      .post(`${this.authUrl}/revoke`, {}, { withCredentials: true })
+      .subscribe({ error: () => {} });
+    this.clearSession();
   }
 
   isAuthenticated(): boolean {
-    const token = this.getToken();
-    return !!token && !this.jwtHelper.isTokenExpired(token);
+    return !!this.accessToken && !this.jwtHelper.isTokenExpired(this.accessToken);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('access_token');
+    return this.accessToken;
   }
 
   getCurrentUserId(): number | null {
-    const token = this.getToken();
-    if (!token) return null;
-    const decoded = this.jwtHelper.decodeToken(token);
+    if (!this.accessToken) return null;
+    const decoded = this.jwtHelper.decodeToken(this.accessToken);
     return decoded?.sub || null;
   }
 
   setToken(token: string): void {
-    localStorage.setItem('access_token', token);
+    this.accessToken = token;
     this.currentTokenSubject.next(token);
   }
 
-  removeToken(): void {
-    localStorage.removeItem('access_token');
+  private clearSession(): void {
+    this.accessToken = null;
     this.currentTokenSubject.next(null);
-    console.log('Token removed, authentication state:', this.isAuthenticated());
   }
 }
 
