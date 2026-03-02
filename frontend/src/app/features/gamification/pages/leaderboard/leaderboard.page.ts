@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote } from '@ionic/angular/standalone';
+import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote, SegmentCustomEvent } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GamificationService, LeaderboardEntry } from '../../../../services/gamification.service';
 import { PageHeaderComponent } from '../../../../shared/components';
@@ -39,8 +39,8 @@ export class LeaderboardPage implements OnInit {
     });
   }
 
-  onPeriodChange(event: any) {
-    this.selectedPeriod = event.detail.value;
+  onPeriodChange(event: SegmentCustomEvent) {
+    this.selectedPeriod = event.detail.value as 'weekly' | 'monthly' | 'all-time';
     this.loadLeaderboard();
   }
 }

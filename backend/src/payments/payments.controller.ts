@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { Throttle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators';
@@ -28,6 +29,7 @@ export class PaymentsController {
 
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post('create-checkout-session')
   async createCheckoutSession(
     @CurrentUser() user: { sub: number; email: string },

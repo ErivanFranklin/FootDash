@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,6 +22,7 @@ import { SearchModule } from './search/search.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ExportModule } from './export/export.module';
+import { HealthModule } from './health/health.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -26,6 +30,8 @@ const isProd = process.env.NODE_ENV === 'production';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ name: 'global', ttl: 60_000, limit: 100 }]),
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -82,8 +88,12 @@ const isProd = process.env.NODE_ENV === 'production';
     FavoritesModule,
     DashboardModule,
     ExportModule,
+    HealthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}

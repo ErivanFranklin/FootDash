@@ -9,12 +9,13 @@ import { FavoriteButtonComponent } from '../../../components/favorite-button/fav
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LoggerService } from '../../../core/services/logger.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { Match, Team } from '../../../models/domain.model';
 
 interface DashboardData {
-  favoriteTeams: any[];
-  recentResults: any[];
-  upcomingMatches: any[];
-  allRecentMatches: any[];
+  favoriteTeams: Team[];
+  recentResults: Match[];
+  upcomingMatches: Match[];
+  allRecentMatches: Match[];
   hasFavorites: boolean;
 }
 
@@ -64,7 +65,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  getMatchScore(match: any): string {
+  getMatchScore(match: Match): string {
     if (match.homeScore != null && match.awayScore != null) {
       return `${match.homeScore} - ${match.awayScore}`;
     }
@@ -72,6 +73,9 @@ export class HomePage implements OnInit {
   }
 
   getTeamInitials(name: string): string {
-    return (name || 'T').substring(0, 3).toUpperCase();
+    if (!name) return '';
+    const words = name.trim().split(/\s+/);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   }
 }

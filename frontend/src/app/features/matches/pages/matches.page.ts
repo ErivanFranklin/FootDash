@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonChip } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonRefresher, IonRefresherContent, IonFab, IonFabButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonChip, InfiniteScrollCustomEvent, RefresherCustomEvent } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
@@ -89,15 +89,14 @@ export class MatchesPage implements OnInit {
     });
   }
 
-  handleRefresh(event: any) {
+  handleRefresh(event: RefresherCustomEvent) {
     this.loadMatches();
-    // Complete the refresh after data loads
     setTimeout(() => {
       event.target.complete();
     }, 1000);
   }
 
-  loadMoreMatches(event: any) {
+  loadMoreMatches(event: InfiniteScrollCustomEvent) {
     if (!this.hasMoreData) {
       event.target.complete();
       return;

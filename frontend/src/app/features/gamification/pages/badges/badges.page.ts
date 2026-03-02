@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonGrid, IonRow, IonCol, IonText, IonCard, IonCardContent, IonChip } from '@ionic/angular/standalone';
+import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonGrid, IonRow, IonCol, IonText, IonCard, IonCardContent, IonChip, SegmentCustomEvent } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GamificationService, BadgeResponse, BadgeTier } from '../../../../services/gamification.service';
 import { BadgeCardComponent } from '../../../../components/gamification/badge-card/badge-card.component';
@@ -55,8 +55,8 @@ export class BadgesPage implements OnInit {
     });
   }
 
-  onFilterChange(event: any) {
-    this.selectedFilter = event.detail.value;
+  onFilterChange(event: SegmentCustomEvent) {
+    this.selectedFilter = event.detail.value as 'all' | 'unlocked' | 'locked';
     this.applyFilters();
   }
 

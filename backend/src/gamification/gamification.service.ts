@@ -1,14 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserPrediction } from './entities/user-prediction.entity';
+import { MatchFinishedEvent } from '../matches/events/match-finished.event';
 
 @Injectable()
 export class GamificationService {
+  private readonly logger = new Logger(GamificationService.name);
+
   constructor(
     @InjectRepository(UserPrediction)
     private predictionsRepository: Repository<UserPrediction>,
   ) {}
+
+  @OnEvent('match.finished')
+  async onMatchFinished(event: MatchFinishedEvent): Promise<void> {
+    this.logger.log(`[Event] match.finished → matchId=${event.matchId}, score=${event.homeScore}-${event.awayScore}`);
+    await this.processMatchResult(event.matchId, event.homeScore, event.awayScore);
+  }
 
   async submitPrediction(userId: number, matchId: number, homeScore: number, awayScore: number): Promise<UserPrediction> {
     const prediction = this.predictionsRepository.create({

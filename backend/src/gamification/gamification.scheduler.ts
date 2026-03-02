@@ -21,7 +21,9 @@ export class GamificationScheduler {
     private badgeService: BadgeService,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  // Fallback cron — event-driven scoring via 'match.finished' handles real-time.
+  // This runs hourly to catch any predictions missed by the event (e.g. cold starts).
+  @Cron(CronExpression.EVERY_HOUR)
   async processMatchResults() {
     this.logger.log('Checking for finished matches to score predictions...');
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone';
+import { IonBackButton, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton, IonSegment, IonSegmentButton, IonLabel, SegmentCustomEvent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IonContent, IonBadge, IonSpinner, IonButton } from '@ionic/angular/standalone';
@@ -122,8 +122,8 @@ export class MatchDetailsPage implements OnInit, OnDestroy {
     if (side === 'away') this.awayLogoLoaded = true;
   }
 
-  onTabChange(event: any) {
-    this.selectedTab = event.detail.value;
+  onTabChange(event: SegmentCustomEvent) {
+    this.selectedTab = event.detail.value as 'info' | 'lineups';
     if (this.selectedTab === 'lineups' && this.lineups.length === 0 && !this.lineupsLoading) {
       this.loadLineups();
     }

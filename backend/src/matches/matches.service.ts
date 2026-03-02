@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FootballApiService } from '../football-api/football-api.service';
 import { MatchesQueryDto, MatchRangeType } from './dto/matches-query.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +8,7 @@ import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
 import { MatchGateway } from '../websockets/match.gateway';
 import { NotificationsService } from '../notifications/notifications.service';
+import { MatchFinishedEvent } from './events/match-finished.event';
 
 @Injectable()
 export class MatchesService {
@@ -18,6 +20,7 @@ export class MatchesService {
     private readonly teamRepository: Repository<Team>,
     private readonly matchGateway: MatchGateway,
     private readonly notificationsService: NotificationsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getMatch(id: number) {
@@ -184,6 +187,12 @@ export class MatchesService {
             'result',
             `${home.name} ${existing.homeScore ?? 0} - ${existing.awayScore ?? 0} ${away.name} (FT)`,
           );
+          if (existing.homeScore != null && existing.awayScore != null) {
+            this.eventEmitter.emit(
+              'match.finished',
+              new MatchFinishedEvent(existing.id, existing.homeScore, existing.awayScore),
+            );
+          }
         }
         savedMatches.push(existing);
         continue;

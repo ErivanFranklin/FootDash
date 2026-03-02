@@ -7,6 +7,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import {
   ApiTags,
   ApiOperation,
@@ -53,6 +54,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @Throttle({ default: { ttl: 60_000, limit: 3 } })
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({
     status: 201,
@@ -81,6 +83,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Authenticate user and get tokens' })
   @ApiResponse({
     status: 200,
@@ -158,6 +161,7 @@ export class AuthController {
   }
 
   @Get('profile')
+  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get user profile' })
@@ -195,6 +199,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @Throttle({ default: { ttl: 60_000, limit: 3 } })
   @ApiOperation({ summary: 'Request a password reset email' })
   @ApiResponse({ status: 200, description: 'If the email exists, a reset link was sent.' })
   async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
