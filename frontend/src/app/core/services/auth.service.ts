@@ -4,6 +4,8 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, tap, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { Store } from '@ngrx/store';
+import { authLogoutSuccess, authSetToken } from '../../store/auth/auth.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +29,7 @@ export class AuthService {
   private refreshInFlight = false;
 
   private http = inject(HttpClient);
+  private store = inject(Store);
 
   /**
    * Attempt to restore the session on app boot by calling /auth/refresh.
@@ -119,11 +122,15 @@ export class AuthService {
   setToken(token: string): void {
     this.accessToken = token;
     this.currentTokenSubject.next(token);
+    const decoded = this.jwtHelper.decodeToken(token);
+    const userId = decoded?.sub ?? 0;
+    this.store.dispatch(authSetToken({ token, userId }));
   }
 
   private clearSession(): void {
     this.accessToken = null;
     this.currentTokenSubject.next(null);
+    this.store.dispatch(authLogoutSuccess());
   }
 }
 

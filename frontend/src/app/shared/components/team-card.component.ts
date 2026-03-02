@@ -35,7 +35,7 @@ import { CommonModule } from '@angular/common';
             [disabled]="action.disabled"
             (click)="action.handler(team)">
             <ng-container *ngIf="!action.loading; else loadingTemplate">
-              <ion-icon *ngIf="action.icon" [name]="action.icon"></ion-icon>
+              <ion-icon *ngIf="action.icon" [name]="action.icon" slot="start"></ion-icon>
               {{ action.label }}
             </ng-container>
             <ng-template #loadingTemplate>

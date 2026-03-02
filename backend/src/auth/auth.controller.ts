@@ -5,6 +5,7 @@ import {
   Post,
   Request,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
@@ -30,11 +31,13 @@ const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 /** Shared cookie options for the refresh token. */
 function refreshCookieOptions(isProd: boolean) {
+  const sameSite: 'strict' | 'lax' = isProd ? 'strict' : 'lax';
   return {
     httpOnly: true,
     secure: isProd,
-    sameSite: 'strict' as const,
-    path: '/api/auth',
+    // Use lax in dev to allow localhost:4200 -> 3000 cross-port cookie
+    sameSite,
+    path: '/api/',
     maxAge: REFRESH_COOKIE_MAX_AGE,
   };
 }
@@ -137,6 +140,9 @@ export class AuthController {
   ): Promise<any> {
     // Prefer HttpOnly cookie, fall back to body for backward compatibility
     const token = req.cookies?.refresh_token || dto.refreshToken;
+    if (!token) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
     const result = await this.authService.refresh(token);
     const isProd = process.env.NODE_ENV === 'production';
     return sendWithCookie(res, result, isProd);
