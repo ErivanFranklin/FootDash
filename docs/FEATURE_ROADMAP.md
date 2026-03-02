@@ -15,8 +15,9 @@ This document is the single source of truth for all planned features, improvemen
 3. [Phase 9 — Core Missing Features](#phase-9--core-missing-features)
 4. [Phase 10 — Engagement & Polish](#phase-10--engagement--polish)
 5. [Phase 11 — Architecture & Quality](#phase-11--architecture--quality)
-6. [Phase 12 — Future Vision](#phase-12--future-vision)
-7. [Sprint Calendar](#sprint-calendar)
+6. [Phase 12 — State Management Migration](#phase-12--state-management-migration)
+7. [Phase 13 — Future Vision](#phase-13--future-vision)
+8. [Sprint Calendar](#sprint-calendar)
 
 ---
 
@@ -775,8 +776,8 @@ Frontend:
 
 ## Phase 11 — Architecture & Quality
 
-> **Goal:** Improve codebase quality, performance, and developer experience.  
-> **Estimated Duration:** 2-3 weeks (can run in parallel with feature work)  
+> **Goal:** Ensure stability, security, and maintainability.
+> **Estimated Duration:** 2 weeks
 > **Branch Prefix:** `chore/` or `refactor/`
 
 ---
@@ -938,98 +939,110 @@ Currently the app uses a mix of Signals, BehaviorSubjects, and component-local s
 
 ---
 
-## Phase 12 — Future Vision
+## Phase 12 — State Management Migration
 
-> **Goal:** Long-term differentiating features that require significant R&D.  
-> **Timeline:** 3-6+ months out  
+> **Goal:** Standardize global state management using NgRx to improve predictability, debugging, and testability across the application.
+> **Estimated Duration:** 3-4 weeks (Incremental)
+> **Branch Prefix:** `refactor/ngrx-`
 
----
+### 12.1 — Migration Strategy & Standards
+**Scope:** Architecture / Documentation
+**Effort:** 3 days
+- [x] Create `docs/state-management.md` defining:
+    - Criteria for Global (NgRx) vs Local (Component/Signal) state.
+    - Folder structure (`store/{feature}/*.{actions,reducer,effects,selectors}.ts`).
+    - Naming conventions.
+- [x] Establish `BaseFacade` or facade patterns to hide Store dispatch from components.
+- [x] Add `.github/pull_request_template.md` with state migration checklist.
 
-### 12.1 — ML Prediction Model ⚪ P4
+### 12.2 — Auth State Migration
+**Scope:** Frontend
+**Effort:** 3 days
+- [x] Create `AuthStore` (Actions/Reducers) for `user`, `token`, `isAuthenticated`.
+- [x] Move `AuthService` logic into `AuthEffects`.
+- [x] Update `AuthGuard` and `AuthInterceptor` to use Store Selectors.
+- [x] Deprecate behavior subjects in `AuthService` (facade pattern adopted).
 
-The `ml-services/` directory contains a basic Python prediction model and training scripts. Evolve this into a real ML pipeline:
+### 12.3 — Notification State
+**Scope:** Frontend
+**Effort:** 2 days
+- [x] Create `NotificationStore` (NgRx SignalStore).
+- [x] Handle WebSocket events via `rxMethod` (listenForRealTimeAlerts).
+- [x] Store unread count and list in SignalStore state.
 
-- **Training pipeline:** Ingest historical match data → feature engineering → train XGBoost/LightGBM model
-- **Serving:** Deploy as a FastAPI microservice, called by the NestJS backend via HTTP
-- **Features:** Home/away form, H2H record, player availability, weather data, league position
-- **A/B testing:** Compare ML model accuracy vs current statistical model
-- **Auto-retrain:** Weekly cron retrains on new match results
+### 12.4 — Payment & Subscription State
+**Scope:** Frontend
+**Effort:** 2 days
+- [x] Create `BillingStore` (NgRx SignalStore).
+- [x] Manage subscription status, history, checkout and payment loading states.
 
----
-
-### 12.2 — Fantasy League Mode ⚪ P4
-
-Let users create private leagues with friends:
-- Squad budget system — pick 11 players within a salary cap
-- Per-gameweek scoring based on real player performance (goals, assists, clean sheets, etc.)
-- League tables with head-to-head matchups
-- Transfer market with buy/sell windows
-- Weekly/seasonal prizes
-
----
-
-### 12.3 — Multi-League Support ⚪ P4
-
-Currently defaults to a single league. Expand to:
-- League selector in navigation (Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League)
-- Per-league match feeds, standings, and stats
-- Cross-league search and comparison
-- User can follow multiple leagues
-
----
-
-### 12.4 — Native Mobile App Deployment ⚪ P4
-
-Capacitor is configured but no native builds exist. Plan:
-- iOS: Xcode project setup, App Store submission
-- Android: Android Studio project, Play Store submission
-- Native push notifications (replace web push with APNs/FCM native)
-- Biometric auth (Face ID / fingerprint for login)
-- Deep linking (Universal Links / App Links)
+### 12.5 — Offline Queue Integration
+**Scope:** Frontend
+**Effort:** 4 days
+- [x] Integrate `OfflineQueueService` with NgRx SignalStore (`OfflineStore`).
+- [x] Methods: `addToQueue`, `removeFromQueue`, `flush` (replaces action constants).
+- [x] Hydrate state from LocalStorage via `withHooks({ onInit })`.
 
 ---
 
-### 12.5 — Match Highlights & Video Integration ⚪ P4
+## Phase 13 — Future Vision
 
-- Embed highlight clips from YouTube (search API) or a highlights provider
-- "Key moments" timeline on match detail page
-- Clip-sharing to social feed
-- Copyright-safe approach: link to official sources, don't host content
+> **Goal:** Long-term R&D and major platform expansions.
+> **Status:** backlog / research
 
----
+### 13.1 — ML Prediction Model ⚪ P4
+**Scope:** Python Microservice
+**Details:**
+- Train model on historical stats (last 5 years).
+- Predict: Outcome, BTTS, Over/Under 2.5.
+- Stack: Python, Scikit-learn/TensorFlow, exposed via FastAPI.
 
-### 12.6 — Betting Odds Comparison (Informational) ⚪ P4
+### 13.2 — Fantasy League System ⚪ P4
+**Scope:** Full Stack
+**Details:**
+- Weekly drafts with budget cap.
+- Points based on real match performance.
+- Private leagues (invite only).
 
-- Pull odds from odds APIs (The Odds API, etc.)
-- Display alongside match predictions — "Our model says 65% home win; average bookmaker odds imply 52%"
-- Odds movement chart over time
-- Strictly informational — no gambling functionality
+### 13.3 — Multi-League Support ⚪ P4
+**Scope:** Backend Data
+**Details:**
+- Expand beyond Premier League.
+- La Liga, Serie A, Bundesliga, Ligue 1.
+- Dynamic league selection in UI.
+
+### 13.4 — Native Mobile Apps ⚪ P4
+**Scope:** Capacitor / Native
+**Details:**
+- Full Capacitor implementation for iOS/Android.
+- Push Notifications (FCM).
+- In-App Purchases (RevenueCat).
+
+### 13.5 — Video Highlights Integration ⚪ P4
+**Scope:** Frontend / Content
+**Details:**
+- Embed official YouTube highlights.
+- Auto-match highlights to completed games.
+
+### 13.6 — Real-time Betting Odds ⚪ P4
+**Scope:** Backend Integration
+**Details:**
+- Integration with Odds API.
+- Comparison across major bookmakers.
+- "Value Bet" detection.
 
 ---
 
 ## Sprint Calendar
 
-A suggested ordering assuming a 2-week sprint cadence:
-
-| Sprint | Dates | Items | Theme |
-|--------|-------|-------|-------|
-| **S1** | Mar 2 – Mar 15 | 8.1, 8.2, 8.3, 8.5, 11.1, 11.2 | Critical fixes + infra |
-| **S2** | Mar 16 – Mar 29 | 8.4, 8.6, 8.7, 11.4 | Security + cleanup |
-| **S3** | Mar 30 – Apr 12 | 9.1, 9.6 | Forgot password + error pages |
-| **S4** | Apr 13 – Apr 26 | 9.2, 9.3 | Notification center + settings |
-| **S5** | Apr 27 – May 10 | 10.1 | Badge system |
-| **S6** | May 11 – May 24 | 9.4, 9.5, 11.5 | Search + threading + events |
-| **S7** | May 25 – Jun 7 | 10.3, 10.4 | Lineups + favorites |
-| **S8** | Jun 8 – Jun 21 | 10.2, 10.5, 10.6 | Chat + export + offline |
-| **S9+** | Jun 22+ | 11.3, 11.6, 11.7, Phase 12 | Quality + future vision |
-
-> **Note:** Sprint S1–S2 focus on tech debt to stabilize the platform before adding new features. This protects new feature work from building on shaky foundations.
-
----
-
-## How to Use This Document
-
-1. **Before starting a feature:** Read its section here, create a feature branch with the suggested name, and open a GitHub issue linking to this doc.
-2. **During implementation:** Check off acceptance criteria as you go.
-3. **After completion:** Update status in this doc and in [TODO.md](../TODO.md).
-4. **Weekly review:** Revisit the sprint calendar and adjust priorities based on team velocity and user feedback.
+| Sprint | Dates | Focus Areas |
+|--------|-------|-------------|
+| **1** | Mar 02 - Mar 15 | Phase 8 (Tech Debt) + Phase 9.1-9.3 (Auth, Notifs, Settings) |
+| **2** | Mar 16 - Mar 29 | Phase 9.4-9.6 (Search, Comments, Errors) |
+| **3** | Mar 30 - Apr 12 | Phase 10.1-10.3 (Badges, Gamification UI, Live Chat) |
+| **4** | Apr 13 - Apr 26 | Phase 10.4-10.6 (Lineups, Favorites, Polish) |
+| **5** | Apr 27 - May 10 | Phase 11 (Architecture, Testing, Security) |
+| **6** | May 11 - May 24 | **Phase 12.1 - 12.2 (NgRx Setup & Auth Migration)** |
+| **7** | May 25 - Jun 07 | **Phase 12.3 - 12.5 (Notifications, Billing, Offline State)** |
+| **8** | Jun 08 - Jun 21 | Buffer / Beta Testing |
+| **9** | Jun 22 - Jul 05 | Phase 13 Research / v2.0 Planning |

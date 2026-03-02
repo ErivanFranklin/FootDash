@@ -1,19 +1,26 @@
 
 import { inject } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { AuthService } from '../services/auth.service';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, first, switchMap, throwError } from 'rxjs';
+import { selectToken } from '../../store/auth/auth.selectors';
+import { authSetToken } from '../../store/auth/auth.actions';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const store = inject(Store);
   const auth = inject(AuthService);
-  const token = auth.getToken();
+
+  // Read token synchronously from the Store's latest emission
+  let currentToken: string | null = null;
+  store.select(selectToken).pipe(first()).subscribe(t => (currentToken = t));
 
   // Always send credentials (cookies) for auth endpoints
   let cloned = req.clone({ withCredentials: true });
 
-  if (token) {
+  if (currentToken) {
     cloned = cloned.clone({
-      setHeaders: { Authorization: `Bearer ${token}` },
+      setHeaders: { Authorization: `Bearer ${currentToken}` },
     });
   }
 
@@ -31,6 +38,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             if (!newToken) {
               return throwError(() => error);
             }
+            // Sync new token into the Store
+            const decoded = (auth as any).jwtHelper?.decodeToken?.(newToken);
+            store.dispatch(authSetToken({ token: newToken, userId: decoded?.sub ?? 0 }));
+
             // Retry original request with new token
             const retried = req.clone({
               withCredentials: true,
