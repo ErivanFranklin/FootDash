@@ -139,10 +139,21 @@ CI notes:
 - ✅ **Phase B**: NestJS backend with full feature parity - Complete
 - ✅ **Phase C**: Frontend modularization - Complete
 - ✅ **Phase D**: DevOps consolidation - Complete
-- 🔄 **Phase E**: Cleanup & Enhancements - In Progress
-  - ✅ Database migrations system operational
-  - ✅ Frontend proxy configuration fixed
-  - 🔄 README updates and documentation improvements
+- ✅ **Phase E**: Cleanup & Enhancements - Complete
+- ✅ **Phases 8–12**: Real-time features, gamification, social, AI/ML predictions, payments - Complete
+- ✅ **Phase 13**: Fantasy League, Multi-League Support, Video Highlights, Betting Odds - Complete
+- 🔄 **Phase 14**: Production Readiness (DB migrations, env validation, test coverage) - In Progress
+
+### Phase 13 Major Features
+
+| Feature | Backend Module | Frontend Page |
+|---------|---------------|---------------|
+| Fantasy League | `backend/src/fantasy/` | `/fantasy/home` |
+| Multi-League Support | `backend/src/leagues/` | `/leagues` |
+| Video Highlights | `backend/src/highlights/` | `/highlights` |
+| Betting Odds + Value Bets | `backend/src/odds/` | `/odds` |
+
+See [docs/features/phase-13-features.md](docs/features/phase-13-features.md) for full API documentation, environment variables, and configuration details.
 
 For detailed roadmap, see `docs/migration-roadmap.md` and the Phase E checklist at `docs/phase-e-checklist.md`.
 

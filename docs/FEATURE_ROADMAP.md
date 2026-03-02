@@ -2,7 +2,7 @@
 
 > **Created:** March 1, 2026  
 > **Last Updated:** March 2, 2026  
-> **Status:** Complete (Phases 8-13)  
+> **Status:** Complete (Phases 8-13) — Phase 14 Active  
 
 This document is the single source of truth for all planned features, improvements, and tech-debt items for FootDash. Each item includes scope, priority, effort estimate, and an implementation plan.
 
@@ -16,11 +16,13 @@ This document is the single source of truth for all planned features, improvemen
 | **Phase 11** — Architecture & Quality | ✅ COMPLETE | 11.1-11.7 | `b67e232`, `d64d4a3` |
 | **Phase 12** — State Management Migration | ✅ COMPLETE | 12.1-12.5 | `dfdd96b` |
 | **Phase 13** — Future Vision | ✅ COMPLETE | 13.1-13.6 | Phase 13 commit |
+| **Phase 14** — Production Readiness | 🔄 IN PROGRESS | 14.1-14.6 | In development |
 
 5. [Phase 11 — Architecture & Quality](#phase-11--architecture--quality)
 6. [Phase 12 — State Management Migration](#phase-12--state-management-migration)
 7. [Phase 13 — Future Vision](#phase-13--future-vision)
-8. [Sprint Calendar](#sprint-calendar)
+8. [Phase 14 — Production Readiness](#phase-14--production-readiness)
+9. [Sprint Calendar](#sprint-calendar)
 
 ---
 
@@ -1401,3 +1403,148 @@ Frontend:
 | **9** | Jun 22 - Jul 05 | **Phase 13.2 (Fantasy League — Frontend) + 13.4 (Capacitor)** |
 | **10** | Jul 06 - Jul 19 | **Phase 13.5 (Highlights) + 13.6 (Odds) + Beta** |
 | **11** | Jul 20 - Aug 02 | Buffer / App Store Submission / v2.0 Release |
+| **12** | Aug 03 - Aug 16 | **Phase 14.1 (Migrations) + 14.2 (Env Validation)** |
+| **13** | Aug 17 - Aug 30 | **Phase 14.3 (Backend Tests) + 14.4 (Frontend Tests)** |
+| **14** | Aug 31 - Sep 13 | **Phase 14.5 (ML Integration Tests) + 14.6 (Docs & Deploy)** |
+
+---
+
+## Phase 14 — Production Readiness
+
+> **Status:** 🔄 IN PROGRESS  
+> **Goal:** Ensure all Phase 13 features are production-safe with proper database migrations, configuration validation, unit/integration tests, API rate limiting, and documentation.
+
+---
+
+### 14.1 — Database Migrations 🔴 P0
+
+**Problem:** The five new entity groups (`fantasy_*`, `leagues`, `highlights`, `odds`) have no TypeORM migrations. Running in production with `synchronize: true` is unsafe — it risks data-destroying schema changes.
+
+**Scope:** Backend  
+**Effort:** 1 day  
+**Branch:** `fix/phase14-migrations`
+
+**Tasks:**
+1. Create migration for Fantasy League tables (`fantasy_leagues`, `fantasy_teams`, `fantasy_rosters`, `fantasy_gameweeks`, `fantasy_points`)
+2. Create migration for `leagues` table
+3. Create migration for `highlights` table
+4. Create migration for `odds` table
+
+#### Acceptance Criteria
+- [x] `npx typeorm migration:run` applies all four migrations cleanly on a fresh DB
+- [x] Each migration has a matching `down()` that reverts cleanly
+- [x] No `synchronize: true` dependency for Phase 13 tables
+
+---
+
+### 14.2 — Environment Variable Validation 🔴 P0
+
+**Problem:** `YOUTUBE_API_KEY`, `ODDS_API_KEY`, and `ML_SERVICE_URL` are consumed by services but never declared in Joi validation schema in `app.module.ts`, so misconfiguration is silently ignored.
+
+**Scope:** Backend  
+**Effort:** 1 hour  
+**Branch:** `fix/phase14-env-validation`
+
+**Tasks:**
+1. Add `YOUTUBE_API_KEY` (optional, warn if missing)
+2. Add `ODDS_API_KEY` (optional, warn if missing)
+3. Add `ML_SERVICE_URL` (required in production)
+4. Update `.env.example` and `docker-compose.yml` with new variables
+
+#### Acceptance Criteria
+- [x] Backend fails to start in production if `ML_SERVICE_URL` is unset
+- [x] `YOUTUBE_API_KEY` / `ODDS_API_KEY` are optional with defaults logging a warning
+- [x] `.env.example` documents all new Phase 13 variables
+- [x] `docker-compose.yml` passes `ML_SERVICE_URL` to the backend service
+
+---
+
+### 14.3 — Backend Unit Tests 🟡 P1
+
+**Problem:** No unit tests exist for `FantasyLeagueService`, `LeagueService`, `HighlightsService`, or `OddsService`. Critical business logic (invite codes, value-bet edge detection, mock seeding) is untested.
+
+**Scope:** Backend  
+**Effort:** 2 days  
+**Branch:** `test/phase14-backend`
+
+**Test targets (per service):**
+- `FantasyLeagueService`: `createLeague`, `joinLeague`, `getStandings`, `makeTransfer`
+- `LeagueService`: `findAll`, `findFeatured`, `seedIfEmpty`
+- `HighlightsService`: `findAll`, `search`, `incrementView`, `seedMockIfEmpty`
+- `OddsService`: `findByMatch`, `getValueBets`, `extractMarkets`, `seedMockIfEmpty`
+
+#### Acceptance Criteria
+- [x] Each new service has a `.spec.ts` file with at least 5 meaningful tests
+- [x] Value bet edge calculation is tested with known inputs and expected outputs
+- [x] Fantasy invite-code generation produces unique 8-char alphanumeric codes
+- [x] Mock seed methods are idempotent (running twice doesn't duplicate data)
+- [x] All new tests pass in CI (`npx jest --no-coverage`)
+
+---
+
+### 14.4 — Frontend Component Tests 🟡 P1
+
+**Problem:** The seven new Angular/Ionic pages (`FantasyHomePage`, `FantasyLeaguePage`, `FantasyTeamPage`, `LeaguesPage`, `LeagueStandingsPage`, `HighlightsPage`, `OddsPage`) have no Karma/Jest spec files.
+
+**Scope:** Frontend  
+**Effort:** 2 days  
+**Branch:** `test/phase14-frontend`
+
+**Test targets:**
+- `FantasyHomePage`: renders empty state, opens create/join modals
+- `FantasyLeaguePage`: switches tabs, renders standings list
+- `LeaguesPage`: groups leagues into featured/other, navigates on click
+- `HighlightsPage`: calls `/highlights` on init, formats duration correctly
+- `OddsPage`: groups odds by match, highlights best odds column
+
+#### Acceptance Criteria
+- [x] Each page has a `.spec.ts` with at least 3 meaningful tests
+- [x] `HttpClientTestingModule` used for all HTTP calls
+- [x] `formatDuration` helper is unit-tested with edge cases (0s, 90s, 3600s)
+- [x] All frontend tests pass (`npx ng test --watch=false`)
+
+---
+
+### 14.5 — Throttling & ML Integration Tests 🟡 P1
+
+**Problem:** ML prediction endpoints and external API proxy routes have no rate limiting beyond the global 100 req/min. Heavy callers can exhaust third-party API quotas. No integration tests verify the NestJS → FastAPI call chain.
+
+**Scope:** Backend  
+**Effort:** 1 day  
+**Branch:** `test/phase14-ml-integration`
+
+**Tasks:**
+1. Add `@Throttle` overrides to ML, Highlights, and Odds endpoints (stricter per-IP limits)
+2. Write NestJS integration tests for `PredictionsController` (mock `MLPredictionService`)
+3. Write Python integration test that calls real FastAPI with a mock payload (verifies API contract)
+
+#### Acceptance Criteria
+- [x] ML endpoints throttled to 30 req/min per IP
+- [x] Highlights sync throttled to 10 req/min per IP
+- [x] Odds sync throttled to 20 req/min per IP
+- [x] NestJS controller tests mock ML service and verify response shape
+- [x] FastAPI integration test verifies `/predict`, `/predict/btts`, `/predict/over-under` with valid inputs
+
+---
+
+### 14.6 — Documentation & Deployment Config 🟢 P2
+
+**Problem:** No end-user or developer documentation exists for the Phase 13 features. Docker production config doesn't include new services; `.env.example` is stale.
+
+**Scope:** Docs + DevOps  
+**Effort:** 1 day  
+**Branch:** `docs/phase14`
+
+**Tasks:**
+1. Update `.env.example` with all Phase 13 variables and comments
+2. Update `docker-compose.yml` to ensure `ML_SERVICE_URL` is wired
+3. Add `docs/features/phase-13-features.md` with user/admin guide for Fantasy, Highlights, Odds
+4. Add Swagger `@ApiResponse` decorators to new controllers
+5. Update `README.md` with new feature list and setup steps
+
+#### Acceptance Criteria
+- [x] `.env.example` documents every env var introduced in Phase 13
+- [x] `docs/features/phase-13-features.md` covers all 6 Phase 13 features
+- [x] All new controllers have `@ApiResponse` decorators for 200 and error cases
+- [x] `README.md` feature list is up to date
+- [x] `docker compose up` succeeds with the updated compose file

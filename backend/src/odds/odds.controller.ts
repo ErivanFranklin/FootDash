@@ -8,6 +8,7 @@ import {
   DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OddsService } from './odds.service';
 
@@ -15,6 +16,7 @@ import { OddsService } from './odds.service';
 @Controller('odds')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
+@Throttle({ default: { ttl: 60_000, limit: 20 } })
 export class OddsController {
   constructor(private readonly service: OddsService) {}
 

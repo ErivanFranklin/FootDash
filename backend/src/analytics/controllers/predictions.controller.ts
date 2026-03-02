@@ -13,6 +13,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { MatchPredictionService } from '../services/match-prediction.service';
 import { PredictionStrategyService } from '../services/prediction-strategy.service';
@@ -23,6 +24,7 @@ import { PredictionResultDto } from '../dto/prediction-result.dto';
 @Controller('analytics')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
+@Throttle({ default: { ttl: 60_000, limit: 30 } })
 export class PredictionsController {
   constructor(
     private readonly predictionService: MatchPredictionService,

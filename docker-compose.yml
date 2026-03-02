@@ -30,6 +30,9 @@ services:
       - FOOTBALL_API_URL=https://v3.football.api-sports.io
       - FOOTBALL_API_KEY=86fab59f8a111466351853e50973561c
       - FOOTBALL_API_MOCK=true
+      # Phase 13 external API keys (optional — services fall back to mock data when not set)
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - ODDS_API_KEY=${ODDS_API_KEY:-}
     ports:
       - "4000:4000"
     depends_on:

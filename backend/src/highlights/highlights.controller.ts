@@ -9,6 +9,7 @@ import {
   DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { HighlightsService } from './highlights.service';
 
@@ -16,6 +17,7 @@ import { HighlightsService } from './highlights.service';
 @Controller('highlights')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
+@Throttle({ default: { ttl: 60_000, limit: 10 } })
 export class HighlightsController {
   constructor(private readonly service: HighlightsService) {}
 

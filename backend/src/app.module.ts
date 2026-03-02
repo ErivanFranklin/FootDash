@@ -73,6 +73,15 @@ const isProd = process.env.NODE_ENV === 'production';
         SMTP_USER: Joi.string().allow('').default(''),
         SMTP_PASS: Joi.string().allow('').default(''),
         MAIL_FROM: Joi.string().default('"FootDash" <noreply@footdash.app>'),
+        // ML Service
+        ML_SERVICE_URL: Joi.string().uri().when('$env', {
+          is: 'production',
+          then: Joi.required(),
+          otherwise: Joi.string().uri().default('http://localhost:8000'),
+        }),
+        // Phase 13 optional external API keys
+        YOUTUBE_API_KEY: Joi.string().optional().allow(''),
+        ODDS_API_KEY: Joi.string().optional().allow(''),
       }),
     }),
     ScheduleModule.forRoot(),
