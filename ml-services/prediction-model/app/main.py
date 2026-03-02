@@ -71,6 +71,49 @@ class PredictionRequest(BaseModel):
     home_recent_form: Optional[List[str]] = None  # ['W', 'L', 'D', 'W', 'W']
     away_recent_form: Optional[List[str]] = None
 
+class BttsRequest(BaseModel):
+    """Request model for BTTS prediction."""
+    home_goals_avg: float
+    away_goals_avg: float
+    home_goals_conceded_avg: float
+    away_goals_conceded_avg: float
+    home_form_rating: float
+    away_form_rating: float
+    league_id: int
+    season: str
+
+class OverUnderRequest(BaseModel):
+    """Request model for Over/Under prediction."""
+    home_goals_avg: float
+    away_goals_avg: float
+    home_goals_conceded_avg: float
+    away_goals_conceded_avg: float
+    home_form_rating: float
+    away_form_rating: float
+    league_id: int
+    season: str
+    line: float = 2.5  # Over/Under line (default 2.5)
+
+class BatchPredictionRequest(BaseModel):
+    """Request model for batch predictions."""
+    matches: List[PredictionRequest]
+
+class BttsResponse(BaseModel):
+    """Response model for BTTS prediction."""
+    btts_yes_probability: float
+    btts_no_probability: float
+    confidence: str
+    model_version: str
+
+class OverUnderResponse(BaseModel):
+    """Response model for Over/Under prediction."""
+    over_probability: float
+    under_probability: float
+    line: float
+    expected_total_goals: float
+    confidence: str
+    model_version: str
+
 class PredictionResponse(BaseModel):
     """Response model for match prediction."""
     home_win_probability: float
@@ -182,6 +225,144 @@ async def reload_model():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Model reload failed: {str(e)}"
         )
+
+
+# ── BTTS Prediction ───────────────────────────────────────────────────────────
+
+@app.post("/predict/btts", response_model=BttsResponse, tags=["Predictions"])
+async def predict_btts(request: BttsRequest):
+    """Predict Both Teams To Score probability."""
+    try:
+        # Calculate BTTS probability from goal-scoring and conceding averages
+        home_scoring_rate = request.home_goals_avg
+        away_scoring_rate = request.away_goals_avg
+        home_concede_rate = request.home_goals_conceded_avg
+        away_concede_rate = request.away_goals_conceded_avg
+
+        # Expected goals for each side (attack meets defence)
+        home_expected = (home_scoring_rate + away_concede_rate) / 2
+        away_expected = (away_scoring_rate + home_concede_rate) / 2
+
+        # Poisson-based probability of scoring at least 1
+        import math
+        p_home_scores = 1 - math.exp(-home_expected)
+        p_away_scores = 1 - math.exp(-away_expected)
+
+        btts_yes = round(p_home_scores * p_away_scores * 100, 2)
+        btts_no = round(100 - btts_yes, 2)
+
+        confidence = "high" if abs(btts_yes - 50) > 20 else ("medium" if abs(btts_yes - 50) > 10 else "low")
+
+        return BttsResponse(
+            btts_yes_probability=btts_yes,
+            btts_no_probability=btts_no,
+            confidence=confidence,
+            model_version=predictor.version if predictor else "statistical-1.0"
+        )
+    except Exception as e:
+        logger.error(f"BTTS prediction failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Over/Under Prediction ────────────────────────────────────────────────────
+
+@app.post("/predict/over-under", response_model=OverUnderResponse, tags=["Predictions"])
+async def predict_over_under(request: OverUnderRequest):
+    """Predict Over/Under total goals probability."""
+    try:
+        import math
+
+        home_expected = (request.home_goals_avg + request.away_goals_conceded_avg) / 2
+        away_expected = (request.away_goals_avg + request.home_goals_conceded_avg) / 2
+        expected_total = home_expected + away_expected
+
+        # Poisson CDF for total goals ≤ line
+        lam = expected_total
+        line = request.line
+        # P(X ≤ floor(line)) using Poisson CDF
+        k = int(line)
+        p_under = sum((lam ** i) * math.exp(-lam) / math.factorial(i) for i in range(k + 1))
+        p_over = 1 - p_under
+
+        over_pct = round(p_over * 100, 2)
+        under_pct = round(p_under * 100, 2)
+
+        confidence = "high" if abs(over_pct - 50) > 20 else ("medium" if abs(over_pct - 50) > 10 else "low")
+
+        return OverUnderResponse(
+            over_probability=over_pct,
+            under_probability=under_pct,
+            line=line,
+            expected_total_goals=round(expected_total, 2),
+            confidence=confidence,
+            model_version=predictor.version if predictor else "statistical-1.0"
+        )
+    except Exception as e:
+        logger.error(f"Over/Under prediction failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Batch Prediction ─────────────────────────────────────────────────────────
+
+@app.post("/predict/batch", tags=["Predictions"])
+async def predict_batch(request: BatchPredictionRequest):
+    """Generate predictions for multiple matches at once."""
+    if predictor is None or feature_engineer is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="ML model not available."
+        )
+
+    results = []
+    for match_req in request.matches:
+        try:
+            features = feature_engineer.engineer_features(match_req)
+            result = predictor.predict(features)
+            probs = result['probabilities']
+            confidence = _determine_confidence(probs)
+            results.append({
+                "home_win_probability": round(probs[0] * 100, 2),
+                "draw_probability": round(probs[1] * 100, 2),
+                "away_win_probability": round(probs[2] * 100, 2),
+                "confidence": confidence,
+                "model_version": predictor.version,
+                "status": "success"
+            })
+        except Exception as e:
+            results.append({"status": "error", "error": str(e)})
+
+    return {"predictions": results, "total": len(results)}
+
+
+# ── Model Metrics ────────────────────────────────────────────────────────────
+
+@app.get("/model/metrics", tags=["Model"])
+async def get_model_metrics():
+    """Get model performance metrics."""
+    if predictor is None:
+        raise HTTPException(status_code=503, detail="ML model not available")
+
+    return {
+        "version": predictor.version,
+        "algorithm": predictor.algorithm,
+        "overall_accuracy": predictor.accuracy,
+        "markets": {
+            "outcome": {
+                "accuracy": predictor.accuracy,
+                "description": "Home/Draw/Away outcome prediction"
+            },
+            "btts": {
+                "accuracy": None,
+                "description": "Both Teams To Score — Poisson-based statistical model"
+            },
+            "over_under": {
+                "accuracy": None,
+                "description": "Over/Under goals — Poisson-based statistical model"
+            }
+        },
+        "training_info": predictor.training_info,
+        "feature_count": len(predictor.feature_names)
+    }
 
 def _determine_confidence(probabilities: List[float]) -> str:
     """Determine confidence level based on prediction probabilities."""

@@ -49,6 +49,7 @@ import { DataExportController } from './controllers/data-export.controller';
     TeamAnalyticsService,
     PredictionStrategyService,
     DataExportService,
+    MLPredictionService,
   ],
 })
 export class AnalyticsModule {}

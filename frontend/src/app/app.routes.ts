@@ -119,6 +119,41 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'leagues',
+    loadComponent: () => import('./features/leagues/pages/leagues.page').then(m => m.LeaguesPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'leagues/:id/standings',
+    loadComponent: () => import('./features/leagues/pages/league-standings.page').then(m => m.LeagueStandingsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'fantasy',
+    loadComponent: () => import('./features/fantasy/pages/fantasy-home.page').then(m => m.FantasyHomePage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'fantasy/league/:id',
+    loadComponent: () => import('./features/fantasy/pages/fantasy-league.page').then(m => m.FantasyLeaguePage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'fantasy/league/:id/team/:teamId',
+    loadComponent: () => import('./features/fantasy/pages/fantasy-team.page').then(m => m.FantasyTeamPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'highlights',
+    loadComponent: () => import('./features/highlights/pages/highlights.page').then(m => m.HighlightsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'odds',
+    loadComponent: () => import('./features/odds/pages/odds.page').then(m => m.OddsPage),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: '404',
   },

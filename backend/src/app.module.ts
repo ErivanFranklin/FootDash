@@ -23,6 +23,10 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ExportModule } from './export/export.module';
 import { HealthModule } from './health/health.module';
+import { FantasyModule } from './fantasy/fantasy.module';
+import { LeagueModule } from './leagues/league.module';
+import { HighlightsModule } from './highlights/highlights.module';
+import { OddsModule } from './odds/odds.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -89,6 +93,10 @@ const isProd = process.env.NODE_ENV === 'production';
     DashboardModule,
     ExportModule,
     HealthModule,
+    FantasyModule,
+    LeagueModule,
+    HighlightsModule,
+    OddsModule,
   ],
   controllers: [AppController],
   providers: [
