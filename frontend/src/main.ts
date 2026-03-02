@@ -16,6 +16,16 @@ import { GlobalErrorHandler } from './app/core/handlers/global-error.handler';
 import { AppConfigService } from './app/core/services/app-config.service';
 import { AuthService } from './app/core/services/auth.service';
 import { environment } from './environments/environment';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { authReducer, authFeatureKey } from './app/store/auth/auth.reducer';
+import {
+  loginEffect,
+  registerEffect,
+  logoutEffect,
+  restoreSessionEffect,
+} from './app/store/auth/auth.effects';
 
 // Configure ionicons to load assets from CDN (ensures getAssetPath works in dev/prod)
 setAssetPath('https://cdn.jsdelivr.net/npm/ionicons/dist/');
@@ -68,7 +78,15 @@ bootstrapApplication(AppComponent, {
     provideServiceWorker('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
-    })
+    }),
+    // ─── NgRx Store ─────────────────────────────────────────────────────────
+    provideStore({ [authFeatureKey]: authReducer }),
+    provideEffects({ loginEffect, registerEffect, logoutEffect, restoreSessionEffect }),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: environment.production,
+      connectInZone: true,
+    }),
   ],
 }).catch(err => {
   console.error("ERROR-> ", err);
