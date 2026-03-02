@@ -1,19 +1,22 @@
 # FootDash — Feature Roadmap & Implementation Plans
 
 > **Created:** March 1, 2026  
-> **Last Updated:** March 1, 2026  
-> **Status:** In Progress (Phase 8 Complete)  
+> **Last Updated:** March 2, 2026  
+> **Status:** In Progress (Phases 8-12 Complete)  
 
 This document is the single source of truth for all planned features, improvements, and tech-debt items for FootDash. Each item includes scope, priority, effort estimate, and an implementation plan.
 
----
+## Completion Overview
 
-## Table of Contents
+| Phase | Status | Items | Commit |
+|-------|--------|-------|--------|
+| **Phase 8** — Critical Tech Debt | ✅ COMPLETE | 8.1-8.7 | Multiple commits |
+| **Phase 9** — Core Missing Features | ✅ COMPLETE | 9.1-9.6 | Multiple commits |
+| **Phase 10** — Engagement & Polish | ✅ COMPLETE | 10.1-10.6 | Multiple commits |
+| **Phase 11** — Architecture & Quality | ✅ COMPLETE | 11.1-11.7 | `b67e232`, `d64d4a3` |
+| **Phase 12** — State Management Migration | ✅ COMPLETE | 12.1-12.5 | `dfdd96b` |
+| **Phase 13** — Future Vision | 🔄 PLANNED | 13.1-13.6 | Research phase |
 
-1. [Priority Legend](#priority-legend)
-2. [Phase 8 — Critical Tech Debt](#phase-8--critical-tech-debt)
-3. [Phase 9 — Core Missing Features](#phase-9--core-missing-features)
-4. [Phase 10 — Engagement & Polish](#phase-10--engagement--polish)
 5. [Phase 11 — Architecture & Quality](#phase-11--architecture--quality)
 6. [Phase 12 — State Management Migration](#phase-12--state-management-migration)
 7. [Phase 13 — Future Vision](#phase-13--future-vision)
@@ -541,7 +544,7 @@ Frontend:
 
 ---
 
-### 10.1 — Badge & Achievement System 🟠 P1
+### 10.1 — Badge & Achievement System ✅ DONE
 
 **Problem:** `Badge` and `Leaderboard` entities are registered in the backend but completely unused. The gamification module only handles predictions.
 
@@ -613,7 +616,7 @@ Frontend:
 
 ---
 
-### 10.2 — Live Match Chat Enhancements 🟡 P2
+### 10.2 — Live Match Chat Enhancements ✅ DONE
 
 **Problem:** Match chat exists but is basic — text-only, no moderation, no context.
 
@@ -636,7 +639,7 @@ Frontend:
 
 ---
 
-### 10.3 — Match Lineups & Player Stats 🟡 P2
+### 10.3 — Match Lineups & Player Stats ✅ DONE
 
 **Problem:** Match detail page shows scores and basic info but no lineups or player data.
 
@@ -685,7 +688,7 @@ Frontend:
 
 ---
 
-### 10.4 — Favorites & Personalized Dashboard 🟡 P2
+### 10.4 — Favorites & Personalized Dashboard ✅ DONE
 
 **Problem:** Dashboard shows generic match data. No way to follow specific teams/leagues for a personalized experience.
 
@@ -727,7 +730,7 @@ Frontend:
 
 ---
 
-### 10.5 — Data Export & Social Sharing 🔵 P3
+### 10.5 — Data Export & Social Sharing ✅ DONE
 
 **Problem:** Backend has `DataExportController` but no frontend. Users can't share their predictions or stats.
 
@@ -749,7 +752,7 @@ Frontend:
 
 ---
 
-### 10.6 — Offline Mode & Caching Strategy 🔵 P3
+### 10.6 — Offline Mode & Caching Strategy ✅ DONE
 
 **Problem:** PWA shell caches assets but no API data. App is blank when offline.
 
@@ -782,7 +785,7 @@ Frontend:
 
 ---
 
-### 11.1 — Rate Limiting 🟠 P1
+### 11.1 — Rate Limiting ✅ DONE
 
 **Problem:** No rate limiting on any endpoint. Auth endpoints and payment APIs are unprotected against brute force.
 
@@ -802,13 +805,13 @@ Frontend:
 4. Return `429 Too Many Requests` with `Retry-After` header
 
 #### Acceptance Criteria
-- [ ] Brute-force login attempts are blocked after 5 tries
-- [ ] Global default is 100 req/min per IP
-- [ ] 429 responses include `Retry-After` header
+- [x] Brute-force login attempts are blocked after 5 tries
+- [x] Global default is 100 req/min per IP
+- [x] 429 responses include `Retry-After` header
 
 ---
 
-### 11.2 — Health Check Endpoint 🟠 P1
+### 11.2 — Health Check Endpoint ✅ DONE
 
 **Problem:** No `/health` endpoint for container orchestration probes.
 
@@ -828,13 +831,13 @@ Frontend:
 5. Update deployment workflow smoke tests to hit `/health`
 
 #### Acceptance Criteria
-- [ ] `GET /health` returns `{ status: 'ok', details: {...} }`
-- [ ] Returns 503 if DB is unreachable
-- [ ] Docker compose uses the health endpoint
+- [x] `GET /health` returns `{ status: 'ok', details: {...} }`
+- [x] Returns 503 if DB is unreachable
+- [x] Docker compose uses the health endpoint
 
 ---
 
-### 11.3 — Test Coverage Improvement 🟡 P2
+### 11.3 — Test Coverage Improvement ✅ DONE
 
 **Problem:** Coverage thresholds are 30%. Several critical modules (payments, gamification, social services, WebSocket gateways) have zero tests.
 
@@ -869,7 +872,7 @@ Frontend:
 
 ---
 
-### 11.4 — Shared `@CurrentUser()` Decorator 🟡 P2
+### 11.4 — Shared `@CurrentUser()` Decorator ✅ DONE
 
 **Problem:** `CurrentUser` param decorator is defined inline in `payments.controller.ts` instead of being in `common/`.
 
@@ -886,7 +889,7 @@ Frontend:
 
 ---
 
-### 11.5 — Event-Driven Gamification Scoring 🟡 P2
+### 11.5 — Event-Driven Gamification Scoring ✅ DONE
 
 **Problem:** `gamification.scheduler.ts` runs every 60 seconds querying all unscored predictions — wasteful at scale.
 
@@ -904,7 +907,7 @@ Frontend:
 
 ---
 
-### 11.6 — Centralized State Management Evaluation 🔵 P3
+### 11.6 — Centralized State Management Evaluation ✅ DONE
 
 **Scope:** Frontend  
 **Effort:** Research 2-3 days, migration 1-2 weeks  
@@ -921,7 +924,7 @@ Currently the app uses a mix of Signals, BehaviorSubjects, and component-local s
 
 ---
 
-### 11.7 — Strong Typing Cleanup 🔵 P3
+### 11.7 — Strong Typing Cleanup ✅ DONE
 
 **Problem:** Heavy use of `any` types across the frontend (match objects, API responses).
 
