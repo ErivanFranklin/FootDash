@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { MatchDetailsPage } from './match-details.page';
@@ -16,7 +17,7 @@ describe('MatchDetailsPage', () => {
   beforeEach(async () => {
     const wsSpy = jasmine.createSpyObj('WebSocketService', [
       'subscribeToMatch',
-      'unsubscribefromMatch',
+      'unsubscribeFromMatch',
       'connectionStatus',
       'onMatchUpdate'
     ]);
@@ -26,7 +27,11 @@ describe('MatchDetailsPage', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [MatchDetailsPage, TranslocoTestingModule.forRoot({ langs: { en: {}, es: {} }, translocoConfig: { availableLangs: ['en', 'es'], defaultLang: 'en' } })],
+      imports: [
+        MatchDetailsPage, 
+        HttpClientTestingModule,
+        TranslocoTestingModule.forRoot({ langs: { en: {}, es: {} }, translocoConfig: { availableLangs: ['en', 'es'], defaultLang: 'en' } })
+      ],
       providers: [
         { provide: WebSocketService, useValue: wsSpy },
         { provide: ApiService, useValue: apiSpy },
@@ -136,7 +141,7 @@ describe('MatchDetailsPage', () => {
       component.ngOnInit();
       component.ngOnDestroy();
 
-      expect(mockWebSocketService.unsubscribefromMatch).toHaveBeenCalledWith(123);
+      expect(mockWebSocketService.unsubscribeFromMatch).toHaveBeenCalledWith(123);
     });
   });
 });

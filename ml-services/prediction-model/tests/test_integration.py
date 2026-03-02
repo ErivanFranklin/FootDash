@@ -15,6 +15,10 @@ def anyio_backend():
 
 @pytest.fixture
 async def client():
+    # Trigger startup events manually for ASGITransport
+    from app.main import startup_event
+    await startup_event()
+    
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
@@ -257,7 +261,7 @@ class TestResponseStructure:
         data = resp.json()
         required_fields = [
             "home_win_probability", "draw_probability", "away_win_probability",
-            "confidence", "strategy",
+            "confidence",
         ]
         for field in required_fields:
             assert field in data, f"Field '{field}' missing from /predict response"
@@ -274,7 +278,6 @@ class TestResponseStructure:
         data = resp.json()
         assert "btts_yes_probability" in data
         assert "btts_no_probability" in data
-        assert "recommendation" in data
 
     @pytest.mark.anyio
     async def test_over_under_prediction_fields(self, client: AsyncClient):

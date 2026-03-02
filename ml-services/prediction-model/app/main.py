@@ -47,9 +47,18 @@ async def startup_event():
         feature_engineer = FeatureEngineer()
         logger.info("ML prediction service started successfully")
     except Exception as e:
-        logger.error(f"Failed to load model: {e}")
-        predictor = None
-        feature_engineer = None
+        logger.error(f"Failed to load model during startup: {e}")
+        # Use explicit component class names to avoid assignment issues
+        from models.match_predictor import MatchPredictor as MP
+        from models.feature_engineer import FeatureEngineer as FE
+        try:
+            predictor = MP()
+            feature_engineer = FE()
+            logger.info("Initialized fallback predictor after startup error")
+        except Exception as inner_e:
+            logger.error(f"Critical failure: could not load fallback: {inner_e}")
+            predictor = None
+            feature_engineer = None
 
 class PredictionRequest(BaseModel):
     """Request model for match prediction."""

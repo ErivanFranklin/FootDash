@@ -36,14 +36,25 @@ describe('HighlightsPage', () => {
   describe('ngOnInit', () => {
     it('calls GET /highlights on init and populates highlights signal', () => {
       const items = [
-        { id: 1, title: 'Arsenal Goals', homeTeam: 'Arsenal', awayTeam: 'Chelsea', matchDate: '2025-01-01', viewCount: 100, source: 'YouTube', duration: 90, videoUrl: '' },
+        { 
+          id: 1, 
+          title: 'Arsenal Goals', 
+          homeTeam: 'Arsenal', 
+          awayTeam: 'Chelsea', 
+          matchDate: '2025-01-01', 
+          viewCount: 100, 
+          source: 'YouTube', 
+          duration: 90, 
+          videoUrl: '', 
+          thumbnailUrl: 'thumb' 
+        } as any,
       ];
       fixture.detectChanges(); // triggers ngOnInit
       const req = httpMock.expectOne(`${API}?page=1&limit=20`);
       expect(req.request.method).toBe('GET');
       req.flush(items);
 
-      expect(component.highlights()).toEqual(items);
+      expect(component.highlights()).toEqual(items as any);
     });
 
     it('sets loading to false after response', () => {

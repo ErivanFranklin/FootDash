@@ -90,13 +90,14 @@ describe('LeaguesPage', () => {
       fixture.detectChanges();
       httpMock.expectOne(API).flush([]);
 
-      const mockEvent = { target: { complete: jest.fn() } };
+      let completed = false;
+      const mockEvent = { target: { complete: () => { completed = true; } } };
       component.refresh(mockEvent);
       httpMock.expectOne(API).flush([]);
 
       // complete is called inside setTimeout(500)
       setTimeout(() => {
-        expect(mockEvent.target.complete).toHaveBeenCalled();
+        expect(completed).toBe(true);
         done();
       }, 600);
     });

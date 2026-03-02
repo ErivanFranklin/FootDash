@@ -15,7 +15,7 @@ describe('LeagueStandingsPage', () => {
   let httpMock: HttpTestingController;
 
   const mockRoute = {
-    snapshot: { paramMap: { get: jest.fn().mockReturnValue('39') } },
+    snapshot: { paramMap: { get: () => '39' } },
   };
 
   beforeEach(async () => {
