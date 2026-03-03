@@ -35,27 +35,21 @@ export class GamificationScheduler {
 
     const pendingMatchIds = [...new Set(pendingPredictions.map((p) => p.matchId))];
 
-    if (pendingMatchIds.length === 0) {
-      return;
-    }
-
-    // 2. Load those matches, filter for FINISHED status
-    const matches = await this.matchesRepository.findByIds(pendingMatchIds);
-    const finishedMatches = matches.filter(
-      (m) => m.status === 'FINISHED' || m.status === 'FT',
-    );
-
-    if (finishedMatches.length === 0) {
-      return;
-    }
-
-    this.logger.log(`Found ${finishedMatches.length} finished matches to process.`);
-
-    // 3. Process each match and check badges for affected users
     const affectedUserIds = new Set<number>();
 
-    for (const match of finishedMatches) {
-        if (match.homeScore != null && match.awayScore != null) {
+    if (pendingMatchIds.length > 0) {
+      // 2. Load those matches, filter for FINISHED status
+      const matches = await this.matchesRepository.findByIds(pendingMatchIds);
+      const finishedMatches = matches.filter(
+        (m) => m.status === 'FINISHED' || m.status === 'FT',
+      );
+
+      if (finishedMatches.length > 0) {
+        this.logger.log(`Found ${finishedMatches.length} finished matches to process.`);
+
+        // 3. Process each match and check badges for affected users
+        for (const match of finishedMatches) {
+          if (match.homeScore != null && match.awayScore != null) {
             // Collect user IDs from predictions for this match
             const matchPredictions = await this.predictionsRepository.find({
               where: { matchId: match.id, points: IsNull() },
@@ -65,7 +59,9 @@ export class GamificationScheduler {
 
             await this.gamificationService.processMatchResult(match.id, match.homeScore, match.awayScore);
             this.logger.log(`Processed results for match ${match.id}`);
+          }
         }
+      }
     }
 
     // 4. Check badges for all affected users
@@ -78,6 +74,14 @@ export class GamificationScheduler {
           this.logger.error(`Badge check failed for user ${userId}: ${(err as Error).message}`);
         }
       }
+
+    }
+
+    // 5. Keep leaderboard snapshots fresh every scheduler run
+    try {
+      await this.gamificationService.rebuildLeaderboards(['weekly', 'monthly', 'all-time']);
+    } catch (err) {
+      this.logger.error(`Leaderboard rebuild failed: ${(err as Error).message}`);
     }
   }
 }

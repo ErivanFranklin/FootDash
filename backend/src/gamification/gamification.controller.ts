@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GamificationService } from './gamification.service';
 import { BadgeService } from './badge.service';
@@ -47,5 +47,17 @@ export class GamificationController {
   async checkBadges(@CurrentUser() user: { sub: number }) {
     const newBadges = await this.badgeService.checkAndAward(user.sub);
     return { success: true, newBadges };
+  }
+
+  @Get('leaderboard')
+  async getLeaderboard(
+    @Query('period') period: 'weekly' | 'monthly' | 'all-time' = 'weekly',
+  ) {
+    return this.gamificationService.getLeaderboard(period);
+  }
+
+  @Post('leaderboard/rebuild')
+  async rebuildLeaderboard() {
+    return this.gamificationService.rebuildLeaderboards(['weekly', 'monthly', 'all-time']);
   }
 }
