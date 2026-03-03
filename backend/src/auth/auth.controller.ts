@@ -42,8 +42,21 @@ function refreshCookieOptions(isProd: boolean) {
   };
 }
 
+/**
+ * Clear any stale refresh_token cookies that may have been set with a
+ * different path (e.g. the old '/api/' path). Without this the browser
+ * sends two cookies and the backend reads the stale one first.
+ */
+function clearLegacyCookies(res: Response, isProd: boolean) {
+  const base = { httpOnly: true, secure: isProd, sameSite: isProd ? 'strict' as const : 'lax' as const };
+  // Previous path values that may still be stored in the browser
+  res.clearCookie('refresh_token', { ...base, path: '/api/' });
+  res.clearCookie('refresh_token', { ...base, path: '/api' });
+}
+
 /** Helper to attach the refresh-token cookie and return only the access token. */
 function sendWithCookie(res: Response, result: AuthResult, isProd: boolean) {
+  clearLegacyCookies(res, isProd);
   res.cookie('refresh_token', result.tokens.refreshToken, refreshCookieOptions(isProd));
   return res.json({
     user: result.user,
@@ -160,8 +173,9 @@ export class AuthController {
   ): Promise<any> {
     const token = req.cookies?.refresh_token || dto.refreshToken;
     await this.authService.revoke(token);
-    // Clear the cookie
+    // Clear the cookie (both current and legacy paths)
     const isProd = process.env.NODE_ENV === 'production';
+    clearLegacyCookies(res, isProd);
     res.clearCookie('refresh_token', refreshCookieOptions(isProd));
     return res.json({ message: 'Token revoked' });
   }

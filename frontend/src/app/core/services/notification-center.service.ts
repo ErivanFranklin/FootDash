@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, map, tap, catchError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { WebSocketService, SocialEvent } from './web-socket.service';
+import { AuthService } from './auth.service';
 
 export enum AlertType {
   FOLLOWER = 'follower',
@@ -39,6 +40,7 @@ export interface AlertsPage {
 export class NotificationCenterService {
   private http = inject(HttpClient);
   private ws = inject(WebSocketService);
+  private authService = inject(AuthService);
 
   private apiUrl = `${environment.apiBaseUrl || ''}/alerts`;
 
@@ -60,10 +62,18 @@ export class NotificationCenterService {
   }
 
   loadUnreadCount(): void {
-    this.getUnreadAlerts(1).subscribe(alerts => {
+    // Guard: don't poll when user is not authenticated
+    if (!this.authService.isAuthenticated()) {
+      return;
+    }
+    this.getUnreadAlerts(1).pipe(
+      catchError(() => of([] as Alert[])),
+    ).subscribe(alerts => {
       // The backend returns unread alerts — use the array length as a count
       // For a precise count we use the by-type endpoint
-      this.getCountsByType().subscribe(counts => {
+      this.getCountsByType().pipe(
+        catchError(() => of({} as Record<string, number>)),
+      ).subscribe(counts => {
         const total = Object.values(counts).reduce((sum: number, c: number) => sum + c, 0);
         this.unreadCountSubject.next(total);
       });
