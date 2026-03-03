@@ -10,7 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ToastController, AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline } from 'ionicons/icons';
+import { cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline, globeOutline, timeOutline } from 'ionicons/icons';
 
 import { AuthService } from '../../core/services/auth.service';
 import { UserSettingsService, UserProfile, UserPreferences } from '../../core/services/user-settings.service';
@@ -65,7 +65,7 @@ import { LoggerService } from '../../core/services/logger.service';
             <div class="avatar-section">
               <ion-avatar class="avatar-lg">
                 @if (profile?.avatarUrl) {
-                  <img [src]="profile!.avatarUrl" alt="avatar" />
+                  <img [src]="profile!.avatarUrl" alt="" (error)="onAvatarError()" />
                 } @else {
                   <ion-icon name="person-outline" class="avatar-placeholder"></ion-icon>
                 }
@@ -113,16 +113,18 @@ import { LoggerService } from '../../core/services/logger.service';
                   <ion-select-option value="auto">Auto (System)</ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-item>
+              <ion-item class="language-item">
                 <ion-icon name="globe-outline" slot="start"></ion-icon>
-                <ion-select label="Language" [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()">
+                <ion-label>Language</ion-label>
+                <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()">
                   <ion-select-option value="en">English (US)</ion-select-option>
                   <ion-select-option value="es">Español</ion-select-option>
                   <ion-select-option value="pt">Português (BR)</ion-select-option>
                 </ion-select>
               </ion-item>
               <ion-item>
-                <ion-label>Timezone</ion-label>
+                <ion-icon name="time-outline" slot="start"></ion-icon>
+                <ion-label position="stacked">Timezone</ion-label>
                 <ion-input [(ngModel)]="timezone" placeholder="e.g. America/Sao_Paulo"></ion-input>
               </ion-item>
             </ion-list>
@@ -195,9 +197,12 @@ import { LoggerService } from '../../core/services/logger.service';
     .center { display: flex; justify-content: center; padding: 48px 0; }
     .tab-content { padding: 16px; max-width: 600px; margin: 0 auto; }
     .avatar-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
-    .avatar-lg { width: 96px; height: 96px; margin-bottom: 12px; --border-radius: 50%; background: var(--ion-color-light); display: flex; align-items: center; justify-content: center; }
+    .avatar-lg { width: 96px; height: 96px; margin-bottom: 12px; --border-radius: 50%; background: var(--ion-color-light); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .avatar-lg img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     .avatar-placeholder { font-size: 48px; color: var(--ion-color-medium); }
     .avatar-actions { display: flex; gap: 8px; }
+    .language-item ion-label { margin-right: 12px; }
+    .language-item ion-select { min-width: 170px; }
     .save-btn { margin-top: 16px; }
     .notif-note { display: block; padding: 8px 16px; font-size: 13px; }
     .danger-zone { margin-top: 48px; text-align: center; }
@@ -241,7 +246,7 @@ export class SettingsPage implements OnInit {
   private logger = inject(LoggerService);
 
   constructor() {
-    addIcons({ cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline });
+    addIcons({ cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline, globeOutline, timeOutline });
   }
 
   ngOnInit() {
@@ -329,6 +334,12 @@ export class SettingsPage implements OnInit {
       },
       error: () => this.showToast('Failed to remove avatar', 'danger'),
     });
+  }
+
+  onAvatarError() {
+    if (this.profile) {
+      this.profile.avatarUrl = undefined;
+    }
   }
 
   // ─── Preferences ───────────────────────────

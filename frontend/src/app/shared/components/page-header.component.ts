@@ -1,10 +1,11 @@
 import { Component, Input, OnDestroy, inject } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton, IonBackButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { Observable, of, isObservable, BehaviorSubject, from, Subject } from 'rxjs';
 import { takeUntil, finalize, catchError } from 'rxjs/operators';
 import { LoggerService } from '../../core/services/logger.service';
 import { NotificationBellComponent } from './notification-bell.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-page-header',
@@ -13,7 +14,13 @@ import { NotificationBellComponent } from './notification-bell.component';
     <ion-header [translucent]="translucent">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-back-button
+            *ngIf="shouldShowBackButton(); else menuButton"
+            [defaultHref]="defaultBackHref">
+          </ion-back-button>
+          <ng-template #menuButton>
+            <ion-menu-button></ion-menu-button>
+          </ng-template>
         </ion-buttons>
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
@@ -39,11 +46,13 @@ import { NotificationBellComponent } from './notification-bell.component';
       </ion-toolbar>
     </ion-header>
   `,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton, CommonModule, NotificationBellComponent]
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonSpinner, IonMenuButton, IonBackButton, CommonModule, NotificationBellComponent]
 })
 export class PageHeaderComponent implements OnDestroy {
   @Input() title!: string;
   @Input() translucent: boolean = true;
+  @Input() defaultBackHref: string = '/home';
+  @Input() showBackButton?: boolean;
   @Input() actions?: Array<{
     label: string;
     handler: () => void | Promise<void> | Observable<void>;
@@ -60,6 +69,22 @@ export class PageHeaderComponent implements OnDestroy {
   private actionLoadingStates = new Map<number, BehaviorSubject<boolean>>();
   private destroy$ = new Subject<void>();
   private logger = inject(LoggerService);
+  private router = inject(Router);
+
+  shouldShowBackButton(): boolean {
+    if (this.showBackButton !== undefined) {
+      return this.showBackButton;
+    }
+
+    const currentPath = this.router.url.split('?')[0].split('#')[0];
+    const segments = currentPath.split('/').filter(Boolean);
+    const primaryRoutes = new Set(['home', 'teams', 'feed', 'notifications', 'settings']);
+
+    if (segments.length === 0) return false;
+    if (segments.length > 1) return true;
+
+    return !primaryRoutes.has(segments[0]);
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
