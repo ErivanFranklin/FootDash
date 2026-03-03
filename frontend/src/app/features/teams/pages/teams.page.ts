@@ -1,9 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, InfiniteScrollCustomEvent } from '@ionic/angular/standalone';
+import { IonContent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, InfiniteScrollCustomEvent, IonSegment, IonSegmentButton, IonLabel, SegmentCustomEvent } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
+import { FavoritesService } from '../../../services/favorites.service';
 import { PageHeaderComponent, TeamCardComponent } from '../../../shared/components';
 
 @Component({
@@ -11,16 +14,19 @@ import { PageHeaderComponent, TeamCardComponent } from '../../../shared/componen
   standalone: true,
   templateUrl: './teams.page.html',
   styleUrls: ['./teams.page.scss'],
-  imports: [CommonModule, IonContent, PageHeaderComponent, TeamCardComponent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent]
+  imports: [CommonModule, IonContent, PageHeaderComponent, TeamCardComponent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton, IonLabel]
 })
 export class TeamsPage implements OnInit {
   private api = inject(ApiService);
+  private favoritesService = inject(FavoritesService);
   private router = inject(Router);
   private toast = inject(ToastController);
 
   teams: any[] = [];
+  favoriteTeams: any[] = [];
   loading = false;
   syncingTeamIds = new Set<number>();
+  filterMode: 'all' | 'favorites' = 'all';
 
   // Pagination state
   currentPage = 1;
@@ -30,6 +36,10 @@ export class TeamsPage implements OnInit {
 
   ngOnInit() {
     this.loadTeams();
+  }
+
+  get visibleTeams(): any[] {
+    return this.filterMode === 'favorites' ? this.favoriteTeams : this.teams;
   }
 
   loadTeams(page = 1) {
@@ -60,10 +70,19 @@ export class TeamsPage implements OnInit {
 
   refreshTeams() {
     this.currentPage = 1;
+    if (this.filterMode === 'favorites') {
+      this.loadFavoriteTeams();
+      return;
+    }
     this.loadTeams(1);
   }
 
   loadMore(event: InfiniteScrollCustomEvent) {
+    if (this.filterMode === 'favorites') {
+      event.target.complete();
+      return;
+    }
+
     if (!this.hasMoreData) {
       event.target.complete();
       return;
@@ -83,6 +102,61 @@ export class TeamsPage implements OnInit {
       error: () => {
         event.target.complete();
       }
+    });
+  }
+
+  onFilterChange(event: SegmentCustomEvent) {
+    const mode = (event.detail.value || 'all') as 'all' | 'favorites';
+    this.filterMode = mode;
+
+    if (mode === 'favorites') {
+      this.loadFavoriteTeams();
+      return;
+    }
+
+    if (!this.teams.length) {
+      this.loadTeams(1);
+    }
+  }
+
+  loadFavoriteTeams() {
+    this.loading = true;
+
+    this.favoritesService.loadFavorites('team').subscribe({
+      next: (favorites) => {
+        const favoriteIds = Array.from(new Set((favorites || []).map((fav) => Number(fav.entityId)).filter((id) => Number.isFinite(id))));
+
+        if (!favoriteIds.length) {
+          this.favoriteTeams = [];
+          this.loading = false;
+          return;
+        }
+
+        const requests = favoriteIds.map((id) =>
+          this.api.getTeam(id).pipe(catchError(() => of(null))),
+        );
+
+        forkJoin(requests).subscribe({
+          next: (results) => {
+            this.favoriteTeams = results
+              .map((item: any) => item?.data ?? item)
+              .filter((item: any) => !!item);
+            this.loading = false;
+          },
+          error: async () => {
+            this.favoriteTeams = [];
+            this.loading = false;
+            const t = await this.toast.create({ message: 'Failed to load favorite teams', duration: 2000, color: 'danger' });
+            t.present();
+          },
+        });
+      },
+      error: async () => {
+        this.favoriteTeams = [];
+        this.loading = false;
+        const t = await this.toast.create({ message: 'Failed to load favorite teams', duration: 2000, color: 'danger' });
+        t.present();
+      },
     });
   }
 

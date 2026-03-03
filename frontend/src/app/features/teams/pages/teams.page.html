@@ -4,8 +4,19 @@
 </app-page-header>
 
 <ion-content [fullscreen]="true">
+  <div style="padding: 12px 12px 0 12px;">
+    <ion-segment [value]="filterMode" (ionChange)="onFilterChange($event)">
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="favorites">
+        <ion-label>Favorites</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
   <!-- Loading skeletons (initial load only) -->
-  <div style="padding: 12px;" *ngIf="loading && !teams.length">
+  <div style="padding: 12px;" *ngIf="loading && !visibleTeams.length">
     <ion-list lines="none">
       <ion-item *ngFor="let i of [1,2,3]">
         <ion-skeleton-text animated style="width: 100%; height: 120px; border-radius: 8px; margin-bottom: 12px;"></ion-skeleton-text>
@@ -14,14 +25,14 @@
   </div>
 
   <!-- Empty state -->
-  <div style="padding: 12px;" *ngIf="!teams.length && !loading">
-    No teams found.
+  <div style="padding: 12px;" *ngIf="!visibleTeams.length && !loading">
+    {{ filterMode === 'favorites' ? 'No favorite teams yet.' : 'No teams found.' }}
   </div>
 
   <!-- Teams list -->
   <div style="padding: 12px;">
     <app-team-card
-      *ngFor="let team of teams; trackBy: trackByTeamId"
+      *ngFor="let team of visibleTeams; trackBy: trackByTeamId"
       [team]="team"
       [showDetails]="false"
       [favoriteEntityType]="'team'"
@@ -34,8 +45,8 @@
   <ion-infinite-scroll
     threshold="200px"
     (ionInfinite)="loadMore($event)"
-    *ngIf="hasMoreData && !loading"
-    [disabled]="!hasMoreData">
+    *ngIf="filterMode === 'all' && hasMoreData && !loading"
+    [disabled]="filterMode !== 'all' || !hasMoreData">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"
       loadingText="Loading more teams...">
