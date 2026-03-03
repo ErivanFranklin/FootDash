@@ -37,7 +37,7 @@ function refreshCookieOptions(isProd: boolean) {
     secure: isProd,
     // Use lax in dev to allow localhost:4200 -> 3000 cross-port cookie
     sameSite,
-    path: '/api/',
+    path: '/',
     maxAge: REFRESH_COOKIE_MAX_AGE,
   };
 }
