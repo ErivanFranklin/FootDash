@@ -26,9 +26,16 @@
         #{{ entry.rank }}
       </ion-label>
       <ion-avatar slot="start">
-        <img [src]="entry.avatarUrl || 'assets/default-avatar.png'" alt="avatar" />
+        <img
+          *ngIf="entry.avatarUrl; else avatarInitials"
+          [src]="entry.avatarUrl"
+          [alt]="entry.userName"
+          (error)="onAvatarError($event)" />
+        <ng-template #avatarInitials>
+          <div class="avatar-fallback">{{ getInitials(entry.userName) }}</div>
+        </ng-template>
       </ion-avatar>
-      <ion-label>
+      <ion-label class="user-label">
         <h2>{{ entry.userName }}</h2>
       </ion-label>
       <ion-note slot="end" color="primary" class="points-label">
