@@ -161,7 +161,8 @@ export class TeamsPage implements OnInit {
   }
 
   trackByTeamId(_index: number, team: any): number {
-    return this.resolveTeamId(team) ?? _index;
+    const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    return id != null ? Number(id) : _index;
   }
 
   resolveTeamId(team: any): number | null {
