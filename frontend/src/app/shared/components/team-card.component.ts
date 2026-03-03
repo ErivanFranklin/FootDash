@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { FavoriteButtonComponent } from '../../components/favorite-button/favorite-button.component';
+import { FavoriteEntityType } from '../../services/favorites.service';
 
 @Component({
   selector: 'app-team-card',
@@ -8,8 +10,17 @@ import { CommonModule } from '@angular/common';
   template: `
     <ion-card>
       <ion-card-header>
-        <ion-card-title>{{ getTeamName() }}</ion-card-title>
-        <ion-card-subtitle *ngIf="getTeamCode()">{{ getTeamCode() }}</ion-card-subtitle>
+        <div class="team-header-row">
+          <div>
+            <ion-card-title>{{ getTeamName() }}</ion-card-title>
+            <ion-card-subtitle *ngIf="getTeamCode()">{{ getTeamCode() }}</ion-card-subtitle>
+          </div>
+          <app-favorite-button
+            *ngIf="favoriteEntityType && favoriteEntityId != null"
+            [entityType]="favoriteEntityType"
+            [entityId]="favoriteEntityId">
+          </app-favorite-button>
+        </div>
       </ion-card-header>
       <ion-card-content>
         <div class="team-info" *ngIf="showDetails">
@@ -47,6 +58,13 @@ import { CommonModule } from '@angular/common';
     </ion-card>
   `,
   styles: [`
+    .team-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-sm);
+    }
+
     .team-info {
       margin-bottom: var(--spacing-md);
     }
@@ -66,11 +84,13 @@ import { CommonModule } from '@angular/common';
       margin-top: var(--spacing-md);
     }
   `],
-  imports: [IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonSpinner, CommonModule]
+  imports: [IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonIcon, IonSpinner, CommonModule, FavoriteButtonComponent]
 })
 export class TeamCardComponent {
   @Input() team: any;
   @Input() showDetails: boolean = false;
+  @Input() favoriteEntityType?: FavoriteEntityType;
+  @Input() favoriteEntityId: number | null = null;
   @Input() actions?: Array<{
     label: string;
     handler: (team: any) => void;

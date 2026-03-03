@@ -87,32 +87,37 @@ export class TeamsPage implements OnInit {
   }
 
   trackByTeamId(_index: number, team: any): number {
-    return team?.id ?? _index;
+    return this.resolveTeamId(team) ?? _index;
+  }
+
+  resolveTeamId(team: any): number | null {
+    const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    return id != null ? Number(id) : null;
   }
 
   getTeamActions(team: any) {
-    const teamId = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    const teamId = this.resolveTeamId(team);
     return [
       { label: 'View Matches', handler: this.viewMatches.bind(this), icon: 'eye' },
       { label: 'View Analytics', handler: this.viewAnalytics.bind(this), icon: 'stats-chart', color: 'secondary' },
-      { label: 'Sync Team', handler: this.syncTeam.bind(this), icon: 'sync', color: 'medium', loading: this.syncingTeamIds.has(teamId) }
+      { label: 'Sync Team', handler: this.syncTeam.bind(this), icon: 'sync', color: 'medium', loading: teamId != null && this.syncingTeamIds.has(teamId) }
     ];
   }
 
   viewMatches(team: any) {
-    const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    const id = this.resolveTeamId(team);
     if (id == null) return;
     this.router.navigate(['/matches', id]);
   }
 
   viewAnalytics(team: any) {
-    const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    const id = this.resolveTeamId(team);
     if (id == null) return;
     this.router.navigate(['/analytics/team', id]);
   }
 
   async syncTeam(team: any) {
-    const id = team?.id ?? team?.teamId ?? team?.externalId ?? team?.team?.id;
+    const id = this.resolveTeamId(team);
     if (id == null) return;
     this.syncingTeamIds.add(id);
     this.api.syncTeam(id).subscribe({

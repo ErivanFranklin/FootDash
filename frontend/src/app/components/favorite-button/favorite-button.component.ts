@@ -1,6 +1,8 @@
 import { Component, Input, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { heart, heartOutline } from 'ionicons/icons';
 import { FavoritesService, FavoriteEntityType } from '../../services/favorites.service';
 
 @Component({
@@ -30,6 +32,10 @@ export class FavoriteButtonComponent implements OnInit {
   loading = false;
 
   private favoritesService = inject(FavoritesService);
+
+  constructor() {
+    addIcons({ heart, heartOutline });
+  }
 
   ngOnInit() {
     this.favoritesService.isFavorite(this.entityType, this.entityId).subscribe({

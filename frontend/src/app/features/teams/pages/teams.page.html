@@ -24,6 +24,8 @@
       *ngFor="let team of teams; trackBy: trackByTeamId"
       [team]="team"
       [showDetails]="false"
+      [favoriteEntityType]="'team'"
+      [favoriteEntityId]="resolveTeamId(team)"
       [actions]="getTeamActions(team)">
     </app-team-card>
   </div>
