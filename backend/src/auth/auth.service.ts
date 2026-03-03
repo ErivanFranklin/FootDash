@@ -113,7 +113,6 @@ export class AuthService {
       const stored = await this.refreshRepo.findOne({
         where: { token: refreshToken },
         relations: ['user'],
-        order: { id: 'DESC' },
       });
       if (!stored || stored.revoked) {
         // Possible token reuse attack — revoke entire family
