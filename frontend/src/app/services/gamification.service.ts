@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface UserPrediction {
@@ -42,6 +42,16 @@ export interface PredictionWithBadges {
   newBadges: BadgeResponse[];
 }
 
+interface BadgesEnvelope {
+  success?: boolean;
+  badges?: BadgeResponse[];
+}
+
+interface NewBadgesEnvelope {
+  success?: boolean;
+  newBadges?: BadgeResponse[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -65,16 +75,22 @@ export class GamificationService {
 
   /** Get all badges with unlock state for the current user */
   getAllBadges(): Observable<BadgeResponse[]> {
-    return this.http.get<BadgeResponse[]>(`${this.apiUrl}/badges`);
+    return this.http
+      .get<BadgeResponse[] | BadgesEnvelope>(`${this.apiUrl}/badges`)
+      .pipe(map((resp) => Array.isArray(resp) ? resp : (resp?.badges ?? [])));
   }
 
   /** Get badges unlocked by a specific user */
   getUserBadges(userId: number): Observable<BadgeResponse[]> {
-    return this.http.get<BadgeResponse[]>(`${this.apiUrl}/badges/user/${userId}`);
+    return this.http
+      .get<BadgeResponse[] | BadgesEnvelope>(`${this.apiUrl}/badges/user/${userId}`)
+      .pipe(map((resp) => Array.isArray(resp) ? resp : (resp?.badges ?? [])));
   }
 
   /** Trigger a badge check for the current user */
   checkBadges(): Observable<BadgeResponse[]> {
-    return this.http.post<BadgeResponse[]>(`${this.apiUrl}/badges/check`, {});
+    return this.http
+      .post<BadgeResponse[] | NewBadgesEnvelope>(`${this.apiUrl}/badges/check`, {})
+      .pipe(map((resp) => Array.isArray(resp) ? resp : (resp?.newBadges ?? [])));
   }
 }
