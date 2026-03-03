@@ -113,6 +113,7 @@ export class AuthService {
       const stored = await this.refreshRepo.findOne({
         where: { token: refreshToken },
         relations: ['user'],
+        order: { id: 'DESC' },
       });
       if (!stored || stored.revoked) {
         // Possible token reuse attack — revoke entire family
@@ -198,7 +199,7 @@ export class AuthService {
     );
     const refreshToken = this.jwtService.sign(
       { sub: user.id },
-      { expiresIn: '7d' },
+      { expiresIn: '7d', jwtid: crypto.randomUUID() },
     );
 
     // Persist the refresh token so it can be revoked later.
@@ -256,7 +257,14 @@ export class AuthService {
       }),
     );
 
-    await this.mailService.sendPasswordResetEmail(email, rawToken);
+    try {
+      await this.mailService.sendPasswordResetEmail(email, rawToken);
+    } catch (error) {
+      this.logger.error(
+        `Failed to deliver reset email for user ${user.id} (${email}). Returning generic success response.`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
   }
 
   /**
