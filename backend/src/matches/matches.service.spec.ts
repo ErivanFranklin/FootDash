@@ -7,6 +7,7 @@ import { Match } from './entities/match.entity';
 import { Team } from '../teams/entities/team.entity';
 import { MatchGateway } from '../websockets/match.gateway';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 const footballApiMock = {
   getTeamFixtures: jest.fn(),
@@ -33,6 +34,10 @@ const mockTeamRepo = {
   findOne: jest.fn(() => undefined),
 };
 
+const mockEventEmitter = {
+  emit: jest.fn(),
+};
+
 describe('MatchesService', () => {
   let service: MatchesService;
 
@@ -45,6 +50,7 @@ describe('MatchesService', () => {
         { provide: getRepositoryToken(Team), useValue: mockTeamRepo },
         { provide: MatchGateway, useValue: mockMatchGateway },
         { provide: NotificationsService, useValue: mockNotificationsService },
+        { provide: EventEmitter2, useValue: mockEventEmitter },
       ],
     }).compile();
 

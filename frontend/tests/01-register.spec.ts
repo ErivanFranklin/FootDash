@@ -37,6 +37,7 @@ async function waitForIonicReady(page: Page) {
 
 /** Clear auth state so each test starts logged out */
 async function clearAuth(page: Page) {
+  await page.context().clearCookies();
   await page.evaluate(() => localStorage.removeItem('access_token'));
 }
 
@@ -174,9 +175,9 @@ test.describe('Phase 1: Register', () => {
   });
 
   // -----------------------------------------------------------------------
-  // 6. Token is stored in localStorage after registration
+  // 6. Registration creates an authenticated session
   // -----------------------------------------------------------------------
-  test('should store JWT token in localStorage after registration', async ({ page }) => {
+  test('should keep authenticated session after registration and reload', async ({ page }) => {
     const email = uniqueEmail();
     const password = 'TestPassword123!';
 
@@ -186,9 +187,13 @@ test.describe('Phase 1: Register', () => {
 
     await page.waitForURL('**/home', { timeout: 10_000 });
 
-    // Verify token exists
-    const token = await page.evaluate(() => localStorage.getItem('access_token'));
-    expect(token).toBeTruthy();
-    expect(token!.split('.').length).toBe(3); // JWT has 3 parts
+    // Session should remain valid after reload
+    await page.reload();
+    await waitForIonicReady(page);
+    expect(page.url()).toContain('/home');
+
+    // Auth cookies should exist
+    const cookies = await page.context().cookies();
+    expect(cookies.length).toBeGreaterThan(0);
   });
 });

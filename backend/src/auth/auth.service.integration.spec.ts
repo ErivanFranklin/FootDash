@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { MailService } from '../mail/mail.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('AuthService (TypeORM integration)', () => {
   let service: AuthService;
@@ -20,7 +23,24 @@ describe('AuthService (TypeORM integration)', () => {
         TypeOrmModule.forFeature([User, RefreshToken]),
         JwtModule.register({ secret: 'test-secret' }),
       ],
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        {
+          provide: getRepositoryToken(PasswordResetToken),
+          useValue: {
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+          },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            sendPasswordResetEmail: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);

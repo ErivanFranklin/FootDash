@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { MailService } from '../mail/mail.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -38,6 +40,21 @@ describe('AuthService', () => {
         {
           provide: getRepositoryToken(RefreshToken),
           useValue: (usersRepo as any).refreshRepo,
+        },
+        {
+          provide: getRepositoryToken(PasswordResetToken),
+          useValue: {
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+          },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            sendPasswordResetEmail: jest.fn(),
+          },
         },
         { provide: JwtService, useValue: jwtService },
       ],

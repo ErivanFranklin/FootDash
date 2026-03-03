@@ -3,6 +3,7 @@ import { TeamsController } from './teams.controller';
 import { TeamsService } from './teams.service';
 
 const mockTeamsService = {
+  findTeamById: jest.fn(),
   getTeamOverview: jest.fn(),
   getTeamStats: jest.fn(),
   getTeamFixtures: jest.fn(),
@@ -22,8 +23,10 @@ describe('TeamsController', () => {
   });
 
   it('returns team overview', async () => {
+    mockTeamsService.findTeamById.mockResolvedValue(undefined);
     mockTeamsService.getTeamOverview.mockResolvedValue('overview');
     const result = await controller.getTeamOverview({ teamId: 7 });
+    expect(mockTeamsService.findTeamById).toHaveBeenCalledWith(7);
     expect(mockTeamsService.getTeamOverview).toHaveBeenCalledWith(7);
     expect(result).toBe('overview');
   });
