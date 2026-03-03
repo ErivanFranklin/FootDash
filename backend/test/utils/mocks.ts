@@ -9,10 +9,21 @@ export function createMockedFootballApi(): jest.Mocked<FootballApiAdapter> {
   } as unknown as jest.Mocked<FootballApiAdapter>;
 }
 
-export const createMockRepo = () => ({
-  create: jest.fn((v) => v),
-  save: jest.fn((v) => Promise.resolve({ id: 1, ...v })),
-  findOne: jest.fn((opts) =>
-    Promise.resolve({ id: opts.where.id, name: 'Saved' }),
-  ),
-});
+export const createMockRepo = () => {
+  const qb = {
+    orderBy: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    take: jest.fn().mockReturnThis(),
+    getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+  };
+  return {
+    create: jest.fn((v) => v),
+    save: jest.fn((v) => Promise.resolve({ id: 1, ...v })),
+    find: jest.fn(() => Promise.resolve([])),
+    findOne: jest.fn((opts) =>
+      Promise.resolve({ id: opts.where.id, name: 'Saved' }),
+    ),
+    createQueryBuilder: jest.fn(() => qb),
+  };
+};

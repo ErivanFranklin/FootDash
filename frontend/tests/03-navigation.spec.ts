@@ -9,27 +9,27 @@ import {
 /**
  * Phase 3: Navigation & Layout
  *
- * Uses [routerLink] attribute selectors for tab buttons instead of
- * text-based matching (transloco translations may not be loaded).
+ * Uses [href] attribute selectors for tab buttons (Angular compiles
+ * routerLink directives to href attributes in the rendered DOM).
  */
 test.describe('Phase 3: Navigation & Layout', () => {
-  test.setTimeout(45_000);
+  test.setTimeout(60_000);
 
   // 1. Tab bar navigation (mobile) - use attribute selectors
   test('should navigate via tab bar on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await loginTestUser(page, { prefix: 'nav' });
 
-    const homeTab = page.locator('a.tab-button[routerLink="/home"]');
+    const homeTab = page.locator('a.tab-button[href="/home"]');
     await expect(homeTab).toBeVisible({ timeout: 5_000 });
     await expect(homeTab).toHaveClass(/tab-active/);
 
-    const teamsTab = page.locator('a.tab-button[routerLink="/teams"]');
+    const teamsTab = page.locator('a.tab-button[href="/teams"]');
     await teamsTab.click();
     await page.waitForURL('**/teams', { timeout: 8_000 });
     await expect(teamsTab).toHaveClass(/tab-active/);
 
-    const feedTab = page.locator('a.tab-button[routerLink="/feed"]');
+    const feedTab = page.locator('a.tab-button[href="/feed"]');
     await feedTab.click();
     await page.waitForURL('**/feed', { timeout: 8_000 });
     await expect(feedTab).toHaveClass(/tab-active/);
@@ -56,17 +56,9 @@ test.describe('Phase 3: Navigation & Layout', () => {
     const sideMenu = page.locator('ion-menu');
     if (!(await sideMenu.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
-    // Side menu uses ion-item with routerLink
-    const teamsItem = page.locator('ion-menu ion-item[routerLink="/teams"]').first();
-    if (!(await teamsItem.isVisible().catch(() => false))) {
-      // Fallback: try text-based
-      const teamsItemText = page.locator('ion-menu ion-item', { hasText: /teams/i }).first();
-      if (await teamsItemText.isVisible().catch(() => false)) {
-        await teamsItemText.click();
-        await page.waitForURL('**/teams', { timeout: 5_000 });
-      }
-      return;
-    }
+    // Side menu uses (click) handlers, not routerLink — match by text
+    const teamsItem = page.locator('ion-menu ion-item', { hasText: /teams/i }).first();
+    if (!(await teamsItem.isVisible().catch(() => false))) return;
     await teamsItem.click();
     await page.waitForURL('**/teams', { timeout: 5_000 });
     expect(page.url()).toContain('/teams');

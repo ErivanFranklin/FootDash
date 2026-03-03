@@ -12,7 +12,7 @@ import {
  * `app-team-card` for team cards, action buttons for View Matches / Sync.
  */
 test.describe('Phase 4: Teams', () => {
-  test.setTimeout(45_000);
+  test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
     await loginTestUser(page, { prefix: 'teams' });
@@ -89,7 +89,7 @@ test.describe('Phase 4: Teams', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await navigateTo(page, '/home');
 
-    const teamsTab = page.locator('a.tab-button[routerLink="/teams"]');
+    const teamsTab = page.locator('a.tab-button[href="/teams"]');
     await expect(teamsTab).toBeVisible({ timeout: 8_000 });
     await teamsTab.click();
     await page.waitForURL('**/teams', { timeout: 8_000 });

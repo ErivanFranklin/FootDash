@@ -19,26 +19,43 @@ export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all teams from database' })
+  @ApiOperation({ summary: 'Get teams from database (paginated)' })
+  @ApiQuery({ name: 'page', required: false, type: 'integer', example: 1, description: 'Page number (1-based)' })
+  @ApiQuery({ name: 'limit', required: false, type: 'integer', example: 20, description: 'Items per page' })
+  @ApiQuery({ name: 'search', required: false, type: 'string', description: 'Search by team name' })
   @ApiResponse({
     status: 200,
-    description: 'List of all teams in database',
+    description: 'Paginated list of teams',
     schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'integer', example: 33 },
-          name: { type: 'string', example: 'FC Example' },
-          country: { type: 'string', example: 'England' },
-          founded: { type: 'integer', example: 1878 },
-          logo: { type: 'string', nullable: true },
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'integer', example: 33 },
+              name: { type: 'string', example: 'FC Example' },
+              country: { type: 'string', example: 'England' },
+              founded: { type: 'integer', example: 1878 },
+              logo: { type: 'string', nullable: true },
+            },
+          },
         },
+        total: { type: 'integer', example: 992 },
+        page: { type: 'integer', example: 1 },
+        limit: { type: 'integer', example: 20 },
       },
     },
   })
-  getAllTeams() {
-    return this.teamsService.findAllTeams();
+  getAllTeams(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
+    const p = Math.max(1, Number(page) || 1);
+    const l = Math.min(100, Math.max(1, Number(limit) || 20));
+    return this.teamsService.findAllTeams({ page: p, limit: l, search });
   }
 
   @Get(':teamId')

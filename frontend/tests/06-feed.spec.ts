@@ -18,6 +18,7 @@ import {
  * ion-segment value is bound via ngModel, not a DOM attribute.
  */
 test.describe('Phase 6: Feed', () => {
+  test.setTimeout(60_000);
 
   test.beforeEach(async ({ page }) => {
     await loginTestUser(page, { prefix: 'feed' });

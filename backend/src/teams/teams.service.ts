@@ -72,10 +72,22 @@ export class TeamsService {
   }
 
   // Persistence helpers
-  async findAllTeams() {
-    return this.teamRepository.find({
-      order: { name: 'ASC' },
-    });
+  async findAllTeams(opts?: { page?: number; limit?: number; search?: string }) {
+    const page = opts?.page ?? 1;
+    const limit = opts?.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const qb = this.teamRepository.createQueryBuilder('team');
+    qb.orderBy('team.name', 'ASC');
+
+    if (opts?.search) {
+      qb.where('LOWER(team.name) LIKE :search', {
+        search: `%${opts.search.toLowerCase()}%`,
+      });
+    }
+
+    const [data, total] = await qb.skip(skip).take(limit).getManyAndCount();
+    return { data, total, page, limit };
   }
 
   async createTeam(dto: CreateTeamDto) {

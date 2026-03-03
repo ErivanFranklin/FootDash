@@ -14,8 +14,12 @@ export class ApiService {
   }
 
   // Teams
-  getTeams(): Observable<any> {
-    return this.http.get(`${this.base}/teams`);
+  getTeams(opts?: { page?: number; limit?: number; search?: string }): Observable<any> {
+    let params = new HttpParams();
+    if (opts?.page != null) params = params.set('page', String(opts.page));
+    if (opts?.limit != null) params = params.set('limit', String(opts.limit));
+    if (opts?.search) params = params.set('search', opts.search);
+    return this.http.get(`${this.base}/teams`, { params });
   }
 
   getTeam(teamId: number | string): Observable<any> {

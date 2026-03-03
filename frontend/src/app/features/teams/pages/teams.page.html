@@ -1,14 +1,11 @@
 <app-page-header
   title="Teams"
-  [actions]="[{ label: 'Refresh', handler: loadTeams.bind(this), icon: 'refresh', loading: loading }]">
+  [actions]="[{ label: 'Refresh', handler: refreshTeams.bind(this), icon: 'refresh', loading: loading }]">
 </app-page-header>
 
 <ion-content [fullscreen]="true">
-  <div style="padding: 12px;" *ngIf="!teams.length && !loading">
-    No teams found.
-  </div>
-
-  <div style="padding: 12px;" *ngIf="loading">
+  <!-- Loading skeletons (initial load only) -->
+  <div style="padding: 12px;" *ngIf="loading && !teams.length">
     <ion-list lines="none">
       <ion-item *ngFor="let i of [1,2,3]">
         <ion-skeleton-text animated style="width: 100%; height: 120px; border-radius: 8px; margin-bottom: 12px;"></ion-skeleton-text>
@@ -16,16 +13,30 @@
     </ion-list>
   </div>
 
+  <!-- Empty state -->
+  <div style="padding: 12px;" *ngIf="!teams.length && !loading">
+    No teams found.
+  </div>
+
+  <!-- Teams list -->
   <div style="padding: 12px;">
     <app-team-card
-      *ngFor="let team of teams"
+      *ngFor="let team of teams; trackBy: trackByTeamId"
       [team]="team"
       [showDetails]="false"
-      [actions]="[
-        { label: 'View Matches', handler: viewMatches.bind(this), icon: 'eye' },
-        { label: 'View Analytics', handler: viewAnalytics.bind(this), icon: 'stats-chart', color: 'secondary' },
-        { label: 'Sync Team', handler: syncTeam.bind(this), icon: 'sync', color: 'medium', loading: loading }
-      ]">
+      [actions]="getTeamActions(team)">
     </app-team-card>
   </div>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll
+    threshold="200px"
+    (ionInfinite)="loadMore($event)"
+    *ngIf="hasMoreData && !loading"
+    [disabled]="!hasMoreData">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more teams...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

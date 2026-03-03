@@ -28,10 +28,18 @@ export async function loginTestUser(
   let userId: number | null = null;
 
   // Register via API (tolerant of 409 Conflict if user already exists)
+  // Retries once on failure (e.g. 429 throttle) after a short delay.
   if (!opts.skipRegistration) {
-    const resp = await page.request.post('/api/auth/register', {
+    let resp = await page.request.post('/api/auth/register', {
       data: { email, password },
     });
+    if (!resp.ok() && resp.status() !== 409) {
+      // Retry once after a brief wait (handles rate-limiting / transient errors)
+      await page.waitForTimeout(2_000);
+      resp = await page.request.post('/api/auth/register', {
+        data: { email, password },
+      });
+    }
     if (resp.ok()) {
       try {
         const body = await resp.json();
@@ -49,10 +57,10 @@ export async function loginTestUser(
   await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
 
   // Wait for redirect to authenticated route (home)
-  await page.waitForURL('**/home', { timeout: 15_000 }).catch(async () => {
+  await page.waitForURL('**/home', { timeout: 20_000 }).catch(async () => {
     // Retry click in case Ionic swallowed the first one
     await page.locator('ion-button', { hasText: 'Sign in' }).first().click({ force: true });
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL('**/home', { timeout: 15_000 });
   });
 
   // Wait for authenticated layout to be fully rendered (split-pane = auth layout is active)

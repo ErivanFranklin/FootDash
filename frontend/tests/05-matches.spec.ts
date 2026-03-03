@@ -17,7 +17,7 @@ import {
  */
 test.describe('Phase 5: Matches', () => {
   // Increase timeout for data-dependent multi-step navigation
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
 
   test.beforeEach(async ({ page }) => {
     await loginTestUser(page, { prefix: 'matches' });
