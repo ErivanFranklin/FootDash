@@ -5,7 +5,7 @@ import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 
 export class RedisIoAdapter extends IoAdapter {
-  private adapterConstructor: ReturnType<typeof createAdapter>;
+  private adapterConstructor?: ReturnType<typeof createAdapter>;
 
   constructor(
     app: any,
@@ -21,10 +21,22 @@ export class RedisIoAdapter extends IoAdapter {
       return;
     }
 
-    const pubClient = new Redis(redisUrl);
+    const pubClient = new Redis(redisUrl, {
+      lazyConnect: true,
+      enableOfflineQueue: false,
+      maxRetriesPerRequest: 1,
+    });
     const subClient = pubClient.duplicate();
 
-    this.adapterConstructor = createAdapter(pubClient, subClient);
+    try {
+      await pubClient.connect();
+      await subClient.connect();
+      this.adapterConstructor = createAdapter(pubClient, subClient);
+    } catch {
+      await pubClient.quit().catch(() => undefined);
+      await subClient.quit().catch(() => undefined);
+      this.adapterConstructor = undefined;
+    }
   }
 
   createIOServer(port: number, options?: ServerOptions): any {

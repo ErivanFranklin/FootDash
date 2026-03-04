@@ -152,7 +152,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<any> {
     // Prefer HttpOnly cookie, fall back to body for backward compatibility
-    const token = req.cookies?.refresh_token || dto.refreshToken;
+    const token = req.cookies?.refresh_token || dto?.refreshToken;
     if (!token) {
       throw new UnauthorizedException('No refresh token provided');
     }
@@ -171,7 +171,7 @@ export class AuthController {
     @Request() req: any,
     @Res() res: Response,
   ): Promise<any> {
-    const token = req.cookies?.refresh_token || dto.refreshToken;
+    const token = req.cookies?.refresh_token || dto?.refreshToken;
     await this.authService.revoke(token);
     // Clear the cookie (both current and legacy paths)
     const isProd = process.env.NODE_ENV === 'production';

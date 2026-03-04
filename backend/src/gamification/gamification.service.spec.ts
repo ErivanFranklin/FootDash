@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GamificationService } from './gamification.service';
 import { UserPrediction } from './entities/user-prediction.entity';
+import { Leaderboard } from './entities/leaderboard.entity';
+import { Match } from '../matches/entities/match.entity';
 import { MatchFinishedEvent } from '../matches/events/match-finished.event';
 
 const mockPredictionRepository = () => ({
@@ -10,6 +12,15 @@ const mockPredictionRepository = () => ({
   save: jest.fn(),
   find: jest.fn(),
   findOne: jest.fn(),
+});
+
+const mockGenericRepository = () => ({
+  create: jest.fn(),
+  save: jest.fn(),
+  find: jest.fn(),
+  findOne: jest.fn(),
+  delete: jest.fn(),
+  createQueryBuilder: jest.fn(),
 });
 
 describe('GamificationService', () => {
@@ -21,6 +32,8 @@ describe('GamificationService', () => {
       providers: [
         GamificationService,
         { provide: getRepositoryToken(UserPrediction), useFactory: mockPredictionRepository },
+        { provide: getRepositoryToken(Leaderboard), useFactory: mockGenericRepository },
+        { provide: getRepositoryToken(Match), useFactory: mockGenericRepository },
       ],
     }).compile();
 
@@ -126,6 +139,10 @@ describe('GamificationService', () => {
   describe('onMatchFinished', () => {
     it('calls processMatchResult with event data', async () => {
       jest.spyOn(service, 'processMatchResult').mockResolvedValue();
+      jest.spyOn(service, 'rebuildLeaderboards').mockResolvedValue({
+        success: true,
+        rebuilt: [],
+      });
       const event = new MatchFinishedEvent(42, 3, 1);
 
       await service.onMatchFinished(event);

@@ -11,7 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
 @Component({

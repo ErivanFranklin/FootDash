@@ -43,9 +43,11 @@ describe('Analytics Export Authorization (e2e)', () => {
       providers: [
         RolesGuard,
         { provide: DataExportService, useValue: exportServiceMock },
-        { provide: JwtAuthGuard, useClass: MockJwtAuthGuard },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useClass(MockJwtAuthGuard)
+      .compile();
 
     app = moduleRef.createNestApplication();
     await app.init();

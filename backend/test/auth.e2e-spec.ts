@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
+import * as cookieParser from 'cookie-parser';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../src/auth/auth.module';
@@ -26,6 +27,7 @@ describe('Auth e2e (auth workflow)', () => {
     }).compile();
 
     app = module.createNestApplication();
+    app.use(cookieParser());
     await app.init();
   });
 
@@ -38,31 +40,28 @@ describe('Auth e2e (auth workflow)', () => {
   it('register -> refresh -> revoke -> refresh(fails)', async () => {
     const email = `e2e-${Date.now()}@example.com`;
     const password = 'password123';
+    const agent = request.agent(app.getHttpServer());
 
-    const reg = await request(app.getHttpServer())
+    const reg = await agent
       .post('/auth/register')
       .send({ email, password })
       .expect(201);
 
-    const refreshToken = reg.body?.tokens?.refreshToken;
-    expect(refreshToken).toBeDefined();
+    expect(reg.body?.tokens?.accessToken).toBeDefined();
 
-    const refreshed = await request(app.getHttpServer())
+    const refreshed = await agent
       .post('/auth/refresh')
-      .send({ refreshToken })
       .expect(201);
 
     expect(refreshed.body?.tokens?.accessToken).toBeDefined();
 
-    await request(app.getHttpServer())
+    await agent
       .post('/auth/revoke')
-      .send({ refreshToken })
       .expect(201);
 
     // now the same refresh should be rejected
-    await request(app.getHttpServer())
+    await agent
       .post('/auth/refresh')
-      .send({ refreshToken })
       .expect(401);
   }, 20000);
 
