@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '../../users/user.entity';
 
 export class ProfileDto {
   @ApiProperty({ example: 1 })
@@ -12,4 +13,7 @@ export class ProfileDto {
 
   @ApiProperty({ example: false })
   isPro: boolean;
+
+  @ApiProperty({ enum: UserRole, example: UserRole.USER })
+  role: UserRole;
 }

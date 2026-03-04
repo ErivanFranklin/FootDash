@@ -22,10 +22,12 @@ import { UserProfileService } from '../users/services/user-profile.service';
 import { Optional } from '@nestjs/common';
 import { ProfileDto } from './dto/profile.dto';
 import { MailService } from '../mail/mail.service';
+import { UserRole } from '../users/user.entity';
 
 export interface AuthUser {
   id: number;
   email: string;
+  role: UserRole;
 }
 
 export interface AuthTokens {
@@ -72,8 +74,16 @@ export class AuthService {
       const tokens = await this.createTokens({
         id: saved.id,
         email: saved.email,
+        role: saved.role ?? UserRole.USER,
       });
-      return { user: { id: saved.id, email: saved.email }, tokens };
+      return {
+        user: {
+          id: saved.id,
+          email: saved.email,
+          role: saved.role ?? UserRole.USER,
+        },
+        tokens,
+      };
     } catch (error) {
        if (error instanceof ConflictException) throw error;
        console.error('Registration error details:', error);
@@ -96,8 +106,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.createTokens({ id: user.id, email: user.email });
-    return { user: { id: user.id, email: user.email }, tokens };
+    const tokens = await this.createTokens({ id: user.id, email: user.email, role: user.role ?? UserRole.USER });
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role ?? UserRole.USER,
+      },
+      tokens,
+    };
   }
 
   async refresh(refreshToken: string): Promise<AuthResult> {
@@ -137,8 +154,16 @@ export class AuthService {
       const tokens = await this.createTokens({
         id: user.id,
         email: user.email,
+        role: user.role ?? UserRole.USER,
       });
-      return { user: { id: user.id, email: user.email }, tokens };
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role ?? UserRole.USER,
+        },
+        tokens,
+      };
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
       throw new UnauthorizedException('Invalid refresh token');
@@ -171,6 +196,8 @@ export class AuthService {
           id: profile.id,
           email: profile.email,
           createdAt: profile.createdAt,
+          isPro: profile.user?.isPro ?? false,
+          role: profile.user?.role ?? UserRole.USER,
         } as ProfileDto;
       } catch {
         // fallthrough to user lookup
@@ -185,6 +212,7 @@ export class AuthService {
         email: user.email,
         createdAt: user.createdAt,
         isPro: user.isPro,
+        role: user.role,
       } as ProfileDto;
     } catch {
       throw new UnauthorizedException('User not found');
@@ -193,11 +221,11 @@ export class AuthService {
 
   private async createTokens(user: AuthUser): Promise<AuthTokens> {
     const accessToken = this.jwtService.sign(
-      { sub: user.id, email: user.email },
+      { sub: user.id, email: user.email, role: user.role },
       { expiresIn: '15m' },
     );
     const refreshToken = this.jwtService.sign(
-      { sub: user.id },
+      { sub: user.id, role: user.role },
       { expiresIn: '7d', jwtid: crypto.randomUUID() },
     );
 

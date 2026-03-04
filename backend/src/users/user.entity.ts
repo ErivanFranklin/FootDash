@@ -5,6 +5,12 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+}
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -15,6 +21,13 @@ export class User {
 
   @Column({ name: 'password_hash' })
   password_hash: string;
+
+  @Column({
+    type: 'simple-enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @Column({ name: 'is_pro', default: false })
   isPro: boolean;

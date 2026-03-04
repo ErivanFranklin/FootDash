@@ -19,16 +19,19 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { AdminGuard } from '../../auth/guards/admin.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 import {
   DataExportService,
   TrainingDataExportParams,
 } from '../services/data-export.service';
 import { Readable } from 'stream';
+import { UserRole } from '../../users/user.entity';
 
 @ApiTags('Analytics - Data Export')
 @Controller('analytics/export')
-@UseGuards(JwtAuthGuard, AdminGuard) // Only admins can export training data
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
 @ApiBearerAuth()
 export class DataExportController {
   constructor(private readonly dataExportService: DataExportService) {}

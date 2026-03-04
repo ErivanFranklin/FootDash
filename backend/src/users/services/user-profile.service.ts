@@ -27,7 +27,17 @@ export class UserProfileService {
     return {
       ...profileRest,
       email: user?.email,
+      role: user?.role,
+      isPro: user?.isPro,
     };
+  }
+
+  private async findEntityByUserId(userId: number): Promise<UserProfile> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+    if (!profile) {
+      throw new NotFoundException(`Profile for user ${userId} not found`);
+    }
+    return profile;
   }
 
   async create(
@@ -54,21 +64,19 @@ export class UserProfileService {
     userId: number,
     updateProfileDto: UpdateProfileDto,
   ): Promise<UserProfile> {
-    const profile = await this.findByUserId(userId);
-
+    const profile = await this.findEntityByUserId(userId);
     Object.assign(profile, updateProfileDto);
-
     return this.profileRepository.save(profile);
   }
 
   async updateAvatar(userId: number, avatarUrl: string): Promise<UserProfile> {
-    const profile = await this.findByUserId(userId);
+    const profile = await this.findEntityByUserId(userId);
     profile.avatarUrl = avatarUrl;
     return this.profileRepository.save(profile);
   }
 
   async deleteAvatar(userId: number): Promise<UserProfile> {
-    const profile = await this.findByUserId(userId);
+    const profile = await this.findEntityByUserId(userId);
     profile.avatarUrl = null;
     return this.profileRepository.save(profile);
   }

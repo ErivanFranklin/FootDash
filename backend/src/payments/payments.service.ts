@@ -1,4 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -85,6 +91,130 @@ export class PaymentsService {
     }
 
     return { received: true };
+  }
+
+  async getSubscriptionInfo(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.stripeCustomerId) {
+      return {
+        tier: user.isPro ? 'pro' : 'free',
+        status: user.isPro ? 'active' : 'none',
+      };
+    }
+
+    const subscriptions = await this.stripe.subscriptions.list({
+      customer: user.stripeCustomerId,
+      status: 'all',
+      limit: 1,
+    });
+
+    const subscription = subscriptions.data[0];
+    if (!subscription) {
+      return {
+        tier: user.isPro ? 'pro' : 'free',
+        status: user.isPro ? 'active' : 'none',
+        stripeCustomerId: user.stripeCustomerId,
+      };
+    }
+
+    const status = this.mapStripeStatus(subscription.status);
+    const currentPeriodEndRaw = (subscription as any).current_period_end ?? (subscription as any).currentPeriodEnd;
+    return {
+      tier: user.isPro ? 'pro' : 'free',
+      status,
+      currentPeriodEnd: currentPeriodEndRaw
+        ? new Date(currentPeriodEndRaw * 1000).toISOString()
+        : undefined,
+      cancelAtPeriodEnd: (subscription as any).cancel_at_period_end ?? false,
+      stripeCustomerId: user.stripeCustomerId,
+    };
+  }
+
+  async getPaymentHistory(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.stripeCustomerId) {
+      return [];
+    }
+
+    const invoices = await this.stripe.invoices.list({
+      customer: user.stripeCustomerId,
+      limit: 20,
+    });
+
+    return invoices.data.map((invoice) => ({
+      id: invoice.id,
+      amount: invoice.amount_paid || invoice.amount_due || invoice.total || 0,
+      currency: invoice.currency,
+      status: invoice.status || 'unknown',
+      createdAt: new Date(invoice.created * 1000).toISOString(),
+      description:
+        invoice.description || invoice.lines.data[0]?.description || undefined,
+    }));
+  }
+
+  async verifyCheckoutSession(userId: number, sessionId: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!sessionId.startsWith('cs_')) {
+      throw new BadRequestException('Invalid Stripe session ID');
+    }
+
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    if (!session) {
+      throw new NotFoundException('Checkout session not found');
+    }
+
+    const metadataUserId = Number(session.metadata?.userId);
+    const customerId = typeof session.customer === 'string' ? session.customer : null;
+    const ownsSession =
+      metadataUserId === userId ||
+      (!!customerId && !!user.stripeCustomerId && customerId === user.stripeCustomerId);
+
+    if (!ownsSession) {
+      throw new ForbiddenException('You cannot verify this checkout session');
+    }
+
+    const isCompleted = session.status === 'complete';
+    const isPaid =
+      session.payment_status === 'paid' ||
+      session.payment_status === 'no_payment_required';
+    const verified = isCompleted && isPaid;
+
+    if (verified && !user.isPro) {
+      user.isPro = true;
+      if (customerId && !user.stripeCustomerId) {
+        user.stripeCustomerId = customerId;
+      }
+      await this.userRepository.save(user);
+    }
+
+    return {
+      verified,
+      sessionId: session.id,
+      status: session.status,
+      paymentStatus: session.payment_status,
+    };
+  }
+
+  private mapStripeStatus(status: Stripe.Subscription.Status) {
+    if (status === 'active') return 'active';
+    if (status === 'trialing') return 'trialing';
+    if (status === 'past_due') return 'past_due';
+    if (status === 'canceled' || status === 'unpaid' || status === 'incomplete_expired') {
+      return 'canceled';
+    }
+    return 'none';
   }
 
   private async fulfillOrder(session: Stripe.Checkout.Session) {

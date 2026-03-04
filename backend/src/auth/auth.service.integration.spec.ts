@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { MailService } from '../mail/mail.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { UserRole } from '../users/user.entity';
 
 describe('AuthService (TypeORM integration)', () => {
   let service: AuthService;
@@ -53,6 +54,7 @@ describe('AuthService (TypeORM integration)', () => {
     });
     expect(res).toBeDefined();
     expect(res.user.email).toBe('test@example.com');
+    expect(res.user.role).toBe(UserRole.USER);
     expect(res.tokens.accessToken).toBeDefined();
   });
 });

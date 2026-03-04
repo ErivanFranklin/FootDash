@@ -17,6 +17,7 @@ import { DataExportService } from './services/data-export.service';
 import { PredictionsController } from './controllers/predictions.controller';
 import { TeamAnalyticsController } from './controllers/team-analytics.controller';
 import { DataExportController } from './controllers/data-export.controller';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { DataExportController } from './controllers/data-export.controller';
     MLPredictionService,
     PredictionStrategyService,
     DataExportService,
+    RolesGuard,
   ],
   exports: [
     MatchPredictionService,

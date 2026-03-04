@@ -7,6 +7,7 @@ import { User } from '../users/user.entity';
 const mockUserRepository = () => ({
   findOne: jest.fn(),
   save: jest.fn(),
+  update: jest.fn(),
 });
 
 const mockConfigService = {
@@ -127,6 +128,81 @@ describe('PaymentsService', () => {
       await expect(
         service.handleWebhook(badSig, Buffer.from('payload')),
       ).rejects.toThrow('Webhook signature verification failed');
+    });
+  });
+
+  describe('getSubscriptionInfo', () => {
+    it('returns free/none when user has no stripe customer', async () => {
+      userRepo.findOne.mockResolvedValue({ id: 1, isPro: false, stripeCustomerId: null });
+
+      const result = await service.getSubscriptionInfo(1);
+      expect(result.tier).toBe('free');
+      expect(result.status).toBe('none');
+    });
+
+    it('returns active subscription details when stripe subscription exists', async () => {
+      userRepo.findOne.mockResolvedValue({ id: 1, isPro: true, stripeCustomerId: 'cus_123' });
+      (service as any).stripe = {
+        subscriptions: {
+          list: jest.fn().mockResolvedValue({
+            data: [
+              {
+                status: 'active',
+                current_period_end: 1_800_000_000,
+                cancel_at_period_end: false,
+              },
+            ],
+          }),
+        },
+      };
+
+      const result = await service.getSubscriptionInfo(1);
+      expect(result.tier).toBe('pro');
+      expect(result.status).toBe('active');
+      expect(result.stripeCustomerId).toBe('cus_123');
+    });
+  });
+
+  describe('getPaymentHistory', () => {
+    it('returns empty history when user has no stripe customer', async () => {
+      userRepo.findOne.mockResolvedValue({ id: 1, stripeCustomerId: null });
+
+      const result = await service.getPaymentHistory(1);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('verifyCheckoutSession', () => {
+    it('rejects invalid session ID format', async () => {
+      userRepo.findOne.mockResolvedValue({ id: 1, stripeCustomerId: 'cus_1', isPro: false });
+
+      await expect(service.verifyCheckoutSession(1, 'bad')).rejects.toThrow(
+        'Invalid Stripe session ID',
+      );
+    });
+
+    it('verifies owned completed paid session', async () => {
+      const mockUser = { id: 1, stripeCustomerId: 'cus_1', isPro: false } as any;
+      userRepo.findOne.mockResolvedValue(mockUser);
+      userRepo.save.mockResolvedValue({ ...mockUser, isPro: true });
+
+      (service as any).stripe = {
+        checkout: {
+          sessions: {
+            retrieve: jest.fn().mockResolvedValue({
+              id: 'cs_test_123',
+              status: 'complete',
+              payment_status: 'paid',
+              customer: 'cus_1',
+              metadata: { userId: '1' },
+            }),
+          },
+        },
+      };
+
+      const result = await service.verifyCheckoutSession(1, 'cs_test_123');
+      expect(result.verified).toBe(true);
+      expect(userRepo.save).toHaveBeenCalled();
     });
   });
 });

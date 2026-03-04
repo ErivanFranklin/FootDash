@@ -1,6 +1,8 @@
 import {
   Controller,
   Post,
+  Get,
+  Param,
   Body,
   Headers,
   Req,
@@ -54,5 +56,32 @@ export class PaymentsController {
       throw new BadRequestException('Raw body not available');
     }
     return this.paymentsService.handleWebhook(signature, rawBody);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('subscription')
+  async getSubscription(@CurrentUser() user: { sub: number }) {
+    return this.paymentsService.getSubscriptionInfo(user.sub);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('history')
+  async getHistory(@CurrentUser() user: { sub: number }) {
+    return this.paymentsService.getPaymentHistory(user.sub);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('verify-session/:sessionId')
+  async verifySession(
+    @CurrentUser() user: { sub: number },
+    @Param('sessionId') sessionId: string,
+  ) {
+    if (!sessionId) {
+      throw new BadRequestException('Session ID is required');
+    }
+    return this.paymentsService.verifyCheckoutSession(user.sub, sessionId);
   }
 }

@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, ConflictException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
+import { UserRole } from '../users/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
@@ -65,7 +66,12 @@ describe('AuthService', () => {
 
   it('registers a new user and returns tokens', async () => {
     (usersRepo.findOneBy as jest.Mock).mockResolvedValue(undefined);
-    const savedUser = { id: 1, email: 'a@b.com', passwordHash: 'x' } as any;
+    const savedUser = {
+      id: 1,
+      email: 'a@b.com',
+      passwordHash: 'x',
+      role: UserRole.USER,
+    } as any;
     (usersRepo.create as jest.Mock).mockReturnValue(savedUser);
     (usersRepo.save as jest.Mock).mockResolvedValue(savedUser);
 
@@ -75,6 +81,7 @@ describe('AuthService', () => {
     } as any);
     expect(res.user.id).toBe(1);
     expect(res.user.email).toBe('a@b.com');
+    expect(res.user.role).toBe(UserRole.USER);
     expect(res.tokens.accessToken).toBeDefined();
     expect(res.tokens.refreshToken).toBeDefined();
   });
@@ -100,19 +107,44 @@ describe('AuthService', () => {
     (usersRepo.findOneBy as jest.Mock).mockResolvedValue({
       id: 5,
       email: 'test@example.com',
+      role: UserRole.ADMIN,
     } as any);
     const refreshRepo = (usersRepo as any).refreshRepo as any;
     (refreshRepo.findOne as jest.Mock).mockResolvedValue({
       token: 'valid-token',
       revoked: false,
-      user: { id: 5, email: 'test@example.com' },
+      user: { id: 5, email: 'test@example.com', role: UserRole.ADMIN },
     });
 
     const res = await service.refresh('valid-token');
     expect(res.user.id).toBe(5);
     expect(res.user.email).toBe('test@example.com');
+    expect(res.user.role).toBe(UserRole.ADMIN);
     expect(res.tokens.accessToken).toBeDefined();
     expect(res.tokens.refreshToken).toBeDefined();
+  });
+
+  it('serializes role into JWT access token payload', async () => {
+    const signSpy = jwtService.sign as jest.Mock;
+    signSpy.mockClear();
+
+    (usersRepo.findOneBy as jest.Mock).mockResolvedValue(undefined);
+    const savedUser = {
+      id: 9,
+      email: 'role@example.com',
+      password_hash: 'hash',
+      role: UserRole.MODERATOR,
+    } as any;
+    (usersRepo.create as jest.Mock).mockReturnValue(savedUser);
+    (usersRepo.save as jest.Mock).mockResolvedValue(savedUser);
+
+    await service.register({
+      email: 'role@example.com',
+      password: 'StrongPass123!',
+    } as any);
+
+    const firstPayload = signSpy.mock.calls[0]?.[0];
+    expect(firstPayload.role).toBe(UserRole.MODERATOR);
   });
 
   it('revokes a refresh token', async () => {

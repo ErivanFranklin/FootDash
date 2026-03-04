@@ -8,6 +8,8 @@
 
 ## Deploy Steps
 - [ ] Deploy backend with the new branch/commit that includes push notification logic
+- [ ] Run pending DB migrations before traffic cutover: `cd backend && npm run migrate:run` (includes `1773000000000-AddUserRole`)
+- [ ] Verify no pending migrations remain: `cd backend && npm run migrate:show`
 - [ ] Wait for staging services to be healthy (watch logs for startup errors)
 
 ## Post-Deploy Verification

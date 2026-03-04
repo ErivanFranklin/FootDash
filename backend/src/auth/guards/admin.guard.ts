@@ -1,6 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
+import { UserRole } from '../../users/user.entity';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -13,14 +14,16 @@ export class AdminGuard implements CanActivate {
       | undefined;
 
     if (!user) {
-      // Fallback to allow access if no auth context is attached.
-      return true;
+      return false;
     }
 
     return Boolean(
       user.isAdmin ||
-        user.role === 'admin' ||
-        (Array.isArray(user.roles) && user.roles.includes('admin')),
+        user.role === UserRole.ADMIN ||
+        user.role?.toLowerCase() === 'admin' ||
+        (Array.isArray(user.roles) &&
+          (user.roles.includes(UserRole.ADMIN) ||
+            user.roles.map(r => r.toLowerCase()).includes('admin'))),
     );
   }
 }

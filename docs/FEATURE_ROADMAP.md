@@ -1,7 +1,7 @@
 # FootDash — Feature Roadmap & Implementation Plans
 
 > **Created:** March 1, 2026  
-> **Last Updated:** March 2, 2026  
+> **Last Updated:** March 4, 2026  
 > **Status:** Complete (Phases 8-13) — Phase 14 Active  
 
 This document is the single source of truth for all planned features, improvements, and tech-debt items for FootDash. Each item includes scope, priority, effort estimate, and an implementation plan.
@@ -16,7 +16,7 @@ This document is the single source of truth for all planned features, improvemen
 | **Phase 11** — Architecture & Quality | ✅ COMPLETE | 11.1-11.7 | `b67e232`, `d64d4a3` |
 | **Phase 12** — State Management Migration | ✅ COMPLETE | 12.1-12.5 | `dfdd96b` |
 | **Phase 13** — Future Vision | ✅ COMPLETE | 13.1-13.6 | Phase 13 commit |
-| **Phase 14** — Production Readiness | 🔄 IN PROGRESS | 14.1-14.6 | In development |
+| **Phase 14** — Production Readiness | 🔄 IN PROGRESS | 14.1-14.7 | In development |
 
 5. [Phase 11 — Architecture & Quality](#phase-11--architecture--quality)
 6. [Phase 12 — State Management Migration](#phase-12--state-management-migration)
@@ -1548,3 +1548,50 @@ Frontend:
 - [x] All new controllers have `@ApiResponse` decorators for 200 and error cases
 - [x] `README.md` feature list is up to date
 - [x] `docker compose up` succeeds with the updated compose file
+
+---
+
+### 14.7 — RBAC + Billing Completion Plan ✅ DONE
+
+**Problem:** Authorization is currently subscription-centric (`isPro`) and does not provide persistent RBAC (USER/ADMIN/MODERATOR). Stripe flow is functional but incomplete for production billing UX because key API endpoints (`/payments/subscription`, `/payments/history`, `/payments/verify-session/:id`) are missing.
+
+**Scope:** Backend + Frontend  
+**Effort:** 3-4 days  
+**Branch:** `feature/phase14-rbac-billing`
+
+#### Track 1 — RBAC Foundation (Data + Auth)
+
+1. Add `UserRole` enum and `role` column to `users` (`USER` default)
+2. Create migration to backfill existing users with `USER`
+3. Include `role` in JWT payload at login/refresh
+4. Extend `/auth/profile` response and frontend `User` model with `role`
+5. Add unit tests for role serialization/deserialization in auth flow
+
+#### Track 2 — Admin Authorization Enforcement
+
+1. Replace permissive `AdminGuard` fallback with strict deny-by-default behavior when user context is missing
+2. Add reusable `@Roles(...)` decorator and `RolesGuard` for role-based route policies
+3. Keep `JwtAuthGuard` + `RolesGuard` composition for admin-only endpoints
+4. Apply role policies to existing admin routes (starting with analytics export)
+5. Add E2E tests: user gets `403`, admin gets `200`
+
+#### Track 3 — Stripe Billing API Completion
+
+1. Add `GET /payments/subscription` endpoint returning tier/status/period flags
+2. Add `GET /payments/history` endpoint returning recent invoices/charges
+3. Add `GET /payments/verify-session/:sessionId` endpoint to confirm checkout completion server-side
+4. Update `PaymentSuccessPage` to verify session before rendering success copy
+5. Align frontend billing state usage (`BillingStore`) to real backend responses
+
+#### Acceptance Criteria
+- [x] DB schema includes `users.role` with safe migration and rollback
+- [x] JWT payload and `/auth/profile` include `role`
+- [x] Admin-only routes return `403` for non-admin users and `200` for admins
+- [x] `BillingStore.loadSubscription()` and `BillingStore.loadHistory()` work against live backend endpoints
+- [x] `PaymentSuccessPage` shows success only after `verify-session` confirms payment
+- [x] Existing Pro paywall behavior remains intact for non-Pro users
+
+#### Implementation Notes (Mar 4, 2026)
+- Added persistent RBAC (`USER`/`ADMIN`/`MODERATOR`) with migration and auth/profile propagation.
+- Added role-based authorization primitives (`@Roles`, `RolesGuard`) and enforced admin policy on analytics export routes.
+- Added billing endpoints (`/payments/subscription`, `/payments/history`, `/payments/verify-session/:sessionId`) and connected frontend payment success flow to server-side verification.
