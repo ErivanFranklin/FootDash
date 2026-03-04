@@ -54,12 +54,36 @@ export async function loginTestUser(
 
   await page.locator('ion-input[type="email"] input').fill(email);
   await page.locator('ion-input[type="password"] input').fill(password);
-  await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
+
+  const submitLogin = async (): Promise<void> => {
+    const localizedSignIn = page
+      .locator('ion-button')
+      .filter({ hasText: /sign in|login|log in|entrar/i })
+      .first();
+
+    if (await localizedSignIn.isVisible().catch(() => false)) {
+      await localizedSignIn.click({ force: true });
+      return;
+    }
+
+    const submitButton = page
+      .locator('ion-button[type="submit"], button[type="submit"]')
+      .first();
+
+    if (await submitButton.isVisible().catch(() => false)) {
+      await submitButton.click({ force: true });
+      return;
+    }
+
+    await page.locator('ion-input[type="password"] input').press('Enter');
+  };
+
+  await submitLogin();
 
   // Wait for redirect to authenticated route (home)
   await page.waitForURL('**/home', { timeout: 20_000 }).catch(async () => {
     // Retry click in case Ionic swallowed the first one
-    await page.locator('ion-button', { hasText: 'Sign in' }).first().click({ force: true });
+    await submitLogin();
     await page.waitForURL('**/home', { timeout: 15_000 });
   });
 
