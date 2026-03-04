@@ -52,8 +52,35 @@ export async function loginTestUser(
   await page.goto('/login');
   await waitForIonicReady(page);
 
-  await page.locator('ion-input[type="email"] input').fill(email);
-  await page.locator('ion-input[type="password"] input').fill(password);
+  // In some runs the app restores session immediately and redirects to /home.
+  if (page.url().includes('/home')) {
+    await waitForAuthLayout(page);
+    return { email, password, userId };
+  }
+
+  const emailInput = page.locator('ion-input[type="email"] input').first();
+  const passwordInput = page.locator('ion-input[type="password"] input').first();
+
+  const hasPasswordInput = await passwordInput
+    .waitFor({ state: 'visible', timeout: 8_000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (!hasPasswordInput) {
+    // If login form is not visible, allow one short window for redirect completion.
+    const redirectedHome = await page
+      .waitForURL('**/home', { timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (redirectedHome) {
+      await waitForAuthLayout(page);
+      return { email, password, userId };
+    }
+    throw new Error(`Login form did not become visible. Current URL: ${page.url()}`);
+  }
+
+  await emailInput.fill(email, { timeout: 10_000 });
+  await passwordInput.fill(password, { timeout: 10_000 });
 
   const submitLogin = async (): Promise<void> => {
     const localizedSignIn = page
@@ -75,7 +102,7 @@ export async function loginTestUser(
       return;
     }
 
-    await page.locator('ion-input[type="password"] input').press('Enter');
+    await page.keyboard.press('Enter');
   };
 
   await submitLogin();
