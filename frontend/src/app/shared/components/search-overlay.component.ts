@@ -49,7 +49,7 @@ export interface FilterChip {
             [class.chip-selected]="chip.selected"
             (click)="onTypeSelect(chip)">
             <ion-icon *ngIf="chip.icon" [name]="chip.icon"></ion-icon>
-            {{ chip.label }}
+            <span>{{ chip.label }}</span>
           </ion-chip>
         </div>
 
@@ -132,6 +132,12 @@ export interface FilterChip {
       cursor: pointer;
       transition: all 0.2s ease;
       user-select: none;
+      display: flex;
+      align-items: center;
+    }
+
+    ion-chip ion-icon {
+      margin-right: 6px;
     }
 
     ion-chip.chip-selected {

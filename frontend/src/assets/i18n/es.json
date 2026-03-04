@@ -16,8 +16,73 @@
     "MATCHES": "Partidos",
     "FEED": "Feed",
     "PROFILE": "Perfil",
+    "NOTIFICATIONS": "Notificaciones",
     "SETTINGS": "Ajustes",
     "LOGOUT": "Cerrar sesión"
+  },
+  "LANGUAGE": {
+    "LABEL": "Idioma",
+    "EN_US": "Inglés (EE. UU.)",
+    "ES": "Español",
+    "PT_BR": "Portugués (Brasil)"
+  },
+  "SETTINGS": {
+    "TITLE": "Ajustes",
+    "LANGUAGE": "Idioma",
+    "TABS": {
+      "PROFILE": "Perfil",
+      "PREFERENCES": "Preferencias",
+      "NOTIFICATIONS": "Notificaciones",
+      "ACCOUNT": "Cuenta"
+    },
+    "PROFILE": {
+      "UPLOAD": "Subir",
+      "REMOVE": "Eliminar",
+      "DISPLAY_NAME": "Nombre para mostrar",
+      "DISPLAY_NAME_PLACEHOLDER": "Tu nombre",
+      "BIO": "Biografía",
+      "BIO_PLACEHOLDER": "Cuéntanos sobre ti",
+      "SAVE": "Guardar perfil"
+    },
+    "PREFERENCES": {
+      "THEME": "Tema",
+      "THEME_LIGHT": "Claro",
+      "THEME_DARK": "Oscuro",
+      "THEME_AUTO": "Automático (Sistema)",
+      "TIMEZONE": "Zona horaria",
+      "TIMEZONE_PLACEHOLDER": "p. ej. America/Sao_Paulo",
+      "SAVE": "Guardar preferencias"
+    },
+    "NOTIFICATIONS": {
+      "PUSH": "Notificaciones push",
+      "EMAIL": "Notificaciones por correo",
+      "NOTE": "Controla qué tipos de eventos activan notificaciones."
+    },
+    "ACCOUNT": {
+      "CURRENT_PASSWORD": "Contraseña actual",
+      "NEW_PASSWORD": "Nueva contraseña",
+      "CONFIRM_NEW_PASSWORD": "Confirmar nueva contraseña",
+      "PASSWORD_MIN": "Debe tener al menos 8 caracteres",
+      "PASSWORD_MISMATCH": "Las contraseñas no coinciden",
+      "CHANGE_PASSWORD": "Cambiar contraseña",
+      "DANGER_ZONE": "Zona de peligro",
+      "DELETE": "Eliminar cuenta",
+      "DELETE_WARNING": "Esta acción es permanente y no se puede deshacer. Todos tus datos se perderán."
+    },
+    "MESSAGES": {
+      "PROFILE_SAVED": "¡Perfil guardado!",
+      "PROFILE_SAVE_FAILED": "No se pudo guardar el perfil",
+      "FILE_TOO_LARGE": "El archivo debe ser menor de 2 MB",
+      "AVATAR_UPDATED": "¡Avatar actualizado!",
+      "AVATAR_UPDATE_FAILED": "Falló la subida del avatar",
+      "AVATAR_REMOVED": "Avatar eliminado",
+      "AVATAR_REMOVE_FAILED": "No se pudo eliminar el avatar",
+      "PREFERENCES_SAVED": "¡Preferencias guardadas!",
+      "PREFERENCES_SAVE_FAILED": "No se pudieron guardar las preferencias",
+      "PASSWORD_CHANGED": "¡Contraseña cambiada!",
+      "PASSWORD_CHANGE_FAILED": "No se pudo cambiar la contraseña",
+      "ACCOUNT_DELETE_UNAVAILABLE": "La eliminación de cuenta aún no está disponible"
+    }
   },
   "MATCH_STATUS": {
     "LIVE": "En Vivo",

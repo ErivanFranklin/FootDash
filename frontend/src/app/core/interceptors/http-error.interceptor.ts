@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { timer } from 'rxjs';
 import { LoggerService } from '../services/logger.service';
 
 @Injectable()
@@ -12,8 +13,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       // Retry failed requests (except for auth endpoints and non-GET requests)
       retry({
-        count: this.shouldRetry(request) ? 2 : 0,
-        delay: 1000
+        count: 2,
+        delay: (error) => {
+          if (!this.shouldRetry(request, error)) {
+            throw error;
+          }
+          return timer(1000);
+        },
       }),
       catchError((error: HttpErrorResponse) => {
         // Log the error for debugging
@@ -27,15 +33,22 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     );
   }
 
-  private shouldRetry(request: HttpRequest<any>): boolean {
+  private shouldRetry(request: HttpRequest<any>, error: HttpErrorResponse): boolean {
     // Don't retry auth endpoints or non-GET requests
     const isAuthEndpoint = request.url.includes('/auth/');
     const isGetRequest = request.method === 'GET';
-    
-    return !isAuthEndpoint && isGetRequest;
+
+    // Retry only transient failures (network / 5xx), never retry 4xx like 401.
+    const isTransientError = error.status === 0 || error.status >= 500;
+
+    return !isAuthEndpoint && isGetRequest && isTransientError;
   }
 
   private logError(error: HttpErrorResponse, request: HttpRequest<any>): void {
+    if (this.shouldSuppressExpectedAuthNoise(error, request)) {
+      return;
+    }
+
     const timestamp = new Date().toISOString();
     
     console.group(`🔴 HTTP Error [${timestamp}]`);
@@ -51,6 +64,22 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       message: error.message
     });
     console.groupEnd();
+  }
+
+  private shouldSuppressExpectedAuthNoise(
+    error: HttpErrorResponse,
+    request: HttpRequest<any>,
+  ): boolean {
+    if (error.status !== 401) {
+      return false;
+    }
+
+    const url = request.url || '';
+    const isPassiveNotificationPoll =
+      url.includes('/alerts/unread') || url.includes('/alerts/counts/by-type');
+    const isRefresh = url.includes('/auth/refresh');
+
+    return isPassiveNotificationPoll || isRefresh;
   }
 
   private enhanceError(error: HttpErrorResponse): HttpErrorResponse {

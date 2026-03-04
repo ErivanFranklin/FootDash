@@ -95,8 +95,18 @@ import {
           (click)="selectType(t.value)"
         >
           <ion-icon [name]="t.icon"></ion-icon>
-          {{ t.label }}
+          <span>{{ t.label }}</span>
         </ion-chip>
+      </div>
+
+      <!-- Initial Empty State -->
+      <div class="center-content" *ngIf="!query && recentSearches.length === 0 && !loading && !searched">
+        <ion-icon
+          name="search-outline"
+          style="font-size: 64px; color: var(--ion-color-medium)"
+        ></ion-icon>
+        <h3>Start searching</h3>
+        <p>Type at least 2 characters to search teams, users, and matches</p>
       </div>
 
       <!-- Recent Searches (shown when no query) -->
@@ -197,6 +207,12 @@ import {
         --background: var(--ion-color-light);
         cursor: pointer;
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      ion-chip ion-icon {
+        margin-right: 6px;
       }
 
       ion-chip.chip-selected {

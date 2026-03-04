@@ -51,6 +51,16 @@ export class HomePage implements OnInit {
     }
   }
 
+  ionViewWillEnter() {
+    this.isLoggedIn = !!this.authService.getToken();
+    if (this.isLoggedIn) {
+      this.loadDashboard();
+    } else {
+      this.dashboard = null;
+      this.loading = false;
+    }
+  }
+
   loadDashboard() {
     this.loading = true;
     this.http.get<DashboardData>(`${environment.apiBaseUrl}/dashboard`).subscribe({

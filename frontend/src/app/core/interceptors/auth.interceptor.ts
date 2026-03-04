@@ -14,13 +14,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Read token synchronously from the Store's latest emission
   let currentToken: string | null = null;
   store.select(selectToken).pipe(first()).subscribe(t => (currentToken = t));
+  const runtimeToken = auth.getToken();
+  const tokenForRequest = currentToken || runtimeToken;
 
   // Always send credentials (cookies) for auth endpoints
   let cloned = req.clone({ withCredentials: true });
 
-  if (currentToken) {
+  if (tokenForRequest && auth.isAuthenticated()) {
     cloned = cloned.clone({
-      setHeaders: { Authorization: `Bearer ${currentToken}` },
+      setHeaders: { Authorization: `Bearer ${tokenForRequest}` },
     });
   }
 
@@ -31,8 +33,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/auth/refresh') ||
         req.url.includes('/auth/login') ||
         req.url.includes('/auth/register');
+      const isPassiveNotificationPoll =
+        req.url.includes('/alerts/unread') ||
+        req.url.includes('/alerts/counts/by-type');
 
-      if (error.status === 401 && !isAuthUrl) {
+      const hasSessionToken = auth.isAuthenticated();
+
+      if (
+        error.status === 401 &&
+        !isAuthUrl &&
+        !isPassiveNotificationPoll &&
+        hasSessionToken
+      ) {
         return auth.refreshAccessToken().pipe(
           switchMap((newToken) => {
             if (!newToken) {

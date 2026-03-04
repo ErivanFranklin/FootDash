@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LanguageService } from '../../core/services/language.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
@@ -30,7 +30,7 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
       </ion-item>
       <ion-item button (click)="navigateTo('/notifications')">
         <ion-icon name="notifications-outline" slot="start"></ion-icon>
-        <ion-label>Notifications</ion-label>
+        <ion-label>{{ 'NAV.NOTIFICATIONS' | transloco }}</ion-label>
       </ion-item>
       
       <ion-item-divider>
@@ -39,17 +39,22 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
 
       <ion-item button (click)="navigateTo('/settings')">
         <ion-icon name="settings-outline" slot="start"></ion-icon>
-        <ion-label>Settings</ion-label>
+        <ion-label>{{ 'NAV.SETTINGS' | transloco }}</ion-label>
       </ion-item>
 
-      <ion-item>
+      <ion-item class="language-item">
         <ion-icon name="globe" slot="start"></ion-icon>
-        <ion-select [interfaceOptions]="{header: 'Language'}" 
-                    [value]="currentLang" 
-                    (ionChange)="changeLanguage($event)">
-          <ion-select-option value="en">English (US)</ion-select-option>
-          <ion-select-option value="es">Español</ion-select-option>
-          <ion-select-option value="pt">Português (BR)</ion-select-option>
+        <ion-label>{{ 'SETTINGS.LANGUAGE' | transloco }}</ion-label>
+        <ion-select
+          slot="end"
+          interface="popover"
+          [interfaceOptions]="{ header: languageHeader }"
+          [value]="currentLang"
+          (ionChange)="changeLanguage($event)"
+        >
+          <ion-select-option value="en">{{ 'LANGUAGE.EN_US' | transloco }}</ion-select-option>
+          <ion-select-option value="es">{{ 'LANGUAGE.ES' | transloco }}</ion-select-option>
+          <ion-select-option value="pt">{{ 'LANGUAGE.PT_BR' | transloco }}</ion-select-option>
         </ion-select>
       </ion-item>
       
@@ -60,18 +65,32 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
     </ion-list>
   `,
   standalone: true,
+  styles: [`
+    .language-item ion-label {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .language-item ion-select {
+      min-width: 150px;
+      max-width: 210px;
+      text-align: right;
+    }
+  `],
   imports: [CommonModule, IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption, TranslocoPipe, FormsModule],
 })
 export class NavigationMenuComponent {
   private router = inject(Router);
   private languageService = inject(LanguageService);
+  private translocoService = inject(TranslocoService);
   private authService = inject(AuthService);
   private websocketService = inject(WebsocketService);
 
-  currentLang = 'en';
+  get currentLang(): string {
+    return this.languageService.currentLang();
+  }
 
-  constructor() {
-    this.currentLang = this.languageService.currentLang();
+  get languageHeader(): string {
+    return this.translocoService.translate('SETTINGS.LANGUAGE');
   }
 
   navigateTo(path: string) {

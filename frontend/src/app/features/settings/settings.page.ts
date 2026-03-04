@@ -9,6 +9,7 @@ import {
   IonSpinner, IonText, IonList, IonNote,
 } from '@ionic/angular/standalone';
 import { ToastController, AlertController } from '@ionic/angular';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import { cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline, globeOutline, timeOutline } from 'ionicons/icons';
 
@@ -27,6 +28,7 @@ import { LoggerService } from '../../core/services/logger.service';
     IonSegment, IonSegmentButton, IonLabel, IonItem, IonInput, IonTextarea,
     IonButton, IonIcon, IonAvatar, IonToggle, IonSelect, IonSelectOption,
     IonSpinner, IonText, IonList, IonNote,
+    TranslocoPipe,
   ],
   template: `
     <ion-header [translucent]="true">
@@ -34,21 +36,21 @@ import { LoggerService } from '../../core/services/logger.service';
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/home"></ion-back-button>
         </ion-buttons>
-        <ion-title>Settings</ion-title>
+        <ion-title>{{ 'SETTINGS.TITLE' | transloco }}</ion-title>
       </ion-toolbar>
       <ion-toolbar>
         <ion-segment [(ngModel)]="activeTab" (ionChange)="onTabChange()">
           <ion-segment-button value="profile">
-            <ion-label>Profile</ion-label>
+            <ion-label>{{ 'SETTINGS.TABS.PROFILE' | transloco }}</ion-label>
           </ion-segment-button>
           <ion-segment-button value="preferences">
-            <ion-label>Preferences</ion-label>
+            <ion-label>{{ 'SETTINGS.TABS.PREFERENCES' | transloco }}</ion-label>
           </ion-segment-button>
           <ion-segment-button value="notifications">
-            <ion-label>Notifications</ion-label>
+            <ion-label>{{ 'SETTINGS.TABS.NOTIFICATIONS' | transloco }}</ion-label>
           </ion-segment-button>
           <ion-segment-button value="account">
-            <ion-label>Account</ion-label>
+            <ion-label>{{ 'SETTINGS.TABS.ACCOUNT' | transloco }}</ion-label>
           </ion-segment-button>
         </ion-segment>
       </ion-toolbar>
@@ -73,12 +75,12 @@ import { LoggerService } from '../../core/services/logger.service';
               <div class="avatar-actions">
                 <ion-button size="small" (click)="fileInput.click()">
                   <ion-icon slot="start" name="camera-outline"></ion-icon>
-                  Upload
+                  {{ 'SETTINGS.PROFILE.UPLOAD' | transloco }}
                 </ion-button>
                 @if (profile?.avatarUrl) {
                   <ion-button size="small" color="danger" fill="outline" (click)="removeAvatar()">
                     <ion-icon slot="start" name="trash-outline"></ion-icon>
-                    Remove
+                    {{ 'SETTINGS.PROFILE.REMOVE' | transloco }}
                   </ion-button>
                 }
                 <input #fileInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onAvatarSelected($event)" />
@@ -87,16 +89,16 @@ import { LoggerService } from '../../core/services/logger.service';
 
             <ion-list>
               <ion-item>
-                <ion-label position="stacked">Display Name</ion-label>
-                <ion-input [(ngModel)]="displayName" maxlength="50" placeholder="Your name"></ion-input>
+                <ion-label position="stacked">{{ 'SETTINGS.PROFILE.DISPLAY_NAME' | transloco }}</ion-label>
+                <ion-input [(ngModel)]="displayName" maxlength="50" [placeholder]="'SETTINGS.PROFILE.DISPLAY_NAME_PLACEHOLDER' | transloco"></ion-input>
               </ion-item>
               <ion-item>
-                <ion-label position="stacked">Bio</ion-label>
-                <ion-textarea [(ngModel)]="bio" maxlength="500" rows="4" placeholder="Tell us about yourself"></ion-textarea>
+                <ion-label position="stacked">{{ 'SETTINGS.PROFILE.BIO' | transloco }}</ion-label>
+                <ion-textarea [(ngModel)]="bio" maxlength="500" rows="4" [placeholder]="'SETTINGS.PROFILE.BIO_PLACEHOLDER' | transloco"></ion-textarea>
               </ion-item>
             </ion-list>
             <ion-button expand="block" (click)="saveProfile()" [disabled]="savingProfile" class="save-btn">
-              @if (savingProfile) { <ion-spinner name="dots"></ion-spinner> } @else { Save Profile }
+              @if (savingProfile) { <ion-spinner name="dots"></ion-spinner> } @else { {{ 'SETTINGS.PROFILE.SAVE' | transloco }} }
             </ion-button>
           </div>
         }
@@ -105,31 +107,42 @@ import { LoggerService } from '../../core/services/logger.service';
         @if (activeTab === 'preferences') {
           <div class="tab-content">
             <ion-list>
-              <ion-item>
+              <ion-item class="preferences-item">
                 <ion-icon name="settings-outline" slot="start"></ion-icon>
-                <ion-select label="Theme" [(ngModel)]="selectedTheme" (ionChange)="onThemeChange()">
-                  <ion-select-option value="light">Light</ion-select-option>
-                  <ion-select-option value="dark">Dark</ion-select-option>
-                  <ion-select-option value="auto">Auto (System)</ion-select-option>
+                <ion-label>{{ 'SETTINGS.PREFERENCES.THEME' | transloco }}</ion-label>
+                <ion-select
+                  slot="end"
+                  interface="popover"
+                  [(ngModel)]="selectedTheme"
+                  (ionChange)="onThemeChange()"
+                >
+                  <ion-select-option value="light">{{ 'SETTINGS.PREFERENCES.THEME_LIGHT' | transloco }}</ion-select-option>
+                  <ion-select-option value="dark">{{ 'SETTINGS.PREFERENCES.THEME_DARK' | transloco }}</ion-select-option>
+                  <ion-select-option value="auto">{{ 'SETTINGS.PREFERENCES.THEME_AUTO' | transloco }}</ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-item class="language-item">
+              <ion-item class="preferences-item language-item">
                 <ion-icon name="globe-outline" slot="start"></ion-icon>
-                <ion-label>Language</ion-label>
-                <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()">
-                  <ion-select-option value="en">English (US)</ion-select-option>
-                  <ion-select-option value="es">Español</ion-select-option>
-                  <ion-select-option value="pt">Português (BR)</ion-select-option>
+                <ion-label>{{ 'SETTINGS.LANGUAGE' | transloco }}</ion-label>
+                <ion-select
+                  slot="end"
+                  interface="popover"
+                  [(ngModel)]="selectedLanguage"
+                  (ionChange)="onLanguageChange()"
+                >
+                  <ion-select-option value="en">{{ 'LANGUAGE.EN_US' | transloco }}</ion-select-option>
+                  <ion-select-option value="es">{{ 'LANGUAGE.ES' | transloco }}</ion-select-option>
+                  <ion-select-option value="pt">{{ 'LANGUAGE.PT_BR' | transloco }}</ion-select-option>
                 </ion-select>
               </ion-item>
               <ion-item>
                 <ion-icon name="time-outline" slot="start"></ion-icon>
-                <ion-label position="stacked">Timezone</ion-label>
-                <ion-input [(ngModel)]="timezone" placeholder="e.g. America/Sao_Paulo"></ion-input>
+                <ion-label position="stacked">{{ 'SETTINGS.PREFERENCES.TIMEZONE' | transloco }}</ion-label>
+                <ion-input [(ngModel)]="timezone" [placeholder]="'SETTINGS.PREFERENCES.TIMEZONE_PLACEHOLDER' | transloco"></ion-input>
               </ion-item>
             </ion-list>
             <ion-button expand="block" (click)="savePreferences()" [disabled]="savingPrefs" class="save-btn">
-              @if (savingPrefs) { <ion-spinner name="dots"></ion-spinner> } @else { Save Preferences }
+              @if (savingPrefs) { <ion-spinner name="dots"></ion-spinner> } @else { {{ 'SETTINGS.PREFERENCES.SAVE' | transloco }} }
             </ion-button>
           </div>
         }
@@ -140,17 +153,17 @@ import { LoggerService } from '../../core/services/logger.service';
             <ion-list>
               <ion-item>
                 <ion-toggle [(ngModel)]="notificationEnabled" (ionChange)="onNotifChange()">
-                  Push Notifications
+                  {{ 'SETTINGS.NOTIFICATIONS.PUSH' | transloco }}
                 </ion-toggle>
               </ion-item>
               <ion-item>
                 <ion-toggle [(ngModel)]="emailNotifications" (ionChange)="onNotifChange()">
-                  Email Notifications
+                  {{ 'SETTINGS.NOTIFICATIONS.EMAIL' | transloco }}
                 </ion-toggle>
               </ion-item>
             </ion-list>
             <ion-note class="notif-note">
-              Control which types of events trigger notifications.
+              {{ 'SETTINGS.NOTIFICATIONS.NOTE' | transloco }}
             </ion-note>
           </div>
         }
@@ -160,32 +173,32 @@ import { LoggerService } from '../../core/services/logger.service';
           <div class="tab-content">
             <ion-list>
               <ion-item>
-                <ion-label position="stacked">Current Password</ion-label>
+                <ion-label position="stacked">{{ 'SETTINGS.ACCOUNT.CURRENT_PASSWORD' | transloco }}</ion-label>
                 <ion-input [(ngModel)]="currentPassword" type="password"></ion-input>
               </ion-item>
               <ion-item>
-                <ion-label position="stacked">New Password</ion-label>
+                <ion-label position="stacked">{{ 'SETTINGS.ACCOUNT.NEW_PASSWORD' | transloco }}</ion-label>
                 <ion-input [(ngModel)]="newPassword" type="password" minlength="8"></ion-input>
               </ion-item>
               <ion-item>
-                <ion-label position="stacked">Confirm New Password</ion-label>
+                <ion-label position="stacked">{{ 'SETTINGS.ACCOUNT.CONFIRM_NEW_PASSWORD' | transloco }}</ion-label>
                 <ion-input [(ngModel)]="confirmNewPassword" type="password"></ion-input>
               </ion-item>
             </ion-list>
             @if (newPassword && newPassword.length > 0 && newPassword.length < 8) {
-              <ion-note color="danger" class="field-note">Must be at least 8 characters</ion-note>
+              <ion-note color="danger" class="field-note">{{ 'SETTINGS.ACCOUNT.PASSWORD_MIN' | transloco }}</ion-note>
             }
             @if (confirmNewPassword && newPassword !== confirmNewPassword) {
-              <ion-note color="danger" class="field-note">Passwords do not match</ion-note>
+              <ion-note color="danger" class="field-note">{{ 'SETTINGS.ACCOUNT.PASSWORD_MISMATCH' | transloco }}</ion-note>
             }
             <ion-button expand="block" (click)="changePassword()" [disabled]="changingPw || !canChangePw()" class="save-btn">
-              @if (changingPw) { <ion-spinner name="dots"></ion-spinner> } @else { Change Password }
+              @if (changingPw) { <ion-spinner name="dots"></ion-spinner> } @else { {{ 'SETTINGS.ACCOUNT.CHANGE_PASSWORD' | transloco }} }
             </ion-button>
 
             <div class="danger-zone">
-              <ion-text color="danger"><h3>Danger Zone</h3></ion-text>
+              <ion-text color="danger"><h3>{{ 'SETTINGS.ACCOUNT.DANGER_ZONE' | transloco }}</h3></ion-text>
               <ion-button expand="block" color="danger" fill="outline" (click)="confirmDeleteAccount()">
-                Delete Account
+                {{ 'SETTINGS.ACCOUNT.DELETE' | transloco }}
               </ion-button>
             </div>
           </div>
@@ -201,8 +214,15 @@ import { LoggerService } from '../../core/services/logger.service';
     .avatar-lg img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     .avatar-placeholder { font-size: 48px; color: var(--ion-color-medium); }
     .avatar-actions { display: flex; gap: 8px; }
-    .language-item ion-label { margin-right: 12px; }
-    .language-item ion-select { min-width: 170px; }
+    .preferences-item ion-label {
+      flex: 1;
+      margin-right: 12px;
+    }
+    .preferences-item ion-select {
+      min-width: 170px;
+      max-width: 220px;
+      text-align: right;
+    }
     .save-btn { margin-top: 16px; }
     .notif-note { display: block; padding: 8px 16px; font-size: 13px; }
     .danger-zone { margin-top: 48px; text-align: center; }
@@ -244,6 +264,7 @@ export class SettingsPage implements OnInit {
   private alertCtrl = inject(AlertController);
   private router = inject(Router);
   private logger = inject(LoggerService);
+  private transloco = inject(TranslocoService);
 
   constructor() {
     addIcons({ cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline, globeOutline, timeOutline });
@@ -296,12 +317,12 @@ export class SettingsPage implements OnInit {
       next: (p) => {
         this.profile = p;
         this.savingProfile = false;
-        this.showToast('Profile saved!', 'success');
+        this.showToast(this.t('SETTINGS.MESSAGES.PROFILE_SAVED'), 'success');
       },
       error: (err) => {
         this.savingProfile = false;
         this.logger.error('Error saving profile', err);
-        this.showToast('Failed to save profile', 'danger');
+        this.showToast(this.t('SETTINGS.MESSAGES.PROFILE_SAVE_FAILED'), 'danger');
       },
     });
   }
@@ -311,17 +332,17 @@ export class SettingsPage implements OnInit {
     const file = input.files?.[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-      this.showToast('File must be under 2 MB', 'warning');
+      this.showToast(this.t('SETTINGS.MESSAGES.FILE_TOO_LARGE'), 'warning');
       return;
     }
     this.settings.uploadAvatar(this.userId, file).subscribe({
       next: (p) => {
         this.profile = p;
-        this.showToast('Avatar updated!', 'success');
+        this.showToast(this.t('SETTINGS.MESSAGES.AVATAR_UPDATED'), 'success');
       },
       error: (err) => {
         this.logger.error('Avatar upload failed', err);
-        this.showToast('Avatar upload failed', 'danger');
+        this.showToast(this.t('SETTINGS.MESSAGES.AVATAR_UPDATE_FAILED'), 'danger');
       },
     });
   }
@@ -330,9 +351,9 @@ export class SettingsPage implements OnInit {
     this.settings.deleteAvatar(this.userId).subscribe({
       next: () => {
         if (this.profile) this.profile.avatarUrl = undefined;
-        this.showToast('Avatar removed', 'success');
+        this.showToast(this.t('SETTINGS.MESSAGES.AVATAR_REMOVED'), 'success');
       },
-      error: () => this.showToast('Failed to remove avatar', 'danger'),
+      error: () => this.showToast(this.t('SETTINGS.MESSAGES.AVATAR_REMOVE_FAILED'), 'danger'),
     });
   }
 
@@ -363,11 +384,11 @@ export class SettingsPage implements OnInit {
     }).subscribe({
       next: () => {
         this.savingPrefs = false;
-        this.showToast('Preferences saved!', 'success');
+        this.showToast(this.t('SETTINGS.MESSAGES.PREFERENCES_SAVED'), 'success');
       },
       error: () => {
         this.savingPrefs = false;
-        this.showToast('Failed to save preferences', 'danger');
+        this.showToast(this.t('SETTINGS.MESSAGES.PREFERENCES_SAVE_FAILED'), 'danger');
       },
     });
   }
@@ -394,23 +415,23 @@ export class SettingsPage implements OnInit {
       next: () => {
         this.changingPw = false;
         this.currentPassword = this.newPassword = this.confirmNewPassword = '';
-        this.showToast('Password changed!', 'success');
+        this.showToast(this.t('SETTINGS.MESSAGES.PASSWORD_CHANGED'), 'success');
       },
       error: (err) => {
         this.changingPw = false;
         this.logger.error('Change password failed', err);
-        this.showToast(err?.error?.message || 'Failed to change password', 'danger');
+        this.showToast(err?.error?.message || this.t('SETTINGS.MESSAGES.PASSWORD_CHANGE_FAILED'), 'danger');
       },
     });
   }
 
   async confirmDeleteAccount() {
     const alert = await this.alertCtrl.create({
-      header: 'Delete Account',
-      message: 'This action is permanent and cannot be undone. All your data will be lost.',
+      header: this.t('SETTINGS.ACCOUNT.DELETE'),
+      message: this.t('SETTINGS.ACCOUNT.DELETE_WARNING'),
       buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        { text: 'Delete', role: 'destructive', cssClass: 'danger', handler: () => this.deleteAccount() },
+        { text: this.t('COMMON.CANCEL'), role: 'cancel' },
+        { text: this.t('SETTINGS.ACCOUNT.DELETE'), role: 'destructive', cssClass: 'danger', handler: () => this.deleteAccount() },
       ],
     });
     await alert.present();
@@ -418,7 +439,11 @@ export class SettingsPage implements OnInit {
 
   private deleteAccount() {
     // Placeholder — backend endpoint not yet implemented
-    this.showToast('Account deletion is not yet available', 'warning');
+    this.showToast(this.t('SETTINGS.MESSAGES.ACCOUNT_DELETE_UNAVAILABLE'), 'warning');
+  }
+
+  private t(key: string): string {
+    return this.transloco.translate(key);
   }
 
   private async showToast(message: string, color: string) {

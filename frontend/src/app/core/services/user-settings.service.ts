@@ -64,8 +64,12 @@ export class UserSettingsService {
     return this.http.put<UserPreferences>(`${this.baseUrl}/users/${userId}/preferences`, data, { withCredentials: true });
   }
 
-  updateTheme(userId: number, theme: string): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/users/${userId}/preferences/theme`, { theme }, { withCredentials: true });
+  updateTheme(
+    userId: number,
+    theme: UserPreferences['theme'],
+  ): Observable<UserPreferences> {
+    // Use upsert-safe endpoint so first-time users without preferences rows don't get 404.
+    return this.updatePreferences(userId, { theme });
   }
 
   updateNotificationPrefs(

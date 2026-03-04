@@ -16,8 +16,73 @@
     "MATCHES": "Matches",
     "FEED": "Feed",
     "PROFILE": "Profile",
+    "NOTIFICATIONS": "Notifications",
     "SETTINGS": "Settings",
     "LOGOUT": "Logout"
+  },
+  "LANGUAGE": {
+    "LABEL": "Language",
+    "EN_US": "English (US)",
+    "ES": "Español",
+    "PT_BR": "Português (BR)"
+  },
+  "SETTINGS": {
+    "TITLE": "Settings",
+    "LANGUAGE": "Language",
+    "TABS": {
+      "PROFILE": "Profile",
+      "PREFERENCES": "Preferences",
+      "NOTIFICATIONS": "Notifications",
+      "ACCOUNT": "Account"
+    },
+    "PROFILE": {
+      "UPLOAD": "Upload",
+      "REMOVE": "Remove",
+      "DISPLAY_NAME": "Display Name",
+      "DISPLAY_NAME_PLACEHOLDER": "Your name",
+      "BIO": "Bio",
+      "BIO_PLACEHOLDER": "Tell us about yourself",
+      "SAVE": "Save Profile"
+    },
+    "PREFERENCES": {
+      "THEME": "Theme",
+      "THEME_LIGHT": "Light",
+      "THEME_DARK": "Dark",
+      "THEME_AUTO": "Auto (System)",
+      "TIMEZONE": "Timezone",
+      "TIMEZONE_PLACEHOLDER": "e.g. America/Sao_Paulo",
+      "SAVE": "Save Preferences"
+    },
+    "NOTIFICATIONS": {
+      "PUSH": "Push Notifications",
+      "EMAIL": "Email Notifications",
+      "NOTE": "Control which types of events trigger notifications."
+    },
+    "ACCOUNT": {
+      "CURRENT_PASSWORD": "Current Password",
+      "NEW_PASSWORD": "New Password",
+      "CONFIRM_NEW_PASSWORD": "Confirm New Password",
+      "PASSWORD_MIN": "Must be at least 8 characters",
+      "PASSWORD_MISMATCH": "Passwords do not match",
+      "CHANGE_PASSWORD": "Change Password",
+      "DANGER_ZONE": "Danger Zone",
+      "DELETE": "Delete Account",
+      "DELETE_WARNING": "This action is permanent and cannot be undone. All your data will be lost."
+    },
+    "MESSAGES": {
+      "PROFILE_SAVED": "Profile saved!",
+      "PROFILE_SAVE_FAILED": "Failed to save profile",
+      "FILE_TOO_LARGE": "File must be under 2 MB",
+      "AVATAR_UPDATED": "Avatar updated!",
+      "AVATAR_UPDATE_FAILED": "Avatar upload failed",
+      "AVATAR_REMOVED": "Avatar removed",
+      "AVATAR_REMOVE_FAILED": "Failed to remove avatar",
+      "PREFERENCES_SAVED": "Preferences saved!",
+      "PREFERENCES_SAVE_FAILED": "Failed to save preferences",
+      "PASSWORD_CHANGED": "Password changed!",
+      "PASSWORD_CHANGE_FAILED": "Failed to change password",
+      "ACCOUNT_DELETE_UNAVAILABLE": "Account deletion is not yet available"
+    }
   },
   "MATCH_STATUS": {
     "LIVE": "Live",

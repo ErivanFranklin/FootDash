@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -15,16 +15,16 @@ export class UserPreferencesService {
     private readonly preferencesRepository: Repository<UserPreferences>,
   ) {}
 
-  async findByUserId(userId: number): Promise<UserPreferences> {
-    const preferences = await this.preferencesRepository.findOne({
-      where: { userId },
-    });
-
-    if (!preferences) {
-      throw new NotFoundException(`Preferences for user ${userId} not found`);
+  private async getOrCreate(userId: number): Promise<UserPreferences> {
+    const existing = await this.preferencesRepository.findOne({ where: { userId } });
+    if (existing) {
+      return existing;
     }
+    return this.createDefault(userId);
+  }
 
-    return preferences;
+  async findByUserId(userId: number): Promise<UserPreferences> {
+    return this.getOrCreate(userId);
   }
 
   async createDefault(userId: number): Promise<UserPreferences> {
@@ -53,26 +53,13 @@ export class UserPreferencesService {
     userId: number,
     updatePreferencesDto: UpdatePreferencesDto,
   ): Promise<UserPreferences> {
-    let preferences: UserPreferences;
-
-    try {
-      preferences = await this.findByUserId(userId);
-    } catch (error) {
-      // If preferences do not exist, create default preferences then apply updates
-      if (error instanceof NotFoundException) {
-        preferences = await this.createDefault(userId);
-      } else {
-        throw error;
-      }
-    }
-
+    const preferences = await this.getOrCreate(userId);
     Object.assign(preferences, updatePreferencesDto);
-
     return this.preferencesRepository.save(preferences);
   }
 
   async updateTheme(userId: number, theme: Theme): Promise<UserPreferences> {
-    const preferences = await this.findByUserId(userId);
+    const preferences = await this.getOrCreate(userId);
     preferences.theme = theme;
     return this.preferencesRepository.save(preferences);
   }
@@ -86,7 +73,7 @@ export class UserPreferencesService {
       >
     >,
   ): Promise<UserPreferences> {
-    const preferences = await this.findByUserId(userId);
+    const preferences = await this.getOrCreate(userId);
     Object.assign(preferences, notificationSettings);
     return this.preferencesRepository.save(preferences);
   }
