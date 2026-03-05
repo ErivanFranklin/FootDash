@@ -11,7 +11,7 @@ export class League {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', unique: true, comment: 'Football API external league ID' })
+  @Column({ name: 'external_id', type: 'int', unique: true, comment: 'Football API external league ID' })
   externalId: number;
 
   @Column({ type: 'varchar', length: 100 })
@@ -29,15 +29,15 @@ export class League {
   @Column({ type: 'varchar', length: 10, nullable: true, comment: 'League or Cup' })
   type: string;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'is_featured', type: 'boolean', default: false })
   isFeatured: boolean;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'last_sync_at', type: 'timestamp', nullable: true })
   lastSyncAt: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

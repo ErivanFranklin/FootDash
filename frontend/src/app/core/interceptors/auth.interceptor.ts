@@ -20,7 +20,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Always send credentials (cookies) for auth endpoints
   let cloned = req.clone({ withCredentials: true });
 
-  if (tokenForRequest && auth.isAuthenticated()) {
+  if (tokenForRequest) {
     cloned = cloned.clone({
       setHeaders: { Authorization: `Bearer ${tokenForRequest}` },
     });
@@ -37,7 +37,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         req.url.includes('/alerts/unread') ||
         req.url.includes('/alerts/counts/by-type');
 
-      const hasSessionToken = auth.isAuthenticated();
+      const hasSessionToken = !!auth.getToken();
 
       if (
         error.status === 401 &&

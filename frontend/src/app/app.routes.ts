@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { proGuard } from './core/guards/pro.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -92,6 +93,11 @@ export const routes: Routes = [
     path: 'payments/success',
     loadComponent: () => import('./features/subscription/pages/payment-success.page').then(m => m.PaymentSuccessPage),
     canActivate: [authGuard],
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/pages/admin.page').then(m => m.AdminPage),
+    canActivate: [authGuard, adminGuard],
   },
   {
     path: '',

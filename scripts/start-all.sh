@@ -38,8 +38,10 @@ echo ""
 echo -e "${BLUE}[2/6]${NC} Starting PostgreSQL..."
 if docker ps --format '{{.Names}}' | grep -q "^footdash-postgres-local$"; then
   echo -e "${GREEN}✓${NC} PostgreSQL already running — skipping"
+elif lsof -ti:5432 > /dev/null 2>&1; then
+  echo -e "${YELLOW}⚠${NC}  Port 5432 is already in use. Assuming PostgreSQL is available — skipping container start"
 else
-  docker start footdash-postgres-local 2>/dev/null || \
+  if ! docker start footdash-postgres-local 2>/dev/null; then
     docker run -d \
       --name footdash-postgres-local \
       -e POSTGRES_USER=footdash_user \
@@ -48,6 +50,7 @@ else
       -p 5432:5432 \
       -v postgres_data:/var/lib/postgresql/data \
       postgres:15-alpine
+  fi
 
   echo -n "Waiting for PostgreSQL"
   for i in {1..30}; do
@@ -71,12 +74,15 @@ echo ""
 echo -e "${BLUE}[3/6]${NC} Starting Redis..."
 if docker ps --format '{{.Names}}' | grep -q "^footdash-redis-local$"; then
   echo -e "${GREEN}✓${NC} Redis already running — skipping"
+elif lsof -ti:6379 > /dev/null 2>&1; then
+  echo -e "${YELLOW}⚠${NC}  Port 6379 is already in use. Assuming Redis is available — skipping container start"
 else
-  docker start footdash-redis-local 2>/dev/null || \
+  if ! docker start footdash-redis-local 2>/dev/null; then
     docker run -d \
       --name footdash-redis-local \
       -p 6379:6379 \
       redis:7-alpine
+  fi
 
   sleep 2
   if docker exec footdash-redis-local redis-cli ping > /dev/null 2>&1; then
@@ -107,6 +113,9 @@ if lsof -ti:3000 > /dev/null 2>&1; then
   echo -e "${GREEN}✓${NC} Backend already running on port 3000 — skipping"
 else
   cd "${PROJECT_ROOT}/backend"
+  echo "Running backend migrations..."
+  npm run migrate:run || echo -e "${YELLOW}⚠${NC}  Migration run failed (continuing startup; check DB schema)"
+
   echo "Starting NestJS backend..."
   npm run start:dev > /tmp/footdash-backend.log 2>&1 &
   BACKEND_PID=$!
@@ -154,56 +163,6 @@ else
   echo -e "${GREEN}✓${NC} Frontend starting (PID: ${FRONTEND_PID})"
   echo "   Logs: /tmp/footdash-frontend.log"
 fi
-echo ""
-
-
-# Start backend in background
-cd "${PROJECT_ROOT}/backend"
-echo "Starting NestJS backend..."
-npm run start:dev > /tmp/footdash-backend.log 2>&1 &
-BACKEND_PID=$!
-echo -e "${GREEN}✓${NC} Backend starting (PID: ${BACKEND_PID})"
-echo "   Logs: /tmp/footdash-backend.log"
-
-# Wait for backend to be ready
-echo -n "Waiting for backend API"
-for i in {1..30}; do
-  if lsof -ti:3000 > /dev/null 2>&1; then
-    echo ""
-    echo -e "${GREEN}✓${NC} Backend API is ready"
-    break
-  fi
-  echo -n "."
-  sleep 2
-  if [ $i -eq 30 ]; then
-    echo ""
-    echo -e "${YELLOW}⚠${NC}  Backend may not be fully ready, check logs: tail -f /tmp/footdash-backend.log"
-  fi
-done
-echo ""
-
-# Step 5: Build Frontend (if not already built)
-echo -e "${BLUE}[5/6]${NC} Checking Frontend build..."
-cd "${PROJECT_ROOT}/frontend"
-if [ ! -d "www" ] || [ ! -f "www/index.html" ]; then
-  echo "Building frontend..."
-  npm run build
-else
-  echo -e "${GREEN}✓${NC} Frontend already built"
-fi
-echo ""
-
-# Step 6: Start Frontend Dev Server
-echo -e "${BLUE}[6/6]${NC} Starting Frontend Dev Server..."
-
-# Kill any existing frontend processes
-pkill -f "ng serve" 2>/dev/null || true
-
-cd "${PROJECT_ROOT}/frontend"
-npm start > /tmp/footdash-frontend.log 2>&1 &
-FRONTEND_PID=$!
-echo -e "${GREEN}✓${NC} Frontend starting (PID: ${FRONTEND_PID})"
-echo "   Logs: /tmp/footdash-frontend.log"
 echo ""
 
 # Summary

@@ -14,6 +14,7 @@ import { addIcons } from 'ionicons';
 import { cameraOutline, trashOutline, personOutline, settingsOutline, notificationsOutline, lockClosedOutline, globeOutline, timeOutline } from 'ionicons/icons';
 
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 import { UserSettingsService, UserProfile, UserPreferences } from '../../core/services/user-settings.service';
 import { ThemeService, ThemeMode } from '../../core/services/theme.service';
 import { LanguageService } from '../../core/services/language.service';
@@ -172,6 +173,13 @@ import { LoggerService } from '../../core/services/logger.service';
         @if (activeTab === 'account') {
           <div class="tab-content">
             <ion-list>
+              @if (isAdmin) {
+                <ion-item lines="none">
+                  <ion-button expand="block" fill="outline" (click)="goToAdmin()">
+                    Admin Dashboard
+                  </ion-button>
+                </ion-item>
+              }
               <ion-item>
                 <ion-label position="stacked">{{ 'SETTINGS.ACCOUNT.CURRENT_PASSWORD' | transloco }}</ion-label>
                 <ion-input [(ngModel)]="currentPassword" type="password"></ion-input>
@@ -254,6 +262,7 @@ export class SettingsPage implements OnInit {
   newPassword = '';
   confirmNewPassword = '';
   changingPw = false;
+  isAdmin = false;
 
   private userId!: number;
   private auth = inject(AuthService);
@@ -263,6 +272,7 @@ export class SettingsPage implements OnInit {
   private toast = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private router = inject(Router);
+  private userService = inject(UserService);
   private logger = inject(LoggerService);
   private transloco = inject(TranslocoService);
 
@@ -273,6 +283,14 @@ export class SettingsPage implements OnInit {
   ngOnInit() {
     this.userId = this.auth.getCurrentUserId() ?? 0;
     if (!this.userId) { this.router.navigate(['/login']); return; }
+    this.isAdmin = this.auth.getCurrentUserRole() === 'ADMIN';
+
+    this.userService.getProfile().subscribe({
+      next: (user) => {
+        this.isAdmin = user?.role === 'ADMIN';
+      },
+      error: () => {},
+    });
 
     this.selectedTheme = this.themeService.theme();
     this.selectedLanguage = this.langService.currentLang();
@@ -440,6 +458,10 @@ export class SettingsPage implements OnInit {
   private deleteAccount() {
     // Placeholder — backend endpoint not yet implemented
     this.showToast(this.t('SETTINGS.MESSAGES.ACCOUNT_DELETE_UNAVAILABLE'), 'warning');
+  }
+
+  goToAdmin() {
+    this.router.navigate(['/admin']);
   }
 
   private t(key: string): string {

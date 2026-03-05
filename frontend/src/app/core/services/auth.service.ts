@@ -119,6 +119,16 @@ export class AuthService {
     return decoded?.sub || null;
   }
 
+  getCurrentUserRole(): 'USER' | 'ADMIN' | 'MODERATOR' | null {
+    if (!this.accessToken) return null;
+    const decoded = this.jwtHelper.decodeToken(this.accessToken);
+    const role = decoded?.role;
+    if (role === 'USER' || role === 'ADMIN' || role === 'MODERATOR') {
+      return role;
+    }
+    return null;
+  }
+
   setToken(token: string): void {
     this.accessToken = token;
     this.currentTokenSubject.next(token);

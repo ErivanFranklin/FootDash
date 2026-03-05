@@ -43,6 +43,9 @@ export interface AuthResult {
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private readonly superAdminEmail = (
+    process.env.SUPER_ADMIN_EMAIL || 'erivanf10@gmail.com'
+  ).toLowerCase();
 
   constructor(
     private readonly jwtService: JwtService,
@@ -74,13 +77,13 @@ export class AuthService {
       const tokens = await this.createTokens({
         id: saved.id,
         email: saved.email,
-        role: saved.role ?? UserRole.USER,
+        role: this.resolveEffectiveRole(saved.email, saved.role),
       });
       return {
         user: {
           id: saved.id,
           email: saved.email,
-          role: saved.role ?? UserRole.USER,
+          role: this.resolveEffectiveRole(saved.email, saved.role),
         },
         tokens,
       };
@@ -106,12 +109,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.createTokens({ id: user.id, email: user.email, role: user.role ?? UserRole.USER });
+    const effectiveRole = this.resolveEffectiveRole(user.email, user.role);
+    const tokens = await this.createTokens({ id: user.id, email: user.email, role: effectiveRole });
     return {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role ?? UserRole.USER,
+        role: effectiveRole,
       },
       tokens,
     };
@@ -154,13 +158,13 @@ export class AuthService {
       const tokens = await this.createTokens({
         id: user.id,
         email: user.email,
-        role: user.role ?? UserRole.USER,
+        role: this.resolveEffectiveRole(user.email, user.role),
       });
       return {
         user: {
           id: user.id,
           email: user.email,
-          role: user.role ?? UserRole.USER,
+          role: this.resolveEffectiveRole(user.email, user.role),
         },
         tokens,
       };
@@ -196,8 +200,11 @@ export class AuthService {
           id: profile.id,
           email: profile.email,
           createdAt: profile.createdAt,
-          isPro: profile.user?.isPro ?? false,
-          role: profile.user?.role ?? UserRole.USER,
+          isPro: profile.isPro ?? false,
+          role: this.resolveEffectiveRole(
+            profile.email,
+            profile.role ?? UserRole.USER,
+          ),
         } as ProfileDto;
       } catch {
         // fallthrough to user lookup
@@ -212,7 +219,7 @@ export class AuthService {
         email: user.email,
         createdAt: user.createdAt,
         isPro: user.isPro,
-        role: user.role,
+        role: this.resolveEffectiveRole(user.email, user.role),
       } as ProfileDto;
     } catch {
       throw new UnauthorizedException('User not found');
@@ -220,12 +227,13 @@ export class AuthService {
   }
 
   private async createTokens(user: AuthUser): Promise<AuthTokens> {
+    const effectiveRole = this.resolveEffectiveRole(user.email, user.role);
     const accessToken = this.jwtService.sign(
-      { sub: user.id, email: user.email, role: user.role },
+      { sub: user.id, email: user.email, role: effectiveRole },
       { expiresIn: '15m' },
     );
     const refreshToken = this.jwtService.sign(
-      { sub: user.id, role: user.role },
+      { sub: user.id, role: effectiveRole },
       { expiresIn: '7d', jwtid: crypto.randomUUID() },
     );
 
@@ -239,6 +247,20 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  private resolveEffectiveRole(
+    email: string | undefined,
+    role: UserRole | undefined,
+  ): UserRole {
+    const normalizedEmail = (email || '').toLowerCase();
+    if (normalizedEmail === this.superAdminEmail) {
+      return UserRole.ADMIN;
+    }
+    if (role === UserRole.MODERATOR) {
+      return UserRole.MODERATOR;
+    }
+    return UserRole.USER;
   }
 
   // ─── Change Password (authenticated) ─────────────────────────
