@@ -22,13 +22,14 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private toast = inject(ToastController);
   private logger = inject(LoggerService);
+  private readonly ONBOARDING_KEY = 'footdash_onboarding_done';
 
   ngOnInit() {
     // If already authenticated, redirect to home
     // Use Promise.resolve to defer until after the current navigation completes
     if (this.auth.isAuthenticated()) {
       Promise.resolve().then(() => {
-        this.router.navigate(['/home'], { replaceUrl: true });
+        this.router.navigate([this.shouldShowOnboarding() ? '/onboarding' : '/home'], { replaceUrl: true });
       });
     }
   }
@@ -62,7 +63,7 @@ export class LoginPage implements OnInit {
         
         // Navigate to home after a brief delay to ensure token is stored
         setTimeout(() => {
-          this.router.navigate(['/home']);
+          this.router.navigate([this.shouldShowOnboarding() ? '/onboarding' : '/home']);
         }, 100);
       },
       error: (err: any) => {
@@ -98,7 +99,8 @@ export class LoginPage implements OnInit {
         
         // Navigate to home after a brief delay to ensure token is stored
         setTimeout(() => {
-          this.router.navigate(['/home']);
+          localStorage.removeItem(this.ONBOARDING_KEY);
+          this.router.navigate(['/onboarding']);
         }, 100);
       },
       error: (err: any) => {
@@ -112,5 +114,9 @@ export class LoginPage implements OnInit {
         }).then((toastEl: any) => toastEl.present());
       }
     });
+  }
+
+  private shouldShowOnboarding(): boolean {
+    return localStorage.getItem(this.ONBOARDING_KEY) !== 'true';
   }
 }

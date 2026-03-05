@@ -51,6 +51,12 @@ export interface GrowthMetrics {
   activeUsersChange: number;
 }
 
+export interface RoleDistribution {
+  users: number;
+  moderators: number;
+  admins: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly http = inject(HttpClient);
@@ -121,6 +127,12 @@ export class AdminService {
   getGrowthMetrics() {
     return this.http.get<GrowthMetrics>(
       `${this.apiUrl}/admin/analytics/growth`,
+    );
+  }
+
+  getRoleDistribution() {
+    return this.http.get<RoleDistribution>(
+      `${this.apiUrl}/admin/analytics/role-distribution`,
     );
   }
 }

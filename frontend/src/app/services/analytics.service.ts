@@ -90,6 +90,23 @@ export class AnalyticsService {
       .pipe(catchError(this.handleError('getPredictionStats', null)));
   }
 
+  getBttsPrediction(matchId: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/match/${matchId}/prediction/btts`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(catchError(this.handleError('getBttsPrediction', null)));
+  }
+
+  getOverUnderPrediction(matchId: number, line = 2.5): Observable<any> {
+    return this.http
+      .get<any>(`${this.apiUrl}/match/${matchId}/prediction/over-under`, {
+        headers: this.getHeaders(),
+        params: { line: String(line) },
+      })
+      .pipe(catchError(this.handleError('getOverUnderPrediction', null)));
+  }
+
   /**
    * Get team analytics
    */

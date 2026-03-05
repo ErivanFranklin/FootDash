@@ -42,6 +42,41 @@
         [awayTeamId]="match.awayTeam.id"
       ></app-team-comparison>
 
+      <ion-card class="probability-card">
+        <ion-card-header>
+          <ion-card-title>BTTS and Over/Under</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="probabilitiesLoading" class="loading-inline">
+            <ion-spinner name="dots"></ion-spinner>
+          </div>
+
+          <div *ngIf="!probabilitiesLoading">
+            <div class="probability-group">
+              <div class="probability-header">
+                <span>Both Teams to Score</span>
+                <strong>{{ bttsYes | number: '1.0-0' }}% Yes</strong>
+              </div>
+              <div class="probability-bar">
+                <div class="segment yes" [style.width.%]="bttsYes"></div>
+                <div class="segment no" [style.width.%]="bttsNo"></div>
+              </div>
+            </div>
+
+            <div class="probability-group">
+              <div class="probability-header">
+                <span>Over / Under 2.5</span>
+                <strong>{{ over25 | number: '1.0-0' }}% Over</strong>
+              </div>
+              <div class="probability-bar">
+                <div class="segment over" [style.width.%]="over25"></div>
+                <div class="segment under" [style.width.%]="under25"></div>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
       <!-- Detailed Team Analysis -->
       <ion-accordion-group expand="inset" class="team-details-accordion">
         <ion-accordion value="home">

@@ -52,6 +52,59 @@
   }
 }
 
+.probability-card {
+  margin: 16px;
+}
+
+.loading-inline {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.probability-group {
+  margin-bottom: 16px;
+}
+
+.probability-group:last-child {
+  margin-bottom: 0;
+}
+
+.probability-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.probability-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--ion-color-light-shade);
+}
+
+.segment {
+  height: 100%;
+}
+
+.segment.yes {
+  background: var(--ion-color-success);
+}
+
+.segment.no {
+  background: var(--ion-color-danger);
+}
+
+.segment.over {
+  background: var(--ion-color-primary);
+}
+
+.segment.under {
+  background: var(--ion-color-warning);
+}
+
 @media (prefers-color-scheme: dark) {
   .match-header {
     background: var(--ion-color-step-100);

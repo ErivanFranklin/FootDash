@@ -24,6 +24,7 @@ import {
   RegistrationDataPoint,
   ActiveUsersDataPoint,
   PredictionAccuracyItem,
+  RoleDistribution,
 } from '../../../core/services/admin.service';
 
 Chart.register(...registerables);
@@ -246,6 +247,16 @@ Chart.register(...registerables);
             </div>
           </div>
         }
+
+        <!-- User distribution -->
+        @if (roleDistribution) {
+          <div class="chart-section">
+            <h4>User Distribution</h4>
+            <div class="chart-wrapper">
+              <canvas #distributionCanvas></canvas>
+            </div>
+          </div>
+        }
       </div>
     }
   `,
@@ -256,10 +267,12 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
   @ViewChild('registrationsCanvas') registrationsRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('activeUsersCanvas') activeUsersRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('accuracyCanvas') accuracyRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('distributionCanvas') distributionRef!: ElementRef<HTMLCanvasElement>;
 
   loading = true;
   period = '30';
   growth: GrowthMetrics | null = null;
+  roleDistribution: RoleDistribution | null = null;
   registrations: RegistrationDataPoint[] = [];
   activeUsers: ActiveUsersDataPoint[] = [];
   accuracy: PredictionAccuracyItem[] = [];
@@ -267,6 +280,7 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
   private regChart: Chart | null = null;
   private activeChart: Chart | null = null;
   private accChart: Chart | null = null;
+  private distributionChart: Chart | null = null;
   private viewReady = false;
 
   ngOnInit(): void {
@@ -285,6 +299,7 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
     this.regChart?.destroy();
     this.activeChart?.destroy();
     this.accChart?.destroy();
+    this.distributionChart?.destroy();
   }
 
   onPeriodChange(value: string) {
@@ -298,7 +313,7 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
 
     // Load all data in parallel
     let completed = 0;
-    const total = 4;
+    const total = 5;
     const checkDone = () => {
       completed++;
       if (completed >= total) {
@@ -338,6 +353,14 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
       },
       error: () => checkDone(),
     });
+
+    this.adminService.getRoleDistribution().subscribe({
+      next: (data) => {
+        this.roleDistribution = data;
+        checkDone();
+      },
+      error: () => checkDone(),
+    });
   }
 
   private loadTimeSeries() {
@@ -372,6 +395,7 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
     this.renderRegistrationsChart();
     this.renderActiveUsersChart();
     this.renderAccuracyChart();
+    this.renderDistributionChart();
   }
 
   private renderRegistrationsChart() {
@@ -489,6 +513,46 @@ export class AdminAnalyticsComponent implements OnInit, OnDestroy, AfterViewInit
         plugins: { legend: { display: false } },
         scales: {
           x: { beginAtZero: true, max: 100, ticks: { callback: (v) => `${v}%` } },
+        },
+      },
+    });
+  }
+
+  private renderDistributionChart() {
+    if (!this.distributionRef?.nativeElement || !this.roleDistribution || !this.growth) return;
+    this.distributionChart?.destroy();
+
+    const freeUsers = Math.max(0, this.growth.totalUsers - this.growth.totalPro);
+
+    this.distributionChart = new Chart(this.distributionRef.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels: ['User', 'Moderator', 'Admin', 'Pro', 'Free'],
+        datasets: [
+          {
+            data: [
+              this.roleDistribution.users,
+              this.roleDistribution.moderators,
+              this.roleDistribution.admins,
+              this.growth.totalPro,
+              freeUsers,
+            ],
+            backgroundColor: ['#3880ff', '#ffc409', '#eb445a', '#2dd36f', '#92949c'],
+            borderWidth: 2,
+            borderColor: '#fff',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 10,
+            },
+          },
         },
       },
     });

@@ -91,4 +91,9 @@ export class AdminController {
   async getGrowthMetrics() {
     return this.analyticsService.getGrowthMetrics();
   }
+
+  @Get('analytics/role-distribution')
+  async getRoleDistribution() {
+    return this.analyticsService.getRoleDistribution();
+  }
 }

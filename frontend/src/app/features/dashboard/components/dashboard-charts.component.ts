@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IonCard, IonCardContent, IonSpinner } from '@ionic/angular/standalone';
 import { Chart, registerables } from 'chart.js';
+import { forkJoin } from 'rxjs';
 import { AnalyticsService } from '../../../services/analytics.service';
 import { GamificationService } from '../../../services/gamification.service';
 import { FavoritesService } from '../../../services/favorites.service';
@@ -18,12 +19,6 @@ import { AuthService } from '../../../core/services/auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
 
 Chart.register(...registerables);
-
-interface QuickStat {
-  label: string;
-  value: string;
-  color: string;
-}
 
 @Component({
   selector: 'app-dashboard-charts',
@@ -62,7 +57,6 @@ interface QuickStat {
         margin: 0 0 6px;
       }
       .mini-canvas-wrapper {
-        height: 48px;
         width: 100%;
       }
       canvas {
@@ -73,29 +67,6 @@ interface QuickStat {
         text-align: center;
         padding: 12px;
       }
-      .activity-ring-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 48px;
-      }
-      .activity-ring {
-        position: relative;
-        width: 48px;
-        height: 48px;
-      }
-      .activity-ring canvas {
-        width: 48px !important;
-        height: 48px !important;
-      }
-      .ring-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 11px;
-        font-weight: 700;
-      }
     `,
   ],
   template: `
@@ -105,7 +76,6 @@ interface QuickStat {
       </div>
     } @else {
       <div class="charts-row">
-        <!-- Leaderboard rank -->
         <ion-card class="mini-chart-card" routerLink="/leaderboard">
           <ion-card-content>
             <p class="mini-label">Your Rank</p>
@@ -116,7 +86,6 @@ interface QuickStat {
           </ion-card-content>
         </ion-card>
 
-        <!-- Prediction accuracy ring -->
         <ion-card class="mini-chart-card" routerLink="/analytics/predictions">
           <ion-card-content>
             <p class="mini-label">Predictions</p>
@@ -124,10 +93,12 @@ interface QuickStat {
               {{ predictionsMade > 0 ? accuracy + '%' : '—' }}
             </p>
             <p class="mini-label" style="margin-bottom:0">{{ predictionsMade }} made</p>
+            <div class="mini-canvas-wrapper" style="margin-top: 6px; height: 40px;">
+              <canvas #predictionGauge></canvas>
+            </div>
           </ion-card-content>
         </ion-card>
 
-        <!-- Badges earned -->
         <ion-card class="mini-chart-card" routerLink="/badges">
           <ion-card-content>
             <p class="mini-label">Badges Earned</p>
@@ -138,25 +109,31 @@ interface QuickStat {
           </ion-card-content>
         </ion-card>
 
-        <!-- Favorites count -->
         <ion-card class="mini-chart-card" [routerLink]="['/teams']" [queryParams]="{ tab: 'favorites' }">
           <ion-card-content>
             <p class="mini-label">Favorite Teams</p>
             <p class="mini-value" style="color: var(--ion-color-danger)">
               {{ favoriteCount }}
             </p>
-            <p class="mini-label" style="margin-bottom:0">teams followed</p>
+            <p class="mini-label" style="margin-bottom:0">{{ favoriteFormLabel }}</p>
+            <div class="mini-canvas-wrapper" style="margin-top: 6px; height: 36px;">
+              <canvas #favoritesFormSparkline></canvas>
+            </div>
           </ion-card-content>
         </ion-card>
       </div>
     }
   `,
 })
-export class DashboardChartsComponent implements OnInit {
+export class DashboardChartsComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly gamificationService = inject(GamificationService);
   private readonly favoritesService = inject(FavoritesService);
   private readonly authService = inject(AuthService);
+  private readonly analyticsService = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+
+  @ViewChild('predictionGauge') predictionGaugeRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('favoritesFormSparkline') favoritesSparklineRef?: ElementRef<HTMLCanvasElement>;
 
   loading = true;
   rank: number | null = null;
@@ -167,9 +144,24 @@ export class DashboardChartsComponent implements OnInit {
   badgesEarned = 0;
   badgesTotal = 0;
   favoriteCount = 0;
+  favoriteFormLabel = 'No form data';
+
+  private predictionChart: Chart | null = null;
+  private formChart: Chart | null = null;
+  private viewReady = false;
 
   ngOnInit(): void {
     this.loadStats();
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    this.renderMiniCharts();
+  }
+
+  ngOnDestroy(): void {
+    this.predictionChart?.destroy();
+    this.formChart?.destroy();
   }
 
   private loadStats() {
@@ -180,41 +172,159 @@ export class DashboardChartsComponent implements OnInit {
       completed++;
       if (completed >= total) {
         this.loading = false;
+        this.renderMiniCharts();
       }
     };
 
-    // Leaderboard rank
     this.gamificationService.getLeaderboard('weekly').subscribe({
       next: (entries: any[]) => {
-        // Find current user in leaderboard
         const userId = this.getCurrentUserId();
         const me = entries.find((e: any) => e.userId === userId);
         if (me) {
           this.rank = me.rank;
           this.points = me.points ?? 0;
+          this.predictionsMade = me.predictionsCount ?? me.predictions ?? 0;
+          this.accuracy = Math.round(me.accuracy ?? 0);
+          this.accuracyColor = this.accuracy >= 60
+            ? 'var(--ion-color-success)'
+            : this.accuracy >= 45
+              ? 'var(--ion-color-warning)'
+              : 'var(--ion-color-danger)';
         }
         checkDone();
       },
-      error: () => checkDone(),
+      error: (err) => {
+        this.logger.warn('Leaderboard stats unavailable', err);
+        checkDone();
+      },
     });
 
-    // Badges
     this.gamificationService.getAllBadges().subscribe({
       next: (badges: any[]) => {
         this.badgesTotal = badges.length;
         this.badgesEarned = badges.filter((b: any) => b.earned || b.unlockedAt).length;
         checkDone();
       },
-      error: () => checkDone(),
+      error: (err) => {
+        this.logger.warn('Badges stats unavailable', err);
+        checkDone();
+      },
     });
 
-    // Favorites
     this.favoritesService.loadFavorites('team').subscribe({
       next: (favorites: any[]) => {
         this.favoriteCount = favorites?.length ?? 0;
+        this.loadFavoriteFormSparkline(favorites ?? []);
         checkDone();
       },
-      error: () => checkDone(),
+      error: (err) => {
+        this.logger.warn('Favorites stats unavailable', err);
+        checkDone();
+      },
+    });
+  }
+
+  private loadFavoriteFormSparkline(favorites: any[]) {
+    if (!favorites.length) {
+      this.favoriteFormLabel = 'No favorites yet';
+      this.renderFavoriteSparkline([0, 0, 0, 0, 0]);
+      return;
+    }
+
+    const ids = favorites
+      .slice(0, 3)
+      .map((f: any) => Number(f.entityId))
+      .filter((id: number) => Number.isFinite(id));
+
+    if (!ids.length) {
+      this.renderFavoriteSparkline([0, 0, 0, 0, 0]);
+      return;
+    }
+
+    forkJoin(ids.map((id: number) => this.analyticsService.getTeamAnalytics(id))).subscribe({
+      next: (analyticsList: any[]) => {
+        const best = analyticsList
+          .filter((a) => a?.scoringTrend?.last5Matches?.length)
+          .sort((a, b) => (Number(b.formRating) || 0) - (Number(a.formRating) || 0))[0];
+
+        if (!best) {
+          this.favoriteFormLabel = 'No form data';
+          this.renderFavoriteSparkline([0, 0, 0, 0, 0]);
+          return;
+        }
+
+        this.favoriteFormLabel = `${best.teamName}: ${Math.round(Number(best.formRating) || 0)} form`;
+        this.renderFavoriteSparkline(best.scoringTrend.last5Matches);
+      },
+      error: () => {
+        this.favoriteFormLabel = 'Form unavailable';
+        this.renderFavoriteSparkline([0, 0, 0, 0, 0]);
+      },
+    });
+  }
+
+  private renderMiniCharts() {
+    if (!this.viewReady) return;
+    this.renderPredictionGauge();
+    if (!this.formChart) {
+      this.renderFavoriteSparkline([0, 0, 0, 0, 0]);
+    }
+  }
+
+  private renderPredictionGauge() {
+    if (!this.predictionGaugeRef?.nativeElement) return;
+    this.predictionChart?.destroy();
+
+    const value = Math.max(0, Math.min(100, this.accuracy || 0));
+    this.predictionChart = new Chart(this.predictionGaugeRef.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels: ['Accuracy', 'Remaining'],
+        datasets: [{
+          data: [value, 100 - value],
+          backgroundColor: [
+            value >= 60 ? '#2dd36f' : value >= 45 ? '#ffc409' : '#eb445a',
+            'rgba(146, 148, 156, 0.25)',
+          ],
+          borderWidth: 0,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '72%',
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      },
+    });
+  }
+
+  private renderFavoriteSparkline(points: number[]) {
+    if (!this.favoritesSparklineRef?.nativeElement) return;
+    this.formChart?.destroy();
+
+    const normalized = (points || []).slice(-5).map((p) => Number(p) || 0);
+    this.formChart = new Chart(this.favoritesSparklineRef.nativeElement, {
+      type: 'line',
+      data: {
+        labels: normalized.map((_, idx) => `M${idx + 1}`),
+        datasets: [{
+          data: normalized,
+          borderColor: '#eb445a',
+          backgroundColor: 'rgba(235, 68, 90, 0.14)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 0,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+      },
     });
   }
 

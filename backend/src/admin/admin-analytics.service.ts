@@ -171,4 +171,22 @@ export class AdminAnalyticsService {
       activeUsersChange: calcChange(activeUsersCurrent, activeUsersPrevious),
     };
   }
+
+  /**
+   * User role distribution for admin visualization.
+   */
+  async getRoleDistribution() {
+    const rows: { role: string; count: string }[] = await this.usersRepo
+      .createQueryBuilder('u')
+      .select('u.role', 'role')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('u.role')
+      .getRawMany();
+
+    return {
+      users: Number(rows.find((r) => r.role === 'USER')?.count ?? 0),
+      moderators: Number(rows.find((r) => r.role === 'MODERATOR')?.count ?? 0),
+      admins: Number(rows.find((r) => r.role === 'ADMIN')?.count ?? 0),
+    };
+  }
 }

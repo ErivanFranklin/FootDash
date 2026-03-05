@@ -10,6 +10,8 @@ import {
 import { AnalyticsService } from '../../../services/analytics.service';
 import { PredictionResult } from '../../../models/analytics.model';
 import { Chart, registerables } from 'chart.js';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 Chart.register(...registerables);
 
@@ -74,6 +76,34 @@ Chart.register(...registerables);
               <span class="summary-label">Avg Confidence</span>
             </div>
           </div>
+
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>BTTS and Over/Under Snapshot</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              @if (probabilitySamplesLoading) {
+                <div class="loading-container" style="padding: 16px 0;">
+                  <ion-spinner name="dots"></ion-spinner>
+                </div>
+              } @else {
+                <div class="stats-grid">
+                  <ion-card class="stat-card">
+                    <ion-card-content>
+                      <div class="stat-value accuracy">{{ avgBttsYes | number:'1.0-0' }}%</div>
+                      <div class="stat-label">BTTS Yes (avg)</div>
+                    </ion-card-content>
+                  </ion-card>
+                  <ion-card class="stat-card">
+                    <ion-card-content>
+                      <div class="stat-value">{{ avgOver25 | number:'1.0-0' }}%</div>
+                      <div class="stat-label">Over 2.5 (avg)</div>
+                    </ion-card-content>
+                  </ion-card>
+                </div>
+              }
+            </ion-card-content>
+          </ion-card>
 
           <!-- Confidence Distribution Chart -->
           <ion-card>
@@ -148,6 +178,25 @@ Chart.register(...registerables);
               <h3>No Upcoming Predictions</h3>
               <p>Predictions will appear here when matches are scheduled.</p>
             </div>
+          }
+
+          @if (predictions.length > 0) {
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>Recent Predictions</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="recent-table">
+                  @for (pred of predictions.slice(0, 8); track pred.matchId) {
+                    <div class="recent-row" (click)="goToMatch(pred.matchId)">
+                      <span class="match-col">{{ pred.homeTeam }} vs {{ pred.awayTeam }}</span>
+                      <span class="outcome-col">{{ getMostLikelyLabel(pred.mostLikely) }}</span>
+                      <span class="confidence-col">{{ asPercent(getMostLikelyPercent(pred)) | number:'1.0-0' }}%</span>
+                    </div>
+                  }
+                </div>
+              </ion-card-content>
+            </ion-card>
           }
         </div>
       }
@@ -476,6 +525,39 @@ Chart.register(...registerables);
       text-align: right;
     }
 
+    .recent-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recent-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--ion-color-light);
+      cursor: pointer;
+    }
+
+    .match-col {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .outcome-col {
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+    }
+
+    .confidence-col {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ion-color-primary);
+    }
+
     /* Empty State */
     .empty-state {
       display: flex;
@@ -521,6 +603,9 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
 
   highConfidenceCount = 0;
   averageConfidence = 0;
+  probabilitySamplesLoading = false;
+  avgBttsYes = 0;
+  avgOver25 = 0;
 
   private charts: Chart[] = [];
 
@@ -563,6 +648,7 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
       next: (data) => {
         this.predictions = data || [];
         this.calculateSummary();
+        this.loadProbabilitySnapshots();
         this.loading = false;
         callback?.();
         setTimeout(() => this.buildUpcomingCharts(), 100);
@@ -599,6 +685,45 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
       const total = this.predictions.reduce((sum, p) => sum + (confidenceMap[p.confidence] || 50), 0);
       this.averageConfidence = Math.round(total / this.predictions.length);
     }
+  }
+
+  private loadProbabilitySnapshots() {
+    const sampleIds = this.predictions.slice(0, 6).map((p) => p.matchId);
+    if (!sampleIds.length) {
+      this.avgBttsYes = 0;
+      this.avgOver25 = 0;
+      return;
+    }
+
+    this.probabilitySamplesLoading = true;
+    const requests = sampleIds.map((matchId) =>
+      forkJoin({
+        btts: this.analyticsService.getBttsPrediction(matchId).pipe(catchError(() => of(null))),
+        overUnder: this.analyticsService.getOverUnderPrediction(matchId).pipe(catchError(() => of(null))),
+      })
+    );
+
+    forkJoin(requests).subscribe({
+      next: (rows: any[]) => {
+        const bttsValues = rows
+          .map((r) => this.asPercent(Number(r?.btts?.btts_yes_probability ?? 0)))
+          .filter((v) => Number.isFinite(v));
+        const overValues = rows
+          .map((r) => this.asPercent(Number(r?.overUnder?.over_probability ?? 0)))
+          .filter((v) => Number.isFinite(v));
+
+        this.avgBttsYes = bttsValues.length
+          ? bttsValues.reduce((acc, val) => acc + val, 0) / bttsValues.length
+          : 0;
+        this.avgOver25 = overValues.length
+          ? overValues.reduce((acc, val) => acc + val, 0) / overValues.length
+          : 0;
+        this.probabilitySamplesLoading = false;
+      },
+      error: () => {
+        this.probabilitySamplesLoading = false;
+      },
+    });
   }
 
   private buildUpcomingCharts() {
@@ -778,6 +903,14 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
       case 'away': return 'Away Win';
       default: return mostLikely;
     }
+  }
+
+  getMostLikelyPercent(pred: PredictionResult): number {
+    return Math.max(
+      this.asPercent(pred.homeWinProbability),
+      this.asPercent(pred.drawProbability),
+      this.asPercent(pred.awayWinProbability),
+    );
   }
 
   goToMatch(matchId: number) {
