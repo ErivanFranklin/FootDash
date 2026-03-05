@@ -16,6 +16,8 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonSegment,
+  IonSegmentButton,
   IonSelect,
   IonSelectOption,
   IonSpinner,
@@ -26,6 +28,7 @@ import {
 import { ToastController } from '@ionic/angular';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AdminService, AdminStats, AdminUser } from '../../../core/services/admin.service';
+import { AdminAnalyticsComponent } from '../components/admin-analytics.component';
 
 type RoleFilter = '' | 'USER' | 'MODERATOR' | 'ADMIN';
 type ProFilter = '' | 'true' | 'false';
@@ -56,6 +59,9 @@ type ProFilter = '' | 'true' | 'false';
     IonChip,
     IonBadge,
     IonIcon,
+    IonSegment,
+    IonSegmentButton,
+    AdminAnalyticsComponent,
   ],
   styles: [`
     .filter-row {
@@ -137,9 +143,22 @@ type ProFilter = '' | 'true' | 'false';
         </ion-buttons>
         <ion-title>Admin Dashboard</ion-title>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-segment [value]="activeTab" (ionChange)="activeTab = $event.detail.value?.toString() || 'users'">
+          <ion-segment-button value="users">
+            <ion-label>Users</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="analytics">
+            <ion-label>Analytics</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding-top">
+      @if (activeTab === 'analytics') {
+        <app-admin-analytics></app-admin-analytics>
+      } @else {
       @if (loading) {
         <div style="text-align:center;padding:40px">
           <ion-spinner name="crescent"></ion-spinner>
@@ -280,6 +299,7 @@ type ProFilter = '' | 'true' | 'false';
           ></ion-infinite-scroll-content>
         </ion-infinite-scroll>
       }
+      }
     </ion-content>
   `,
 })
@@ -293,6 +313,7 @@ export class AdminPage implements OnInit, OnDestroy {
 
   loading = false;
   loadingUsers = false;
+  activeTab: string = 'users';
   stats: AdminStats | null = null;
   users: AdminUser[] = [];
   totalUsers = 0;

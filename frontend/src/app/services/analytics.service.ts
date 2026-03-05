@@ -77,6 +77,20 @@ export class AnalyticsService {
   }
 
   /**
+   * Get prediction performance statistics
+   */
+  getPredictionStats(strategy?: string, limit: number = 100): Observable<any> {
+    const params: any = { limit: limit.toString() };
+    if (strategy) params.strategy = strategy;
+    return this.http
+      .get<any>(`${this.apiUrl}/predictions/stats`, {
+        headers: this.getHeaders(),
+        params,
+      })
+      .pipe(catchError(this.handleError('getPredictionStats', null)));
+  }
+
+  /**
    * Get team analytics
    */
   getTeamAnalytics(teamId: number): Observable<TeamAnalytics> {

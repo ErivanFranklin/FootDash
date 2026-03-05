@@ -52,7 +52,15 @@ import {
   eyeOff,
   remove,
   removeOutline,
-  trendingDownOutline
+  trendingDownOutline,
+  analyticsOutline,
+  barChartOutline,
+  gitCompareOutline,
+  arrowBackOutline,
+  arrowForwardOutline,
+  bulbOutline,
+  closeCircle,
+  addCircle
 } from 'ionicons/icons';
 
 @Component({
@@ -113,7 +121,15 @@ export class AppComponent implements OnInit {
       eyeOff,
       remove,
       removeOutline,
-      trendingDownOutline
+      trendingDownOutline,
+      analyticsOutline,
+      barChartOutline,
+      gitCompareOutline,
+      arrowBackOutline,
+      arrowForwardOutline,
+      bulbOutline,
+      closeCircle,
+      addCircle
     });
   }
 

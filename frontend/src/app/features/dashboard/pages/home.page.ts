@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { MatchCardComponent, StatCardComponent } from '../../../shared/components';
 import { FavoriteButtonComponent } from '../../../components/favorite-button/favorite-button.component';
+import { DashboardChartsComponent } from '../components/dashboard-charts.component';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LoggerService } from '../../../core/services/logger.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -30,6 +31,7 @@ interface DashboardData {
     IonButtons, IonMenuButton, IonIcon, IonCard, IonCardContent,
     IonCardHeader, IonCardTitle, IonText, IonBadge, IonAvatar, IonChip,
     MatchCardComponent, StatCardComponent, FavoriteButtonComponent,
+    DashboardChartsComponent,
     TranslocoPipe,
   ],
 })

@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AdminService } from './admin.service';
+import { AdminAnalyticsService } from './admin-analytics.service';
 import { UserRole } from '../users/user.entity';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdateUserProDto } from './dto/update-user-pro.dto';
@@ -22,7 +23,10 @@ import { UpdateUserProDto } from './dto/update-user-pro.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly analyticsService: AdminAnalyticsService,
+  ) {}
 
   @Get('stats')
   async getStats() {
@@ -60,5 +64,31 @@ export class AdminController {
     @Body() dto: UpdateUserProDto,
   ) {
     return this.adminService.updateUserPro(userId, dto.isPro);
+  }
+
+  @Get('analytics/registrations')
+  async getRegistrationTrend(
+    @Query('days') days?: string,
+  ) {
+    const parsedDays = Number.isFinite(Number(days)) ? Number(days) : 30;
+    return this.analyticsService.getRegistrationTrend(parsedDays);
+  }
+
+  @Get('analytics/active-users')
+  async getActiveUsers(
+    @Query('days') days?: string,
+  ) {
+    const parsedDays = Number.isFinite(Number(days)) ? Number(days) : 30;
+    return this.analyticsService.getActiveUsers(parsedDays);
+  }
+
+  @Get('analytics/prediction-accuracy')
+  async getPredictionAccuracy() {
+    return this.analyticsService.getPredictionAccuracy();
+  }
+
+  @Get('analytics/growth')
+  async getGrowthMetrics() {
+    return this.analyticsService.getGrowthMetrics();
   }
 }

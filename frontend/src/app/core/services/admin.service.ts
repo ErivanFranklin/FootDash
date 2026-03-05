@@ -24,6 +24,33 @@ export interface AdminStats {
   newUsersLast7Days: number;
 }
 
+export interface RegistrationDataPoint {
+  date: string;
+  count: number;
+}
+
+export interface ActiveUsersDataPoint {
+  date: string;
+  count: number;
+}
+
+export interface PredictionAccuracyItem {
+  modelType: string;
+  total: number;
+  correct: number;
+  accuracy: number;
+}
+
+export interface GrowthMetrics {
+  totalUsers: number;
+  totalPro: number;
+  proRate: number;
+  newUsers30d: number;
+  newUsersChange: number;
+  activeUsers30d: number;
+  activeUsersChange: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly http = inject(HttpClient);
@@ -64,6 +91,36 @@ export class AdminService {
       `${this.apiUrl}/admin/users/pro`,
       { isPro },
       { params },
+    );
+  }
+
+  // ── Analytics endpoints ──
+
+  getRegistrationTrend(days = 30) {
+    const params = new HttpParams().set('days', days);
+    return this.http.get<RegistrationDataPoint[]>(
+      `${this.apiUrl}/admin/analytics/registrations`,
+      { params },
+    );
+  }
+
+  getActiveUsers(days = 30) {
+    const params = new HttpParams().set('days', days);
+    return this.http.get<ActiveUsersDataPoint[]>(
+      `${this.apiUrl}/admin/analytics/active-users`,
+      { params },
+    );
+  }
+
+  getPredictionAccuracy() {
+    return this.http.get<PredictionAccuracyItem[]>(
+      `${this.apiUrl}/admin/analytics/prediction-accuracy`,
+    );
+  }
+
+  getGrowthMetrics() {
+    return this.http.get<GrowthMetrics>(
+      `${this.apiUrl}/admin/analytics/growth`,
     );
   }
 }

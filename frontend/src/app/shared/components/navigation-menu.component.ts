@@ -34,6 +34,19 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
       </ion-item>
       
       <ion-item-divider>
+        <ion-label>Analytics</ion-label>
+      </ion-item-divider>
+
+      <ion-item button (click)="navigateTo('/analytics/predictions')">
+        <ion-icon name="pulse-outline" slot="start"></ion-icon>
+        <ion-label>Predictions</ion-label>
+      </ion-item>
+      <ion-item button (click)="navigateTo('/compare')">
+        <ion-icon name="git-compare-outline" slot="start"></ion-icon>
+        <ion-label>Team Compare</ion-label>
+      </ion-item>
+
+      <ion-item-divider>
         <ion-label>{{ 'NAV.SETTINGS' | transloco }}</ion-label>
       </ion-item-divider>
 

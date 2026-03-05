@@ -35,6 +35,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'analytics/predictions',
+    loadComponent: () => import('./features/analytics/pages/prediction-analytics.page').then(m => m.PredictionAnalyticsPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'compare',
+    loadComponent: () => import('./features/analytics/pages/team-compare.page').then(m => m.TeamComparePage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },
