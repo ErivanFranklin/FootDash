@@ -75,11 +75,11 @@
         <div class="section">
           <div class="section-header">
             <h3>Your Teams</h3>
-            <ion-button fill="clear" size="small" routerLink="/teams">View All</ion-button>
+            <ion-button fill="clear" size="small" [routerLink]="['/teams']" [queryParams]="{ tab: 'favorites' }">View All</ion-button>
           </div>
           <div class="teams-scroll">
             @for (team of dashboard.favoriteTeams; track team.id) {
-              <div class="team-card" [routerLink]="['/matches', team.id]">
+              <div class="team-card" [routerLink]="['/teams']" [queryParams]="{ tab: 'favorites', teamId: team.id }">
                 <ion-avatar>
                   @if (team.logo) {
                     <img [src]="team.logo" [alt]="team.name">
@@ -97,7 +97,7 @@
       <!-- Upcoming Matches -->
       @if (dashboard.upcomingMatches.length > 0) {
         <div class="section">
-          <div class="section-header">
+          <div class="section-header card-aligned">
             <h3>Upcoming</h3>
           </div>
           @for (match of dashboard.upcomingMatches; track match.id) {
@@ -109,7 +109,7 @@
       <!-- Recent Results -->
       @if (dashboard.recentResults.length > 0) {
         <div class="section">
-          <div class="section-header">
+          <div class="section-header card-aligned">
             <h3>Recent Results</h3>
           </div>
           @for (match of dashboard.recentResults; track match.id) {
@@ -136,7 +136,7 @@
       <!-- All Recent Matches -->
       @if (dashboard.allRecentMatches.length > 0) {
         <div class="section">
-          <div class="section-header">
+          <div class="section-header card-aligned">
             <h3>Latest Matches</h3>
           </div>
           @for (match of dashboard.allRecentMatches; track match.id) {

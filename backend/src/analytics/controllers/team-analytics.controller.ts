@@ -22,6 +22,25 @@ import { TeamAnalyticsDto } from '../dto/team-analytics.dto';
 export class TeamAnalyticsController {
   constructor(private readonly teamAnalyticsService: TeamAnalyticsService) {}
 
+  @Get('compare')
+  @ApiOperation({ summary: 'Compare two teams' })
+  @ApiResponse({
+    status: 200,
+    description: 'Comparison data retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  async compareTeams(
+    @Query('team1', ParseIntPipe) team1Id: number,
+    @Query('team2', ParseIntPipe) team2Id: number,
+    @Query('season') season?: string,
+  ) {
+    return await this.teamAnalyticsService.compareTeams(
+      team1Id,
+      team2Id,
+      season,
+    );
+  }
+
   @Get(':teamId')
   @ApiOperation({ summary: 'Get comprehensive team analytics' })
   @ApiResponse({
@@ -46,25 +65,6 @@ export class TeamAnalyticsController {
     @Query('lastN', ParseIntPipe) lastN = 5,
   ) {
     return await this.teamAnalyticsService.getTeamForm(teamId, lastN);
-  }
-
-  @Get('compare')
-  @ApiOperation({ summary: 'Compare two teams' })
-  @ApiResponse({
-    status: 200,
-    description: 'Comparison data retrieved successfully',
-  })
-  @ApiResponse({ status: 404, description: 'Team not found' })
-  async compareTeams(
-    @Query('team1', ParseIntPipe) team1Id: number,
-    @Query('team2', ParseIntPipe) team2Id: number,
-    @Query('season') season?: string,
-  ) {
-    return await this.teamAnalyticsService.compareTeams(
-      team1Id,
-      team2Id,
-      season,
-    );
   }
 
   @Post('refresh-all')

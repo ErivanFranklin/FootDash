@@ -139,7 +139,7 @@ interface QuickStat {
         </ion-card>
 
         <!-- Favorites count -->
-        <ion-card class="mini-chart-card" routerLink="/teams">
+        <ion-card class="mini-chart-card" [routerLink]="['/teams']" [queryParams]="{ tab: 'favorites' }">
           <ion-card-content>
             <p class="mini-label">Favorite Teams</p>
             <p class="mini-value" style="color: var(--ion-color-danger)">

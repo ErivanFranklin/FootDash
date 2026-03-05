@@ -11,9 +11,12 @@ import { FavoriteEntityType } from '../../services/favorites.service';
     <ion-card>
       <ion-card-header>
         <div class="team-header-row">
-          <div>
-            <ion-card-title>{{ getTeamName() }}</ion-card-title>
-            <ion-card-subtitle *ngIf="getTeamCode()">{{ getTeamCode() }}</ion-card-subtitle>
+          <div class="team-title-wrap">
+            <div class="team-flag" *ngIf="getCountryFlag()">{{ getCountryFlag() }}</div>
+            <div>
+              <ion-card-title>{{ getTeamName() }}</ion-card-title>
+              <ion-card-subtitle *ngIf="getTeamCode()">{{ getTeamCode() }}</ion-card-subtitle>
+            </div>
           </div>
           <app-favorite-button
             *ngIf="favoriteEntityType && favoriteEntityId != null"
@@ -65,6 +68,20 @@ import { FavoriteEntityType } from '../../services/favorites.service';
       gap: var(--spacing-sm);
     }
 
+    .team-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-flag {
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      width: 28px;
+      text-align: center;
+    }
+
     .team-info {
       margin-bottom: var(--spacing-md);
     }
@@ -109,5 +126,29 @@ export class TeamCardComponent {
 
   getTeamCode(): string | null {
     return this.team?.code || null;
+  }
+
+  private getCountry(): string | null {
+    return (this.team?.country || this.team?.team?.country || this.team?.area || null) as string | null;
+  }
+
+  getCountryFlag(): string | null {
+    const country = this.getCountry();
+    if (!country) return null;
+    const map: Record<string, string> = {
+      'Germany': '🇩🇪',
+      'England': '🇬🇧',
+      'Spain': '🇪🇸',
+      'Brazil': '🇧🇷',
+      'Portugal': '🇵🇹',
+      'France': '🇫🇷',
+      'Italy': '🇮🇹',
+      'Netherlands': '🇳🇱',
+      'United States': '🇺🇸',
+      'USA': '🇺🇸'
+    };
+
+    const normalized = country.trim();
+    return map[normalized] || normalized;
   }
 }

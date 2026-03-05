@@ -7,12 +7,14 @@ import {
   IonButton, IonIcon, IonSearchbar, IonList, IonItem, IonLabel,
   IonBadge, IonChip, IonNote, IonRefresher, IonRefresherContent
 } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular/standalone';
 import { ApiService } from '../../../core/services/api.service';
 import { AnalyticsService } from '../../../services/analytics.service';
 import { FavoritesService, Favorite } from '../../../services/favorites.service';
 import { TeamComparison, TeamAnalytics, HeadToHeadStats } from '../../../models/analytics.model';
 import { Chart, registerables } from 'chart.js';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 Chart.register(...registerables);
 
@@ -88,7 +90,7 @@ interface TeamOption {
 
         <!-- Compare Button -->
         @if (homeTeam && awayTeam) {
-          <ion-button expand="block" (click)="compare()" [disabled]="comparing" class="compare-btn">
+          <ion-button expand="block" (click)="compare()" [disabled]="comparing || (homeTeam?.id === awayTeam?.id)" class="compare-btn">
             @if (comparing) {
               <ion-spinner name="dots"></ion-spinner>
             } @else {
@@ -617,6 +619,7 @@ export class TeamComparePage implements OnInit, OnDestroy {
   private apiService = inject(ApiService);
   private analyticsService = inject(AnalyticsService);
   private favoritesService = inject(FavoritesService);
+  private toast = inject(ToastController);
 
   @ViewChild('radarChart') radarChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('statsChart') statsChartRef!: ElementRef<HTMLCanvasElement>;
@@ -652,25 +655,81 @@ export class TeamComparePage implements OnInit, OnDestroy {
   loadFavoriteTeams() {
     this.favoritesService.loadFavorites('team').subscribe({
       next: (favorites) => {
-        // For each favorite, fetch team info
-        const teamIds = favorites.map(f => f.entityId);
-        teamIds.forEach(id => {
-          this.apiService.getTeam(id).subscribe({
-            next: (team: any) => {
-              const t = Array.isArray(team) ? team[0] : team;
-              if (t?.id && t?.name) {
-                this.favoriteTeams.push({
-                  id: t.id,
+        const teamIds = Array.from(
+          new Set((favorites || []).map((f) => Number(f.entityId)).filter((id) => Number.isFinite(id))),
+        );
+
+        if (!teamIds.length) {
+          this.favoriteTeams = [];
+          this.preloadTeamsForCompare();
+          return;
+        }
+
+        const requests = teamIds.map((id) =>
+          this.apiService.getTeam(id).pipe(catchError(() => of(null))),
+        );
+
+        forkJoin(requests).subscribe({
+          next: (results) => {
+            this.favoriteTeams = results
+              .map((team: any) => {
+                const t = team?.data ?? (Array.isArray(team) ? team[0] : team);
+                if (!t?.id || !t?.name) return null;
+                return {
+                  id: Number(t.id),
                   name: t.name,
                   logo: t.logo || t.logoUrl,
-                  isFavorite: true
-                });
-              }
-            }
-          });
+                  isFavorite: true,
+                } as TeamOption;
+              })
+              .filter((t): t is TeamOption => !!t);
+
+            this.autoselectAndCompare();
+          },
+          error: () => {
+            this.favoriteTeams = [];
+            this.preloadTeamsForCompare();
+          },
         });
+      },
+      error: () => {
+        this.favoriteTeams = [];
+        this.preloadTeamsForCompare();
       }
     });
+  }
+
+  private preloadTeamsForCompare() {
+    this.apiService.getTeams({ page: 1, limit: 10 }).subscribe({
+      next: (result: any) => {
+        const teams = Array.isArray(result) ? result : (result?.data || []);
+        this.favoriteTeams = teams
+          .map((t: any) => ({
+            id: Number(t.id),
+            name: t.name,
+            logo: t.logo || t.logoUrl,
+            isFavorite: false,
+          }))
+          .filter((t: TeamOption) => Number.isFinite(t.id) && !!t.name);
+
+        this.autoselectAndCompare();
+      },
+      error: () => {
+        this.favoriteTeams = [];
+      },
+    });
+  }
+
+  private autoselectAndCompare() {
+    if (this.homeTeam || this.awayTeam) {
+      return;
+    }
+
+    if (this.favoriteTeams.length >= 2) {
+      this.homeTeam = this.favoriteTeams[0];
+      this.awayTeam = this.favoriteTeams[1];
+      this.compare();
+    }
   }
 
   openSearch(side: 'home' | 'away') {
@@ -738,6 +797,10 @@ export class TeamComparePage implements OnInit, OnDestroy {
 
   compare() {
     if (!this.homeTeam || !this.awayTeam) return;
+    if (this.homeTeam.id === this.awayTeam.id) {
+      this.toast.create({ message: 'Please select two different teams to compare', duration: 2200, color: 'warning' }).then(t => t.present());
+      return;
+    }
     this.comparing = true;
     this.comparison = null;
     this.destroyCharts();

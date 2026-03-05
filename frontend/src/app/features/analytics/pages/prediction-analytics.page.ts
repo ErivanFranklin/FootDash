@@ -113,16 +113,16 @@ Chart.register(...registerables);
                 <div class="probabilities">
                   <div class="prob-bar">
                     <div class="prob-segment home-win"
-                         [style.width.%]="pred.homeWinProbability * 100">
-                      {{ (pred.homeWinProbability * 100) | number:'1.0-0' }}%
+                       [style.width.%]="asPercent(pred.homeWinProbability)">
+                     {{ asPercent(pred.homeWinProbability) | number:'1.0-0' }}%
                     </div>
                     <div class="prob-segment draw"
-                         [style.width.%]="pred.drawProbability * 100">
-                      {{ (pred.drawProbability * 100) | number:'1.0-0' }}%
+                       [style.width.%]="asPercent(pred.drawProbability)">
+                     {{ asPercent(pred.drawProbability) | number:'1.0-0' }}%
                     </div>
                     <div class="prob-segment away-win"
-                         [style.width.%]="pred.awayWinProbability * 100">
-                      {{ (pred.awayWinProbability * 100) | number:'1.0-0' }}%
+                       [style.width.%]="asPercent(pred.awayWinProbability)">
+                     {{ asPercent(pred.awayWinProbability) | number:'1.0-0' }}%
                     </div>
                   </div>
                   <div class="prob-labels">
@@ -666,6 +666,14 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
       });
       this.charts.push(chart);
     }
+  }
+
+  asPercent(value: number): number {
+    if (value == null || Number.isNaN(value as any)) {
+      return 0;
+    }
+    const normalized = value <= 1 ? value * 100 : value;
+    return Math.max(0, Math.min(100, normalized));
   }
 
   private buildPerformanceCharts() {

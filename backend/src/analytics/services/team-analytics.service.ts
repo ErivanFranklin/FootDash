@@ -198,18 +198,21 @@ export class TeamAnalyticsService {
       team2Id,
     );
 
+    const team1FormRating = Number(team1Analytics.formRating ?? 0);
+    const team2FormRating = Number(team2Analytics.formRating ?? 0);
+
     // Determine advantage
     let advantage: 'home' | 'away' | 'neutral' = 'neutral';
-    if (team1Analytics.formRating > team2Analytics.formRating + 20) {
+    if (team1FormRating > team2FormRating + 20) {
       advantage = 'home';
-    } else if (team2Analytics.formRating > team1Analytics.formRating + 20) {
+    } else if (team2FormRating > team1FormRating + 20) {
       advantage = 'away';
     }
 
     // Generate comparison insights
     const insights: string[] = [];
     insights.push(
-      `Form: ${team1Analytics.teamName} (${team1Analytics.formRating.toFixed(0)}) vs ${team2Analytics.teamName} (${team2Analytics.formRating.toFixed(0)})`,
+      `Form: ${team1Analytics.teamName} (${team1FormRating.toFixed(0)}) vs ${team2Analytics.teamName} (${team2FormRating.toFixed(0)})`,
     );
 
     if (h2h.homeWins + h2h.awayWins + h2h.draws > 0) {

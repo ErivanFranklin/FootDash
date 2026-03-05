@@ -5,16 +5,13 @@ import {
   Param,
   ParseIntPipe,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { MatchPredictionService } from '../services/match-prediction.service';
 import { PredictionStrategyService } from '../services/prediction-strategy.service';
 import { MLPredictionService } from '../services/ml-prediction.service';
@@ -22,8 +19,6 @@ import { PredictionResultDto } from '../dto/prediction-result.dto';
 
 @ApiTags('Analytics - Predictions')
 @Controller('analytics')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 @Throttle({ default: { ttl: 60_000, limit: 30 } })
 export class PredictionsController {
   constructor(

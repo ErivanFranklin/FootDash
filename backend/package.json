@@ -23,7 +23,8 @@
     "migrate:run": "node -r ts-node/register scripts/run-migrations.ts",
     "migrate:show": "node -r ts-node/register -e \"require('./scripts/run-migrations').show()\" || true",
     "migrate:show:full": "node -r ts-node/register -e \"require('./scripts/run-migrations').showFull()\" || true",
-    "seed:dev": "node -r ts-node/register scripts/seed-dev.ts"
+    "seed:dev": "node -r ts-node/register scripts/seed-dev.ts",
+    "seed:analytics-demo": "node -r ts-node/register scripts/seed-analytics-demo.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",

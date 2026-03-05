@@ -13,6 +13,13 @@
         <ion-label>Favorites</ion-label>
       </ion-segment-button>
     </ion-segment>
+    <ion-searchbar
+      placeholder="Search teams..."
+      [debounce]="300"
+      (ionInput)="onSearchChange($event)"
+      [value]="searchTerm"
+      showCancelButton="focus">
+    </ion-searchbar>
   </div>
 
   <!-- Loading skeletons (initial load only) -->

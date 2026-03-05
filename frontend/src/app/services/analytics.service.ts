@@ -65,11 +65,11 @@ export class AnalyticsService {
   /**
    * Get predictions for upcoming matches
    */
-  getUpcomingPredictions(days: number = 7): Observable<PredictionResult[]> {
+  getUpcomingPredictions(limit: number = 7): Observable<PredictionResult[]> {
     return this.http
       .get<PredictionResult[]>(`${this.apiUrl}/upcoming-predictions`, {
         headers: this.getHeaders(),
-        params: { days: days.toString() },
+        params: { limit: limit.toString() },
       })
       .pipe(
         catchError(this.handleError<PredictionResult[]>('getUpcomingPredictions', []))
@@ -140,8 +140,8 @@ export class AnalyticsService {
       .get<TeamComparison>(`${this.apiUrl}/team/compare`, {
         headers: this.getHeaders(),
         params: {
-          homeTeamId: homeTeamId.toString(),
-          awayTeamId: awayTeamId.toString(),
+          team1: homeTeamId.toString(),
+          team2: awayTeamId.toString(),
         },
       })
       .pipe(

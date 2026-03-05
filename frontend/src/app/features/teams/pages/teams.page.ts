@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { IonContent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, InfiniteScrollCustomEvent, IonSegment, IonSegmentButton, IonLabel, SegmentCustomEvent } from '@ionic/angular/standalone';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IonContent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, InfiniteScrollCustomEvent, IonSegment, IonSegmentButton, IonLabel, SegmentCustomEvent, IonSearchbar } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -14,12 +14,13 @@ import { PageHeaderComponent, TeamCardComponent } from '../../../shared/componen
   standalone: true,
   templateUrl: './teams.page.html',
   styleUrls: ['./teams.page.scss'],
-  imports: [CommonModule, IonContent, PageHeaderComponent, TeamCardComponent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton, IonLabel]
+  imports: [CommonModule, IonContent, PageHeaderComponent, TeamCardComponent, IonList, IonItem, IonSkeletonText, IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton, IonLabel, IonSearchbar]
 })
 export class TeamsPage implements OnInit {
   private api = inject(ApiService);
   private favoritesService = inject(FavoritesService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private toast = inject(ToastController);
 
   teams: any[] = [];
@@ -27,6 +28,7 @@ export class TeamsPage implements OnInit {
   loading = false;
   syncingTeamIds = new Set<number>();
   filterMode: 'all' | 'favorites' = 'all';
+  selectedFavoriteTeamId: number | null = null;
 
   // Pagination state
   currentPage = 1;
@@ -34,17 +36,51 @@ export class TeamsPage implements OnInit {
   totalTeams = 0;
   hasMoreData = true;
 
+  // Search
+  searchTerm: string = '';
+  private searchTimeout: any = null;
+
   ngOnInit() {
+    this.applyQueryFilters();
     this.loadTeams();
   }
 
   get visibleTeams(): any[] {
-    return this.filterMode === 'favorites' ? this.favoriteTeams : this.teams;
+    const base = this.filterMode === 'favorites' ? this.favoriteTeams : this.teams;
+
+    if (this.filterMode === 'favorites' && this.selectedFavoriteTeamId != null) {
+      return base.filter((team) => this.resolveTeamId(team) === this.selectedFavoriteTeamId);
+    }
+
+    let list = base;
+    if (this.searchTerm && this.searchTerm.trim().length > 0) {
+      const q = this.searchTerm.toLowerCase();
+      list = list.filter((t: any) => {
+        const name = (t?.name || t?.team?.name || '').toString().toLowerCase();
+        const code = (t?.shortCode || t?.code || '').toString().toLowerCase();
+        return name.includes(q) || code.includes(q);
+      });
+    }
+
+    return list;
+  }
+
+  private applyQueryFilters() {
+    const tab = (this.route.snapshot.queryParamMap.get('tab') || '').toLowerCase();
+    const teamIdParam = this.route.snapshot.queryParamMap.get('teamId');
+    const teamId = teamIdParam ? Number(teamIdParam) : null;
+
+    this.filterMode = tab === 'favorites' ? 'favorites' : 'all';
+    this.selectedFavoriteTeamId = teamId != null && Number.isFinite(teamId) ? teamId : null;
+
+    if (this.filterMode === 'favorites') {
+      this.loadFavoriteTeams();
+    }
   }
 
   loadTeams(page = 1) {
     this.loading = true;
-    this.api.getTeams({ page, limit: this.pageSize }).subscribe({
+    this.api.getTeams({ page, limit: this.pageSize, search: this.searchTerm && this.searchTerm.trim().length ? this.searchTerm.trim() : undefined }).subscribe({
       next: (res) => {
         const data = res?.data ?? (Array.isArray(res) ? res : []);
         const total = res?.total ?? data.length;
@@ -88,7 +124,7 @@ export class TeamsPage implements OnInit {
       return;
     }
     const nextPage = this.currentPage + 1;
-    this.api.getTeams({ page: nextPage, limit: this.pageSize }).subscribe({
+    this.api.getTeams({ page: nextPage, limit: this.pageSize, search: this.searchTerm && this.searchTerm.trim().length ? this.searchTerm.trim() : undefined }).subscribe({
       next: (res) => {
         const data = res?.data ?? (Array.isArray(res) ? res : []);
         const total = res?.total ?? this.totalTeams;
@@ -105,9 +141,27 @@ export class TeamsPage implements OnInit {
     });
   }
 
+  onSearchChange(event: any) {
+    const val = event?.detail?.value ?? '';
+    this.searchTerm = val;
+
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      if (this.filterMode === 'all') {
+        this.currentPage = 1;
+        this.loadTeams(1);
+      }
+      // favorites uses client-side filtering via visibleTeams getter
+    }, 300);
+  }
+
   onFilterChange(event: SegmentCustomEvent) {
     const mode = (event.detail.value || 'all') as 'all' | 'favorites';
     this.filterMode = mode;
+
+    if (mode !== 'favorites') {
+      this.selectedFavoriteTeamId = null;
+    }
 
     if (mode === 'favorites') {
       this.loadFavoriteTeams();
