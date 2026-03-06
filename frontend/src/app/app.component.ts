@@ -171,11 +171,16 @@ export class AppComponent implements OnInit {
   private setupSocialNotifications() {
     this.authService.currentToken$.subscribe(token => {
       if (token) {
+        // Connect WebSockets only after authentication
+        this.websocketService.connect();
         const userId = this.authService.getCurrentUserId();
         if (userId) {
           this.websocketService.subscribeToUser(userId);
           this.notificationCenter.init(userId);
         }
+      } else {
+        // Disconnect WebSockets when logged out
+        this.websocketService.disconnect();
       }
     });
 

@@ -35,6 +35,15 @@ export class User {
   @Column({ name: 'stripe_customer_id', nullable: true })
   stripeCustomerId: string;
 
+  @Column({ name: 'two_factor_enabled', default: false })
+  twoFactorEnabled: boolean;
+
+  @Column({ name: 'two_factor_secret', type: 'text', nullable: true })
+  twoFactorSecret: string | null;
+
+  @Column({ name: 'two_factor_recovery_codes', type: 'text', nullable: true })
+  twoFactorRecoveryCodes: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

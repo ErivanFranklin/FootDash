@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Request,
   Res,
@@ -25,6 +28,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ProfileDto } from './dto/profile.dto';
+import { TwoFactorCodeDto } from './dto/two-factor-code.dto';
 
 /** Duration in milliseconds for the refresh-token cookie (7 days). */
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
@@ -63,6 +67,12 @@ function sendWithCookie(res: Response, result: AuthResult, isProd: boolean) {
   });
 }
 
+function getRequestContext(req: any): { ipAddress: string | null; userAgent: string | null } {
+  const ipAddress = (req.ip || req.headers?.['x-forwarded-for'] || null) as string | null;
+  const userAgent = (req.headers?.['user-agent'] || null) as string | null;
+  return { ipAddress, userAgent };
+}
+
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -98,7 +108,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @Throttle({ default: { ttl: 15 * 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Authenticate user and get tokens' })
   @ApiResponse({
     status: 200,
@@ -121,14 +131,19 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(
     @Body() dto: LoginAuthDto,
+    @Request() req: any,
     @Res() res: Response,
   ): Promise<any> {
-    const result = await this.authService.login(dto);
+    const result = await this.authService.login(dto, getRequestContext(req));
+    if ('requiresTwoFactor' in result && result.requiresTwoFactor) {
+      return res.status(202).json(result);
+    }
     const isProd = process.env.NODE_ENV === 'production';
-    return sendWithCookie(res, result, isProd);
+    return sendWithCookie(res, result as AuthResult, isProd);
   }
 
   @Post('refresh')
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({
     status: 200,
@@ -180,12 +195,13 @@ export class AuthController {
       throw new UnauthorizedException('No refresh token provided');
     }
 
-    const result = await this.authService.refresh(token);
+    const result = await this.authService.refresh(token, getRequestContext(req));
     const isProd = process.env.NODE_ENV === 'production';
     return sendWithCookie(res, result, isProd);
   }
 
   @Post('revoke')
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Revoke refresh token' })
   @ApiResponse({ status: 200, description: 'Token revoked successfully' })
@@ -228,6 +244,7 @@ export class AuthController {
   // ─── Forgot / Reset Password ─────────────────────────────────
 
   @Post('change-password')
+  @Throttle({ default: { ttl: 15 * 60_000, limit: 5 } })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Change password (authenticated user)' })
@@ -243,7 +260,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @Throttle({ default: { ttl: 60_000, limit: 3 } })
+  @Throttle({ default: { ttl: 15 * 60_000, limit: 3 } })
   @ApiOperation({ summary: 'Request a password reset email' })
   @ApiResponse({ status: 200, description: 'If the email exists, a reset link was sent.' })
   async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
@@ -253,11 +270,91 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @Throttle({ default: { ttl: 15 * 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Reset password using the emailed token' })
   @ApiResponse({ status: 200, description: 'Password has been reset successfully.' })
   @ApiResponse({ status: 400, description: 'Token invalid or expired.' })
   async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
     await this.authService.resetPassword(dto);
     return { message: 'Password has been reset successfully. You can now log in.' };
+  }
+
+  @Get('2fa/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async twoFactorStatus(@Request() req: any): Promise<{ enabled: boolean; recoveryCodesRemaining: number }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    return this.authService.getTwoFactorStatus(userId);
+  }
+
+  @Post('2fa/setup')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async twoFactorSetup(
+    @Request() req: any,
+  ): Promise<{ secret: string; otpauthUrl: string; qrCodeDataUrl: string }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    return this.authService.setupTwoFactor(userId);
+  }
+
+  @Post('2fa/verify')
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async twoFactorVerify(
+    @Request() req: any,
+    @Body() dto: TwoFactorCodeDto,
+  ): Promise<{ valid: boolean }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    return this.authService.verifyTwoFactor(userId, dto.code);
+  }
+
+  @Post('2fa/enable')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async twoFactorEnable(
+    @Request() req: any,
+    @Body() dto: TwoFactorCodeDto,
+  ): Promise<{ recoveryCodes: string[] }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    return this.authService.enableTwoFactor(userId, dto.code);
+  }
+
+  @Post('2fa/disable')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async twoFactorDisable(
+    @Request() req: any,
+    @Body() dto: TwoFactorCodeDto,
+  ): Promise<{ message: string }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    await this.authService.disableTwoFactor(userId, dto.code);
+    return { message: 'Two-factor authentication disabled' };
+  }
+
+  @Get('sessions')
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async getSessions(@Request() req: any): Promise<any[]> {
+    const userId = req.user?.id ?? req.user?.sub;
+    const currentToken = req.cookies?.refresh_token;
+    return this.authService.getSessions(userId, currentToken);
+  }
+
+  @Delete('sessions/:id')
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async revokeSession(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string }> {
+    const userId = req.user?.id ?? req.user?.sub;
+    await this.authService.revokeSession(userId, id);
+    return { message: 'Session revoked successfully' };
   }
 }

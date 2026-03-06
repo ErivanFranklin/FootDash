@@ -27,7 +27,14 @@ export class MatchSchedulerService implements OnModuleInit {
   async onModuleInit() {
     // Start scheduler on application startup
     this.logger.log('Match scheduler initialized, running initial check');
-    await this.checkAndUpdateLiveMatches();
+    // Do not block API startup on external/API-dependent checks.
+    setTimeout(() => {
+      this.checkAndUpdateLiveMatches().catch((error) => {
+        this.logger.warn(
+          `Initial live-match check failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
+    }, 0);
   }
 
   /**

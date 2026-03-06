@@ -18,6 +18,7 @@ export class LeagueModule implements OnModuleInit {
   constructor(private readonly leagueService: LeagueService) {}
 
   async onModuleInit() {
-    await this.leagueService.seedIfEmpty();
+    // Keep startup resilient even if external league seeding is slow/unavailable.
+    this.leagueService.seedIfEmpty().catch(() => undefined);
   }
 }

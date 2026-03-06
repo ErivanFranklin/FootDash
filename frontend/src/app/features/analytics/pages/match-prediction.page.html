@@ -77,6 +77,55 @@
         </ion-card-content>
       </ion-card>
 
+      <ion-card class="h2h-card">
+        <ion-card-header>
+          <ion-card-title>Head-to-Head History (Last 10)</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div *ngIf="h2hLoading" class="loading-inline">
+            <ion-spinner name="dots"></ion-spinner>
+          </div>
+
+          <ng-container *ngIf="!h2hLoading">
+            <div *ngIf="h2hMatches.length > 0; else noH2H" class="h2h-content">
+              <div class="h2h-summary">
+                <div class="summary-pill home">Home wins: {{ h2hHomeWins }}</div>
+                <div class="summary-pill draw">Draws: {{ h2hDraws }}</div>
+                <div class="summary-pill away">Away wins: {{ h2hAwayWins }}</div>
+              </div>
+
+              <div class="h2h-chart-wrap">
+                <canvas #h2hChart></canvas>
+              </div>
+
+              <div class="h2h-list">
+                <div class="h2h-row" *ngFor="let game of h2hMatches">
+                  <span class="date">{{ game.kickOff | date: 'shortDate' }}</span>
+                  <span class="fixture">{{ game.homeTeam.name }} {{ game.homeScore }} - {{ game.awayScore }} {{ game.awayTeam.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #noH2H>
+              <p class="empty-note">No recent head-to-head history available yet.</p>
+            </ng-template>
+          </ng-container>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="timeline-card">
+        <ion-card-header>
+          <ion-card-title>Match Timeline</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="timeline-row" *ngFor="let event of timeline">
+            <span class="minute">{{ event.minute }}'</span>
+            <span class="event" [class.home]="event.type === 'home'" [class.away]="event.type === 'away'">{{ event.label }}</span>
+          </div>
+          <ion-note class="timeline-note">Timeline is generated from available match data.</ion-note>
+        </ion-card-content>
+      </ion-card>
+
       <!-- Detailed Team Analysis -->
       <ion-accordion-group expand="inset" class="team-details-accordion">
         <ion-accordion value="home">

@@ -36,11 +36,20 @@ export class WebSocketService implements OnDestroy {
   // Social socket state
   private socialConnectionStatus$ = new BehaviorSubject<boolean>(false);
 
+  private initialized = false;
+
   constructor() {
-    this.initializeSockets();
+    // Sockets are initialized lazily via connect() after authentication
   }
 
   // ──────────── Initialization ────────────
+
+  /** Call after successful authentication to establish WebSocket connections. */
+  connect(): void {
+    if (this.initialized) return;
+    this.initialized = true;
+    this.initializeSockets();
+  }
 
   private initializeSockets(): void {
     const wsUrl = environment.websocketUrl || window.location.origin;
@@ -174,6 +183,7 @@ export class WebSocketService implements OnDestroy {
     this.socialSocket = null;
     this.connectionStatus$.next('disconnected');
     this.socialConnectionStatus$.next(false);
+    this.initialized = false;
   }
 
   ngOnDestroy(): void {

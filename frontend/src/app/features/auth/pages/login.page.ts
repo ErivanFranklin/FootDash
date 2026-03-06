@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonNote } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
@@ -11,11 +11,14 @@ import { LoggerService } from '../../../core/services/logger.service';
   templateUrl: 'login.page.html',
   styleUrls: ['login.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, FormsModule, RouterLink],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonNote, FormsModule, RouterLink],
 })
 export class LoginPage implements OnInit {
   email = '';
   password = '';
+  twoFactorCode = '';
+  recoveryCode = '';
+  requiresTwoFactor = false;
   loading = false;
   // use functional inject() to satisfy @angular-eslint/prefer-inject
   private auth = inject(AuthService);
@@ -47,11 +50,32 @@ export class LoginPage implements OnInit {
       }).then((toastEl: any) => toastEl.present());
       return;
     }
+
+    if (this.requiresTwoFactor && !this.twoFactorCode && !this.recoveryCode) {
+      this.toast.create({
+        message: 'Enter your authenticator code or a recovery code',
+        duration: 2500,
+        color: 'warning'
+      }).then((toastEl: any) => toastEl.present());
+      return;
+    }
+
     this.loading = true;
     // Note: AuthService.login will set the token on success
     // Use router navigation on success and a toast on failure
-    this.auth.login(this.email, this.password).subscribe({
+    this.auth.login(this.email, this.password, this.twoFactorCode, this.recoveryCode).subscribe({
       next: (response) => {
+        if (response?.requiresTwoFactor) {
+          this.loading = false;
+          this.requiresTwoFactor = true;
+          this.toast.create({
+            message: 'Two-factor verification is required for this account',
+            duration: 2500,
+            color: 'medium'
+          }).then((toastEl: any) => toastEl.present());
+          return;
+        }
+
         this.loading = false;
         this.logger.log('Login successful', response);
         

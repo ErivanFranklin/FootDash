@@ -608,11 +608,20 @@ Kickoff progress:
 - [x] Fantasy analytics charts integration
 
 ### Phase 5 — Security & Polish (1 week)
+Status: Complete (2026-03-06)
+
 20. 2FA
 21. Session management
 22. Rate limiting per-endpoint
 23. Onboarding flow
 24. Offline enhancements
+
+Kickoff progress:
+- [x] TOTP-based 2FA backend + login challenge UI
+- [x] Active session listing + remote revocation API/UI
+- [x] Per-endpoint auth throttling for sensitive operations
+- [x] Onboarding first-login flow already integrated
+- [x] Service worker cache enhancements for fantasy/player APIs
 
 ---
 

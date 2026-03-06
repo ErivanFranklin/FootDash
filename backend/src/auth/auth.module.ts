@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { LoginAudit } from './entities/login-audit.entity';
 import { JwtStrategy } from './jwt.strategy';
 import { MailModule } from '../mail/mail.module';
 
@@ -15,7 +16,7 @@ import { MailModule } from '../mail/mail.module';
   imports: [
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    TypeOrmModule.forFeature([User, RefreshToken, PasswordResetToken]),
+    TypeOrmModule.forFeature([User, RefreshToken, PasswordResetToken, LoginAudit]),
     MailModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

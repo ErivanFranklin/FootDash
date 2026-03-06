@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginAuthDto {
@@ -16,4 +16,22 @@ export class LoginAuthDto {
   })
   @IsString()
   password!: string;
+
+  @ApiProperty({
+    description: 'TOTP code for users with 2FA enabled',
+    example: '123456',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  twoFactorCode?: string;
+
+  @ApiProperty({
+    description: 'One-time 2FA recovery code',
+    example: 'AB12-CD34',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  recoveryCode?: string;
 }

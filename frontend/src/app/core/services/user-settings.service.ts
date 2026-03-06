@@ -27,6 +27,26 @@ export interface UserPreferences {
   updatedAt: string;
 }
 
+export interface TwoFactorStatus {
+  enabled: boolean;
+  recoveryCodesRemaining: number;
+}
+
+export interface TwoFactorSetup {
+  secret: string;
+  otpauthUrl: string;
+  qrCodeDataUrl: string;
+}
+
+export interface AuthSession {
+  id: number;
+  createdAt: string;
+  lastUsedAt: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  current: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -83,5 +103,33 @@ export class UserSettingsService {
 
   changePassword(data: { currentPassword: string; newPassword: string }): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/change-password`, data, { withCredentials: true });
+  }
+
+  getTwoFactorStatus(): Observable<TwoFactorStatus> {
+    return this.http.get<TwoFactorStatus>(`${this.baseUrl}/auth/2fa/status`, { withCredentials: true });
+  }
+
+  setupTwoFactor(): Observable<TwoFactorSetup> {
+    return this.http.post<TwoFactorSetup>(`${this.baseUrl}/auth/2fa/setup`, {}, { withCredentials: true });
+  }
+
+  verifyTwoFactor(code: string): Observable<{ valid: boolean }> {
+    return this.http.post<{ valid: boolean }>(`${this.baseUrl}/auth/2fa/verify`, { code }, { withCredentials: true });
+  }
+
+  enableTwoFactor(code: string): Observable<{ recoveryCodes: string[] }> {
+    return this.http.post<{ recoveryCodes: string[] }>(`${this.baseUrl}/auth/2fa/enable`, { code }, { withCredentials: true });
+  }
+
+  disableTwoFactor(code: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/auth/2fa/disable`, { code }, { withCredentials: true });
+  }
+
+  getSessions(): Observable<AuthSession[]> {
+    return this.http.get<AuthSession[]>(`${this.baseUrl}/auth/sessions`, { withCredentials: true });
+  }
+
+  revokeSession(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/auth/sessions/${id}`, { withCredentials: true });
   }
 }

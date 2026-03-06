@@ -15,7 +15,13 @@ import { cameraOutline, trashOutline, personOutline, settingsOutline, notificati
 
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
-import { UserSettingsService, UserProfile, UserPreferences } from '../../core/services/user-settings.service';
+import {
+  UserSettingsService,
+  UserProfile,
+  UserPreferences,
+  TwoFactorSetup,
+  AuthSession,
+} from '../../core/services/user-settings.service';
 import { ThemeService, ThemeMode } from '../../core/services/theme.service';
 import { LanguageService } from '../../core/services/language.service';
 import { LoggerService } from '../../core/services/logger.service';
@@ -223,6 +229,70 @@ import { LoggerService } from '../../core/services/logger.service';
               @if (changingPw) { <ion-spinner name="dots"></ion-spinner> } @else { {{ 'SETTINGS.ACCOUNT.CHANGE_PASSWORD' | transloco }} }
             </ion-button>
 
+            <div class="security-zone">
+              <ion-text><h3>Two-Factor Authentication</h3></ion-text>
+              <ion-note class="field-note">
+                Status: {{ twoFactorEnabled ? 'Enabled' : 'Disabled' }}
+                @if (twoFactorEnabled) {
+                  ({{ recoveryCodesRemaining }} recovery codes left)
+                }
+              </ion-note>
+
+              @if (!twoFactorEnabled && !twoFactorSetup) {
+                <ion-button expand="block" fill="outline" (click)="startTwoFactorSetup()">
+                  Set up 2FA
+                </ion-button>
+              }
+
+              @if (twoFactorSetup) {
+                <div class="twofa-setup">
+                  <img [src]="twoFactorSetup.qrCodeDataUrl" alt="2FA QR code" />
+                  <ion-note class="field-note">Secret: {{ twoFactorSetup.secret }}</ion-note>
+                  <ion-item>
+                    <ion-label position="stacked">Verification code</ion-label>
+                    <ion-input [(ngModel)]="twoFactorCode" maxlength="8" inputmode="numeric"></ion-input>
+                  </ion-item>
+                  <ion-button expand="block" (click)="enableTwoFactor()">Enable 2FA</ion-button>
+                </div>
+              }
+
+              @if (twoFactorEnabled) {
+                <ion-item>
+                  <ion-label position="stacked">Disable with code</ion-label>
+                  <ion-input [(ngModel)]="disableTwoFactorCode" maxlength="8" inputmode="numeric"></ion-input>
+                </ion-item>
+                <ion-button expand="block" fill="outline" color="warning" (click)="disableTwoFactor()">
+                  Disable 2FA
+                </ion-button>
+              }
+
+              @if (recoveryCodes.length > 0) {
+                <ion-note class="field-note recovery-note">
+                  Save these recovery codes now: {{ recoveryCodes.join(', ') }}
+                </ion-note>
+              }
+
+              <ion-text><h3>Active Sessions</h3></ion-text>
+              <ion-list>
+                @for (session of sessions; track session.id) {
+                  <ion-item>
+                    <ion-label>
+                      <h3>{{ formatSessionAgent(session.userAgent) }}</h3>
+                      <p>IP: {{ session.ipAddress || 'Unknown' }}</p>
+                      <p>Last active: {{ session.lastUsedAt ? (session.lastUsedAt | date:'short') : 'Unknown' }}</p>
+                    </ion-label>
+                    @if (!session.current) {
+                      <ion-button slot="end" size="small" color="danger" fill="outline" (click)="revokeSession(session.id)">
+                        Revoke
+                      </ion-button>
+                    } @else {
+                      <ion-note slot="end">Current</ion-note>
+                    }
+                  </ion-item>
+                }
+              </ion-list>
+            </div>
+
             <div class="danger-zone">
               <ion-text color="danger"><h3>{{ 'SETTINGS.ACCOUNT.DANGER_ZONE' | transloco }}</h3></ion-text>
               <ion-button expand="block" color="danger" fill="outline" (click)="confirmDeleteAccount()">
@@ -253,6 +323,21 @@ import { LoggerService } from '../../core/services/logger.service';
     }
     .save-btn { margin-top: 16px; }
     .notif-note { display: block; padding: 8px 16px; font-size: 13px; }
+    .security-zone { margin-top: 24px; }
+    .twofa-setup img {
+      width: 180px;
+      height: 180px;
+      display: block;
+      margin: 12px auto;
+      border: 1px solid var(--ion-color-light-shade);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+    }
+    .recovery-note {
+      white-space: normal;
+      margin: 8px 0;
+    }
     .danger-zone { margin-top: 48px; text-align: center; }
     .field-note { display: block; padding: 4px 16px; font-size: 12px; }
   `],
@@ -287,6 +372,13 @@ export class SettingsPage implements OnInit {
   confirmNewPassword = '';
   changingPw = false;
   isAdmin = false;
+  twoFactorEnabled = false;
+  recoveryCodesRemaining = 0;
+  twoFactorSetup: TwoFactorSetup | null = null;
+  twoFactorCode = '';
+  disableTwoFactorCode = '';
+  recoveryCodes: string[] = [];
+  sessions: AuthSession[] = [];
 
   private userId!: number;
   private auth = inject(AuthService);
@@ -348,9 +440,31 @@ export class SettingsPage implements OnInit {
         this.emailNotifications = prefs.emailNotifications;
         this.timezone = prefs.timezone || '';
         this.loadLocalNotificationPreferences();
+        this.loadSecurityData();
+      },
+      error: () => {
+        this.loadSecurityData();
+      },
+    });
+  }
+
+  private loadSecurityData() {
+    this.settings.getTwoFactorStatus().subscribe({
+      next: (status) => {
+        this.twoFactorEnabled = status.enabled;
+        this.recoveryCodesRemaining = status.recoveryCodesRemaining;
+      },
+      error: () => {},
+    });
+
+    this.settings.getSessions().subscribe({
+      next: (sessions) => {
+        this.sessions = sessions;
         this.loading = false;
       },
-      error: () => { this.loading = false; },
+      error: () => {
+        this.loading = false;
+      },
     });
   }
 
@@ -487,6 +601,73 @@ export class SettingsPage implements OnInit {
         this.showToast(err?.error?.message || this.t('SETTINGS.MESSAGES.PASSWORD_CHANGE_FAILED'), 'danger');
       },
     });
+  }
+
+  startTwoFactorSetup() {
+    this.settings.setupTwoFactor().subscribe({
+      next: (setup) => {
+        this.twoFactorSetup = setup;
+        this.recoveryCodes = [];
+        this.showToast('Scan the QR code in your authenticator app, then confirm.', 'medium');
+      },
+      error: () => this.showToast('Could not start 2FA setup.', 'danger'),
+    });
+  }
+
+  enableTwoFactor() {
+    if (!this.twoFactorCode) {
+      this.showToast('Enter the verification code from your authenticator app.', 'warning');
+      return;
+    }
+
+    this.settings.enableTwoFactor(this.twoFactorCode).subscribe({
+      next: (result) => {
+        this.twoFactorEnabled = true;
+        this.twoFactorSetup = null;
+        this.twoFactorCode = '';
+        this.recoveryCodes = result.recoveryCodes;
+        this.recoveryCodesRemaining = result.recoveryCodes.length;
+        this.showToast('Two-factor authentication enabled.', 'success');
+      },
+      error: () => this.showToast('Invalid code. Please try again.', 'danger'),
+    });
+  }
+
+  disableTwoFactor() {
+    if (!this.disableTwoFactorCode) {
+      this.showToast('Enter your current authenticator code to disable 2FA.', 'warning');
+      return;
+    }
+
+    this.settings.disableTwoFactor(this.disableTwoFactorCode).subscribe({
+      next: () => {
+        this.twoFactorEnabled = false;
+        this.disableTwoFactorCode = '';
+        this.recoveryCodes = [];
+        this.recoveryCodesRemaining = 0;
+        this.showToast('Two-factor authentication disabled.', 'success');
+      },
+      error: () => this.showToast('Could not disable two-factor authentication.', 'danger'),
+    });
+  }
+
+  revokeSession(sessionId: number) {
+    this.settings.revokeSession(sessionId).subscribe({
+      next: () => {
+        this.sessions = this.sessions.filter((session) => session.id !== sessionId);
+        this.showToast('Session revoked.', 'success');
+      },
+      error: () => this.showToast('Could not revoke session.', 'danger'),
+    });
+  }
+
+  formatSessionAgent(userAgent: string | null): string {
+    if (!userAgent) {
+      return 'Unknown device';
+    }
+
+    const shortAgent = userAgent.length > 48 ? `${userAgent.slice(0, 48)}...` : userAgent;
+    return shortAgent;
   }
 
   async confirmDeleteAccount() {

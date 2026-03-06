@@ -23,6 +23,15 @@ export class RefreshToken {
   @Column({ default: false })
   revoked!: boolean;
 
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  ipAddress!: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  userAgent!: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  lastUsedAt!: Date | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

@@ -8,6 +8,7 @@ import { UserRole } from '../users/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { LoginAudit } from './entities/login-audit.entity';
 import { MailService } from '../mail/mail.service';
 
 describe('AuthService', () => {
@@ -49,6 +50,13 @@ describe('AuthService', () => {
             create: jest.fn(),
             save: jest.fn(),
             update: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(LoginAudit),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
           },
         },
         {

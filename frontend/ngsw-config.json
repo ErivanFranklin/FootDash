@@ -86,6 +86,21 @@
         "maxAge": "1h",
         "timeout": "5s"
       }
+    },
+    {
+      "name": "fantasy-api",
+      "urls": [
+        "/api/fantasy/leagues/**",
+        "/api/fantasy/teams/**",
+        "/api/fantasy/gameweeks/**",
+        "/api/players/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 40,
+        "maxAge": "20m",
+        "timeout": "6s"
+      }
     }
   ]
 }

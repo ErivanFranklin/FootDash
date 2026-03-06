@@ -8,6 +8,7 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
   private redis: Redis | null = null;
   private readonly enabled: boolean;
   private readonly defaultTtl: number;
+  private readonly connectTimeoutMs = 3000;
 
   /** TTL presets (seconds) */
   static readonly TTL = {
@@ -28,6 +29,7 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
     if (this.enabled) {
       this.redis = new Redis(redisUrl!, {
         lazyConnect: true,
+        connectTimeout: this.connectTimeoutMs,
         maxRetriesPerRequest: 2,
         retryStrategy: (times) => (times > 3 ? null : Math.min(times * 200, 2000)),
       });
@@ -41,10 +43,19 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
     }
 
     try {
-      await this.redis.connect();
+      await Promise.race([
+        this.redis.connect(),
+        new Promise((_, reject) => {
+          setTimeout(
+            () => reject(new Error(`Redis cache connect timeout after ${this.connectTimeoutMs}ms`)),
+            this.connectTimeoutMs,
+          );
+        }),
+      ]);
       this.logger.log('Redis cache connected');
     } catch (err: any) {
       this.logger.error(`Redis connection failed: ${err.message}`);
+      this.redis.disconnect();
       this.redis = null;
     }
   }

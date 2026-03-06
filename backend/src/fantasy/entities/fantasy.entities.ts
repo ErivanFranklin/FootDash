@@ -18,7 +18,7 @@ export class FantasyLeague {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 8, unique: true })
+  @Column({ name: 'invite_code', type: 'varchar', length: 8, unique: true })
   inviteCode: string;
 
   @ManyToOne(() => User, { eager: false })
@@ -28,7 +28,7 @@ export class FantasyLeague {
   @Column({ name: 'owner_id' })
   ownerId: number;
 
-  @Column({ type: 'int', default: 20 })
+  @Column({ name: 'max_members', type: 'int', default: 20 })
   maxMembers: number;
 
   @Column({
@@ -38,7 +38,7 @@ export class FantasyLeague {
   })
   status: 'draft' | 'active' | 'completed';
 
-  @Column({ type: 'simple-json', nullable: true })
+  @Column({ name: 'scoring_rules', type: 'simple-json', nullable: true })
   scoringRules: Record<string, number>;
 
   @Column({ type: 'varchar', length: 10, default: '2025' })
@@ -53,10 +53,10 @@ export class FantasyLeague {
   @OneToMany(() => FantasyGameweek, (gw) => gw.league)
   gameweeks: FantasyGameweek[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
 
@@ -76,31 +76,31 @@ export class FantasyTeam {
   userId: number;
 
   @ManyToOne(() => FantasyLeague, (l) => l.teams, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'league_id' })
+  @JoinColumn({ name: 'fantasy_league_id' })
   league: FantasyLeague;
 
-  @Column({ name: 'league_id' })
+  @Column({ name: 'fantasy_league_id' })
   leagueId: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 100.0, comment: 'Budget in millions' })
   budget: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ name: 'total_points', type: 'int', default: 0 })
   totalPoints: number;
 
   @Column({ type: 'varchar', length: 10, default: '4-3-3' })
   formation: string;
 
-  @Column({ type: 'int', default: 2 })
+  @Column({ name: 'free_transfers_remaining', type: 'int', default: 2 })
   freeTransfersRemaining: number;
 
   @OneToMany(() => FantasyRoster, (r) => r.fantasyTeam)
   roster: FantasyRoster[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
 
@@ -116,23 +116,26 @@ export class FantasyRoster {
   @Column({ name: 'fantasy_team_id' })
   fantasyTeamId: number;
 
-  @Column({ type: 'int', comment: 'References Player entity id' })
+  @Column({ name: 'player_id', type: 'int', comment: 'References Player entity id' })
   playerId: number;
 
   @Column({ type: 'varchar', length: 5 })
   position: 'GK' | 'DEF' | 'MID' | 'FWD';
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'is_captain', type: 'boolean', default: false })
   isCaptain: boolean;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ name: 'is_vice_captain', type: 'boolean', default: false })
   isViceCaptain: boolean;
 
-  @Column({ type: 'decimal', precision: 8, scale: 2, default: 0 })
+  @Column({ name: 'purchase_price', type: 'decimal', precision: 8, scale: 2, default: 0 })
   purchasePrice: number;
 
-  @Column({ type: 'boolean', default: true, comment: 'In starting XI vs bench' })
+  @Column({ name: 'is_starter', type: 'boolean', default: true, comment: 'In starting XI vs bench' })
   isStarter: boolean;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }
 
 @Entity({ name: 'fantasy_gameweeks' })
@@ -147,13 +150,13 @@ export class FantasyGameweek {
   @Column({ name: 'league_id' })
   leagueId: number;
 
-  @Column({ type: 'int' })
+  @Column({ name: 'week_number', type: 'int' })
   weekNumber: number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ name: 'start_date', type: 'timestamp' })
   startDate: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ name: 'end_date', type: 'timestamp' })
   endDate: Date;
 
   @Column({
@@ -182,7 +185,7 @@ export class FantasyPoints {
   @Column({ name: 'fantasy_team_id' })
   fantasyTeamId: number;
 
-  @Column({ type: 'int', comment: 'References Player entity id' })
+  @Column({ name: 'player_id', type: 'int', comment: 'References Player entity id' })
   playerId: number;
 
   @ManyToOne(() => FantasyGameweek, (gw) => gw.points, { onDelete: 'CASCADE' })
@@ -198,6 +201,6 @@ export class FantasyPoints {
   @Column({ type: 'simple-json', nullable: true })
   breakdown: Record<string, number>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

@@ -313,7 +313,7 @@ export class FantasyLeagueService {
       .createQueryBuilder()
       .update(FantasyTeam)
       .set({ freeTransfersRemaining: 2 })
-      .where('league_id = :lid', { lid: gameweek.leagueId })
+      .where('fantasy_league_id = :lid', { lid: gameweek.leagueId })
       .execute();
 
     this.logger.log(`Gameweek ${gameweekId} processed (league ${gameweek.leagueId})`);

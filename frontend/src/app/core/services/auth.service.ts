@@ -90,9 +90,13 @@ export class AuthService {
     return source$;
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string, twoFactorCode?: string, recoveryCode?: string): Observable<any> {
+    const payload: Record<string, string> = { email, password };
+    if (twoFactorCode) payload['twoFactorCode'] = twoFactorCode;
+    if (recoveryCode) payload['recoveryCode'] = recoveryCode;
+
     return this.http
-      .post<any>(`${this.authUrl}/login`, { email, password }, { withCredentials: true })
+      .post<any>(`${this.authUrl}/login`, payload, { withCredentials: true })
       .pipe(
         tap(res => {
           const token = res?.tokens?.accessToken;

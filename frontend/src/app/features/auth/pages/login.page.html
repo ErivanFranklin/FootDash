@@ -14,6 +14,17 @@
       <ion-label position="stacked">Password</ion-label>
       <ion-input [(ngModel)]="password" type="password"></ion-input>
     </ion-item>
+    @if (requiresTwoFactor) {
+      <ion-item>
+        <ion-label position="stacked">Authenticator Code</ion-label>
+        <ion-input [(ngModel)]="twoFactorCode" inputmode="numeric" maxlength="8"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Recovery Code (optional)</ion-label>
+        <ion-input [(ngModel)]="recoveryCode" autocapitalize="characters"></ion-input>
+      </ion-item>
+      <ion-note color="medium">Use either your authenticator code or one recovery code.</ion-note>
+    }
     <ion-button expand="block" (click)="submit()" [disabled]="loading">Sign in</ion-button>
     <ion-button expand="block" color="medium" (click)="register()" [disabled]="loading">Register</ion-button>
     <div class="forgot-link">

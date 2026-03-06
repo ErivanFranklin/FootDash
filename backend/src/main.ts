@@ -44,7 +44,20 @@ async function bootstrap() {
   // Set up Redis adapter for Socket.IO clustering
   const configService = app.get(ConfigService);
   const redisAdapter = new RedisIoAdapter(app, configService);
-  await redisAdapter.connectToRedis();
+  // Never block API startup on Redis socket adapter availability.
+  try {
+    await Promise.race([
+      redisAdapter.connectToRedis(),
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Redis websocket adapter init timeout')), 3000);
+      }),
+    ]);
+  } catch (error) {
+    console.warn(
+      '[STARTUP] Redis websocket adapter unavailable, continuing without clustering:',
+      error instanceof Error ? error.message : String(error),
+    );
+  }
   app.useWebSocketAdapter(redisAdapter);
 
   // Register global error handlers

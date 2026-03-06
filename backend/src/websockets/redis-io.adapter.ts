@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 
 export class RedisIoAdapter extends IoAdapter {
   private adapterConstructor?: ReturnType<typeof createAdapter>;
+  private readonly connectTimeoutMs = 3000;
 
   constructor(
     app: any,
@@ -28,13 +29,25 @@ export class RedisIoAdapter extends IoAdapter {
     });
     const subClient = pubClient.duplicate();
 
+    const withTimeout = async <T>(operation: Promise<T>): Promise<T> =>
+      Promise.race([
+        operation,
+        new Promise<T>((_, reject) => {
+          setTimeout(
+            () => reject(new Error(`Redis connect timeout after ${this.connectTimeoutMs}ms`)),
+            this.connectTimeoutMs,
+          );
+        }),
+      ]);
+
     try {
-      await pubClient.connect();
-      await subClient.connect();
+      await withTimeout(pubClient.connect());
+      await withTimeout(subClient.connect());
       this.adapterConstructor = createAdapter(pubClient, subClient);
     } catch {
-      await pubClient.quit().catch(() => undefined);
-      await subClient.quit().catch(() => undefined);
+      // Use immediate disconnect to avoid hanging bootstrap on quit/close.
+      pubClient.disconnect();
+      subClient.disconnect();
       this.adapterConstructor = undefined;
     }
   }
