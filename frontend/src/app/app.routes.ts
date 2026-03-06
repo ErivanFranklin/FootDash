@@ -27,22 +27,26 @@ export const routes: Routes = [
   {
     path: 'analytics/match/:matchId',
     loadComponent: () => import('./features/analytics/pages/match-prediction.page').then(m => m.MatchPredictionPage),
+    data: { proFeature: 'Match Prediction Analytics' },
     canActivate: [authGuard, proGuard],
   },
   {
     path: 'analytics/team/:teamId',
     loadComponent: () => import('./features/analytics/pages/team-analytics.page').then(m => m.TeamAnalyticsPage),
-    canActivate: [authGuard],
+    data: { proFeature: 'Team Analytics' },
+    canActivate: [authGuard, proGuard],
   },
   {
     path: 'analytics/predictions',
     loadComponent: () => import('./features/analytics/pages/prediction-analytics.page').then(m => m.PredictionAnalyticsPage),
-    canActivate: [authGuard],
+    data: { proFeature: 'Prediction Analytics' },
+    canActivate: [authGuard, proGuard],
   },
   {
     path: 'compare',
     loadComponent: () => import('./features/analytics/pages/team-compare.page').then(m => m.TeamComparePage),
-    canActivate: [authGuard],
+    data: { proFeature: 'Team Compare Tool' },
+    canActivate: [authGuard, proGuard],
   },
   {
     path: 'onboarding',
