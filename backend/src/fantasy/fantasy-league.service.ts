@@ -9,6 +9,26 @@ import {
   FantasyPoints,
 } from './entities/fantasy.entities';
 
+type PlayerPosition = 'GK' | 'DEF' | 'MID' | 'FWD';
+
+export interface TransferMarketOption {
+  playerId: number;
+  name: string;
+  position: PlayerPosition;
+  price: number;
+  form: number;
+  trend: 'up' | 'down' | 'flat';
+}
+
+export interface TransferMarketResponse {
+  teamId: number;
+  budget: number;
+  freeTransfersRemaining: number;
+  outgoingPlayerId?: number;
+  outgoingPosition?: PlayerPosition;
+  options: TransferMarketOption[];
+}
+
 @Injectable()
 export class FantasyLeagueService {
   private readonly logger = new Logger(FantasyLeagueService.name);
@@ -93,6 +113,33 @@ export class FantasyLeagueService {
     return team;
   }
 
+  async getTransferMarket(
+    teamId: number,
+    userId: number,
+    outgoingPlayerId?: number,
+  ): Promise<TransferMarketResponse> {
+    const team = await this.getTeam(teamId, userId);
+    const roster = team.roster ?? [];
+
+    const outgoing = outgoingPlayerId
+      ? roster.find((r) => r.playerId === outgoingPlayerId)
+      : undefined;
+    const position: PlayerPosition =
+      (outgoing?.position as PlayerPosition) || 'MID';
+
+    const excluded = new Set<number>(roster.map((r) => r.playerId));
+    const options = this.buildMockMarketOptions(teamId, position, Number(team.budget), excluded);
+
+    return {
+      teamId,
+      budget: Number(team.budget),
+      freeTransfersRemaining: team.freeTransfersRemaining,
+      outgoingPlayerId: outgoing?.playerId,
+      outgoingPosition: outgoing?.position as PlayerPosition | undefined,
+      options,
+    };
+  }
+
   async setSquad(teamId: number, userId: number, roster: { playerId: number; position: string; purchasePrice: number; isCaptain?: boolean; isViceCaptain?: boolean }[]): Promise<FantasyRoster[]> {
     const team = await this.getTeam(teamId, userId);
 
@@ -150,6 +197,41 @@ export class FantasyLeagueService {
     // Update budget
     team.budget = Number(team.budget) + Number(refund) - Number(inPrice);
     await this.teamRepo.save(team);
+  }
+
+  private buildMockMarketOptions(
+    teamId: number,
+    position: PlayerPosition,
+    budget: number,
+    excludedIds: Set<number>,
+  ): TransferMarketOption[] {
+    const base = 900000 + teamId * 100;
+    const options: TransferMarketOption[] = [];
+    const templates = [
+      { name: 'Rising Star', delta: -1.5, trend: 'up' as const, form: 82 },
+      { name: 'Safe Pick', delta: -0.2, trend: 'flat' as const, form: 74 },
+      { name: 'Differential', delta: 1.1, trend: 'up' as const, form: 79 },
+      { name: 'Value Choice', delta: -2.1, trend: 'flat' as const, form: 70 },
+      { name: 'Premium Pick', delta: 2.3, trend: 'down' as const, form: 76 },
+      { name: 'In-Form Option', delta: 0.5, trend: 'up' as const, form: 85 },
+    ];
+
+    for (let i = 0; i < templates.length; i += 1) {
+      const id = base + i + 1;
+      if (excludedIds.has(id)) continue;
+
+      const price = Number(Math.max(4.0, Math.min(15.0, budget / 12 + templates[i].delta)).toFixed(1));
+      options.push({
+        playerId: id,
+        name: `${position}-${id} ${templates[i].name}`,
+        position,
+        price,
+        form: templates[i].form,
+        trend: templates[i].trend,
+      });
+    }
+
+    return options;
   }
 
   // ── Gameweek & Scoring ────────────────────────────────────────────────────

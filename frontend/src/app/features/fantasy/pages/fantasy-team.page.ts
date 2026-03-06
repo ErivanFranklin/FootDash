@@ -173,7 +173,11 @@ interface FantasyTeam {
 
         <!-- Actions -->
         <div class="ion-padding">
-          <ion-button expand="block" [routerLink]="['/fantasy/league', leagueId, 'transfers']">
+          <ion-button
+            expand="block"
+            [routerLink]="['/fantasy/league', leagueId, 'transfers']"
+            [queryParams]="{ teamId: teamId }"
+          >
             <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
             Transfer Market
           </ion-button>

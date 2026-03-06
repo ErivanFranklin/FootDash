@@ -169,6 +169,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'fantasy/league/:id/transfers',
+    loadComponent: () => import('./features/fantasy/pages/fantasy-transfer-market.page').then(m => m.FantasyTransferMarketPage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'highlights',
     loadComponent: () => import('./features/highlights/pages/highlights.page').then(m => m.HighlightsPage),
     canActivate: [authGuard],

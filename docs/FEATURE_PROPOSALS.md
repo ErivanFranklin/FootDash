@@ -603,7 +603,7 @@ Status: Started (2026-03-06)
 
 Kickoff progress:
 - [x] Expanded Pro gating applied to advanced analytics routes
-- [ ] Fantasy Transfer Market backend + UI foundation
+- [x] Fantasy Transfer Market backend + UI foundation
 - [ ] Player Database entity + migration
 - [ ] Fantasy analytics charts integration
 

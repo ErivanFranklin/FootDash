@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -61,6 +62,20 @@ export class FantasyController {
   @ApiOperation({ summary: 'Get your fantasy team details' })
   async getTeam(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     return this.fantasyService.getTeam(id, req.user.id);
+  }
+
+  @Get('teams/:id/market')
+  @ApiOperation({ summary: 'Get transfer market options for your fantasy team' })
+  async getTransferMarket(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: any,
+    @Query('outPlayerId') outPlayerId?: string,
+  ) {
+    return this.fantasyService.getTransferMarket(
+      id,
+      req.user.id,
+      outPlayerId ? Number(outPlayerId) : undefined,
+    );
   }
 
   @Put('teams/:id/squad')
