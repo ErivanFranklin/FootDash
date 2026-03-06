@@ -9,6 +9,7 @@ import {
   FantasyGameweek,
   FantasyPoints,
 } from './entities/fantasy.entities';
+import { Player } from '../players/entities/player.entity';
 
 const mockRepo = () => ({
   create: jest.fn((dto: any) => dto),
@@ -44,6 +45,7 @@ describe('FantasyLeagueService', () => {
         { provide: getRepositoryToken(FantasyRoster), useFactory: mockRepo },
         { provide: getRepositoryToken(FantasyGameweek), useFactory: mockRepo },
         { provide: getRepositoryToken(FantasyPoints), useFactory: mockRepo },
+        { provide: getRepositoryToken(Player), useFactory: mockRepo },
       ],
     }).compile();
 

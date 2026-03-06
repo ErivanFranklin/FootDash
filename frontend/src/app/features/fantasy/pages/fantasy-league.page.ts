@@ -89,6 +89,20 @@ interface LeagueDetail {
     <ion-content>
       <!-- Standings Tab -->
       @if (activeTab === 'standings') {
+        @if (standings().length > 0) {
+          <div class="chart-block ion-padding">
+            <h3>Standings Snapshot</h3>
+            @for (entry of topStandingsForChart(); track entry.fantasyTeam.id) {
+              <div class="bar-row">
+                <span class="bar-label">{{ entry.fantasyTeam.name }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width]="standingsBarWidth(entry.fantasyTeam.totalPoints)"></div>
+                </div>
+                <span class="bar-value">{{ entry.fantasyTeam.totalPoints }}</span>
+              </div>
+            }
+          </div>
+        }
         <ion-list>
           <ion-item class="standings-header">
             <ion-label>
@@ -125,6 +139,20 @@ interface LeagueDetail {
 
       <!-- Gameweek Tab -->
       @if (activeTab === 'gameweek') {
+        @if (gameweekResults().length > 0) {
+          <div class="chart-block ion-padding">
+            <h3>Gameweek Points Distribution</h3>
+            @for (result of topGameweekResults(); track result.fantasyTeamId) {
+              <div class="bar-row compact">
+                <span class="bar-label">{{ result.teamName }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill accent" [style.width]="gameweekBarWidth(result.totalPoints)"></div>
+                </div>
+                <span class="bar-value">{{ result.totalPoints }}</span>
+              </div>
+            }
+          </div>
+        }
         <div class="gameweek-nav ion-padding">
           <ion-button fill="clear" size="small" (click)="changeGameweek(-1)" [disabled]="currentGameweek <= 1">
             <ion-icon name="chevron-back-outline"></ion-icon>
@@ -236,6 +264,52 @@ interface LeagueDetail {
       font-family: monospace;
       letter-spacing: 0.15rem;
     }
+    .chart-block {
+      background: linear-gradient(135deg, rgba(27, 70, 155, 0.08), rgba(18, 173, 109, 0.08));
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .chart-block h3 {
+      margin: 0 0 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr auto;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+    }
+    .bar-row.compact {
+      grid-template-columns: 1fr 1.8fr auto;
+    }
+    .bar-label {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 0.25rem;
+    }
+    .bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2761d8, #38a3ff);
+      border-radius: 999px;
+    }
+    .bar-fill.accent {
+      background: linear-gradient(90deg, #0fa169, #3bd18f);
+    }
+    .bar-value {
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 2.2rem;
+      text-align: right;
+    }
   `],
 })
 export class FantasyLeaguePage implements OnInit {
@@ -296,5 +370,27 @@ export class FantasyLeaguePage implements OnInit {
     if (code) {
       navigator.clipboard.writeText(code);
     }
+  }
+
+  topStandingsForChart(): Standing[] {
+    return this.standings().slice(0, 6);
+  }
+
+  standingsBarWidth(points: number): string {
+    const values = this.standings().map((s) => s.fantasyTeam.totalPoints);
+    const max = Math.max(...values, 1);
+    const width = (points / max) * 100;
+    return `${Math.max(8, Math.round(width))}%`;
+  }
+
+  topGameweekResults(): any[] {
+    return [...this.gameweekResults()].sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 8);
+  }
+
+  gameweekBarWidth(points: number): string {
+    const values = this.gameweekResults().map((r) => Number(r.totalPoints) || 0);
+    const max = Math.max(...values, 1);
+    const width = (points / max) * 100;
+    return `${Math.max(8, Math.round(width))}%`;
   }
 }

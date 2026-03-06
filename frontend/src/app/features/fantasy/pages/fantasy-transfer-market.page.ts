@@ -47,6 +47,7 @@ interface MarketOption {
   playerId: number;
   name: string;
   position: Position;
+  teamName?: string;
   price: number;
   form: number;
   trend: 'up' | 'down' | 'flat';
@@ -166,6 +167,7 @@ interface MarketResponse {
                 <ion-label>
                   <h3>{{ option.name }}</h3>
                   <p>
+                    {{ option.teamName || 'Club TBA' }} ·
                     Price: {{ option.price | number: '1.1-1' }}M
                     · Form: {{ option.form }}
                     · Trend:

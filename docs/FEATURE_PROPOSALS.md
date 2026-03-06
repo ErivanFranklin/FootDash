@@ -594,7 +594,7 @@ This is the standard mobile UX pattern for Ionic apps.
 15. Social Leaderboard enhancements
 
 ### Phase 4 — Pro & Monetization (1-2 weeks)
-Status: Started (2026-03-06)
+Status: Complete (2026-03-06)
 
 16. Expanded Pro feature gating
 17. Fantasy Transfer Market
@@ -604,8 +604,8 @@ Status: Started (2026-03-06)
 Kickoff progress:
 - [x] Expanded Pro gating applied to advanced analytics routes
 - [x] Fantasy Transfer Market backend + UI foundation
-- [ ] Player Database entity + migration
-- [ ] Fantasy analytics charts integration
+- [x] Player Database entity + migration
+- [x] Fantasy analytics charts integration
 
 ### Phase 5 — Security & Polish (1 week)
 20. 2FA

@@ -28,6 +28,7 @@ import { LeagueModule } from './leagues/league.module';
 import { HighlightsModule } from './highlights/highlights.module';
 import { OddsModule } from './odds/odds.module';
 import { AdminModule } from './admin/admin.module';
+import { PlayersModule } from './players/players.module';
 // Use namespace import to avoid default-import interop issues when compiled to CommonJS
 import * as Joi from 'joi';
 
@@ -108,6 +109,7 @@ const isProd = process.env.NODE_ENV === 'production';
     HighlightsModule,
     OddsModule,
     AdminModule,
+    PlayersModule,
   ],
   controllers: [AppController],
   providers: [

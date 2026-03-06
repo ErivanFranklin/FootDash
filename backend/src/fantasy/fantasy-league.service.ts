@@ -8,6 +8,7 @@ import {
   FantasyGameweek,
   FantasyPoints,
 } from './entities/fantasy.entities';
+import { Player } from '../players/entities/player.entity';
 
 type PlayerPosition = 'GK' | 'DEF' | 'MID' | 'FWD';
 
@@ -15,6 +16,7 @@ export interface TransferMarketOption {
   playerId: number;
   name: string;
   position: PlayerPosition;
+  teamName?: string;
   price: number;
   form: number;
   trend: 'up' | 'down' | 'flat';
@@ -44,9 +46,9 @@ export class FantasyLeagueService {
     private readonly gameweekRepo: Repository<FantasyGameweek>,
     @InjectRepository(FantasyPoints)
     private readonly pointsRepo: Repository<FantasyPoints>,
+    @InjectRepository(Player)
+    private readonly playersRepo: Repository<Player>,
   ) {}
-
-  // ── League Management ─────────────────────────────────────────────────────
 
   async createLeague(ownerId: number, dto: { name: string; maxMembers?: number; season?: string; leagueId?: number }): Promise<FantasyLeague> {
     const inviteCode = this.generateInviteCode();
@@ -62,7 +64,6 @@ export class FantasyLeagueService {
     });
     const saved = await this.leagueRepo.save(league);
 
-    // Auto-create owner's team
     await this.createTeam(ownerId, saved.id, `${dto.name} FC`);
     this.logger.log(`Fantasy league "${dto.name}" created by user ${ownerId} (code: ${inviteCode})`);
     return saved;
@@ -99,8 +100,6 @@ export class FantasyLeagueService {
     });
   }
 
-  // ── Team / Squad Management ───────────────────────────────────────────────
-
   private async createTeam(userId: number, leagueId: number, name: string): Promise<FantasyTeam> {
     const team = this.teamRepo.create({ userId, leagueId, name, budget: 100, totalPoints: 0 });
     return this.teamRepo.save(team);
@@ -128,7 +127,12 @@ export class FantasyLeagueService {
       (outgoing?.position as PlayerPosition) || 'MID';
 
     const excluded = new Set<number>(roster.map((r) => r.playerId));
-    const options = this.buildMockMarketOptions(teamId, position, Number(team.budget), excluded);
+    const options = await this.buildMarketOptionsFromPlayers(
+      position,
+      Number(team.budget),
+      excluded,
+      teamId,
+    );
 
     return {
       teamId,
@@ -143,14 +147,11 @@ export class FantasyLeagueService {
   async setSquad(teamId: number, userId: number, roster: { playerId: number; position: string; purchasePrice: number; isCaptain?: boolean; isViceCaptain?: boolean }[]): Promise<FantasyRoster[]> {
     const team = await this.getTeam(teamId, userId);
 
-    // Validate budget
     const totalCost = roster.reduce((sum, r) => sum + r.purchasePrice, 0);
     if (totalCost > team.budget) throw new BadRequestException(`Total cost (${totalCost}M) exceeds budget (${team.budget}M)`);
 
-    // Validate squad size (15 players: 11 starters + 4 bench)
     if (roster.length > 15) throw new BadRequestException('Squad cannot exceed 15 players');
 
-    // Clear existing roster and set new
     await this.rosterRepo.delete({ fantasyTeamId: teamId });
 
     const entries = roster.map((r, idx) =>
@@ -171,20 +172,17 @@ export class FantasyLeagueService {
     const team = await this.getTeam(teamId, userId);
 
     if (team.freeTransfersRemaining <= 0) {
-      // Deduct 4 points for extra transfer
       team.totalPoints -= 4;
     } else {
       team.freeTransfersRemaining -= 1;
     }
 
-    // Remove outgoing player
     const outRoster = await this.rosterRepo.findOne({ where: { fantasyTeamId: teamId, playerId: outPlayerId } });
     if (!outRoster) throw new NotFoundException('Player not in squad');
 
     const refund = outRoster.purchasePrice;
     await this.rosterRepo.remove(outRoster);
 
-    // Add incoming player
     const incoming = this.rosterRepo.create({
       fantasyTeamId: teamId,
       playerId: inPlayerId,
@@ -194,7 +192,6 @@ export class FantasyLeagueService {
     });
     await this.rosterRepo.save(incoming);
 
-    // Update budget
     team.budget = Number(team.budget) + Number(refund) - Number(inPrice);
     await this.teamRepo.save(team);
   }
@@ -225,6 +222,7 @@ export class FantasyLeagueService {
         playerId: id,
         name: `${position}-${id} ${templates[i].name}`,
         position,
+        teamName: 'Market XI',
         price,
         form: templates[i].form,
         trend: templates[i].trend,
@@ -234,7 +232,42 @@ export class FantasyLeagueService {
     return options;
   }
 
-  // ── Gameweek & Scoring ────────────────────────────────────────────────────
+  private async buildMarketOptionsFromPlayers(
+    position: PlayerPosition,
+    budget: number,
+    excludedIds: Set<number>,
+    teamId: number,
+  ): Promise<TransferMarketOption[]> {
+    const maxAffordable = Math.max(4, budget + 1.5);
+    const players = await this.playersRepo
+      .createQueryBuilder('p')
+      .where('p.is_active = true')
+      .andWhere('p.position = :position', { position })
+      .andWhere('p.price <= :maxAffordable', { maxAffordable })
+      .orderBy('p.form', 'DESC')
+      .addOrderBy('p.price', 'ASC')
+      .take(20)
+      .getMany();
+
+    const fromTable = players
+      .filter((p) => !excludedIds.has(p.id))
+      .slice(0, 8)
+      .map((p) => ({
+        playerId: p.id,
+        name: p.name,
+        position,
+        teamName: p.teamName,
+        price: Number(p.price),
+        form: p.form,
+        trend: p.form >= 78 ? ('up' as const) : p.form <= 64 ? ('down' as const) : ('flat' as const),
+      }));
+
+    if (fromTable.length > 0) {
+      return fromTable;
+    }
+
+    return this.buildMockMarketOptions(teamId, position, budget, excludedIds);
+  }
 
   async createGameweek(leagueId: number, weekNumber: number, startDate: Date, endDate: Date): Promise<FantasyGameweek> {
     const gw = this.gameweekRepo.create({ leagueId, weekNumber, startDate, endDate, status: 'upcoming' });
@@ -276,7 +309,6 @@ export class FantasyLeagueService {
     gameweek.status = 'completed';
     await this.gameweekRepo.save(gameweek);
 
-    // Reset free transfers for all teams
     await this.teamRepo
       .createQueryBuilder()
       .update(FantasyTeam)
@@ -294,8 +326,6 @@ export class FantasyLeagueService {
       order: { points: 'DESC' },
     });
   }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
 
   private generateInviteCode(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
