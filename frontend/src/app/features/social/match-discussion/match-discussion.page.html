@@ -51,6 +51,41 @@
     </div>
   </div>
 
+  <ion-card *ngIf="match" class="poll-card">
+    <ion-card-content>
+      <h3>Who scores next?</h3>
+      <div class="poll-options">
+        <button
+          type="button"
+          class="poll-option"
+          *ngFor="let option of pollOptions"
+          [class.selected]="selectedPollOption === option"
+          (click)="votePoll(option)"
+        >
+          <span>{{ option }}</span>
+          <strong>{{ pollPercent(option) }}%</strong>
+        </button>
+      </div>
+      <p class="poll-meta">{{ totalPollVotes() }} votes</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="match" class="timeline-card">
+    <ion-card-content>
+      <h3>Live Timeline</h3>
+      <div *ngIf="liveEvents.length === 0" class="empty-timeline">Waiting for live events...</div>
+      <div class="timeline-list" *ngIf="liveEvents.length > 0">
+        <div class="timeline-item" *ngFor="let ev of liveEvents">
+          <span class="timeline-dot" [class.goal]="ev.kind === 'goal'" [class.kickoff]="ev.kind === 'kickoff'"></span>
+          <div class="timeline-content">
+            <p>{{ ev.text }}</p>
+            <small>{{ ev.at | date:'shortTime' }}</small>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
   <!-- Live Chat -->
   <div class="chat-section" *ngIf="match">
     <ion-list-header>

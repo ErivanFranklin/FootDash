@@ -56,7 +56,6 @@ function clearLegacyCookies(res: Response, isProd: boolean) {
 
 /** Helper to attach the refresh-token cookie and return only the access token. */
 function sendWithCookie(res: Response, result: AuthResult, isProd: boolean) {
-  clearLegacyCookies(res, isProd);
   res.cookie('refresh_token', result.tokens.refreshToken, refreshCookieOptions(isProd));
   return res.json({
     user: result.user,
@@ -151,11 +150,36 @@ export class AuthController {
     @Request() req: any,
     @Res() res: Response,
   ): Promise<any> {
-    // Prefer HttpOnly cookie, fall back to body for backward compatibility
-    const token = req.cookies?.refresh_token || dto?.refreshToken;
+    // Prefer HttpOnly cookie, fall back to body for backward compatibility.
+    // When the browser has stale cookies at a more-specific path (e.g. /api/)
+    // they appear first in the Cookie header and cookie-parser picks them up.
+    // Per RFC 6265 §5.4, longer-path cookies are listed first — so the last
+    // refresh_token value in the header is the one from path=/ (the correct one).
+    const rawHeader = (req.headers?.cookie as string) || '';
+    const allRefreshValues = rawHeader
+      .split(';')
+      .map(c => c.trim())
+      .filter(c => c.startsWith('refresh_token='))
+      .map(c => decodeURIComponent(c.substring('refresh_token='.length)));
+
+    // Use the LAST raw cookie value (from the shortest/root path) rather than
+    // the cookie-parser value (which is the first = most-specific-path = stale).
+    const token =
+      (allRefreshValues.length > 1
+        ? allRefreshValues[allRefreshValues.length - 1]
+        : req.cookies?.refresh_token) ||
+      dto?.refreshToken;
+
+    console.log(
+      '[Auth/refresh] cookies count:', allRefreshValues.length,
+      '| using last-value strategy:', allRefreshValues.length > 1,
+      '| has token:', !!token,
+    );
+
     if (!token) {
       throw new UnauthorizedException('No refresh token provided');
     }
+
     const result = await this.authService.refresh(token);
     const isProd = process.env.NODE_ENV === 'production';
     return sendWithCookie(res, result, isProd);

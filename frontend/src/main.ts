@@ -6,6 +6,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { isDevMode, ErrorHandler, APP_INITIALIZER } from '@angular/core';
 import { provideTransloco } from '@jsverse/transloco';
 import { TranslocoHttpLoader } from './app/core/i18n/transloco.loader';
+import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
@@ -29,6 +30,15 @@ import {
 
 // Configure ionicons to load assets from CDN (ensures getAssetPath works in dev/prod)
 setAssetPath('https://cdn.jsdelivr.net/npm/ionicons/dist/');
+
+// In local development, cookies are host-bound. If one tab uses 127.0.0.1 and
+// another uses localhost, auth restore may fail between tabs. Normalize to
+// localhost to keep a single origin for all tabs.
+if (typeof window !== 'undefined' && window.location.hostname === '127.0.0.1') {
+  const { protocol, port, pathname, search, hash } = window.location;
+  const target = `${protocol}//localhost${port ? `:${port}` : ''}${pathname}${search}${hash}`;
+  window.location.replace(target);
+}
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -55,7 +65,7 @@ bootstrapApplication(AppComponent, {
     // This runs after HttpClient is available so the refresh call can be made.
     {
       provide: APP_INITIALIZER,
-      useFactory: (auth: AuthService) => () => auth.tryRestoreSession().toPromise(),
+      useFactory: (auth: AuthService) => () => firstValueFrom(auth.tryRestoreSession()),
       deps: [AuthService],
       multi: true,
     },

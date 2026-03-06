@@ -2,6 +2,15 @@
 
 <ion-content>
   <div class="filter-container">
+    <ion-segment [value]="selectedScope" (ionChange)="onScopeChange($event)">
+      <ion-segment-button value="global">
+        <ion-label>Global</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="friends">
+        <ion-label>Friends</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
     <ion-segment [value]="selectedPeriod" (ionChange)="onPeriodChange($event)">
       <ion-segment-button value="weekly">
         <ion-label>{{ 'LEADERBOARD.WEEKLY' | transloco }}</ion-label>
@@ -21,7 +30,7 @@
   </div>
 
   <ion-list *ngIf="!isLoading">
-    <ion-item *ngFor="let entry of leaderboard">
+    <ion-item *ngFor="let entry of displayedLeaderboard">
       <ion-label slot="start" class="rank-label" [class.top-3]="entry.rank <= 3">
         #{{ entry.rank }}
       </ion-label>
@@ -41,6 +50,10 @@
       <ion-note slot="end" color="primary" class="points-label">
         {{ entry.points }} pts
       </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="displayedLeaderboard.length === 0">
+      <ion-label color="medium">No friends ranked yet.</ion-label>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -162,6 +162,26 @@ import { LoggerService } from '../../core/services/logger.service';
                   {{ 'SETTINGS.NOTIFICATIONS.EMAIL' | transloco }}
                 </ion-toggle>
               </ion-item>
+              <ion-item>
+                <ion-toggle [(ngModel)]="goalToasts" (ionChange)="onNotifChange()">
+                  Goal event toasts
+                </ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-toggle [(ngModel)]="kickoffToasts" (ionChange)="onNotifChange()">
+                  Kickoff toasts
+                </ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-toggle [(ngModel)]="socialToasts" (ionChange)="onNotifChange()">
+                  Social activity toasts
+                </ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-toggle [(ngModel)]="badgeToasts" (ionChange)="onNotifChange()">
+                  Badge earned toasts
+                </ion-toggle>
+              </ion-item>
             </ion-list>
             <ion-note class="notif-note">
               {{ 'SETTINGS.NOTIFICATIONS.NOTE' | transloco }}
@@ -256,6 +276,10 @@ export class SettingsPage implements OnInit {
   // Notifications
   notificationEnabled = true;
   emailNotifications = true;
+  goalToasts = true;
+  kickoffToasts = true;
+  socialToasts = true;
+  badgeToasts = true;
 
   // Account
   currentPassword = '';
@@ -323,10 +347,25 @@ export class SettingsPage implements OnInit {
         this.notificationEnabled = prefs.notificationEnabled;
         this.emailNotifications = prefs.emailNotifications;
         this.timezone = prefs.timezone || '';
+        this.loadLocalNotificationPreferences();
         this.loading = false;
       },
       error: () => { this.loading = false; },
     });
+  }
+
+  private loadLocalNotificationPreferences() {
+    try {
+      const raw = localStorage.getItem('footdash_notification_preferences');
+      if (!raw) return;
+      const prefs = JSON.parse(raw);
+      this.goalToasts = prefs.goals ?? true;
+      this.kickoffToasts = prefs.kickoff ?? true;
+      this.socialToasts = prefs.social ?? true;
+      this.badgeToasts = prefs.badges ?? true;
+    } catch {
+      // ignore malformed local preferences
+    }
   }
 
   saveProfile() {
@@ -418,6 +457,13 @@ export class SettingsPage implements OnInit {
       notificationEnabled: this.notificationEnabled,
       emailNotifications: this.emailNotifications,
     }).subscribe();
+
+    localStorage.setItem('footdash_notification_preferences', JSON.stringify({
+      goals: this.goalToasts,
+      kickoff: this.kickoffToasts,
+      social: this.socialToasts,
+      badges: this.badgeToasts,
+    }));
   }
 
   // ─── Account ───────────────────────────────

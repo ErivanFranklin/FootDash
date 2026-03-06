@@ -57,6 +57,59 @@
     </ion-row>
   </ion-grid>
 
+  <div class="profile-stats" *ngIf="user">
+    <ion-card>
+      <ion-card-content>
+        <div class="stats-card-title">Prediction Accuracy</div>
+        <div class="accuracy-wrap">
+          <canvas #accuracyCanvas></canvas>
+          <div class="accuracy-center">
+            <strong>{{ predictionAccuracy }}%</strong>
+            <small>{{ predictionCount }} predictions</small>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <div class="stats-card-title">Prediction Points Trend</div>
+        <div class="trend-wrap">
+          <canvas #pointsTrendCanvas></canvas>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <div class="stats-card-title">Activity Heatmap</div>
+        <div class="heatmap-grid">
+          <div
+            class="heat-cell"
+            *ngFor="let cell of activityHeatmapCells"
+            [class.l1]="cell.level === 1"
+            [class.l2]="cell.level === 2"
+            [class.l3]="cell.level === 3"
+            [class.l4]="cell.level === 4"
+            [title]="cell.date + ': ' + cell.count"
+          ></div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="favoriteTeams.length > 0">
+      <ion-card-content>
+        <div class="stats-card-title">Favorite Teams</div>
+        <div class="favorites-grid">
+          <a class="favorite-team" *ngFor="let team of favoriteTeams" [routerLink]="['/analytics/team', team.id]">
+            <img *ngIf="team.logo" [src]="team.logo" [alt]="team.name" />
+            <span>{{ team.name }}</span>
+          </a>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
   <!-- User Badges -->
   @if (userBadges.length > 0) {
     <div class="badges-section">

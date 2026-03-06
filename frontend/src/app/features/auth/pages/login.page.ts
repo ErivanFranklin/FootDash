@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth.service';
@@ -20,6 +20,7 @@ export class LoginPage implements OnInit {
   // use functional inject() to satisfy @angular-eslint/prefer-inject
   private auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private toast = inject(ToastController);
   private logger = inject(LoggerService);
   private readonly ONBOARDING_KEY = 'footdash_onboarding_done';
@@ -29,7 +30,7 @@ export class LoginPage implements OnInit {
     // Use Promise.resolve to defer until after the current navigation completes
     if (this.auth.isAuthenticated()) {
       Promise.resolve().then(() => {
-        this.router.navigate([this.shouldShowOnboarding() ? '/onboarding' : '/home'], { replaceUrl: true });
+        this.router.navigateByUrl(this.getPostLoginTarget(), { replaceUrl: true });
       });
     }
   }
@@ -63,7 +64,7 @@ export class LoginPage implements OnInit {
         
         // Navigate to home after a brief delay to ensure token is stored
         setTimeout(() => {
-          this.router.navigate([this.shouldShowOnboarding() ? '/onboarding' : '/home']);
+          this.router.navigateByUrl(this.getPostLoginTarget(), { replaceUrl: true });
         }, 100);
       },
       error: (err: any) => {
@@ -118,5 +119,13 @@ export class LoginPage implements OnInit {
 
   private shouldShowOnboarding(): boolean {
     return localStorage.getItem(this.ONBOARDING_KEY) !== 'true';
+  }
+
+  private getPostLoginTarget(): string {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '';
+    if (returnUrl.startsWith('/')) {
+      return returnUrl;
+    }
+    return this.shouldShowOnboarding() ? '/onboarding' : '/home';
   }
 }

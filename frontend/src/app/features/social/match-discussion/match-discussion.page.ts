@@ -10,6 +10,7 @@ import { MatchChatComponent } from '../../../components/match-chat/match-chat.co
 import { ReactionsService } from '../../../services/social/reactions.service';
 import { ReactionSummary, ReactionTargetType } from '../../../models/social';
 import { LoggerService } from '../../../core/services/logger.service';
+import { WebSocketService } from '../../../core/services/web-socket.service';
 
 @Component({
   selector: 'app-match-discussion',
@@ -30,6 +31,10 @@ export class MatchDiscussionPage implements OnInit {
   match: any = null; // TODO: Define proper Match model
   reactionSummary: ReactionSummary | null = null;
   loading: boolean = false;
+  liveEvents: Array<{ text: string; at: Date; kind: 'goal' | 'kickoff' | 'update' }> = [];
+  pollOptions = ['Home Team', 'Draw', 'Away Team'];
+  pollVotes: Record<string, number> = {};
+  selectedPollOption = '';
 
   // Enum for template access
   ReactionTargetType = ReactionTargetType;
@@ -38,6 +43,7 @@ export class MatchDiscussionPage implements OnInit {
   private router = inject(Router);
   private apiService = inject(ApiService);
   private reactionsService = inject(ReactionsService);
+  private websocket = inject(WebSocketService);
   private logger = inject(LoggerService);
 
   ngOnInit() {
@@ -45,7 +51,74 @@ export class MatchDiscussionPage implements OnInit {
       this.matchId = +params['id'];
       this.loadMatchDetails();
       this.loadReactionSummary();
+      this.initializeLiveExperience();
     });
+  }
+
+  private initializeLiveExperience() {
+    this.liveEvents = [];
+    this.selectedPollOption = '';
+    this.loadPollVotes();
+
+    this.websocket.subscribeToMatch(this.matchId);
+    this.websocket.onMatchUpdate().subscribe((payload: any) => {
+      if (String(payload?.matchId) !== String(this.matchId)) return;
+      const message = String(payload?.message || 'Live match update');
+      const lower = message.toLowerCase();
+      const kind: 'goal' | 'kickoff' | 'update' = lower.includes('goal') || lower.includes('scored')
+        ? 'goal'
+        : (lower.includes('kick') || lower.includes('start') ? 'kickoff' : 'update');
+
+      this.liveEvents = [
+        { text: message, at: new Date(), kind },
+        ...this.liveEvents,
+      ].slice(0, 12);
+    });
+  }
+
+  private pollStorageKey(): string {
+    return `match_poll_${this.matchId}`;
+  }
+
+  private loadPollVotes() {
+    const homeName = this.match?.homeTeam?.name || this.pollOptions[0];
+    const awayName = this.match?.awayTeam?.name || this.pollOptions[2];
+    this.pollOptions = [homeName, 'Draw', awayName];
+
+    try {
+      const raw = localStorage.getItem(this.pollStorageKey());
+      this.pollVotes = raw ? JSON.parse(raw) : {};
+    } catch {
+      this.pollVotes = {};
+    }
+
+    for (const option of this.pollOptions) {
+      if (!Number.isFinite(this.pollVotes[option])) {
+        this.pollVotes[option] = 0;
+      }
+    }
+  }
+
+  votePoll(option: string) {
+    if (!option || this.selectedPollOption === option) return;
+
+    if (this.selectedPollOption) {
+      this.pollVotes[this.selectedPollOption] = Math.max(0, (this.pollVotes[this.selectedPollOption] || 0) - 1);
+    }
+
+    this.selectedPollOption = option;
+    this.pollVotes[option] = (this.pollVotes[option] || 0) + 1;
+    localStorage.setItem(this.pollStorageKey(), JSON.stringify(this.pollVotes));
+  }
+
+  totalPollVotes(): number {
+    return Object.values(this.pollVotes).reduce((sum, n) => sum + Number(n || 0), 0);
+  }
+
+  pollPercent(option: string): number {
+    const total = this.totalPollVotes();
+    if (!total) return 0;
+    return Math.round(((this.pollVotes[option] || 0) / total) * 100);
   }
 
   private loadMatchDetails() {

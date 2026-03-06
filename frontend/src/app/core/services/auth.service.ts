@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { map, tap, catchError, switchMap } from 'rxjs/operators';
+import { map, tap, catchError, switchMap, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Store } from '@ngrx/store';
 import { authLogoutSuccess, authSetToken } from '../../store/auth/auth.actions';
@@ -28,6 +28,18 @@ export class AuthService {
   /** True while a silent refresh is in-flight (prevents duplicate calls). */
   private refreshInFlight = false;
 
+  /**
+   * In-flight session restore observable (shared via shareReplay).
+   * Prevents concurrent callers from issuing duplicate refresh requests.
+   */
+  private restoreInFlight$: Observable<boolean> | null = null;
+
+  /**
+   * Cached result of the last tryRestoreSession call.
+   * Prevents the guard from repeating a just-completed APP_INITIALIZER call.
+   */
+  private lastRestoreResult: { value: boolean; time: number } | null = null;
+
   private http = inject(HttpClient);
   private store = inject(Store);
 
@@ -36,16 +48,46 @@ export class AuthService {
    * The browser automatically sends the HttpOnly refresh_token cookie.
    */
   tryRestoreSession(): Observable<boolean> {
-    return this.http
-      .post<any>(`${this.authUrl}/refresh`, {}, { withCredentials: true })
+    // Return cached result only if the last restore SUCCEEDED recently.
+    // We do NOT cache failures because cookies may arrive asynchronously
+    // (e.g. the APP_INITIALIZER fires before the login Set-Cookie is
+    // committed but the guard fires after — the retry must proceed).
+    if (this.lastRestoreResult?.value && Date.now() - this.lastRestoreResult.time < 5000) {
+      console.warn('[AuthService] tryRestoreSession → cached success');
+      return of(true);
+    }
+
+    // If a restore request is already in-flight, share it.
+    if (this.restoreInFlight$) {
+      console.warn('[AuthService] tryRestoreSession → sharing in-flight');
+      return this.restoreInFlight$;
+    }
+
+    // Issue a new refresh request.
+    const url = `${this.authUrl}/refresh`;
+    console.warn('[AuthService] tryRestoreSession → POST', url);
+    const source$ = this.http
+      .post<any>(url, {}, { withCredentials: true })
       .pipe(
         tap(res => {
           const token = res?.tokens?.accessToken;
+          console.warn('[AuthService] tryRestoreSession response:', token ? 'got token' : 'NO token');
           if (token) this.setToken(token);
+          this.lastRestoreResult = { value: true, time: Date.now() };
         }),
         map(res => !!res?.tokens?.accessToken),
-        catchError(() => of(false)),
+        catchError((err) => {
+          console.warn('[AuthService] tryRestoreSession FAILED →', err?.status, err?.error?.message ?? err?.message);
+          return of(false);
+        }),
+        // shareReplay keeps the result for concurrent subscribers (e.g. guard
+        // subscribing while the APP_INITIALIZER request is still in-flight).
+        // Do NOT clear restoreInFlight$ inside tap — that would null the ref
+        // before shareReplay has a chance to serve late subscribers.
+        shareReplay(1),
       );
+    this.restoreInFlight$ = source$;
+    return source$;
   }
 
   login(email: string, password: string): Observable<any> {
@@ -55,6 +97,8 @@ export class AuthService {
         tap(res => {
           const token = res?.tokens?.accessToken;
           if (token) this.setToken(token);
+          // Clear the cache so tryRestoreSession works fresh on new tabs.
+          this.lastRestoreResult = null;
         }),
       );
   }
@@ -91,10 +135,17 @@ export class AuthService {
         map(res => res?.tokens?.accessToken || null),
         catchError(err => {
           this.refreshInFlight = false;
-          this.clearSession();
+          // Do not clear the session here. A 401 on one endpoint can be
+          // permission-related and not necessarily a globally invalid session.
+          // The interceptor decides whether to invalidate the session.
           return throwError(() => err);
         }),
       );
+  }
+
+  /** Invalidate local auth state without calling revoke endpoint. */
+  invalidateSession(): void {
+    this.clearSession();
   }
 
   logout(): void {

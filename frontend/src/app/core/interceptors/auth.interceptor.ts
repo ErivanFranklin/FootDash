@@ -48,6 +48,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return auth.refreshAccessToken().pipe(
           switchMap((newToken) => {
             if (!newToken) {
+              // If refresh did not return a token and current token is no longer
+              // valid, end the session and let guards redirect to login.
+              if (!auth.isAuthenticated()) {
+                auth.invalidateSession();
+              }
               return throwError(() => error);
             }
             // Sync new token into the Store
@@ -60,6 +65,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               setHeaders: { Authorization: `Bearer ${newToken}` },
             });
             return next(retried);
+          }),
+          catchError((refreshError) => {
+            // Refresh failed. Only force logout if token is actually invalid/expired.
+            if (!auth.isAuthenticated()) {
+              auth.invalidateSession();
+            }
+            return throwError(() => refreshError);
           }),
         );
       }

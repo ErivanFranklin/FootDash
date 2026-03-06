@@ -143,6 +143,31 @@ export class AppComponent implements OnInit {
     this.swUpdateService.init();
   }
 
+  private getNotificationPrefs() {
+    try {
+      const raw = localStorage.getItem('footdash_notification_preferences');
+      if (!raw) {
+        return { goals: true, kickoff: true, social: true, badges: true };
+      }
+      return { goals: true, kickoff: true, social: true, badges: true, ...JSON.parse(raw) };
+    } catch {
+      return { goals: true, kickoff: true, social: true, badges: true };
+    }
+  }
+
+  private async presentTopToast(message: string, color: string, viewAction?: () => void) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      color,
+      buttons: viewAction
+        ? [{ text: 'View', handler: viewAction }]
+        : undefined,
+    });
+    await toast.present();
+  }
+
   private setupSocialNotifications() {
     this.authService.currentToken$.subscribe(token => {
       if (token) {
@@ -155,6 +180,9 @@ export class AppComponent implements OnInit {
     });
 
     this.websocketService.onNewFollower().subscribe(async data => {
+      const prefs = this.getNotificationPrefs();
+      if (!prefs.social) return;
+
       const toast = await this.toastController.create({
         message: 'You have a new follower!',
         duration: 3000,
@@ -172,6 +200,54 @@ export class AppComponent implements OnInit {
         ]
       });
       await toast.present();
+    });
+
+    this.websocketService.onMatchUpdate().subscribe(async (event: any) => {
+      const prefs = this.getNotificationPrefs();
+      const message = String(event?.message || '').toLowerCase();
+
+      if ((message.includes('goal') || message.includes('scored')) && prefs.goals) {
+        await this.presentTopToast('Goal update in a live match', 'danger', () => {
+          if (event?.matchId) {
+            this.router.navigate(['/match', event.matchId]);
+          }
+        });
+        return;
+      }
+
+      if ((message.includes('kick') || message.includes('start')) && prefs.kickoff) {
+        await this.presentTopToast('Match started', 'warning', () => {
+          if (event?.matchId) {
+            this.router.navigate(['/match', event.matchId]);
+          }
+        });
+      }
+    });
+
+    this.websocketService.onSocialEvent().subscribe(async (event: any) => {
+      const prefs = this.getNotificationPrefs();
+      if (!prefs.social) return;
+
+      if (event?.type === 'comment') {
+        await this.presentTopToast('New comment on a discussion', 'tertiary', () => {
+          if (event?.targetType === 'match' && event?.targetId) {
+            this.router.navigate(['/match-discussion', event.targetId]);
+          }
+        });
+      }
+
+      if (event?.type === 'reaction') {
+        await this.presentTopToast('New reaction received', 'primary');
+      }
+    });
+
+    this.websocketService.onGlobalSocialEvent().subscribe(async (event: any) => {
+      const prefs = this.getNotificationPrefs();
+      if (!prefs.social) return;
+
+      if (event?.type === 'follow') {
+        await this.presentTopToast('A user just gained a new follower', 'medium');
+      }
     });
   }
 }

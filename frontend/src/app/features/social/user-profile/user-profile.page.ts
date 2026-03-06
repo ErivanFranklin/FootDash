@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonIcon, IonContent, IonAvatar, IonGrid, IonRow, IonCol, IonText, IonList, IonListHeader, IonLabel, IonCard, IonCardContent, IonSpinner } from '@ionic/angular/standalone';
@@ -16,6 +16,12 @@ import { Activity, PaginatedActivities, ReportTargetType, ReportReason } from '.
 import { AlertController, ToastController } from '@ionic/angular';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LoggerService } from '../../../core/services/logger.service';
+import { FavoritesService } from '../../../services/favorites.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Chart, registerables } from 'chart.js';
+import { firstValueFrom } from 'rxjs';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-user-profile',
@@ -33,7 +39,10 @@ import { LoggerService } from '../../../core/services/logger.service';
     TranslocoPipe
   ]
 })
-export class UserProfilePage implements OnInit {
+export class UserProfilePage implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('accuracyCanvas') accuracyCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('pointsTrendCanvas') pointsTrendCanvas?: ElementRef<HTMLCanvasElement>;
+
   userId!: number;
   user: User | null = null;
   activities: Activity[] = [];
@@ -45,6 +54,15 @@ export class UserProfilePage implements OnInit {
   followerCount: number = 0;
   followingCount: number = 0;
   userBadges: BadgeResponse[] = [];
+  favoriteTeams: Array<{ id: number; name: string; logo?: string | null }> = [];
+
+  predictionAccuracy = 0;
+  predictionCount = 0;
+  activityHeatmapCells: Array<{ date: string; count: number; level: number }> = [];
+
+  private accuracyChart: Chart | null = null;
+  private pointsTrendChart: Chart | null = null;
+  private viewReady = false;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -53,6 +71,8 @@ export class UserProfilePage implements OnInit {
   private feedService = inject(FeedService);
   private reportsService = inject(ReportsService);
   private gamificationService = inject(GamificationService);
+  private favoritesService = inject(FavoritesService);
+  private authService = inject(AuthService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private logger = inject(LoggerService);
@@ -62,7 +82,18 @@ export class UserProfilePage implements OnInit {
       this.userId = +params['id'];
       this.loadUserProfile();
       this.loadActivities();
+      this.loadFavoriteTeamsIfCurrentUser();
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    this.renderStatsVisuals();
+  }
+
+  ngOnDestroy(): void {
+    this.accuracyChart?.destroy();
+    this.pointsTrendChart?.destroy();
   }
 
   private loadUserProfile() {
@@ -132,6 +163,7 @@ export class UserProfilePage implements OnInit {
           }
           this.hasMore = result.hasMore;
           this.currentPage++;
+          this.recomputeUserStats();
           this.loading = false;
         },
         error: (error) => {
@@ -187,6 +219,131 @@ export class UserProfilePage implements OnInit {
   loadMoreActivities() {
     if (!this.loading && this.hasMore) {
       this.loadActivities();
+    }
+  }
+
+  private loadFavoriteTeamsIfCurrentUser() {
+    const me = this.authService.getCurrentUserId();
+    if (!me || me !== this.userId) {
+      this.favoriteTeams = [];
+      return;
+    }
+
+    this.favoritesService.loadFavorites('team').subscribe({
+      next: (favorites) => {
+        const ids = favorites.slice(0, 6).map((f) => f.entityId);
+        if (!ids.length) {
+          this.favoriteTeams = [];
+          return;
+        }
+
+        Promise.all(ids.map((id) => firstValueFrom(this.apiService.getTeam(id)).catch(() => null))).then((teams) => {
+          this.favoriteTeams = teams
+            .filter((t: any) => !!t)
+            .map((t: any) => ({ id: t.id, name: t.name, logo: t.logo }));
+        });
+      },
+      error: () => {
+        this.favoriteTeams = [];
+      },
+    });
+  }
+
+  private recomputeUserStats() {
+    const predictions = this.activities.filter((a) => a.activityType === 'prediction');
+    this.predictionCount = predictions.length;
+
+    const correct = predictions.filter((a) =>
+      a?.metadata?.correct === true || Number(a?.metadata?.points ?? 0) > 0
+    ).length;
+    this.predictionAccuracy = this.predictionCount > 0
+      ? Math.round((correct / this.predictionCount) * 100)
+      : 0;
+
+    this.activityHeatmapCells = this.buildHeatmapCells(this.activities);
+    this.renderStatsVisuals();
+  }
+
+  private buildHeatmapCells(activities: Activity[]) {
+    const days = 35;
+    const map = new Map<string, number>();
+    for (const act of activities) {
+      const d = new Date(act.createdAt);
+      const key = d.toISOString().slice(0, 10);
+      map.set(key, (map.get(key) || 0) + 1);
+    }
+
+    const cells: Array<{ date: string; count: number; level: number }> = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const count = map.get(key) || 0;
+      const level = count >= 4 ? 4 : count >= 3 ? 3 : count >= 2 ? 2 : count >= 1 ? 1 : 0;
+      cells.push({ date: key, count, level });
+    }
+    return cells;
+  }
+
+  private renderStatsVisuals() {
+    if (!this.viewReady) return;
+
+    if (this.accuracyCanvas?.nativeElement) {
+      this.accuracyChart?.destroy();
+      this.accuracyChart = new Chart(this.accuracyCanvas.nativeElement, {
+        type: 'doughnut',
+        data: {
+          labels: ['Correct', 'Remaining'],
+          datasets: [{
+            data: [this.predictionAccuracy, Math.max(0, 100 - this.predictionAccuracy)],
+            backgroundColor: ['#2dd36f', 'rgba(146, 148, 156, 0.25)'],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: { legend: { display: false } },
+        },
+      });
+    }
+
+    if (this.pointsTrendCanvas?.nativeElement) {
+      this.pointsTrendChart?.destroy();
+      const predictions = this.activities
+        .filter((a) => a.activityType === 'prediction')
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        .slice(-12);
+
+      let cumulative = 0;
+      const data = predictions.map((p) => {
+        cumulative += Number(p?.metadata?.points ?? 0);
+        return cumulative;
+      });
+
+      this.pointsTrendChart = new Chart(this.pointsTrendCanvas.nativeElement, {
+        type: 'line',
+        data: {
+          labels: predictions.map((p) => new Date(p.createdAt).toLocaleDateString()),
+          datasets: [{
+            data,
+            borderColor: '#3880ff',
+            backgroundColor: 'rgba(56, 128, 255, 0.15)',
+            tension: 0.35,
+            fill: true,
+            pointRadius: 3,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { display: false },
+          },
+        },
+      });
     }
   }
 

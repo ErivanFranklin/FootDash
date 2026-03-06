@@ -127,6 +127,7 @@ export class AuthService {
       const payload: any = this.jwtService.verify(refreshToken);
       const userId = payload.sub;
       if (!userId) {
+        this.logger.warn('[refresh] JWT valid but no sub claim');
         throw new UnauthorizedException('Invalid refresh token');
       }
 
@@ -136,6 +137,9 @@ export class AuthService {
         relations: ['user'],
       });
       if (!stored || stored.revoked) {
+        this.logger.warn(
+          `[refresh] token lookup: found=${!!stored} revoked=${stored?.revoked} userId=${userId} tokenId=${stored?.id}`,
+        );
         // Possible token reuse attack — revoke entire family
         if (stored) {
           await this.refreshRepo.update(
