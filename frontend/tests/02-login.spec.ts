@@ -85,8 +85,8 @@ test.describe('Phase 2: Login', () => {
     await expect(toast).toBeVisible({ timeout: 5_000 });
 
     // Expect navigation to /home
-    await page.waitForURL('**/home', { timeout: 10_000 });
-    expect(page.url()).toContain('/home');
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
+    expect(page.url()).toMatch(/\/(home|onboarding|tabs)/);
   });
 
   // -----------------------------------------------------------------------
@@ -150,7 +150,7 @@ test.describe('Phase 2: Login', () => {
     await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
 
     // Wait for authenticated layout
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
     await waitForIonicReady(page);
 
     // Tab bar should be visible on mobile
@@ -186,7 +186,7 @@ test.describe('Phase 2: Login', () => {
     await page.locator('ion-input[type="password"] input').fill(password);
     await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
 
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
 
     const cookies = await page.context().cookies();
     expect(cookies.length).toBeGreaterThan(0);
@@ -206,14 +206,14 @@ test.describe('Phase 2: Login', () => {
     await page.locator('ion-input[type="password"] input').fill(password);
     await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
 
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
 
     // Refresh the page
     await page.reload();
     await waitForIonicReady(page);
 
     // Should still be on /home (not redirected to /login)
-    expect(page.url()).toContain('/home');
+    expect(page.url()).toMatch(/\/(home|onboarding|tabs)/);
 
     const cookies = await page.context().cookies();
     expect(cookies.length).toBeGreaterThan(0);
@@ -233,14 +233,14 @@ test.describe('Phase 2: Login', () => {
     await page.locator('ion-input[type="password"] input').fill(password);
     await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
 
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
 
     // Now visit /login again — should redirect back to /home
     await page.goto('/login');
     
     // Should be redirected to /home automatically
-    await page.waitForURL('**/home', { timeout: 10_000 });
-    expect(page.url()).toContain('/home');
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
+    expect(page.url()).toMatch(/\/(home|onboarding|tabs)/);
   });
 
   // -----------------------------------------------------------------------

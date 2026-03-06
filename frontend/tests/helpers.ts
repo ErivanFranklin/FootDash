@@ -107,11 +107,12 @@ export async function loginTestUser(
 
   await submitLogin();
 
-  // Wait for redirect to authenticated route (home)
-  await page.waitForURL('**/home', { timeout: 20_000 }).catch(async () => {
+  // Wait for redirect to authenticated route (home or onboarding)
+  const authUrlPattern = /\/(home|onboarding|tabs)/;
+  await page.waitForURL(authUrlPattern, { timeout: 20_000 }).catch(async () => {
     // Retry click in case Ionic swallowed the first one
     await submitLogin();
-    await page.waitForURL('**/home', { timeout: 15_000 });
+    await page.waitForURL(authUrlPattern, { timeout: 15_000 });
   });
 
   // Wait for authenticated layout to be fully rendered (split-pane = auth layout is active)

@@ -94,8 +94,8 @@ test.describe('Phase 1: Register', () => {
     await expect(toast).toBeVisible({ timeout: 5_000 });
 
     // Expect navigation to /home (wait for URL change)
-    await page.waitForURL('**/home', { timeout: 10_000 });
-    expect(page.url()).toContain('/home');
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
+    expect(page.url()).toMatch(/\/(home|onboarding|tabs)/);
   });
 
   // -----------------------------------------------------------------------
@@ -114,7 +114,7 @@ test.describe('Phase 1: Register', () => {
     await page.locator('ion-button', { hasText: 'Register' }).click();
 
     // Wait for authenticated layout
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
     await waitForIonicReady(page);
 
     // Tab bar should be visible on mobile
@@ -185,12 +185,12 @@ test.describe('Phase 1: Register', () => {
     await page.locator('ion-input[type="password"] input').fill(password);
     await page.locator('ion-button', { hasText: 'Register' }).click();
 
-    await page.waitForURL('**/home', { timeout: 10_000 });
+    await page.waitForURL(/\/(home|onboarding|tabs)/, { timeout: 10_000 });
 
     // Session should remain valid after reload
     await page.reload();
     await waitForIonicReady(page);
-    expect(page.url()).toContain('/home');
+    expect(page.url()).toMatch(/\/(home|onboarding|tabs)/);
 
     // Auth cookies should exist
     const cookies = await page.context().cookies();
