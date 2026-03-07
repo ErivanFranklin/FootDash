@@ -1,0 +1,37 @@
+flowchart TD
+    subgraph Teams_and_Matches
+        Teams[/teams/] -->|Select team| Matches[/matches/:teamId/]
+        Matches -->|Select match| MatchDetail[/match/:matchId/]
+        MatchDetail -->|Predict Pro| MatchPred[/analytics/match/:matchId/]
+        MatchDetail -->|Discuss| Discussion[/match-discussion/:id/]
+        Teams -->|Analytics Pro| TeamAnalytics[/analytics/team/:teamId/]
+    end
+
+    subgraph Leagues
+        LeaguesHome[/leagues/] -->|Select league| Standings[/leagues/:id/standings/]
+    end
+
+    subgraph Fantasy
+        FantasyHome[/fantasy/] -->|Select or create league| FantasyLeague[/fantasy/league/:id/]
+        FantasyLeague -->|View team| FantasyTeam[/fantasy/league/:id/team/:teamId/]
+        FantasyLeague -->|Transfers| TransferMkt[/fantasy/league/:id/transfers/]
+    end
+
+    subgraph Social
+        Feed[/feed/] -->|User avatar| UserProfile[/user-profile/:id/]
+        Discussion2[/match-discussion/:id/] -->|User avatar| UserProfile
+    end
+
+    subgraph Gamification
+        Leaderboard[/leaderboard/]
+        Badges[/badges/]
+    end
+
+    subgraph Content
+        Highlights[/highlights/]
+        Odds[/odds/]
+    end
+
+    subgraph Pro_and_Subscription
+        ProPage[/pro/] -->|Subscribe| PaySuccess[/payments/success/]
+    end

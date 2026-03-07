@@ -1,0 +1,27 @@
+flowchart LR
+    subgraph Bottom_Tab_Bar_Mobile
+        Tab1[Home]
+        Tab2[Teams]
+        Tab3[Predict]
+        Tab4[Feed]
+        Tab5[Profile]
+    end
+
+    subgraph Side_Menu_Desktop
+        Menu1[Home]
+        Menu2[Teams]
+        Menu3[Leagues]
+        Menu4[Fantasy]
+        Menu5[Highlights]
+        Menu6[Odds]
+        Menu7[Feed]
+        Menu8[Leaderboard]
+        Menu9[Badges]
+        Menu10[Settings]
+    end
+
+    Tab1 --> HomeP[/home/]
+    Tab2 --> TeamsP[/teams/]
+    Tab3 --> PredP[/analytics/predictions/]
+    Tab4 --> FeedP[/feed/]
+    Tab5 --> SettP[/settings/]

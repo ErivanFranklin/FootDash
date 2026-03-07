@@ -1,0 +1,18 @@
+flowchart TD
+    AppStart[App Start] --> CheckSession{Session Valid?}
+    CheckSession -->|No| Login[Login]
+    CheckSession -->|Yes| Home[Home]
+
+    Login -->|Click Register| Register[Register]
+    Register -->|Success auto-login| Login
+    Login -->|Click Forgot| ForgotPassword[Forgot Password]
+    ForgotPassword -->|Email link| ResetPassword[Reset Password]
+    ResetPassword -->|Password reset| Login
+
+    Login -->|Login success| TwoFACheck{2FA Enabled?}
+    TwoFACheck -->|No| Home
+    TwoFACheck -->|Yes| TwoFAVerify[Verify 2FA Code]
+    TwoFAVerify -->|Code verified| Home
+
+    Home -->|Settings Logout| Logout[Logout]
+    Logout -->|Clear session| Login
