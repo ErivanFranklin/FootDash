@@ -57,40 +57,40 @@ graph TB
 
 | Route | Page | Description | URL |
 |-------|------|-------------|-----|
-| `/login` | LoginPage | Sign in / register | `http://localhost:4200/login` |
-| `/auth/forgot-password` | ForgotPasswordPage | Request password reset | `http://localhost:4200/auth/forgot-password` |
-| `/auth/reset-password` | ResetPasswordPage | Reset password with token | `http://localhost:4200/auth/reset-password` |
-| `/404` | NotFoundPage | Page not found | `http://localhost:4200/404` |
-| `/error` | ErrorPage | Generic error page | `http://localhost:4200/error` |
+| `/login` | LoginPage | Sign in / register | [http://localhost:4200/login](http://localhost:4200/login) |
+| `/auth/forgot-password` | ForgotPasswordPage | Request password reset | [http://localhost:4200/auth/forgot-password](http://localhost:4200/auth/forgot-password) |
+| `/auth/reset-password` | ResetPasswordPage | Reset password with token | [http://localhost:4200/auth/reset-password](http://localhost:4200/auth/reset-password) |
+| `/404` | NotFoundPage | Page not found | [http://localhost:4200/404](http://localhost:4200/404) |
+| `/error` | ErrorPage | Generic error page | [http://localhost:4200/error](http://localhost:4200/error) |
 
 ### Authenticated Routes (Free Tier)
 
 | Route | Page | Description | URL |
 |-------|------|-------------|-----|
-| `/home` | HomePage | Dashboard with overview | `http://localhost:4200/home` |
-| `/teams` | TeamsPage | Browse/manage favorite teams | `http://localhost:4200/teams` |
-| `/matches/:teamId` | MatchesPage | Team fixtures & results | `http://localhost:4200/matches/1` |
-| `/match/:matchId` | MatchDetailsPage | Single match details | `http://localhost:4200/match/1` |
-| `/onboarding` | OnboardingPage | New user setup wizard | `http://localhost:4200/onboarding` |
-| `/notifications` | NotificationsPage | Notification center | `http://localhost:4200/notifications` |
-| `/settings` | SettingsPage | User settings | `http://localhost:4200/settings` |
-| `/search` | SearchResultsPage | Search teams/matches | `http://localhost:4200/search` |
-| `/leaderboard` | LeaderboardPage | Prediction rankings | `http://localhost:4200/leaderboard` |
-| `/badges` | BadgesPage | Achievement badges | `http://localhost:4200/badges` |
-| `/export` | ExportPage | Data export | `http://localhost:4200/export` |
-| `/pro` | ProPage | Pro subscription info | `http://localhost:4200/pro` |
-| `/payments/success` | PaymentSuccessPage | Payment confirmation | `http://localhost:4200/payments/success` |
-| `/user-profile/:id` | UserProfilePage | View user profiles | `http://localhost:4200/user-profile/8` |
-| `/feed` | FeedPage | Social feed & activity | `http://localhost:4200/feed` |
-| `/match-discussion/:id` | MatchDiscussionPage | Match chat room | `http://localhost:4200/match-discussion/1` |
-| `/leagues` | LeaguesPage | Browse football leagues | `http://localhost:4200/leagues` |
-| `/leagues/:id/standings` | LeagueStandingsPage | League table/standings | `http://localhost:4200/leagues/1/standings` |
-| `/fantasy` | FantasyHomePage | Fantasy league home | `http://localhost:4200/fantasy` |
-| `/fantasy/league/:id` | FantasyLeaguePage | Fantasy league detail | `http://localhost:4200/fantasy/league/1` |
-| `/fantasy/league/:id/team/:teamId` | FantasyTeamPage | Fantasy team detail | `http://localhost:4200/fantasy/league/1/team/1` |
-| `/fantasy/league/:id/transfers` | FantasyTransferMarketPage | Transfer market | `http://localhost:4200/fantasy/league/1/transfers` |
-| `/highlights` | HighlightsPage | Match highlights/videos | `http://localhost:4200/highlights` |
-| `/odds` | OddsPage | Betting odds comparison | `http://localhost:4200/odds` |
+| `/home` | HomePage | Dashboard with overview | [http://localhost:4200/home](http://localhost:4200/home) |
+| `/teams` | TeamsPage | Browse/manage favorite teams | [http://localhost:4200/teams](http://localhost:4200/teams) |
+| `/matches/:teamId` | MatchesPage | Team fixtures & results | [http://localhost:4200/matches/1](http://localhost:4200/matches/1) |
+| `/match/:matchId` | MatchDetailsPage | Single match details | [http://localhost:4200/match/1](http://localhost:4200/match/1) |
+| `/onboarding` | OnboardingPage | New user setup wizard | [http://localhost:4200/onboarding](http://localhost:4200/onboarding) |
+| `/notifications` | NotificationsPage | Notification center | [http://localhost:4200/notifications](http://localhost:4200/notifications) |
+| `/settings` | SettingsPage | User settings | [http://localhost:4200/settings](http://localhost:4200/settings) |
+| `/search` | SearchResultsPage | Search teams/matches | [http://localhost:4200/search](http://localhost:4200/search) |
+| `/leaderboard` | LeaderboardPage | Prediction rankings | [http://localhost:4200/leaderboard](http://localhost:4200/leaderboard) |
+| `/badges` | BadgesPage | Achievement badges | [http://localhost:4200/badges](http://localhost:4200/badges) |
+| `/export` | ExportPage | Data export | [http://localhost:4200/export](http://localhost:4200/export) |
+| `/pro` | ProPage | Pro subscription info | [http://localhost:4200/pro](http://localhost:4200/pro) |
+| `/payments/success` | PaymentSuccessPage | Payment confirmation | [http://localhost:4200/payments/success](http://localhost:4200/payments/success) |
+| `/user-profile/:id` | UserProfilePage | View user profiles | [http://localhost:4200/user-profile/8](http://localhost:4200/user-profile/8) |
+| `/feed` | FeedPage | Social feed & activity | [http://localhost:4200/feed](http://localhost:4200/feed) |
+| `/match-discussion/:id` | MatchDiscussionPage | Match chat room | [http://localhost:4200/match-discussion/1](http://localhost:4200/match-discussion/1) |
+| `/leagues` | LeaguesPage | Browse football leagues | [http://localhost:4200/leagues](http://localhost:4200/leagues) |
+| `/leagues/:id/standings` | LeagueStandingsPage | League table/standings | [http://localhost:4200/leagues/1/standings](http://localhost:4200/leagues/1/standings) |
+| `/fantasy` | FantasyHomePage | Fantasy league home | [http://localhost:4200/fantasy](http://localhost:4200/fantasy) |
+| `/fantasy/league/:id` | FantasyLeaguePage | Fantasy league detail | [http://localhost:4200/fantasy/league/1](http://localhost:4200/fantasy/league/1) |
+| `/fantasy/league/:id/team/:teamId` | FantasyTeamPage | Fantasy team detail | [http://localhost:4200/fantasy/league/1/team/1](http://localhost:4200/fantasy/league/1/team/1) |
+| `/fantasy/league/:id/transfers` | FantasyTransferMarketPage | Transfer market | [http://localhost:4200/fantasy/league/1/transfers](http://localhost:4200/fantasy/league/1/transfers) |
+| `/highlights` | HighlightsPage | Match highlights/videos | [http://localhost:4200/highlights](http://localhost:4200/highlights) |
+| `/odds` | OddsPage | Betting odds comparison | [http://localhost:4200/odds](http://localhost:4200/odds) |
 
 ### Pro-Only Routes
 
@@ -98,10 +98,10 @@ These routes require `authGuard` + `proGuard`. Free users are redirected to `/pr
 
 | Route | Page | Description | URL |
 |-------|------|-------------|-----|
-| `/analytics/match/:matchId` | MatchPredictionPage | AI match predictions | `http://localhost:4200/analytics/match/1` |
-| `/analytics/team/:teamId` | TeamAnalyticsPage | Team performance analytics | `http://localhost:4200/analytics/team/1` |
-| `/analytics/predictions` | PredictionAnalyticsPage | Prediction accuracy dashboard | `http://localhost:4200/analytics/predictions` |
-| `/compare` | TeamComparePage | Head-to-head team compare | `http://localhost:4200/compare` |
+| `/analytics/match/:matchId` | MatchPredictionPage | AI match predictions | [http://localhost:4200/analytics/match/1](http://localhost:4200/analytics/match/1) |
+| `/analytics/team/:teamId` | TeamAnalyticsPage | Team performance analytics | [http://localhost:4200/analytics/team/1](http://localhost:4200/analytics/team/1) |
+| `/analytics/predictions` | PredictionAnalyticsPage | Prediction accuracy dashboard | [http://localhost:4200/analytics/predictions](http://localhost:4200/analytics/predictions) |
+| `/compare` | TeamComparePage | Head-to-head team compare | [http://localhost:4200/compare](http://localhost:4200/compare) |
 
 ### Admin Routes
 
@@ -109,7 +109,7 @@ Requires `authGuard` + `adminGuard`. Only users with `role = ADMIN` can access.
 
 | Route | Page | Description | URL |
 |-------|------|-------------|-----|
-| `/admin` | AdminPage | Admin dashboard | `http://localhost:4200/admin` |
+| `/admin` | AdminPage | Admin dashboard | [http://localhost:4200/admin](http://localhost:4200/admin) |
 
 ---
 
@@ -118,98 +118,97 @@ Requires `authGuard` + `adminGuard`. Only users with `role = ADMIN` can access.
 ### Auth Flow
 
 ```mermaid
-stateDiagram-v2
-    [*] --> AppStart
-    AppStart --> CheckSession: APP_INITIALIZER
-    CheckSession --> Login: No session
-    CheckSession --> Home: Valid session
-    
-    Login --> Register: Click "Register"
-    Register --> Login: Success → auto-login
-    Login --> ForgotPassword: Click "Forgot?"
-    ForgotPassword --> ResetPassword: Email link
-    ResetPassword --> Login: Password reset
-    
-    Login --> TwoFACheck: Login success
-    TwoFACheck --> Home: No 2FA
-    TwoFACheck --> TwoFAVerify: 2FA enabled (HTTP 202)
-    TwoFAVerify --> Home: Code verified
-    
-    Home --> Logout: Settings → Logout
-    Logout --> Login: Clear session
+flowchart TD
+    AppStart[App Start] --> CheckSession{Session Valid?}
+    CheckSession -->|No| Login[Login]
+    CheckSession -->|Yes| Home[Home]
+
+    Login -->|Click Register| Register[Register]
+    Register -->|Success auto-login| Login
+    Login -->|Click Forgot| ForgotPassword[Forgot Password]
+    ForgotPassword -->|Email link| ResetPassword[Reset Password]
+    ResetPassword -->|Password reset| Login
+
+    Login -->|Login success| TwoFACheck{2FA Enabled?}
+    TwoFACheck -->|No| Home
+    TwoFACheck -->|Yes| TwoFAVerify[Verify 2FA Code]
+    TwoFAVerify -->|Code verified| Home
+
+    Home -->|Settings Logout| Logout[Logout]
+    Logout -->|Clear session| Login
 ```
 
 ### Main App Navigation
 
 ```mermaid
-graph LR
-    subgraph "Bottom Tab Bar (Mobile)"
-        Tab1["🏠 Home"]
-        Tab2["⚽ Teams"]
-        Tab3["🔮 Predict"]
-        Tab4["📰 Feed"]
-        Tab5["👤 Profile"]
+flowchart LR
+    subgraph Bottom_Tab_Bar_Mobile
+        Tab1[Home]
+        Tab2[Teams]
+        Tab3[Predict]
+        Tab4[Feed]
+        Tab5[Profile]
     end
-    
-    subgraph "Side Menu (Desktop)"
-        Menu1["Home"]
-        Menu2["Teams"]
-        Menu3["Leagues"]
-        Menu4["Fantasy"]
-        Menu5["Highlights"]
-        Menu6["Odds"]
-        Menu7["Feed"]
-        Menu8["Leaderboard"]
-        Menu9["Badges"]
-        Menu10["Settings"]
+
+    subgraph Side_Menu_Desktop
+        Menu1[Home]
+        Menu2[Teams]
+        Menu3[Leagues]
+        Menu4[Fantasy]
+        Menu5[Highlights]
+        Menu6[Odds]
+        Menu7[Feed]
+        Menu8[Leaderboard]
+        Menu9[Badges]
+        Menu10[Settings]
     end
-    
-    Tab1 --> HomeP["/home"]
-    Tab2 --> TeamsP["/teams"]
-    Tab3 --> PredP["/analytics/predictions"]
-    Tab4 --> FeedP["/feed"]
-    Tab5 --> SettP["/settings"]
+
+    Tab1 --> HomeP[/home/]
+    Tab2 --> TeamsP[/teams/]
+    Tab3 --> PredP[/analytics/predictions/]
+    Tab4 --> FeedP[/feed/]
+    Tab5 --> SettP[/settings/]
 ```
 
 ### Feature Module Flow
 
 ```mermaid
-graph TD
-    subgraph "Teams & Matches"
-        Teams["/teams"] -->|Select team| Matches["/matches/:teamId"]
-        Matches -->|Select match| MatchDetail["/match/:matchId"]
-        MatchDetail -->|"Predict (Pro)"| MatchPred["/analytics/match/:matchId"]
-        MatchDetail -->|Discuss| Discussion["/match-discussion/:id"]
-        Teams -->|"Analytics (Pro)"| TeamAnalytics["/analytics/team/:teamId"]
+flowchart TD
+    subgraph Teams_and_Matches
+        Teams[/teams/] -->|Select team| Matches[/matches/:teamId/]
+        Matches -->|Select match| MatchDetail[/match/:matchId/]
+        MatchDetail -->|Predict Pro| MatchPred[/analytics/match/:matchId/]
+        MatchDetail -->|Discuss| Discussion[/match-discussion/:id/]
+        Teams -->|Analytics Pro| TeamAnalytics[/analytics/team/:teamId/]
     end
-    
-    subgraph "Leagues"
-        LeaguesHome["/leagues"] -->|Select league| Standings["/leagues/:id/standings"]
+
+    subgraph Leagues
+        LeaguesHome[/leagues/] -->|Select league| Standings[/leagues/:id/standings/]
     end
-    
-    subgraph "Fantasy"
-        FantasyHome["/fantasy"] -->|Select/Create league| FantasyLeague["/fantasy/league/:id"]
-        FantasyLeague -->|View team| FantasyTeam["/fantasy/league/:id/team/:teamId"]
-        FantasyLeague -->|Transfers| TransferMkt["/fantasy/league/:id/transfers"]
+
+    subgraph Fantasy
+        FantasyHome[/fantasy/] -->|Select or create league| FantasyLeague[/fantasy/league/:id/]
+        FantasyLeague -->|View team| FantasyTeam[/fantasy/league/:id/team/:teamId/]
+        FantasyLeague -->|Transfers| TransferMkt[/fantasy/league/:id/transfers/]
     end
-    
-    subgraph "Social"
-        Feed["/feed"] -->|User avatar| UserProfile["/user-profile/:id"]
-        Discussion2["/match-discussion/:id"] -->|User avatar| UserProfile
+
+    subgraph Social
+        Feed[/feed/] -->|User avatar| UserProfile[/user-profile/:id/]
+        Discussion2[/match-discussion/:id/] -->|User avatar| UserProfile
     end
-    
-    subgraph "Gamification"
-        Leaderboard["/leaderboard"]
-        Badges["/badges"]
+
+    subgraph Gamification
+        Leaderboard[/leaderboard/]
+        Badges[/badges/]
     end
-    
-    subgraph "Content"
-        Highlights["/highlights"]
-        Odds["/odds"]
+
+    subgraph Content
+        Highlights[/highlights/]
+        Odds[/odds/]
     end
-    
-    subgraph "Pro & Subscription"
-        ProPage["/pro"] -->|Subscribe| PaySuccess["/payments/success"]
+
+    subgraph Pro_and_Subscription
+        ProPage[/pro/] -->|Subscribe| PaySuccess[/payments/success/]
     end
 ```
 
