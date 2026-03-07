@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, IonRefresher, IonRefresherContent, IonList, IonButton, IonCard, IonCardContent, IonText, IonSpinner, IonItem } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, IonRefresher, IonRefresherContent, IonList, IonButton, IonCard, IonCardContent, IonText, IonSpinner, IonItem, IonBackButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { FeedItemComponent } from '../../../components/social/feed-item/feed-item.component';
 import { FeedService } from '../../../services/social/feed.service';
@@ -18,7 +18,7 @@ import { LoggerService } from '../../../core/services/logger.service';
   imports: [
     CommonModule,
     FormsModule,
-    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, IonRefresher, IonRefresherContent, IonList, IonButton, IonCard, IonCardContent, IonText, IonSpinner, IonItem,
+    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, IonRefresher, IonRefresherContent, IonList, IonButton, IonCard, IonCardContent, IonText, IonSpinner, IonItem, IonBackButton,
     FeedItemComponent
   ]
 })

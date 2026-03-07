@@ -5,6 +5,7 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInpu
 import { ToastController } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -27,6 +28,13 @@ export class LoginPage implements OnInit {
   private toast = inject(ToastController);
   private logger = inject(LoggerService);
   private readonly ONBOARDING_KEY = 'footdash_onboarding_done';
+  private readonly knownDevUsers = new Set([
+    'erivanf10@gmail.com',
+    'test01@test.com',
+    'local+test@example.com',
+    'demo.pro@footdash.com',
+    'demo.user@footdash.com',
+  ]);
 
   ngOnInit() {
     // If already authenticated, redirect to home
@@ -39,8 +47,17 @@ export class LoginPage implements OnInit {
   }
 
   submit() {
+    const email = this.email.trim().toLowerCase();
+    const password = this.password.trim();
+    const twoFactorCode = this.twoFactorCode.trim();
+    const recoveryCode = this.recoveryCode.trim();
+
+    this.email = email;
+    this.twoFactorCode = twoFactorCode;
+    this.recoveryCode = recoveryCode;
+
     // call the AuthService to login and redirect on success
-    if (!this.email || !this.password) {
+    if (!email || !password) {
       // quick client-side guard
       this.logger.log('login: missing credentials');
       this.toast.create({
@@ -51,7 +68,7 @@ export class LoginPage implements OnInit {
       return;
     }
 
-    if (this.requiresTwoFactor && !this.twoFactorCode && !this.recoveryCode) {
+    if (this.requiresTwoFactor && !twoFactorCode && !recoveryCode) {
       this.toast.create({
         message: 'Enter your authenticator code or a recovery code',
         duration: 2500,
@@ -61,9 +78,11 @@ export class LoginPage implements OnInit {
     }
 
     this.loading = true;
+    // Debug: log what we're sending
+    console.log('Login attempt:', { email, password: password ? '[REDACTED]' : '', twoFactorCode: twoFactorCode ? '[REDACTED]' : '', recoveryCode: recoveryCode ? '[REDACTED]' : '' });
     // Note: AuthService.login will set the token on success
     // Use router navigation on success and a toast on failure
-    this.auth.login(this.email, this.password, this.twoFactorCode, this.recoveryCode).subscribe({
+    this.auth.login(email, password, twoFactorCode, recoveryCode).subscribe({
       next: (response) => {
         if (response?.requiresTwoFactor) {
           this.loading = false;
@@ -94,7 +113,14 @@ export class LoginPage implements OnInit {
       error: (err: any) => {
         this.loading = false;
         this.logger.error('Login failed', err);
-        const errorMessage = err?.error?.message || err?.message || 'Login failed';
+        const rawMessage = err?.error?.message || err?.message || 'Login failed';
+        const shouldShowDevHint =
+          !environment.production &&
+          this.knownDevUsers.has(email) &&
+          String(rawMessage).toLowerCase().includes('invalid credentials');
+        const errorMessage = shouldShowDevHint
+          ? 'Invalid credentials. For local dev users, run `cd backend && npm run seed:dev` and use Password123!'
+          : rawMessage;
         this.toast.create({
           message: errorMessage,
           duration: 3000,

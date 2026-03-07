@@ -108,11 +108,14 @@ REDIS_URL=redis://localhost:6379
 EOF
 fi
 
+cd "${PROJECT_ROOT}/backend"
+echo "Ensuring stable development users..."
+npm run seed:dev || echo -e "${YELLOW}⚠${NC}  Seed run failed (login users may be inconsistent)"
+
 # Check if backend is already running on port 3000
 if lsof -ti:3000 > /dev/null 2>&1; then
   echo -e "${GREEN}✓${NC} Backend already running on port 3000 — skipping"
 else
-  cd "${PROJECT_ROOT}/backend"
   echo "Running backend migrations..."
   npm run migrate:run || echo -e "${YELLOW}⚠${NC}  Migration run failed (continuing startup; check DB schema)"
 

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonItem, IonAvatar, IonLabel, IonChip, IonIcon } from '@ionic/angular/standalone';
+import { IonAvatar, IonIcon, IonCard, IonCardContent } from '@ionic/angular/standalone';
 import { RouterModule } from '@angular/router';
 import { Activity, ActivityType } from '../../../models/social';
 
@@ -9,7 +9,7 @@ import { Activity, ActivityType } from '../../../models/social';
   templateUrl: './feed-item.component.html',
   styleUrls: ['./feed-item.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonItem, IonAvatar, IonLabel, IonChip, IonIcon, RouterModule]
+  imports: [CommonModule, IonAvatar, IonIcon, IonCard, IonCardContent, RouterModule]
 })
 export class FeedItemComponent {
   @Input() activity!: Activity;
@@ -38,15 +38,15 @@ export class FeedItemComponent {
   getActivityIcon(): string {
     switch (this.activity.activityType) {
       case ActivityType.COMMENT:
-        return 'chatbubble';
+        return 'chatbubble-outline';
       case ActivityType.REACTION:
         return 'heart';
       case ActivityType.FOLLOW:
-        return 'person-add';
+        return 'person-add-outline';
       case ActivityType.PREDICTION:
-        return 'football';
+        return 'football-outline';
       default:
-        return 'information-circle';
+        return 'information-circle-outline';
     }
   }
 
@@ -103,5 +103,13 @@ export class FeedItemComponent {
 
   shouldShowUserLink(): boolean {
     return !!(this.activity.metadata?.targetUserId && this.activity.metadata?.targetUsername);
+  }
+
+  getUserInitials(): string {
+    const name = String(this.activity.userName || 'Unknown').trim();
+    if (!name) return 'U';
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   }
 }

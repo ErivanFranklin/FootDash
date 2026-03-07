@@ -36,13 +36,31 @@ test.describe('Phase 14: Fantasy League', () => {
     await expect(content).toBeVisible({ timeout: 10_000 });
   });
 
-  test.fixme('fantasy leagues API should respond', async ({ page }) => {
-    // Known 500 – backend fantasy leagues service issue
+  test('fantasy leagues API should respond', async ({ page }) => {
     if (!authToken) return;
     const resp = await page.request.get('/api/fantasy/leagues', {
       headers: { Authorization: `Bearer ${authToken}` },
     });
     expect(resp.status()).toBeLessThan(500);
+  });
+
+  test('fantasy league creation API should succeed', async ({ page }) => {
+    if (!authToken) return;
+
+    const resp = await page.request.post('/api/fantasy/leagues', {
+      headers: { Authorization: `Bearer ${authToken}` },
+      data: {
+        name: `PW League ${Date.now()}`,
+        maxMembers: 20,
+      },
+    });
+
+    expect(resp.status(), await resp.text()).toBeLessThan(500);
+    if (resp.ok()) {
+      const body = await resp.json();
+      expect(body?.id).toBeTruthy();
+      expect(body?.inviteCode).toBeTruthy();
+    }
   });
 
   test('should load fantasy league detail page', async ({ page }) => {

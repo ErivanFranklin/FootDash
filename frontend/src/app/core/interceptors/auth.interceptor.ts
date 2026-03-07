@@ -20,7 +20,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Always send credentials (cookies) for auth endpoints
   let cloned = req.clone({ withCredentials: true });
 
-  if (tokenForRequest) {
+  const isAuthUrl =
+    req.url.includes('/auth/refresh') ||
+    req.url.includes('/auth/login') ||
+    req.url.includes('/auth/register') ||
+    req.url.includes('/auth/revoke');
+
+  // Do not attach stale bearer tokens to auth endpoints.
+  if (tokenForRequest && !isAuthUrl) {
     cloned = cloned.clone({
       setHeaders: { Authorization: `Bearer ${tokenForRequest}` },
     });
@@ -29,10 +36,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(cloned).pipe(
     catchError((error: HttpErrorResponse) => {
       // If 401 and this is NOT a refresh/login/register call, try to refresh
-      const isAuthUrl =
-        req.url.includes('/auth/refresh') ||
-        req.url.includes('/auth/login') ||
-        req.url.includes('/auth/register');
       const isPassiveNotificationPoll =
         req.url.includes('/alerts/unread') ||
         req.url.includes('/alerts/counts/by-type');

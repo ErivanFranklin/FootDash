@@ -5,8 +5,11 @@
   --border-radius: 8px;
 }
 
-ion-list {
-  background: transparent;
+.feed-container {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 ion-card {

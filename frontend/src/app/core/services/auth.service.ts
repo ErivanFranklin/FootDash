@@ -91,9 +91,12 @@ export class AuthService {
   }
 
   login(email: string, password: string, twoFactorCode?: string, recoveryCode?: string): Observable<any> {
-    const payload: Record<string, string> = { email, password };
-    if (twoFactorCode) payload['twoFactorCode'] = twoFactorCode;
-    if (recoveryCode) payload['recoveryCode'] = recoveryCode;
+    const payload: Record<string, string> = {
+      email: this.normalizeEmail(email),
+      password: password.trim(),
+    };
+    if (twoFactorCode) payload['twoFactorCode'] = twoFactorCode.trim();
+    if (recoveryCode) payload['recoveryCode'] = recoveryCode.trim();
 
     return this.http
       .post<any>(`${this.authUrl}/login`, payload, { withCredentials: true })
@@ -109,7 +112,11 @@ export class AuthService {
 
   register(email: string, password: string): Observable<any> {
     return this.http
-      .post<any>(`${this.authUrl}/register`, { email, password }, { withCredentials: true })
+      .post<any>(
+        `${this.authUrl}/register`,
+        { email: this.normalizeEmail(email), password },
+        { withCredentials: true },
+      )
       .pipe(
         tap(res => {
           const token = res?.tokens?.accessToken;
@@ -196,6 +203,10 @@ export class AuthService {
     this.accessToken = null;
     this.currentTokenSubject.next(null);
     this.store.dispatch(authLogoutSuccess());
+  }
+
+  private normalizeEmail(email: string): string {
+    return (email || '').trim().toLowerCase();
   }
 }
 

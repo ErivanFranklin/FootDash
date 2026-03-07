@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-title>Activity Feed</ion-title>
   </ion-toolbar>
@@ -27,7 +27,7 @@
   </ion-refresher>
 
   <!-- Activity Feed -->
-  <ion-list *ngIf="activities.length > 0">
+  <div class="feed-container" *ngIf="activities.length > 0">
     <app-feed-item
       *ngFor="let activity of activities; trackBy: trackByActivityId"
       [activity]="activity"
@@ -35,7 +35,7 @@
       (userClicked)="onUserClicked($event)"
       (matchClicked)="onMatchClicked($event)">
     </app-feed-item>
-  </ion-list>
+  </div>
 
   <!-- Load More Button -->
   <ion-button
