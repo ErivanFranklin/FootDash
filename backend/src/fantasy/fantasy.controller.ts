@@ -21,6 +21,11 @@ import { FantasyLeagueService } from './fantasy-league.service';
 export class FantasyController {
   constructor(private readonly fantasyService: FantasyLeagueService) {}
 
+  private getAuthenticatedUserId(req: any): number {
+    // JWT strategy returns `sub`; keep `id` fallback for compatibility.
+    return Number(req?.user?.sub ?? req?.user?.id);
+  }
+
   // ── Leagues ───────────────────────────────────────────────────────────────
 
   @Post('leagues')
@@ -29,19 +34,19 @@ export class FantasyController {
     @Req() req: any,
     @Body() body: { name: string; maxMembers?: number; season?: string; leagueId?: number },
   ) {
-    return this.fantasyService.createLeague(req.user.id, body);
+    return this.fantasyService.createLeague(this.getAuthenticatedUserId(req), body);
   }
 
   @Post('leagues/join')
   @ApiOperation({ summary: 'Join a fantasy league with invite code' })
   async joinLeague(@Req() req: any, @Body() body: { inviteCode: string }) {
-    return this.fantasyService.joinLeague(req.user.id, body.inviteCode);
+    return this.fantasyService.joinLeague(this.getAuthenticatedUserId(req), body.inviteCode);
   }
 
   @Get('leagues')
   @ApiOperation({ summary: 'List my fantasy leagues' })
   async getMyLeagues(@Req() req: any) {
-    return this.fantasyService.getMyLeagues(req.user.id);
+    return this.fantasyService.getMyLeagues(this.getAuthenticatedUserId(req));
   }
 
   @Get('leagues/:id')
@@ -61,7 +66,7 @@ export class FantasyController {
   @Get('teams/:id')
   @ApiOperation({ summary: 'Get your fantasy team details' })
   async getTeam(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    return this.fantasyService.getTeam(id, req.user.id);
+    return this.fantasyService.getTeam(id, this.getAuthenticatedUserId(req));
   }
 
   @Get('teams/:id/market')
@@ -73,7 +78,7 @@ export class FantasyController {
   ) {
     return this.fantasyService.getTransferMarket(
       id,
-      req.user.id,
+      this.getAuthenticatedUserId(req),
       outPlayerId ? Number(outPlayerId) : undefined,
     );
   }
@@ -94,7 +99,7 @@ export class FantasyController {
       }[];
     },
   ) {
-    return this.fantasyService.setSquad(id, req.user.id, body.roster);
+    return this.fantasyService.setSquad(id, this.getAuthenticatedUserId(req), body.roster);
   }
 
   @Post('teams/:id/transfer')
@@ -104,7 +109,13 @@ export class FantasyController {
     @Req() req: any,
     @Body() body: { outPlayerId: number; inPlayerId: number; inPrice: number },
   ) {
-    await this.fantasyService.makeTransfer(id, req.user.id, body.outPlayerId, body.inPlayerId, body.inPrice);
+    await this.fantasyService.makeTransfer(
+      id,
+      this.getAuthenticatedUserId(req),
+      body.outPlayerId,
+      body.inPlayerId,
+      body.inPrice,
+    );
     return { message: 'Transfer completed' };
   }
 

@@ -191,13 +191,31 @@ export class AuthController {
       '| has token:', !!token,
     );
 
+    const isProd = process.env.NODE_ENV === 'production';
     if (!token) {
-      throw new UnauthorizedException('No refresh token provided');
+      clearLegacyCookies(res, isProd);
+      res.clearCookie('refresh_token', refreshCookieOptions(isProd));
+      return res.status(401).json({
+        statusCode: 401,
+        message: 'No refresh token provided',
+      });
     }
 
-    const result = await this.authService.refresh(token, getRequestContext(req));
-    const isProd = process.env.NODE_ENV === 'production';
-    return sendWithCookie(res, result, isProd);
+    try {
+      const result = await this.authService.refresh(token, getRequestContext(req));
+      return sendWithCookie(res, result, isProd);
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        // Self-heal invalid/rotated cookie state so future app boots are clean.
+        clearLegacyCookies(res, isProd);
+        res.clearCookie('refresh_token', refreshCookieOptions(isProd));
+        return res.status(401).json({
+          statusCode: 401,
+          message: error.message || 'Invalid refresh token',
+        });
+      }
+      throw error;
+    }
   }
 
   @Post('revoke')

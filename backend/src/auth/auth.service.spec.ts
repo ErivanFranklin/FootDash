@@ -10,6 +10,7 @@ import { RefreshToken } from './refresh-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { LoginAudit } from './entities/login-audit.entity';
 import { MailService } from '../mail/mail.service';
+import * as bcrypt from 'bcryptjs';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -173,5 +174,25 @@ describe('AuthService', () => {
     expect((refreshRepo.save as jest.Mock).mock.calls.length).toBeGreaterThan(
       0,
     );
+  });
+
+  it('normalizes login email by trimming and lowercasing', async () => {
+    const hash = await bcrypt.hash('Password123!', 10);
+    (usersRepo.findOneBy as jest.Mock).mockResolvedValue({
+      id: 77,
+      email: 'erivanf10@gmail.com',
+      password_hash: hash,
+      role: UserRole.USER,
+      twoFactorEnabled: false,
+    } as any);
+
+    await service.login({
+      email: '  ErivanF10@GMAIL.COM  ',
+      password: 'Password123!',
+    } as any);
+
+    expect(usersRepo.findOneBy as jest.Mock).toHaveBeenCalledWith({
+      email: 'erivanf10@gmail.com',
+    });
   });
 });

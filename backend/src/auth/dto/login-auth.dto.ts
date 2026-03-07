@@ -1,5 +1,6 @@
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class LoginAuthDto {
   @ApiProperty({
@@ -7,6 +8,7 @@ export class LoginAuthDto {
     example: 'user@example.com',
     format: 'email',
   })
+  @Transform(({ value }) => String(value ?? '').trim().toLowerCase())
   @IsEmail()
   email!: string;
 
@@ -22,6 +24,7 @@ export class LoginAuthDto {
     example: '123456',
     required: false,
   })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional()
   @IsString()
   twoFactorCode?: string;
@@ -31,6 +34,7 @@ export class LoginAuthDto {
     example: 'AB12-CD34',
     required: false,
   })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsOptional()
   @IsString()
   recoveryCode?: string;

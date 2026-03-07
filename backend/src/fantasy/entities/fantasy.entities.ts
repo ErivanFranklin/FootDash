@@ -44,7 +44,7 @@ export class FantasyLeague {
   @Column({ type: 'varchar', length: 10, default: '2025' })
   season: string;
 
-  @Column({ type: 'int', default: 39, comment: 'Football API league ID' })
+  @Column({ name: 'league_id', type: 'int', default: 39, comment: 'Football API league ID' })
   leagueId: number;
 
   @OneToMany(() => FantasyTeam, (t) => t.league)

@@ -2,24 +2,46 @@ import AppDataSource from '../data-source';
 import * as bcrypt from 'bcryptjs';
 
 async function seed() {
-  const email = process.env.SEED_EMAIL || 'local+test@example.com';
-  const password = process.env.SEED_PASSWORD || 'Password123!';
+  const defaultPassword = process.env.SEED_PASSWORD || 'Password123!';
+  const seedUsers = [
+    { email: 'local+test@example.com', role: 'USER' },
+    { email: 'test01@test.com', role: 'USER' },
+    { email: 'demo.pro@footdash.com', role: 'USER' },
+    { email: 'demo.user@footdash.com', role: 'USER' },
+    { email: 'erivanf10@gmail.com', role: 'ADMIN' },
+  ];
+
+  const customSeedEmail = process.env.SEED_EMAIL;
+  if (customSeedEmail) {
+    seedUsers.push({
+      email: customSeedEmail.toLowerCase(),
+      role: 'USER',
+    });
+  }
 
   try {
     const ds = await AppDataSource.initialize();
     console.log('DataSource initialized for seeding');
 
-    // Ensure users table exists and insert a test user if not present
-    const existing = await ds.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
-    if (existing && existing.length > 0) {
-      console.log(`User ${email} already exists (id=${existing[0].id})`);
-    } else {
-      const hash = await bcrypt.hash(password, 10);
-      const res = await ds.query(
-        'INSERT INTO users (email, password_hash, created_at) VALUES ($1, $2, NOW()) RETURNING id',
-        [email.toLowerCase(), hash]
-      );
-      console.log('Inserted seed user id=', res[0]?.id || '(unknown)');
+    // Ensure deterministic local users exist with known passwords.
+    for (const user of seedUsers) {
+      const email = user.email.toLowerCase();
+      const existing = await ds.query('SELECT id FROM users WHERE email = $1', [email]);
+      const hash = await bcrypt.hash(defaultPassword, 10);
+
+      if (existing && existing.length > 0) {
+        await ds.query(
+          'UPDATE users SET password_hash = $1, role = $2, "two_factor_enabled" = false WHERE email = $3',
+          [hash, user.role, email],
+        );
+        console.log(`Updated seed user ${email} (id=${existing[0].id})`);
+      } else {
+        const res = await ds.query(
+          'INSERT INTO users (email, password_hash, role, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id',
+          [email, hash, user.role],
+        );
+        console.log(`Inserted seed user ${email} id=${res[0]?.id || '(unknown)'}`);
+      }
     }
 
     const teamRows = await ds.query('SELECT id FROM teams LIMIT 1');

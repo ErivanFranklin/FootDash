@@ -1,5 +1,6 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class RegisterAuthDto {
   @ApiProperty({
@@ -7,6 +8,7 @@ export class RegisterAuthDto {
     example: 'user@example.com',
     format: 'email',
   })
+  @Transform(({ value }) => String(value ?? '').trim().toLowerCase())
   @IsEmail()
   email!: string;
 

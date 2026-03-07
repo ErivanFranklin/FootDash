@@ -86,7 +86,7 @@ export class AuthService {
 
   async register(dto: RegisterAuthDto): Promise<AuthResult> {
     try {
-      const email = dto.email.toLowerCase();
+      const email = this.normalizeEmail(dto.email);
       const existing = await this.usersRepo.findOneBy({ email });
       if (existing) {
         throw new ConflictException('Email already registered');
@@ -120,7 +120,7 @@ export class AuthService {
   }
 
   async login(dto: LoginAuthDto, context?: AuthContext): Promise<AuthResult | AuthChallenge> {
-    const email = dto.email.toLowerCase();
+    const email = this.normalizeEmail(dto.email);
     const user = await this.usersRepo.findOneBy({ email });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -309,6 +309,10 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  private normalizeEmail(email: string): string {
+    return String(email || '').trim().toLowerCase();
   }
 
   async setupTwoFactor(userId: number): Promise<{ secret: string; otpauthUrl: string; qrCodeDataUrl: string }> {

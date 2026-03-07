@@ -10,6 +10,7 @@ import {
   FantasyPoints,
 } from './entities/fantasy.entities';
 import { Player } from '../players/entities/player.entity';
+import { getMetadataArgsStorage } from 'typeorm';
 
 const mockRepo = () => ({
   create: jest.fn((dto: any) => dto),
@@ -199,6 +200,16 @@ describe('FantasyLeagueService', () => {
       expect(created.scoringRules.assist).toBe(3);
       expect(created.scoringRules.yellow_card).toBe(-1);
       expect(created.scoringRules.penalty_save).toBe(5);
+    });
+  });
+
+  describe('entity mappings', () => {
+    it('maps FantasyLeague.leagueId to league_id column', () => {
+      const metadata = getMetadataArgsStorage().columns.find(
+        (col) => col.target === FantasyLeague && col.propertyName === 'leagueId',
+      );
+
+      expect(metadata?.options?.name).toBe('league_id');
     });
   });
 
