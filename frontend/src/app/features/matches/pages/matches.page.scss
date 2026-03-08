@@ -31,3 +31,16 @@ ion-chip {
     margin-right: 4px;
   }
 }
+
+.filters-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px;
+
+  .apply-chip {
+    --background: rgba(56, 128, 255, 0.12);
+    --color: var(--ion-color-primary);
+    font-weight: 600;
+    cursor: pointer;
+  }
+}

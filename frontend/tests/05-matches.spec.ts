@@ -101,4 +101,27 @@ test.describe('Phase 5: Matches', () => {
 
     await expect(page.locator('ion-content').last()).toBeVisible({ timeout: 5_000 });
   });
+
+  // 7. Quick filters are interactive
+  test('should toggle quick filter chips', async ({ page }) => {
+    const teamId = await navigateToMatchesViaTeams(page);
+    if (!teamId) return;
+
+    const todayChip = page.locator('.quick-filters ion-chip', { hasText: 'Today' }).first();
+    await expect(todayChip).toBeVisible({ timeout: 5_000 });
+    await todayChip.click();
+    await expect(todayChip).toHaveClass(/chip-selected/, { timeout: 3_000 });
+  });
+
+  // 8. Filter form provides apply action
+  test('should show apply filters action in filter form', async ({ page }) => {
+    const teamId = await navigateToMatchesViaTeams(page);
+    if (!teamId) return;
+
+    const applyChip = page.locator('.filters-actions .apply-chip', { hasText: 'Apply Filters' }).first();
+    await expect(applyChip).toBeVisible({ timeout: 5_000 });
+    await applyChip.click();
+
+    await expect(page.locator('ion-content').last()).toBeVisible();
+  });
 });

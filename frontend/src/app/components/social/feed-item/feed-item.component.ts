@@ -40,7 +40,7 @@ export class FeedItemComponent {
       case ActivityType.COMMENT:
         return 'chatbubble-outline';
       case ActivityType.REACTION:
-        return 'heart';
+        return 'sparkles-outline';
       case ActivityType.FOLLOW:
         return 'person-add-outline';
       case ActivityType.PREDICTION:

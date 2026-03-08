@@ -11,7 +11,7 @@
 </ion-header>
 
 <ion-content>
-  <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;">
+  <div class="connection-row">
     <ion-badge *ngIf="(connectionStatus$ | async) as status">{{ 'MATCH_DETAILS.CONNECTION' | transloco }} {{ status }}</ion-badge>
     <ion-spinner *ngIf="(connectionStatus$ | async) === 'connecting'" name="dots"></ion-spinner>
   </div>
@@ -62,7 +62,7 @@
     </section>
 
     <!-- Tab Segment -->
-    <ion-segment [value]="selectedTab" (ionChange)="onTabChange($event)" mode="ios" style="margin: 12px 16px;">
+    <ion-segment [value]="selectedTab" (ionChange)="onTabChange($event)" mode="ios" class="details-tabs">
       <ion-segment-button value="info">
         <ion-label>Info</ion-label>
       </ion-segment-button>
@@ -72,8 +72,8 @@
     </ion-segment>
 
     <!-- Info Tab -->
-    <div *ngIf="selectedTab === 'info'">
-      <section class="voting-section" style="padding: 16px;">
+    <div *ngIf="selectedTab === 'info'" class="details-tab-content">
+      <section class="voting-section">
         <app-prediction-voting 
           [matchId]="matchId" 
           [homeTeamName]="match.homeName" 
@@ -81,14 +81,14 @@
         </app-prediction-voting>
       </section>
 
-      <section class="chat-section" style="padding: 16px;">
+      <section class="chat-section">
         <app-match-chat [matchId]="matchId"></app-match-chat>
       </section>
     </div>
 
     <!-- Lineups Tab -->
-    <div *ngIf="selectedTab === 'lineups'" style="padding: 16px;">
-      <ion-spinner *ngIf="lineupsLoading" name="crescent" style="display:block;margin:24px auto;"></ion-spinner>
+    <div *ngIf="selectedTab === 'lineups'" class="details-tab-content">
+      <ion-spinner *ngIf="lineupsLoading" name="crescent" class="lineups-loading"></ion-spinner>
       <app-lineup-view *ngIf="!lineupsLoading" [lineups]="lineups"></app-lineup-view>
     </div>
 

@@ -48,6 +48,12 @@
       <ion-label position="stacked">To (YYYY-MM-DD)</ion-label>
       <ion-input [(ngModel)]="to" placeholder="2025-12-31"></ion-input>
     </ion-item>
+    <div class="filters-actions">
+      <ion-chip class="apply-chip" (click)="loadMatches()">
+        <ion-icon name="funnel-outline"></ion-icon>
+        Apply Filters
+      </ion-chip>
+    </div>
   </app-form-section>
 
   <div style="padding: 12px;" *ngIf="!fixtures.length && !loading">No fixtures loaded yet.</div>
@@ -75,7 +81,7 @@
   <!-- Floating Action Button -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="loadMatches()">
-      <ion-icon name="refresh"></ion-icon>
+      <ion-icon name="refresh-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 </ion-content>

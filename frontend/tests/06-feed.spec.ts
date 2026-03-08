@@ -9,12 +9,12 @@ import {
  * Phase 6: Feed / Social
  *
  * Tests the feed page:
- *   ion-header > ion-toolbar > ion-menu-button + ion-title("Activity Feed")
+ *   app-page-header + back button + title("Activity Feed")
  *   ion-segment with [(ngModel)]="feedType" and values global/personalized
- *   app-feed-item in ion-list
+ *   app-feed-item in card layout
  *   ion-refresher slot="fixed"
  *
- * Note: ion-menu-button has class `menu-button-hidden` on desktop viewports.
+ * Note: feed now uses explicit back button in shared page header.
  * ion-segment value is bound via ngModel, not a DOM attribute.
  */
 test.describe('Phase 6: Feed', () => {
@@ -35,14 +35,10 @@ test.describe('Phase 6: Feed', () => {
     ).toBeVisible({ timeout: 5_000 });
   });
 
-  // 2. ion-menu-button exists in DOM (may be visually hidden on desktop)
-  test('should have ion-menu-button in toolbar', async ({ page }) => {
-    const menuBtn = page.locator('ion-menu-button');
-    // On desktop viewport, Ionic adds `menu-button-hidden` class and `aria-hidden`.
-    // Just verify it's attached to the DOM.
-    await menuBtn.first().waitFor({ state: 'attached', timeout: 5_000 });
-    const count = await menuBtn.count();
-    expect(count).toBeGreaterThanOrEqual(1);
+  // 2. Back button exists in shared page header
+  test('should have a back button in toolbar', async ({ page }) => {
+    const backBtn = page.locator('ion-back-button').first();
+    await expect(backBtn).toBeVisible({ timeout: 5_000 });
   });
 
   // 3. Segment control exists with both options
@@ -75,19 +71,33 @@ test.describe('Phase 6: Feed', () => {
     await waitForDataLoaded(page);
 
     const feedItems = page.locator('app-feed-item');
-    const ionList = page.locator('ion-list');
+    const feedCards = page.locator('.feed-item-card');
 
     const hasItems = (await feedItems.count()) > 0;
-    const hasList = (await ionList.count()) > 0;
+    const hasCards = (await feedCards.count()) > 0;
 
     // The feed may be empty for a new test user, so also accept
     // ion-content with no items as valid (page loaded without crash)
     const contentVisible = await page.locator('ion-content').last().isVisible().catch(() => false);
 
-    expect(hasItems || hasList || contentVisible).toBeTruthy();
+    expect(hasItems || hasCards || contentVisible).toBeTruthy();
   });
 
-  // 6. Pull to refresh exists in DOM
+  // 6. Feed cards expose heart icon affordance
+  test('should show a heart icon on feed cards', async ({ page }) => {
+    await waitForDataLoaded(page);
+
+    const cardCount = await page.locator('.feed-item-card').count();
+    if (cardCount === 0) {
+      await expect(page.locator('ion-content').last()).toBeVisible();
+      return;
+    }
+
+    const heartIcons = page.locator('.feed-item-card .heart-icon');
+    expect(await heartIcons.count()).toBeGreaterThan(0);
+  });
+
+  // 7. Pull to refresh exists in DOM
   test('should have ion-refresher for pull-to-refresh', async ({ page }) => {
     const refresher = page.locator('ion-refresher');
     await refresher.first().waitFor({ state: 'attached', timeout: 5_000 });
@@ -95,7 +105,7 @@ test.describe('Phase 6: Feed', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  // 7. Navigate away and back
+  // 8. Navigate away and back
   test('should load feed again after navigating away and back', async ({ page }) => {
     // Navigate to teams
     await navigateTo(page, '/teams');
@@ -107,7 +117,7 @@ test.describe('Phase 6: Feed', () => {
     await expect(page.locator('ion-content').last()).toBeVisible({ timeout: 5_000 });
   });
 
-  // 8. Content area renders
+  // 9. Content area renders
   test('should render ion-content', async ({ page }) => {
     await expect(page.locator('ion-content').last()).toBeVisible({ timeout: 5_000 });
   });

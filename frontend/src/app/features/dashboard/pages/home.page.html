@@ -97,7 +97,7 @@
       <!-- Upcoming Matches -->
       @if (dashboard.upcomingMatches.length > 0) {
         <div class="section">
-          <div class="section-header card-aligned">
+          <div class="section-header">
             <h3>Upcoming</h3>
           </div>
           @for (match of dashboard.upcomingMatches; track match.id) {
@@ -109,7 +109,7 @@
       <!-- Recent Results -->
       @if (dashboard.recentResults.length > 0) {
         <div class="section">
-          <div class="section-header card-aligned">
+          <div class="section-header">
             <h3>Recent Results</h3>
           </div>
           @for (match of dashboard.recentResults; track match.id) {
@@ -136,7 +136,7 @@
       <!-- All Recent Matches -->
       @if (dashboard.allRecentMatches.length > 0) {
         <div class="section">
-          <div class="section-header card-aligned">
+          <div class="section-header">
             <h3>Latest Matches</h3>
           </div>
           @for (match of dashboard.allRecentMatches; track match.id) {

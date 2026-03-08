@@ -11,6 +11,26 @@ ion-content {
   --padding-bottom: 16px;
 }
 
+.connection-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.details-tabs {
+  margin: 12px;
+}
+
+.details-tab-content {
+  padding: 12px;
+}
+
+.lineups-loading {
+  display: block;
+  margin: 24px auto;
+}
+
 pre {
   background-color: #f4f4f4;
   padding: 10px;

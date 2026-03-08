@@ -1,11 +1,16 @@
 .filter-container {
-  padding: 10px;
+  padding: 10px 12px;
   background: var(--ion-background-color);
   position: sticky;
   top: 0;
   z-index: 10;
   display: grid;
   gap: 8px;
+}
+
+ion-list {
+  background: transparent;
+  padding: 8px 12px 16px;
 }
 
 .rank-label {
@@ -24,6 +29,9 @@
 ion-item {
   --min-height: 70px;
   --inner-padding-end: 10px;
+  --border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
 ion-avatar {

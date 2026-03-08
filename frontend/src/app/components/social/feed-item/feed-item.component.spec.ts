@@ -34,4 +34,23 @@ describe('FeedItemComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should return sparkles icon for reaction activity to avoid duplicate heart visuals', () => {
+    component.activity = {
+      ...component.activity,
+      activityType: ActivityType.REACTION,
+      targetType: ActivityTargetType.COMMENT,
+    };
+
+    expect(component.getActivityIcon()).toBe('sparkles-outline');
+  });
+
+  it('should build user initials fallback from name', () => {
+    component.activity = {
+      ...component.activity,
+      userName: 'Erivan Silva',
+    };
+
+    expect(component.getUserInitials()).toBe('ES');
+  });
 });

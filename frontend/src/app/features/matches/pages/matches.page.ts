@@ -7,6 +7,7 @@ import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { PageHeaderComponent, MatchCardComponent, FormSectionComponent, MatchSkeletonComponent } from '../../../shared/components';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-matches',
@@ -45,6 +46,9 @@ export class MatchesPage implements OnInit {
     { label: 'Live', value: 'live', icon: 'pulse-outline', active: false },
     { label: 'Upcoming', value: 'upcoming', icon: 'time-outline', active: false }
   ];
+  private readonly defaultRange = 'recent';
+  private readonly defaultFrom: string | null = null;
+  private readonly defaultTo: string | null = null;
 
   ngOnInit() {
     const param = this.route.snapshot.paramMap.get('teamId');
@@ -58,6 +62,9 @@ export class MatchesPage implements OnInit {
     this.api.getTeamMatches(this.teamId, { season: this.season, range: this.range, limit: this.limit ?? undefined, from: this.from || undefined, to: this.to || undefined }).subscribe({
       next: (res) => {
         this.allFixtures = Array.isArray(res) ? res : (res?.data || res?.matches || []);
+        if (!this.allFixtures.length && !environment.production) {
+          this.allFixtures = this.buildDemoFixtures();
+        }
         this.currentPage = 0;
         this.fixtures = this.allFixtures.slice(0, this.pageSize);
         this.hasMoreData = this.allFixtures.length > this.pageSize;
@@ -134,7 +141,9 @@ export class MatchesPage implements OnInit {
     
     if (!activeFilter) {
       // No filter active, reload all matches
-      this.range = 'recent';
+      this.range = this.defaultRange;
+      this.from = this.defaultFrom;
+      this.to = this.defaultTo;
       this.loadMatches();
       return;
     }
@@ -150,7 +159,8 @@ export class MatchesPage implements OnInit {
         break;
       case 'live':
         this.range = 'recent';
-        // In a real app, this would filter by status='LIVE'
+        this.from = todayStr;
+        this.to = todayStr;
         break;
       case 'upcoming':
         this.range = 'upcoming';
@@ -160,5 +170,28 @@ export class MatchesPage implements OnInit {
     }
 
     this.loadMatches();
+  }
+
+  private buildDemoFixtures(): any[] {
+    const now = new Date();
+    const mk = (id: number, offsetDays: number, home: string, away: string, status: string, homeScore?: number, awayScore?: number) => ({
+      id,
+      kickOff: new Date(now.getTime() + offsetDays * 24 * 60 * 60 * 1000).toISOString(),
+      status,
+      homeName: home,
+      awayName: away,
+      homeScore: homeScore ?? null,
+      awayScore: awayScore ?? null,
+      venueName: 'FootDash Arena',
+      leagueName: 'Friendlies Clubs',
+    });
+
+    return [
+      mk(9001, 0, 'Arsenal', 'Manchester United', 'LIVE', 2, 1),
+      mk(9002, 0, 'Liverpool', 'Chelsea', 'NS'),
+      mk(9003, 1, 'Barcelona', 'Atletico Madrid', 'NS'),
+      mk(9004, -1, 'Bayern', 'Dortmund', 'FT', 3, 2),
+      mk(9005, 2, 'Juventus', 'Milan', 'NS'),
+    ];
   }
 }

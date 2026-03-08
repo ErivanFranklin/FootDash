@@ -10,7 +10,7 @@ import { BadgeResponse } from '../../../services/gamification.service';
   template: `
     <div class="badge-card" [class.locked]="!badge.unlocked" [class]="'tier-' + badge.tier">
       <div class="badge-icon">
-        <ion-icon [name]="badge.iconUrl || 'ribbon'" [style.font-size]="'32px'"></ion-icon>
+        <ion-icon [name]="getIconName()" [style.font-size]="'32px'"></ion-icon>
       </div>
       <div class="badge-name">{{ badge.name }}</div>
       <div class="badge-tier">{{ badge.tier | uppercase }}</div>
@@ -164,4 +164,24 @@ import { BadgeResponse } from '../../../services/gamification.service';
 })
 export class BadgeCardComponent {
   @Input({ required: true }) badge!: BadgeResponse;
+
+  getIconName(): string {
+    const icon = String(this.badge?.iconUrl || '').trim();
+    if (icon && !icon.includes('/')) {
+      return icon;
+    }
+
+    switch (this.badge?.tier) {
+      case 'bronze':
+        return 'medal-outline';
+      case 'silver':
+        return 'ribbon-outline';
+      case 'gold':
+        return 'trophy-outline';
+      case 'platinum':
+        return 'diamond-outline';
+      default:
+        return 'ribbon-outline';
+    }
+  }
 }
