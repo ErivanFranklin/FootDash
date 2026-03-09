@@ -122,11 +122,6 @@ export class AppComponent implements OnInit {
       notificationsOutline,
       settingsOutline,
       eye,
-      
-      /* gamification badges */
-      medalOutline,
-      ribbonOutline,
-      diamondOutline
       eyeOff,
       remove,
       removeOutline,
@@ -138,7 +133,12 @@ export class AppComponent implements OnInit {
       arrowForwardOutline,
       bulbOutline,
       closeCircle,
-      addCircle
+      addCircle,
+
+      /* gamification badges */
+      medalOutline,
+      ribbonOutline,
+      diamondOutline,
     });
   }
 

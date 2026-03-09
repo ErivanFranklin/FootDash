@@ -2,6 +2,27 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { BadgeResponse } from '../../../services/gamification.service';
+import { addIcons } from 'ionicons';
+import {
+  trophyOutline,
+  eyeOutline,
+  starOutline,
+  planetOutline,
+  locateOutline,
+  flameOutline,
+  handLeftOutline,
+  chatbubbleOutline,
+  chatbubblesOutline,
+  peopleOutline,
+  heartOutline,
+  megaphoneOutline,
+  diamondOutline,
+  sunnyOutline,
+  calendarOutline,
+  podiumOutline,
+  ribbonOutline,
+  medalOutline,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-badge-card',
@@ -165,10 +186,65 @@ import { BadgeResponse } from '../../../services/gamification.service';
 export class BadgeCardComponent {
   @Input({ required: true }) badge!: BadgeResponse;
 
+  constructor() {
+    // Register badge icons with explicit kebab-case names used by API data.
+    addIcons({
+      'trophy-outline': trophyOutline,
+      'eye-outline': eyeOutline,
+      'star-outline': starOutline,
+      'planet-outline': planetOutline,
+      // API uses bullseye-outline, but Ionicons package does not provide it.
+      'bullseye-outline': locateOutline,
+      'locate-outline': locateOutline,
+      'flame-outline': flameOutline,
+      'hand-left-outline': handLeftOutline,
+      'chatbubble-outline': chatbubbleOutline,
+      'chatbubbles-outline': chatbubblesOutline,
+      'people-outline': peopleOutline,
+      'heart-outline': heartOutline,
+      'megaphone-outline': megaphoneOutline,
+      'diamond-outline': diamondOutline,
+      'sunny-outline': sunnyOutline,
+      'calendar-outline': calendarOutline,
+      'podium-outline': podiumOutline,
+      'ribbon-outline': ribbonOutline,
+      'medal-outline': medalOutline,
+    });
+  }
+
   getIconName(): string {
     const icon = String(this.badge?.iconUrl || '').trim();
+    const apiIconAliases: Record<string, string> = {
+      // API value that does not exist in Ionicons.
+      'bullseye-outline': 'locate-outline',
+    };
+    const allowedApiIcons = new Set([
+      'trophy-outline',
+      'eye-outline',
+      'star-outline',
+      'planet-outline',
+      'bullseye-outline',
+      'locate-outline',
+      'flame-outline',
+      'hand-left-outline',
+      'chatbubble-outline',
+      'chatbubbles-outline',
+      'people-outline',
+      'heart-outline',
+      'megaphone-outline',
+      'diamond-outline',
+      'sunny-outline',
+      'calendar-outline',
+      'podium-outline',
+      'ribbon-outline',
+      'medal-outline',
+    ]);
+
     if (icon && !icon.includes('/')) {
-      return icon;
+      const normalized = apiIconAliases[icon] ?? icon;
+      if (allowedApiIcons.has(normalized)) {
+        return normalized;
+      }
     }
 
     switch (this.badge?.tier) {
