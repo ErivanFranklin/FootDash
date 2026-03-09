@@ -2,14 +2,17 @@
 
 <ion-content>
   <div class="filter-container">
-    <ion-segment [value]="selectedScope" (ionChange)="onScopeChange($event)">
-      <ion-segment-button value="global">
-        <ion-label>Global</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="friends">
-        <ion-label>Friends</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+    <!-- use tabs for scope selection instead of segment buttons -->
+    <ion-tabs [selectedTab]="selectedScope" (ionTabsDidChange)="onScopeChanged($event)">
+      <ion-tab-bar slot="top">
+        <ion-tab-button tab="global">
+          <ion-label>Global</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="friends">
+          <ion-label>Friends</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
 
     <ion-segment [value]="selectedPeriod" (ionChange)="onPeriodChange($event)">
       <ion-segment-button value="weekly">

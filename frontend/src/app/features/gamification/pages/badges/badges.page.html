@@ -14,7 +14,7 @@
   <ion-grid>
     <ion-row>
       <ion-col size="12">
-        <div class="filters-container">
+        <div>
           <!-- Filter segment -->
           <ion-segment [value]="selectedFilter" (ionChange)="onFilterChange($event)" mode="ios">
             <ion-segment-button value="all">
@@ -44,7 +44,7 @@
     </div>
   }
 
-        </div> <!-- end filters-container -->
+        </div>
       </ion-col>
     </ion-row>
   </ion-grid>
