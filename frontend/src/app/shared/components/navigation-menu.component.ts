@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
@@ -7,28 +7,41 @@ import { LanguageService } from '../../core/services/language.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { WebSocketService as WebsocketService } from '../../core/services/web-socket.service';
+import { addIcons } from 'ionicons';
+import {
+  home,
+  people,
+  heart,
+  person,
+  notificationsOutline,
+  pulseOutline,
+  gitCompareOutline,
+  settingsOutline,
+  globe,
+  logOutOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-navigation-menu',
   template: `
-    <ion-list>
-      <ion-item button (click)="navigateTo('/home')">
+    <ion-list class="nav-list">
+      <ion-item button (click)="navigateTo('/home')" class="nav-item">
         <ion-icon name="home" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.HOME' | transloco }}</ion-label>
       </ion-item>
-      <ion-item button (click)="navigateTo('/teams')">
+      <ion-item button (click)="navigateTo('/teams')" class="nav-item">
         <ion-icon name="people" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.TEAMS' | transloco }}</ion-label>
       </ion-item>
-      <ion-item button (click)="navigateTo('/feed')">
+      <ion-item button (click)="navigateTo('/feed')" class="nav-item">
         <ion-icon name="heart" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.FEED' | transloco }}</ion-label>
       </ion-item>
-      <ion-item button (click)="navigateToProfile()">
+      <ion-item button (click)="navigateToProfile()" class="nav-item">
         <ion-icon name="person" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.PROFILE' | transloco }}</ion-label>
       </ion-item>
-      <ion-item button (click)="navigateTo('/notifications')">
+      <ion-item button (click)="navigateTo('/notifications')" class="nav-item">
         <ion-icon name="notifications-outline" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.NOTIFICATIONS' | transloco }}</ion-label>
       </ion-item>
@@ -37,11 +50,11 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
         <ion-label>Analytics</ion-label>
       </ion-item-divider>
 
-      <ion-item button (click)="navigateTo('/analytics/predictions')">
+      <ion-item button (click)="navigateTo('/analytics/predictions')" class="nav-item">
         <ion-icon name="pulse-outline" slot="start"></ion-icon>
         <ion-label>Predictions</ion-label>
       </ion-item>
-      <ion-item button (click)="navigateTo('/compare')">
+      <ion-item button (click)="navigateTo('/compare')" class="nav-item">
         <ion-icon name="git-compare-outline" slot="start"></ion-icon>
         <ion-label>Team Compare</ion-label>
       </ion-item>
@@ -50,12 +63,12 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
         <ion-label>{{ 'NAV.SETTINGS' | transloco }}</ion-label>
       </ion-item-divider>
 
-      <ion-item button (click)="navigateTo('/settings')">
+      <ion-item button (click)="navigateTo('/settings')" class="nav-item">
         <ion-icon name="settings-outline" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.SETTINGS' | transloco }}</ion-label>
       </ion-item>
 
-      <ion-item class="language-item">
+      <ion-item class="language-item nav-item">
         <ion-icon name="globe" slot="start"></ion-icon>
         <ion-label>{{ 'SETTINGS.LANGUAGE' | transloco }}</ion-label>
         <ion-select
@@ -71,7 +84,7 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
         </ion-select>
       </ion-item>
       
-      <ion-item button lines="none" color="danger" (click)="logout()">
+      <ion-item button lines="none" color="danger" (click)="logout()" class="nav-item">
         <ion-icon name="log-out-outline" slot="start"></ion-icon>
         <ion-label>{{ 'NAV.LOGOUT' | transloco }}</ion-label>
       </ion-item>
@@ -79,6 +92,12 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
   `,
   standalone: true,
   styles: [`
+    .nav-list {
+      padding-right: 16px; /* Right margin for the menu items */
+    }
+    .nav-item {
+      --padding-end: 0; /* Align with the list padding */
+    }
     .language-item ion-label {
       flex: 1;
       margin-right: 10px;
@@ -91,12 +110,29 @@ import { WebSocketService as WebsocketService } from '../../core/services/web-so
   `],
   imports: [CommonModule, IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption, TranslocoPipe, FormsModule],
 })
-export class NavigationMenuComponent {
+export class NavigationMenuComponent implements OnInit {
   private router = inject(Router);
   private languageService = inject(LanguageService);
   private translocoService = inject(TranslocoService);
   private authService = inject(AuthService);
   private websocketService = inject(WebsocketService);
+
+  constructor() {
+    addIcons({
+      home,
+      people,
+      heart,
+      person,
+      'notifications-outline': notificationsOutline,
+      'pulse-outline': pulseOutline,
+      'git-compare-outline': gitCompareOutline,
+      'settings-outline': settingsOutline,
+      globe,
+      'log-out-outline': logOutOutline
+    });
+  }
+
+  ngOnInit() {}
 
   get currentLang(): string {
     return this.languageService.currentLang();
