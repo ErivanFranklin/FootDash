@@ -77,7 +77,8 @@ import { ShareService } from '../../core/services/share.service';
   `,
   styles: [`
     ion-card {
-      margin: 8px 12px;
+      /* remove custom margins to defer to global 12px spacing */
+      margin: 0;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       transition: transform 0.2s ease, box-shadow 0.2s ease;

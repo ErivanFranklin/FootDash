@@ -68,7 +68,22 @@ ion-card {
   --padding-end: 16px;
   --padding-top: 12px;
   --padding-bottom: 12px;
-  margin: 12px;
+  margin: 12px; /* consistent 12px on all sides */
+}
+
+/* ensure card content children have uniform spacing */
+ion-card-content > * + * {
+  margin-top: 12px;
+}
+
+/* global heading/paragraph spacing inside cards */
+ion-card h1,
+ion-card h2,
+ion-card h3,
+ion-card h4,
+ion-card h5,
+ion-card p {
+  margin: 0;
 }
 
 /* Interactive card elements - GPU-accelerated animations */

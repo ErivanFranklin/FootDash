@@ -13,11 +13,13 @@
 }
 
 ion-card {
-  margin: 16px;
+  /* use global margin 12px defined in global.scss for consistency */
+  margin: 0;
 
   ion-card-content {
     text-align: center;
-    padding: 24px;
+    /* rely on global card-content spacing rules */
+    padding: 0;
 
     ion-spinner {
       margin-bottom: 16px;
