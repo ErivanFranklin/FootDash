@@ -37,13 +37,17 @@
 }
 
 ion-segment {
-  margin: 8px 16px;
+  margin: 8px 12px; /* align with card grid padding */
+}
+
+.filters-container {
+  padding: 0 12px; /* match grid padding */
 }
 
 .tier-chips {
   display: flex;
   gap: 4px;
-  padding: 8px 16px;
+  padding: 8px 12px; /* match segment margin */
   overflow-x: auto;
   white-space: nowrap;
 

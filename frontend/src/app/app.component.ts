@@ -60,7 +60,11 @@ import {
   arrowForwardOutline,
   bulbOutline,
   closeCircle,
-  addCircle
+  addCircle,
+  /* badge icons */
+  medalOutline,
+  ribbonOutline,
+  diamondOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -118,6 +122,11 @@ export class AppComponent implements OnInit {
       notificationsOutline,
       settingsOutline,
       eye,
+      
+      /* gamification badges */
+      medalOutline,
+      ribbonOutline,
+      diamondOutline
       eyeOff,
       remove,
       removeOutline,

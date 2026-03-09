@@ -10,21 +10,23 @@
     <p class="summary-text">Badges Unlocked</p>
   </div>
 
-  <!-- Filter segment -->
-  <ion-segment [value]="selectedFilter" (ionChange)="onFilterChange($event)" mode="ios">
-    <ion-segment-button value="all">
-      <ion-label>All</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="unlocked">
-      <ion-label>Unlocked</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="locked">
-      <ion-label>Locked</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <!-- Filters (segment + tier chips) container to match card padding -->
+  <div class="filters-container">
+    <!-- Filter segment -->
+    <ion-segment [value]="selectedFilter" (ionChange)="onFilterChange($event)" mode="ios">
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="unlocked">
+        <ion-label>Unlocked</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="locked">
+        <ion-label>Locked</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-  <!-- Tier chips -->
-  <div class="tier-chips">
+    <!-- Tier chips -->
+    <div class="tier-chips">
     <ion-chip [outline]="selectedTier !== 'all'" (click)="onTierChange('all')">All Tiers</ion-chip>
     <ion-chip [outline]="selectedTier !== 'bronze'" class="chip-bronze" (click)="onTierChange('bronze')">Bronze</ion-chip>
     <ion-chip [outline]="selectedTier !== 'silver'" class="chip-silver" (click)="onTierChange('silver')">Silver</ion-chip>
@@ -38,6 +40,8 @@
       <ion-spinner name="crescent"></ion-spinner>
     </div>
   }
+
+  </div> <!-- end filters-container -->
 
   <!-- Badge Grid -->
   @if (!isLoading && filteredBadges.length > 0) {
