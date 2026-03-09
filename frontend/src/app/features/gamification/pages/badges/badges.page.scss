@@ -37,11 +37,11 @@
 }
 
 ion-segment {
-  margin: 8px 12px; /* align with card grid padding */
+  margin: 8px 16px; /* align with grid plus column padding */
 }
 
 .filters-container {
-  padding: 0 12px; /* match grid padding */
+  padding: 0 16px; /* grid padding (12) + col padding (4) = 16 */
 }
 
 .tier-chips {
