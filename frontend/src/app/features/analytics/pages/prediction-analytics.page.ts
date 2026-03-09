@@ -316,7 +316,10 @@ Chart.register(...registerables);
 
     .top-segment {
       margin: 10px 0 0;
-      --background: var(--ion-background-color);
+      --background: var(--ion-color-step-100, #f2f2f7);
+      --background-checked: var(--ion-color-light, #ffffff);
+      --color: var(--ion-color-step-600, #6b6b6b);
+      --color-checked: var(--ion-text-color, #1c1c1e);
       --border-radius: 8px;
     }
 
