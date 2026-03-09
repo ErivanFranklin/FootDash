@@ -5,6 +5,7 @@
   <ion-segment
     [(ngModel)]="feedType"
     (ionChange)="changeFeedType($event.detail.value || 'global')"
+    mode="ios"
     class="feed-selector">
     <ion-segment-button value="global">
       <ion-label>Global</ion-label>

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote, SegmentCustomEvent, IonTabs, IonTabBar, IonTabButton } from '@ionic/angular/standalone';
+import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote, SegmentCustomEvent } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GamificationService, LeaderboardEntry } from '../../../../services/gamification.service';
 import { PageHeaderComponent } from '../../../../shared/components';
@@ -11,7 +11,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [CommonModule, IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote, TranslocoPipe, PageHeaderComponent, IonTabs, IonTabBar, IonTabButton],
+  imports: [CommonModule, IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList, IonItem, IonAvatar, IonNote, TranslocoPipe, PageHeaderComponent],
   templateUrl: './leaderboard.page.html',
   styleUrls: ['./leaderboard.page.scss']
 })
@@ -70,13 +70,9 @@ export class LeaderboardPage implements OnInit {
     this.loadLeaderboard();
   }
 
-  // called when the ion-tabs selection changes
-  onScopeChanged(event: any) {
-    const tab = event.detail.tab as 'global' | 'friends' | undefined;
-    if (tab) {
-      this.selectedScope = tab;
-      this.applyScopeFilter();
-    }
+  onScopeChange(event: SegmentCustomEvent) {
+    this.selectedScope = event.detail.value as 'global' | 'friends';
+    this.applyScopeFilter();
   }
 
   private applyScopeFilter() {
