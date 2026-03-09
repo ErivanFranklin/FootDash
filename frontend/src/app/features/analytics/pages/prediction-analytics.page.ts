@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AnalyticsService } from '../../../services/analytics.service';
 import { PredictionResult } from '../../../models/analytics.model';
+import { environment } from '../../../../environments/environment';
 import { Chart, registerables } from 'chart.js';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -34,7 +35,7 @@ Chart.register(...registerables);
         <ion-title>Prediction Analytics</ion-title>
       </ion-toolbar>
       <ion-toolbar>
-        <ion-segment [value]="activeTab" (ionChange)="onTabChange($event)">
+        <ion-segment class="top-segment" mode="ios" [value]="activeTab" (ionChange)="onTabChange($event)">
           <ion-segment-button value="upcoming">
             <ion-label>Upcoming</ion-label>
           </ion-segment-button>
@@ -310,6 +311,12 @@ Chart.register(...registerables);
 
     .tab-content {
       padding: 8px;
+    }
+
+    .top-segment {
+      margin: 10px 16px;
+      --background: var(--ion-background-color);
+      --border-radius: 8px;
     }
 
     /* Summary Bar */
@@ -600,6 +607,7 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
 
   predictions: PredictionResult[] = [];
   performanceStats: any = null;
+  usingDemoData = false;
 
   highConfidenceCount = 0;
   averageConfidence = 0;
@@ -646,17 +654,31 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
     this.loading = true;
     this.analyticsService.getUpcomingPredictions(20).subscribe({
       next: (data) => {
-        this.predictions = data || [];
+        const incoming = data || [];
+        this.usingDemoData = !environment.production && incoming.length === 0;
+        this.predictions = this.usingDemoData ? this.getFallbackPredictions() : incoming;
         this.calculateSummary();
-        this.loadProbabilitySnapshots();
+        if (this.usingDemoData) {
+          this.avgBttsYes = 58;
+          this.avgOver25 = 64;
+        } else {
+          this.loadProbabilitySnapshots();
+        }
         this.loading = false;
         callback?.();
         setTimeout(() => this.buildUpcomingCharts(), 100);
       },
       error: () => {
-        this.predictions = [];
+        this.usingDemoData = !environment.production;
+        this.predictions = this.usingDemoData ? this.getFallbackPredictions() : [];
+        this.calculateSummary();
+        if (this.usingDemoData) {
+          this.avgBttsYes = 58;
+          this.avgOver25 = 64;
+        }
         this.loading = false;
         callback?.();
+        setTimeout(() => this.buildUpcomingCharts(), 100);
       }
     });
   }
@@ -665,17 +687,94 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
     this.statsLoading = true;
     this.analyticsService.getPredictionStats(undefined, 200).subscribe({
       next: (data) => {
-        this.performanceStats = data || {};
+        const hasData = !!data && (data.totalPredictions || data.correct || data.incorrect || (data.byStrategy?.length ?? 0));
+        this.performanceStats = hasData ? data : (!environment.production ? this.getFallbackPerformanceStats() : data || {});
         this.statsLoading = false;
         callback?.();
         setTimeout(() => this.buildPerformanceCharts(), 100);
       },
       error: () => {
-        this.performanceStats = null;
+        this.performanceStats = !environment.production ? this.getFallbackPerformanceStats() : null;
         this.statsLoading = false;
         callback?.();
+        setTimeout(() => this.buildPerformanceCharts(), 100);
       }
     });
+  }
+
+  private getFallbackPredictions(): PredictionResult[] {
+    const now = new Date();
+    return [
+      {
+        matchId: 900101,
+        homeTeam: 'Arsenal',
+        awayTeam: 'Tottenham',
+        homeWinProbability: 0.52,
+        drawProbability: 0.24,
+        awayWinProbability: 0.24,
+        confidence: 'high',
+        insights: ['Home form edge and stronger xG trend.'],
+        mostLikely: 'home',
+        createdAt: now,
+      },
+      {
+        matchId: 900102,
+        homeTeam: 'Inter',
+        awayTeam: 'Milan',
+        homeWinProbability: 0.42,
+        drawProbability: 0.31,
+        awayWinProbability: 0.27,
+        confidence: 'medium',
+        insights: ['Derby tends to tighten after first goal.'],
+        mostLikely: 'home',
+        createdAt: now,
+      },
+      {
+        matchId: 900103,
+        homeTeam: 'Benfica',
+        awayTeam: 'Porto',
+        homeWinProbability: 0.36,
+        drawProbability: 0.33,
+        awayWinProbability: 0.31,
+        confidence: 'medium',
+        insights: ['Balanced matchup, draw probability remains high.'],
+        mostLikely: 'home',
+        createdAt: now,
+      },
+      {
+        matchId: 900104,
+        homeTeam: 'Lyon',
+        awayTeam: 'Marseille',
+        homeWinProbability: 0.29,
+        drawProbability: 0.30,
+        awayWinProbability: 0.41,
+        confidence: 'low',
+        insights: ['Away side creates more chances in transition.'],
+        mostLikely: 'away',
+        createdAt: now,
+      },
+    ];
+  }
+
+  private getFallbackPerformanceStats() {
+    return {
+      totalPredictions: 28,
+      accuracy: 64.3,
+      correct: 18,
+      incorrect: 10,
+      byStrategy: [
+        { name: 'model', total: 14, accuracy: 71.4 },
+        { name: 'form-based', total: 8, accuracy: 62.5 },
+        { name: 'value-bet', total: 6, accuracy: 50.0 },
+      ],
+      trend: [
+        { period: 'W1', accuracy: 52 },
+        { period: 'W2', accuracy: 57 },
+        { period: 'W3', accuracy: 63 },
+        { period: 'W4', accuracy: 64 },
+        { period: 'W5', accuracy: 68 },
+      ],
+    };
   }
 
   private calculateSummary() {
