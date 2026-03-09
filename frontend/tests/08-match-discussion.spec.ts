@@ -87,4 +87,43 @@ test.describe('Phase 8: Match Details & Discussion', () => {
     const hasError = await errorOverlay.isVisible().catch(() => false);
     expect(hasError).toBe(false);
   });
+
+  // 5. Match details chat section shows messages
+  test('should show chat messages on match details', async ({ page }) => {
+    const matchId = await getMatchId(page);
+    if (!matchId) return;
+
+    await navigateTo(page, `/match/${matchId}`);
+    await expect(page.locator('ion-content').last()).toBeVisible({ timeout: 5_000 });
+
+    // Chat container should be visible
+    const chatContainer = page.locator('.chat-container');
+    const hasChatContainer = await chatContainer.isVisible({ timeout: 5_000 }).catch(() => false);
+    if (hasChatContainer) {
+      // Should have messages area with sample or real messages
+      const messagesArea = page.locator('.messages-area');
+      await expect(messagesArea).toBeVisible({ timeout: 3_000 });
+    }
+  });
+
+  // 6. Match details tab switching works
+  test('should switch between Info and Lineups tabs', async ({ page }) => {
+    const matchId = await getMatchId(page);
+    if (!matchId) return;
+
+    await navigateTo(page, `/match/${matchId}`);
+    await expect(page.locator('ion-content').last()).toBeVisible({ timeout: 5_000 });
+
+    // Click Lineups tab
+    const lineupsTab = page.locator('ion-segment-button[value="lineups"]');
+    if (await lineupsTab.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await lineupsTab.click();
+      await page.waitForTimeout(1_000);
+
+      // Click Info tab back
+      const infoTab = page.locator('ion-segment-button[value="info"]');
+      await infoTab.click();
+      await page.waitForTimeout(500);
+    }
+  });
 });

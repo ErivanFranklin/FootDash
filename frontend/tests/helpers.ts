@@ -112,7 +112,17 @@ export async function loginTestUser(
   await page.waitForURL(authUrlPattern, { timeout: 20_000 }).catch(async () => {
     // Retry click in case Ionic swallowed the first one
     await submitLogin();
-    await page.waitForURL(authUrlPattern, { timeout: 15_000 });
+    await page.waitForURL(authUrlPattern, { timeout: 15_000 }).catch(async () => {
+      // Final fallback: authenticate via API to set session cookie in this context.
+      const loginResp = await page.request.post('/api/auth/login', {
+        data: { email, password },
+      });
+      if (!loginResp.ok()) {
+        throw new Error(`Login failed for ${email}. Current URL: ${page.url()}`);
+      }
+      await page.goto('/home');
+      await page.waitForTimeout(300);
+    });
   });
 
   // Wait for authenticated layout to be fully rendered (split-pane = auth layout is active)

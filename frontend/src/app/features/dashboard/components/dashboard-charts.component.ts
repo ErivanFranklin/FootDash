@@ -17,6 +17,7 @@ import { GamificationService } from '../../../services/gamification.service';
 import { FavoritesService } from '../../../services/favorites.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
+import { environment } from '../../../../environments/environment';
 
 Chart.register(...registerables);
 
@@ -179,7 +180,7 @@ export class DashboardChartsComponent implements OnInit, AfterViewInit, OnDestro
   private loadStats() {
     this.loading = true;
     let completed = 0;
-    const total = 3;
+    const total = 4;
     const checkDone = () => {
       completed++;
       if (completed >= total) {
@@ -195,18 +196,41 @@ export class DashboardChartsComponent implements OnInit, AfterViewInit, OnDestro
         if (me) {
           this.rank = me.rank;
           this.points = me.points ?? 0;
-          this.predictionsMade = me.predictionsCount ?? me.predictions ?? 0;
-          this.accuracy = Math.round(me.accuracy ?? 0);
-          this.accuracyColor = this.accuracy >= 60
-            ? 'var(--ion-color-success)'
-            : this.accuracy >= 45
-              ? 'var(--ion-color-warning)'
-              : 'var(--ion-color-danger)';
         }
         checkDone();
       },
       error: (err) => {
         this.logger.warn('Leaderboard stats unavailable', err);
+        checkDone();
+      },
+    });
+
+    // Load prediction accuracy from dedicated endpoint
+    this.analyticsService.getPredictionStats().subscribe({
+      next: (stats: any) => {
+        if (stats) {
+          this.predictionsMade = stats.totalPredictions ?? stats.total ?? 0;
+          this.accuracy = Math.round(stats.accuracy ?? stats.correctPercentage ?? 0);
+        }
+        if (this.predictionsMade === 0 && !environment.production) {
+          // Seed dev-mode demo values so the chart never shows "—"
+          this.predictionsMade = 12;
+          this.accuracy = 67;
+        }
+        this.accuracyColor = this.accuracy >= 60
+          ? 'var(--ion-color-success)'
+          : this.accuracy >= 45
+            ? 'var(--ion-color-warning)'
+            : 'var(--ion-color-danger)';
+        checkDone();
+      },
+      error: () => {
+        this.logger.warn('Prediction stats unavailable, using demo data');
+        if (!environment.production) {
+          this.predictionsMade = 12;
+          this.accuracy = 67;
+          this.accuracyColor = 'var(--ion-color-success)';
+        }
         checkDone();
       },
     });

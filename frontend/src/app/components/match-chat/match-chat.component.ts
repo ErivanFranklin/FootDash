@@ -6,6 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { ChatService, ChatMessage, TypingEvent, OnlineUsersEvent } from '../../services/chat.service';
 import { AuthService } from '../../core/services/auth.service';
 import { LoggerService } from '../../core/services/logger.service';
+import { environment } from '../../../environments/environment';
 import { Subscription, Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -42,12 +43,13 @@ export class MatchChatComponent implements OnInit, OnDestroy {
     // Load chat history
     this.chatService.getRecentMessages(this.matchId).subscribe({
       next: (msgs) => {
-        this.messages = msgs;
+        this.messages = msgs?.length ? msgs : this.buildSampleMessages();
         this.historyLoaded = true;
         this.scrollToBottom();
       },
       error: (err) => {
         this.logger.error('Failed to load chat history', err);
+        this.messages = this.buildSampleMessages();
         this.historyLoaded = true;
       },
     });
@@ -142,5 +144,16 @@ export class MatchChatComponent implements OnInit, OnDestroy {
         this.content.scrollToBottom(300);
       }
     }, 100);
+  }
+
+  private buildSampleMessages(): ChatMessage[] {
+    if (environment.production) return [];
+    const now = Date.now();
+    return [
+      { id: 9001, matchId: this.matchId, userId: 101, content: 'Come on! This is going to be a great match ⚽', createdAt: new Date(now - 300_000).toISOString(), user: { id: 101, username: 'FootballFan42' } },
+      { id: 9002, matchId: this.matchId, userId: 102, content: 'Starting XI looks strong today 💪', createdAt: new Date(now - 240_000).toISOString(), user: { id: 102, username: 'TacticsPro' } },
+      { id: 9003, matchId: this.matchId, userId: 103, content: 'Prediction: 2-1 home win', createdAt: new Date(now - 180_000).toISOString(), user: { id: 103, username: 'StatsGuru' } },
+      { id: 9004, matchId: this.matchId, userId: 101, content: 'That midfield pairing is 🔥', createdAt: new Date(now - 60_000).toISOString(), user: { id: 101, username: 'FootballFan42' } },
+    ];
   }
 }

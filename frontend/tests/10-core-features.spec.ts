@@ -1,34 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
-
-function uniqueEmail(): string {
-  return `e2e-core-${Date.now()}@test.com`;
-}
-
-async function waitForIonicReady(page: Page) {
-  await page.waitForSelector('ion-app.ion-page, ion-app ion-router-outlet', {
-    state: 'attached',
-    timeout: 10_000,
-  });
-  await page.waitForTimeout(500);
-}
-
-async function loginTestUser(page: Page) {
-  const email = uniqueEmail();
-  const password = 'TestPassword123!';
-
-  const registerResponse = await page.request.post('/api/auth/register', {
-    data: { email, password },
-  });
-  expect(registerResponse.ok()).toBeTruthy();
-
-  await page.goto('/login');
-  await page.locator('ion-input[type="email"] input').fill(email);
-  await page.locator('ion-input[type="password"] input').fill(password);
-  await page.locator('ion-button', { hasText: 'Sign in' }).evaluate((el: any) => el.click());
-
-  await page.waitForURL('**/home', { timeout: 10_000 });
-  await waitForIonicReady(page);
-}
+import { test, expect } from '@playwright/test';
+import { loginTestUser, waitForIonicReady } from './helpers';
 
 test.describe('Phase 10: Core Feature Routes', () => {
   test.beforeEach(async ({ page }) => {

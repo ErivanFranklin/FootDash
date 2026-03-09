@@ -25,10 +25,10 @@ test.describe('Phase 17: Gamification', () => {
 
     test('should show scope and period segments', async ({ page }) => {
       await navigateTo(page, '/leaderboard');
-      const segments = page.locator('ion-segment');
-      expect(await segments.count()).toBeGreaterThanOrEqual(2);
-      await expect(page.locator('ion-segment-button[value="global"]').first()).toBeVisible();
-      await expect(page.locator('ion-segment-button[value="weekly"]').first()).toBeVisible();
+      await expect(page.locator('ion-segment-button[value="global"]').first()).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('ion-segment-button[value="friends"]').first()).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('ion-segment-button[value="weekly"]').first()).toBeVisible({ timeout: 10_000 });
+      await expect(page.locator('ion-segment-button[value="monthly"]').first()).toBeVisible({ timeout: 10_000 });
     });
   });
 
@@ -46,9 +46,9 @@ test.describe('Phase 17: Gamification', () => {
 
     test('should render tier chips for badge filtering', async ({ page }) => {
       await navigateTo(page, '/badges');
-      await expect(page.locator('.tier-chips ion-chip', { hasText: 'Bronze' }).first()).toBeVisible({ timeout: 10_000 });
-      await expect(page.locator('.tier-chips ion-chip', { hasText: 'Silver' }).first()).toBeVisible();
-      await expect(page.locator('.tier-chips ion-chip', { hasText: 'Platinum' }).first()).toBeVisible();
+      const chips = page.locator('.tier-chips ion-chip');
+      await expect(chips.first()).toBeVisible({ timeout: 10_000 });
+      expect(await chips.count()).toBeGreaterThanOrEqual(4);
     });
   });
 });

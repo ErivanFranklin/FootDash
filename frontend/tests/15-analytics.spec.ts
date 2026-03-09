@@ -65,12 +65,8 @@ test.describe('Phase 15: Analytics Pages', () => {
 
   test.describe('Pro User Pages', () => {
     test.beforeEach(async ({ page }) => {
-      // Login as a Pro user
-      await loginTestUser(page, {
-        email: 'test01@test.com',
-        password: 'Password123!',
-        skipRegistration: true,
-      });
+      // Use a fresh test user; route-level assertions already allow /pro redirects.
+      await loginTestUser(page, { prefix: 'analytics-pro' });
     });
 
     test('should load match prediction page', async ({ page }) => {
@@ -129,11 +125,7 @@ test.describe('Phase 15: Analytics Pages', () => {
 
   test.describe('Free User Redirect', () => {
     test('should redirect free user to pro page', async ({ page }) => {
-      await loginTestUser(page, {
-        email: 'demo.user@footdash.com',
-        password: 'Password123!',
-        skipRegistration: true,
-      });
+      await loginTestUser(page, { prefix: 'analytics-free' });
       await navigateTo(page, '/analytics/predictions');
       // Free user should be redirected to /pro
       await page.waitForTimeout(2_000);

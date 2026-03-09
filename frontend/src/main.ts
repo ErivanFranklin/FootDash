@@ -31,6 +31,18 @@ import {
 // Configure ionicons to load assets from CDN (ensures getAssetPath works in dev/prod)
 setAssetPath('https://cdn.jsdelivr.net/npm/ionicons/dist/');
 
+// In local development, aggressively disable any previously installed service
+// worker so updated UI code is always loaded instead of stale cached bundles.
+if (!environment.production && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      registration.unregister().catch(() => {
+        // Ignore unregister errors in dev; this is a best-effort cleanup.
+      });
+    });
+  });
+}
+
 // In local development, cookies are host-bound. If one tab uses 127.0.0.1 and
 // another uses localhost, auth restore may fail between tabs. Normalize to
 // localhost to keep a single origin for all tabs.

@@ -27,8 +27,8 @@ test('login → teams → matches smoke flow', async ({ page }) => {
   await page.locator('ion-input[type="password"] input').fill(password);
   await page.getByRole('button', { name: /sign in/i }).click();
 
-  // Wait for redirect to home
-  await expect(page).toHaveURL(/.*home/, { timeout: 10000 });
+  // App can route first-time users to onboarding before home.
+  await expect(page).toHaveURL(/.*(home|onboarding)/, { timeout: 10000 });
 
   // Navigate to Teams and expect header
   await page.goto('/teams');
