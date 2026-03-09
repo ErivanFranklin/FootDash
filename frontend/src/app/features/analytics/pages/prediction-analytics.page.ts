@@ -34,7 +34,10 @@ Chart.register(...registerables);
         </ion-buttons>
         <ion-title>Prediction Analytics</ion-title>
       </ion-toolbar>
-      <ion-toolbar>
+    </ion-header>
+
+    <ion-content [fullscreen]="true">
+      <div class="segment-container">
         <ion-segment class="top-segment" mode="ios" [value]="activeTab" (ionChange)="onTabChange($event)">
           <ion-segment-button value="upcoming">
             <ion-label>Upcoming</ion-label>
@@ -43,10 +46,8 @@ Chart.register(...registerables);
             <ion-label>Performance</ion-label>
           </ion-segment-button>
         </ion-segment>
-      </ion-toolbar>
-    </ion-header>
+      </div>
 
-    <ion-content [fullscreen]="true">
       <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
@@ -314,9 +315,17 @@ Chart.register(...registerables);
     }
 
     .top-segment {
-      margin: 10px 16px;
+      margin: 10px 0 0;
       --background: var(--ion-background-color);
       --border-radius: 8px;
+    }
+
+    .segment-container {
+      padding: 0 16px 8px;
+      background: var(--ion-background-color);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     /* Summary Bar */
@@ -758,21 +767,26 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
 
   private getFallbackPerformanceStats() {
     return {
-      totalPredictions: 28,
-      accuracy: 64.3,
-      correct: 18,
-      incorrect: 10,
+      totalPredictions: 56,
+      accuracy: 67.9,
+      correct: 38,
+      incorrect: 18,
       byStrategy: [
-        { name: 'model', total: 14, accuracy: 71.4 },
-        { name: 'form-based', total: 8, accuracy: 62.5 },
-        { name: 'value-bet', total: 6, accuracy: 50.0 },
+        { name: 'model', total: 18, accuracy: 77.8 },
+        { name: 'form-based', total: 14, accuracy: 71.4 },
+        { name: 'odds-value', total: 10, accuracy: 60.0 },
+        { name: 'head-to-head', total: 8, accuracy: 62.5 },
+        { name: 'momentum', total: 6, accuracy: 50.0 },
       ],
       trend: [
-        { period: 'W1', accuracy: 52 },
-        { period: 'W2', accuracy: 57 },
-        { period: 'W3', accuracy: 63 },
-        { period: 'W4', accuracy: 64 },
-        { period: 'W5', accuracy: 68 },
+        { period: 'W1', accuracy: 49 },
+        { period: 'W2', accuracy: 53 },
+        { period: 'W3', accuracy: 58 },
+        { period: 'W4', accuracy: 61 },
+        { period: 'W5', accuracy: 65 },
+        { period: 'W6', accuracy: 67 },
+        { period: 'W7', accuracy: 69 },
+        { period: 'W8', accuracy: 68 },
       ],
     };
   }
