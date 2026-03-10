@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -224,11 +224,11 @@ export class FantasyTransferMarketPage implements OnInit {
 
   private readonly apiUrl = `${environment.apiBaseUrl}/fantasy`;
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly http: HttpClient,
-    private readonly toast: ToastController,
-  ) {
+  private readonly route = inject(ActivatedRoute);
+  private readonly http = inject(HttpClient);
+  private readonly toast = inject(ToastController);
+
+  constructor() {
     addIcons({
       swapHorizontalOutline,
       trendingUpOutline,

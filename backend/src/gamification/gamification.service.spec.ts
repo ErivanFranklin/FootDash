@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { GamificationService } from './gamification.service';
 import { UserPrediction } from './entities/user-prediction.entity';
 import { Leaderboard } from './entities/leaderboard.entity';
@@ -31,9 +30,18 @@ describe('GamificationService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GamificationService,
-        { provide: getRepositoryToken(UserPrediction), useFactory: mockPredictionRepository },
-        { provide: getRepositoryToken(Leaderboard), useFactory: mockGenericRepository },
-        { provide: getRepositoryToken(Match), useFactory: mockGenericRepository },
+        {
+          provide: getRepositoryToken(UserPrediction),
+          useFactory: mockPredictionRepository,
+        },
+        {
+          provide: getRepositoryToken(Leaderboard),
+          useFactory: mockGenericRepository,
+        },
+        {
+          provide: getRepositoryToken(Match),
+          useFactory: mockGenericRepository,
+        },
       ],
     }).compile();
 
@@ -102,11 +110,28 @@ describe('GamificationService', () => {
     it('assigns exact-score points to matching predictions', async () => {
       const saved: Partial<UserPrediction>[] = [];
       const predictions = [
-        { id: 1, userId: 1, matchId: 10, homeScore: 2, awayScore: 1, points: null },
-        { id: 2, userId: 2, matchId: 10, homeScore: 1, awayScore: 1, points: null },
+        {
+          id: 1,
+          userId: 1,
+          matchId: 10,
+          homeScore: 2,
+          awayScore: 1,
+          points: null,
+        },
+        {
+          id: 2,
+          userId: 2,
+          matchId: 10,
+          homeScore: 1,
+          awayScore: 1,
+          points: null,
+        },
       ];
       repo.find.mockResolvedValue(predictions);
-      repo.save.mockImplementation(async (p) => { saved.push(p); return p; });
+      repo.save.mockImplementation(async (p) => {
+        saved.push(p);
+        return p;
+      });
 
       await service.processMatchResult(10, 2, 1);
 
@@ -117,10 +142,20 @@ describe('GamificationService', () => {
     it('assigns outcome points for correct predictions', async () => {
       const saved: Partial<UserPrediction>[] = [];
       const predictions = [
-        { id: 3, userId: 3, matchId: 11, homeScore: 3, awayScore: 0, points: null },
+        {
+          id: 3,
+          userId: 3,
+          matchId: 11,
+          homeScore: 3,
+          awayScore: 0,
+          points: null,
+        },
       ];
       repo.find.mockResolvedValue(predictions);
-      repo.save.mockImplementation(async (p) => { saved.push(p); return p; });
+      repo.save.mockImplementation(async (p) => {
+        saved.push(p);
+        return p;
+      });
 
       await service.processMatchResult(11, 2, 0); // actual: 2-0, predicted: 3-0 (home win → correct outcome)
 

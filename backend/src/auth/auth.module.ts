@@ -16,7 +16,12 @@ import { MailModule } from '../mail/mail.module';
   imports: [
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    TypeOrmModule.forFeature([User, RefreshToken, PasswordResetToken, LoginAudit]),
+    TypeOrmModule.forFeature([
+      User,
+      RefreshToken,
+      PasswordResetToken,
+      LoginAudit,
+    ]),
     MailModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

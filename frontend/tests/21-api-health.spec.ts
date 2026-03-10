@@ -173,8 +173,7 @@ test.describe('Phase 21: API Endpoint Health Check', () => {
       expect(resp.status()).toBeLessThan(500);
     });
 
-    test.fixme('GET /api/odds', async ({ request }) => {
-      // Known 500 – backend odds service issue
+    test('GET /api/odds', async ({ request }) => {
       if (!authToken) return;
       const resp = await request.get('/api/odds', {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -182,8 +181,7 @@ test.describe('Phase 21: API Endpoint Health Check', () => {
       expect(resp.status()).toBeLessThan(500);
     });
 
-    test.fixme('GET /api/odds/value-bets', async ({ request }) => {
-      // Known 500 – backend odds service issue
+    test('GET /api/odds/value-bets', async ({ request }) => {
       if (!authToken) return;
       const resp = await request.get('/api/odds/value-bets', {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -191,8 +189,7 @@ test.describe('Phase 21: API Endpoint Health Check', () => {
       expect(resp.status()).toBeLessThan(500);
     });
 
-    test.fixme('GET /api/highlights', async ({ request }) => {
-      // Known 500 – backend highlights service issue
+    test('GET /api/highlights', async ({ request }) => {
       if (!authToken) return;
       const resp = await request.get('/api/highlights', {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -200,8 +197,7 @@ test.describe('Phase 21: API Endpoint Health Check', () => {
       expect(resp.status()).toBeLessThan(500);
     });
 
-    test.fixme('GET /api/highlights/search?q=goal', async ({ request }) => {
-      // Known 500 – backend highlights service issue
+    test('GET /api/highlights/search?q=goal', async ({ request }) => {
       if (!authToken) return;
       const resp = await request.get('/api/highlights/search?q=goal', {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -209,8 +205,7 @@ test.describe('Phase 21: API Endpoint Health Check', () => {
       expect(resp.status()).toBeLessThan(500);
     });
 
-    test.fixme('GET /api/fantasy/leagues', async ({ request }) => {
-      // Known 500 – backend fantasy leagues service issue
+    test('GET /api/fantasy/leagues', async ({ request }) => {
       if (!authToken) return;
       const resp = await request.get('/api/fantasy/leagues', {
         headers: { Authorization: `Bearer ${authToken}` },

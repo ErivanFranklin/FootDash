@@ -32,15 +32,27 @@ export class FantasyController {
   @ApiOperation({ summary: 'Create a new fantasy league' })
   async createLeague(
     @Req() req: any,
-    @Body() body: { name: string; maxMembers?: number; season?: string; leagueId?: number },
+    @Body()
+    body: {
+      name: string;
+      maxMembers?: number;
+      season?: string;
+      leagueId?: number;
+    },
   ) {
-    return this.fantasyService.createLeague(this.getAuthenticatedUserId(req), body);
+    return this.fantasyService.createLeague(
+      this.getAuthenticatedUserId(req),
+      body,
+    );
   }
 
   @Post('leagues/join')
   @ApiOperation({ summary: 'Join a fantasy league with invite code' })
   async joinLeague(@Req() req: any, @Body() body: { inviteCode: string }) {
-    return this.fantasyService.joinLeague(this.getAuthenticatedUserId(req), body.inviteCode);
+    return this.fantasyService.joinLeague(
+      this.getAuthenticatedUserId(req),
+      body.inviteCode,
+    );
   }
 
   @Get('leagues')
@@ -70,7 +82,9 @@ export class FantasyController {
   }
 
   @Get('teams/:id/market')
-  @ApiOperation({ summary: 'Get transfer market options for your fantasy team' })
+  @ApiOperation({
+    summary: 'Get transfer market options for your fantasy team',
+  })
   async getTransferMarket(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: any,
@@ -99,7 +113,11 @@ export class FantasyController {
       }[];
     },
   ) {
-    return this.fantasyService.setSquad(id, this.getAuthenticatedUserId(req), body.roster);
+    return this.fantasyService.setSquad(
+      id,
+      this.getAuthenticatedUserId(req),
+      body.roster,
+    );
   }
 
   @Post('teams/:id/transfer')

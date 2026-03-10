@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../users/user.entity';
 
 @Entity('leaderboards')
@@ -23,5 +29,5 @@ export class Leaderboard {
   period: string; // 'weekly', 'monthly', 'all-time'
 
   @Column({ name: 'period_identifier' })
-  periodIdentifier: string; 
+  periodIdentifier: string;
 }

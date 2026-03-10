@@ -7,9 +7,15 @@ import { loginTestUser, waitForIonicReady, navigateTo } from './helpers';
  * Verifies remaining pages that haven't been covered.
  */
 test.describe('Phase 20: Remaining Pages', () => {
+  const seededLogin = {
+    email: 'demo.user@footdash.com',
+    password: 'Password123!',
+    skipRegistration: true,
+  } as const;
+
   test.describe('Search', () => {
     test.beforeEach(async ({ page }) => {
-      await loginTestUser(page);
+      await loginTestUser(page, seededLogin);
     });
 
     test('should display search page', async ({ page }) => {
@@ -26,7 +32,7 @@ test.describe('Phase 20: Remaining Pages', () => {
 
   test.describe('Notifications', () => {
     test.beforeEach(async ({ page }) => {
-      await loginTestUser(page);
+      await loginTestUser(page, seededLogin);
     });
 
     test('should display notifications page', async ({ page }) => {
@@ -37,7 +43,7 @@ test.describe('Phase 20: Remaining Pages', () => {
 
   test.describe('Onboarding', () => {
     test.beforeEach(async ({ page }) => {
-      await loginTestUser(page);
+      await loginTestUser(page, seededLogin);
     });
 
     test('should display onboarding page', async ({ page }) => {

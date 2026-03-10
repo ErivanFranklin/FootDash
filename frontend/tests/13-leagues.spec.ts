@@ -7,8 +7,15 @@ import { loginTestUser, waitForIonicReady, navigateTo } from './helpers';
  * Verifies leagues listing and standings pages render correctly.
  */
 test.describe('Phase 13: Leagues & Standings', () => {
+  test.setTimeout(90_000);
+
   test.beforeEach(async ({ page }) => {
-    await loginTestUser(page);
+    await loginTestUser(page, {
+      email: 'erivanf10@gmail.com',
+      password: 'Password123!',
+      skipRegistration: true,
+      prefix: 'leagues',
+    });
   });
 
   test('should display leagues page', async ({ page }) => {

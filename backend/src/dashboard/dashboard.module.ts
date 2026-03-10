@@ -7,10 +7,7 @@ import { DashboardService } from './dashboard.service';
 import { FavoritesModule } from '../favorites/favorites.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Match, Team]),
-    FavoritesModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Match, Team]), FavoritesModule],
   controllers: [DashboardController],
   providers: [DashboardService],
 })

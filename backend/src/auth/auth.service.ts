@@ -113,13 +113,18 @@ export class AuthService {
         tokens,
       };
     } catch (error) {
-       if (error instanceof ConflictException) throw error;
-       console.error('Registration error details:', error);
-       throw new InternalServerErrorException(error instanceof Error ? error.message : String(error));
+      if (error instanceof ConflictException) throw error;
+      console.error('Registration error details:', error);
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   }
 
-  async login(dto: LoginAuthDto, context?: AuthContext): Promise<AuthResult | AuthChallenge> {
+  async login(
+    dto: LoginAuthDto,
+    context?: AuthContext,
+  ): Promise<AuthResult | AuthChallenge> {
     const email = this.normalizeEmail(dto.email);
     const user = await this.usersRepo.findOneBy({ email });
     if (!user) {
@@ -142,12 +147,18 @@ export class AuthService {
       }
 
       if (hasRecoveryCode) {
-        const consumed = await this.consumeRecoveryCode(user, dto.recoveryCode as string);
+        const consumed = await this.consumeRecoveryCode(
+          user,
+          dto.recoveryCode as string,
+        );
         if (!consumed) {
           throw new UnauthorizedException('Invalid two-factor recovery code');
         }
       } else {
-        const verified = this.verifyTotpCode(user.twoFactorSecret, dto.twoFactorCode as string);
+        const verified = this.verifyTotpCode(
+          user.twoFactorSecret,
+          dto.twoFactorCode as string,
+        );
         if (!verified) {
           throw new UnauthorizedException('Invalid two-factor code');
         }
@@ -171,7 +182,10 @@ export class AuthService {
     };
   }
 
-  async refresh(refreshToken: string, context?: AuthContext): Promise<AuthResult> {
+  async refresh(
+    refreshToken: string,
+    context?: AuthContext,
+  ): Promise<AuthResult> {
     try {
       // verify refresh token and extract subject (user id)
       const payload: any = this.jwtService.verify(refreshToken);
@@ -210,14 +224,17 @@ export class AuthService {
       stored.lastUsedAt = new Date();
       await this.refreshRepo.save(stored);
 
-      const tokens = await this.createTokens({
-        id: user.id,
-        email: user.email,
-        role: this.resolveEffectiveRole(user.email, user.role),
-      }, {
-        ipAddress: context?.ipAddress ?? stored.ipAddress,
-        userAgent: context?.userAgent ?? stored.userAgent,
-      });
+      const tokens = await this.createTokens(
+        {
+          id: user.id,
+          email: user.email,
+          role: this.resolveEffectiveRole(user.email, user.role),
+        },
+        {
+          ipAddress: context?.ipAddress ?? stored.ipAddress,
+          userAgent: context?.userAgent ?? stored.userAgent,
+        },
+      );
 
       return {
         user: {
@@ -270,7 +287,7 @@ export class AuthService {
       }
     }
 
-        // Fallback to user record if profile service not available or profile not found
+    // Fallback to user record if profile service not available or profile not found
     try {
       const user = await this.usersRepo.findOneByOrFail({ id: userId });
       return {
@@ -285,7 +302,10 @@ export class AuthService {
     }
   }
 
-  private async createTokens(user: AuthUser, context?: AuthContext): Promise<AuthTokens> {
+  private async createTokens(
+    user: AuthUser,
+    context?: AuthContext,
+  ): Promise<AuthTokens> {
     const effectiveRole = this.resolveEffectiveRole(user.email, user.role);
     const accessToken = this.jwtService.sign(
       { sub: user.id, email: user.email, role: effectiveRole },
@@ -312,10 +332,14 @@ export class AuthService {
   }
 
   private normalizeEmail(email: string): string {
-    return String(email || '').trim().toLowerCase();
+    return String(email || '')
+      .trim()
+      .toLowerCase();
   }
 
-  async setupTwoFactor(userId: number): Promise<{ secret: string; otpauthUrl: string; qrCodeDataUrl: string }> {
+  async setupTwoFactor(
+    userId: number,
+  ): Promise<{ secret: string; otpauthUrl: string; qrCodeDataUrl: string }> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -333,19 +357,29 @@ export class AuthService {
     return { secret, otpauthUrl, qrCodeDataUrl };
   }
 
-  async verifyTwoFactor(userId: number, code: string): Promise<{ valid: boolean }> {
+  async verifyTwoFactor(
+    userId: number,
+    code: string,
+  ): Promise<{ valid: boolean }> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user || !user.twoFactorSecret) {
-      throw new BadRequestException('Two-factor setup has not been initialized');
+      throw new BadRequestException(
+        'Two-factor setup has not been initialized',
+      );
     }
 
     return { valid: this.verifyTotpCode(user.twoFactorSecret, code) };
   }
 
-  async enableTwoFactor(userId: number, code: string): Promise<{ recoveryCodes: string[] }> {
+  async enableTwoFactor(
+    userId: number,
+    code: string,
+  ): Promise<{ recoveryCodes: string[] }> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user || !user.twoFactorSecret) {
-      throw new BadRequestException('Two-factor setup has not been initialized');
+      throw new BadRequestException(
+        'Two-factor setup has not been initialized',
+      );
     }
 
     const valid = this.verifyTotpCode(user.twoFactorSecret, code);
@@ -355,7 +389,9 @@ export class AuthService {
 
     const recoveryCodes = this.generateRecoveryCodes();
     user.twoFactorEnabled = true;
-    user.twoFactorRecoveryCodes = recoveryCodes.map((c) => this.hashRecoveryCode(c)).join(',');
+    user.twoFactorRecoveryCodes = recoveryCodes
+      .map((c) => this.hashRecoveryCode(c))
+      .join(',');
     await this.usersRepo.save(user);
 
     return { recoveryCodes };
@@ -378,20 +414,26 @@ export class AuthService {
     await this.usersRepo.save(user);
   }
 
-  async getTwoFactorStatus(userId: number): Promise<{ enabled: boolean; recoveryCodesRemaining: number }> {
+  async getTwoFactorStatus(
+    userId: number,
+  ): Promise<{ enabled: boolean; recoveryCodesRemaining: number }> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
-    const recoveryCodesRemaining = this.getStoredRecoveryCodeHashes(user).length;
+    const recoveryCodesRemaining =
+      this.getStoredRecoveryCodeHashes(user).length;
     return {
       enabled: !!user.twoFactorEnabled,
       recoveryCodesRemaining,
     };
   }
 
-  async getSessions(userId: number, currentRefreshToken?: string): Promise<SessionView[]> {
+  async getSessions(
+    userId: number,
+    currentRefreshToken?: string,
+  ): Promise<SessionView[]> {
     const sessions = await this.refreshRepo.find({
       where: {
         user: { id: userId },
@@ -424,7 +466,10 @@ export class AuthService {
     await this.refreshRepo.save(session);
   }
 
-  private verifyTotpCode(secret: string | null | undefined, code: string): boolean {
+  private verifyTotpCode(
+    secret: string | null | undefined,
+    code: string,
+  ): boolean {
     if (!secret || !code) {
       return false;
     }
@@ -434,7 +479,11 @@ export class AuthService {
     const buffer = this.base32ToBuffer(secret);
 
     for (let offset = -1; offset <= 1; offset += 1) {
-      const candidate = this.generateHotp(buffer, currentCounter + offset, TOTP_DIGITS);
+      const candidate = this.generateHotp(
+        buffer,
+        currentCounter + offset,
+        TOTP_DIGITS,
+      );
       if (candidate === normalized) {
         return true;
       }
@@ -496,11 +545,18 @@ export class AuthService {
     return Buffer.from(bytes);
   }
 
-  private generateHotp(secret: Buffer, counter: number, digits: number): string {
+  private generateHotp(
+    secret: Buffer,
+    counter: number,
+    digits: number,
+  ): string {
     const counterBuffer = Buffer.alloc(8);
     counterBuffer.writeBigUInt64BE(BigInt(counter));
 
-    const hmac = crypto.createHmac('sha1', secret).update(counterBuffer).digest();
+    const hmac = crypto
+      .createHmac('sha1', secret)
+      .update(counterBuffer)
+      .digest();
     const offset = hmac[hmac.length - 1] & 0x0f;
     const code =
       ((hmac[offset] & 0x7f) << 24) |
@@ -538,7 +594,10 @@ export class AuthService {
       .filter(Boolean);
   }
 
-  private async consumeRecoveryCode(user: User, providedCode: string): Promise<boolean> {
+  private async consumeRecoveryCode(
+    user: User,
+    providedCode: string,
+  ): Promise<boolean> {
     const hashes = this.getStoredRecoveryCodeHashes(user);
     if (hashes.length === 0) {
       return false;
@@ -556,7 +615,10 @@ export class AuthService {
     return true;
   }
 
-  private async recordLoginAudit(user: User, context?: AuthContext): Promise<void> {
+  private async recordLoginAudit(
+    user: User,
+    context?: AuthContext,
+  ): Promise<void> {
     await this.loginAuditRepo.save(
       this.loginAuditRepo.create({
         user: { id: user.id } as any,
@@ -586,7 +648,11 @@ export class AuthService {
 
   // ─── Change Password (authenticated) ─────────────────────────
 
-  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+  async changePassword(
+    userId: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
     const user = await this.usersRepo.findOneBy({ id: userId });
     if (!user) throw new UnauthorizedException('User not found');
 
@@ -615,7 +681,10 @@ export class AuthService {
 
     // Generate a cryptographically random UUID-v4 token
     const rawToken = crypto.randomUUID();
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
 
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 

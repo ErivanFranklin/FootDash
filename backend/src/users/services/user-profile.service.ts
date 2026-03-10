@@ -29,6 +29,7 @@ export class UserProfileService {
       email: user?.email,
       role: user?.role,
       isPro: user?.isPro,
+      joinedAt: user?.createdAt ?? profileRest.createdAt,
     };
   }
 

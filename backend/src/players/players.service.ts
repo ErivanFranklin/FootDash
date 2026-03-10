@@ -24,7 +24,9 @@ export class PlayersService {
       .take(Math.max(1, Math.min(200, query.limit ?? 50)));
 
     if (query.position) {
-      qb.andWhere('p.position = :position', { position: query.position.toUpperCase() });
+      qb.andWhere('p.position = :position', {
+        position: query.position.toUpperCase(),
+      });
     }
 
     if (query.search?.trim()) {

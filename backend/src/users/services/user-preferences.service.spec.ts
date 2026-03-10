@@ -6,7 +6,6 @@ import {
   Theme,
   Language,
 } from '../entities/user-preferences.entity';
-import { NotFoundException } from '@nestjs/common';
 
 describe('UserPreferencesService', () => {
   let service: UserPreferencesService;
@@ -43,6 +42,9 @@ describe('UserPreferencesService', () => {
 
     service = module.get<UserPreferencesService>(UserPreferencesService);
     jest.clearAllMocks();
+    mockRepository.findOne.mockReset();
+    mockRepository.create.mockReset();
+    mockRepository.save.mockReset();
   });
 
   it('should be defined', () => {
@@ -61,12 +63,18 @@ describe('UserPreferencesService', () => {
       });
     });
 
-    it('should throw NotFoundException when preferences not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+    it('should create default preferences when preferences not found', async () => {
+      const createdPrefs = { ...mockUserPreferences, userId: 999, id: 2 };
+      mockRepository.findOne.mockResolvedValueOnce(null);
+      mockRepository.findOne.mockResolvedValueOnce(null);
+      mockRepository.create.mockReturnValue(createdPrefs);
+      mockRepository.save.mockResolvedValue(createdPrefs);
 
-      await expect(service.findByUserId(999)).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await service.findByUserId(999);
+
+      expect(result).toEqual(createdPrefs);
+      expect(mockRepository.create).toHaveBeenCalled();
+      expect(mockRepository.save).toHaveBeenCalledWith(createdPrefs);
     });
   });
 
@@ -79,6 +87,7 @@ describe('UserPreferencesService', () => {
         notificationEnabled: true,
       };
 
+      mockRepository.findOne.mockResolvedValue(null);
       mockRepository.create.mockReturnValue(defaultPrefs);
       mockRepository.save.mockResolvedValue(defaultPrefs);
 
@@ -169,12 +178,19 @@ describe('UserPreferencesService', () => {
       expect(result.theme).toBe(Theme.DARK);
     });
 
-    it('should throw NotFoundException when preferences do not exist', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+    it('should create defaults then update theme when preferences do not exist', async () => {
+      const createdPrefs = { ...mockUserPreferences, userId: 999, id: 2 };
+      mockRepository.findOne.mockResolvedValueOnce(null);
+      mockRepository.findOne.mockResolvedValueOnce(null);
+      mockRepository.create.mockReturnValue(createdPrefs);
+      mockRepository.save
+        .mockResolvedValueOnce(createdPrefs)
+        .mockResolvedValueOnce({ ...createdPrefs, theme: Theme.DARK });
 
-      await expect(service.updateTheme(999, Theme.DARK)).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await service.updateTheme(999, Theme.DARK);
+
+      expect(result.theme).toBe(Theme.DARK);
+      expect(mockRepository.create).toHaveBeenCalled();
     });
   });
 
@@ -197,12 +213,21 @@ describe('UserPreferencesService', () => {
       expect(result.pushNotifications).toBe(true);
     });
 
-    it('should throw NotFoundException when preferences do not exist', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+    it('should create defaults then update notification settings when preferences do not exist', async () => {
+      const createdPrefs = { ...mockUserPreferences, userId: 999, id: 2 };
+      mockRepository.findOne.mockResolvedValueOnce(null);
+      mockRepository.findOne.mockResolvedValueOnce(null);
+      mockRepository.create.mockReturnValue(createdPrefs);
+      mockRepository.save
+        .mockResolvedValueOnce(createdPrefs)
+        .mockResolvedValueOnce({ ...createdPrefs, notificationEnabled: false });
 
-      await expect(
-        service.updateNotifications(999, { notificationEnabled: false }),
-      ).rejects.toThrow(NotFoundException);
+      const result = await service.updateNotifications(999, {
+        notificationEnabled: false,
+      });
+
+      expect(result.notificationEnabled).toBe(false);
+      expect(mockRepository.create).toHaveBeenCalled();
     });
 
     it('should update only provided notification fields', async () => {

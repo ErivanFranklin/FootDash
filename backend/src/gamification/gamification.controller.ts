@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, Body, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GamificationService } from './gamification.service';
 import { BadgeService } from './badge.service';
@@ -58,6 +66,10 @@ export class GamificationController {
 
   @Post('leaderboard/rebuild')
   async rebuildLeaderboard() {
-    return this.gamificationService.rebuildLeaderboards(['weekly', 'monthly', 'all-time']);
+    return this.gamificationService.rebuildLeaderboards([
+      'weekly',
+      'monthly',
+      'all-time',
+    ]);
   }
 }

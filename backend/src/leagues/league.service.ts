@@ -25,7 +25,10 @@ export class LeagueService {
   }
 
   async findFeatured(): Promise<League[]> {
-    return this.leagueRepo.find({ where: { isFeatured: true }, order: { name: 'ASC' } });
+    return this.leagueRepo.find({
+      where: { isFeatured: true },
+      order: { name: 'ASC' },
+    });
   }
 
   async findById(id: number): Promise<League> {
@@ -42,12 +45,19 @@ export class LeagueService {
 
   async getStandings(leagueId: number) {
     const league = await this.findById(leagueId);
-    return this.footballApi.getLeagueStandings(league.externalId, Number(league.season));
+    return this.footballApi.getLeagueStandings(
+      league.externalId,
+      Number(league.season),
+    );
   }
 
   async getFixtures(leagueId: number, round?: string) {
     const league = await this.findById(leagueId);
-    return this.footballApi.getLeagueFixtures(league.externalId, Number(league.season), round);
+    return this.footballApi.getLeagueFixtures(
+      league.externalId,
+      Number(league.season),
+      round,
+    );
   }
 
   // ── Sync / Seed ───────────────────────────────────────────────────────────
@@ -67,7 +77,9 @@ export class LeagueService {
         const extId = item.league?.id;
         if (!extId) continue;
 
-        let league = await this.leagueRepo.findOne({ where: { externalId: extId } });
+        let league = await this.leagueRepo.findOne({
+          where: { externalId: extId },
+        });
 
         if (!league) {
           league = this.leagueRepo.create({
@@ -88,7 +100,9 @@ export class LeagueService {
         await this.leagueRepo.save(league);
       }
 
-      this.logger.log(`League sync complete — ${apiLeagues.length} leagues processed`);
+      this.logger.log(
+        `League sync complete — ${apiLeagues.length} leagues processed`,
+      );
     } catch (error) {
       this.logger.error(`League sync failed: ${(error as Error).message}`);
     }

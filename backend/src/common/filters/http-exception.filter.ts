@@ -1,4 +1,10 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  Logger,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch(HttpException)
@@ -19,7 +25,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       method: request.method,
       message: this.getErrorMessage(exceptionResponse),
       ...(process.env.NODE_ENV === 'development' && {
-        error: typeof exceptionResponse === 'object' ? exceptionResponse : undefined,
+        error:
+          typeof exceptionResponse === 'object' ? exceptionResponse : undefined,
       }),
     };
 

@@ -190,7 +190,11 @@ export class MatchesService {
           if (existing.homeScore != null && existing.awayScore != null) {
             this.eventEmitter.emit(
               'match.finished',
-              new MatchFinishedEvent(existing.id, existing.homeScore, existing.awayScore),
+              new MatchFinishedEvent(
+                existing.id,
+                existing.homeScore,
+                existing.awayScore,
+              ),
             );
           }
         }

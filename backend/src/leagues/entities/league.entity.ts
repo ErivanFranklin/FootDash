@@ -11,7 +11,12 @@ export class League {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'external_id', type: 'int', unique: true, comment: 'Football API external league ID' })
+  @Column({
+    name: 'external_id',
+    type: 'int',
+    unique: true,
+    comment: 'Football API external league ID',
+  })
   externalId: number;
 
   @Column({ type: 'varchar', length: 100 })
@@ -26,7 +31,12 @@ export class League {
   @Column({ type: 'varchar', length: 10, default: '2025' })
   season: string;
 
-  @Column({ type: 'varchar', length: 10, nullable: true, comment: 'League or Cup' })
+  @Column({
+    type: 'varchar',
+    length: 10,
+    nullable: true,
+    comment: 'League or Cup',
+  })
   type: string;
 
   @Column({ name: 'is_featured', type: 'boolean', default: false })

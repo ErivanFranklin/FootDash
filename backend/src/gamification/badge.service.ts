@@ -7,7 +7,10 @@ import { UserPrediction } from './entities/user-prediction.entity';
 import { Comment } from '../social/entities/comment.entity';
 import { Follow } from '../social/entities/follow.entity';
 import { User } from '../users/user.entity';
-import { AlertsService, CreateAlertDto } from '../social/services/alerts.service';
+import {
+  AlertsService,
+  CreateAlertDto,
+} from '../social/services/alerts.service';
 import { AlertType } from '../social/entities/alert.entity';
 
 export interface BadgeResponseDto {
@@ -77,9 +80,7 @@ export class BadgeService {
       sortOrder: b.sortOrder,
       unlocked: unlockedMap.has(b.id),
       unlockedAt: unlockedMap.get(b.id)?.toISOString(),
-      progress: unlockedMap.has(b.id)
-        ? 100
-        : progressMap.get(b.id) ?? 0,
+      progress: unlockedMap.has(b.id) ? 100 : (progressMap.get(b.id) ?? 0),
     }));
   }
 
@@ -170,9 +171,7 @@ export class BadgeService {
             progress: 100,
           });
 
-          this.logger.log(
-            `Badge "${badge.name}" awarded to user ${userId}`,
-          );
+          this.logger.log(`Badge "${badge.name}" awarded to user ${userId}`);
         } catch (err) {
           // Unique constraint — already awarded (race condition), ignore
           this.logger.warn(
@@ -283,15 +282,21 @@ export class BadgeService {
     const map = new Map<number, number>();
 
     // Batch compute common counts
-    const [correctCount, exactCount, totalPreds, commentCount, followers, following] =
-      await Promise.all([
-        this.countCorrectPredictions(userId),
-        this.countExactPredictions(userId),
-        this.countTotalPredictions(userId),
-        this.countComments(userId),
-        this.countFollowers(userId),
-        this.countFollowing(userId),
-      ]);
+    const [
+      correctCount,
+      exactCount,
+      totalPreds,
+      commentCount,
+      followers,
+      following,
+    ] = await Promise.all([
+      this.countCorrectPredictions(userId),
+      this.countExactPredictions(userId),
+      this.countTotalPredictions(userId),
+      this.countComments(userId),
+      this.countFollowers(userId),
+      this.countFollowing(userId),
+    ]);
 
     for (const b of badges) {
       let current = 0;

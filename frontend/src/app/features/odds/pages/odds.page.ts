@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -286,8 +286,9 @@ export class OddsPage implements OnInit {
   activeTab = 'odds';
 
   private apiUrl = `${environment.apiBaseUrl}/odds`;
+  private readonly http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
+  constructor() {
     addIcons({ trendingUpOutline, flashOutline, statsChartOutline });
   }
 

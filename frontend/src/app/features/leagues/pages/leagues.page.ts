@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
@@ -139,8 +139,7 @@ interface League {
 export class LeaguesPage implements OnInit {
   featuredLeagues = signal<League[]>([]);
   otherLeagues = signal<League[]>([]);
-
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   ngOnInit() {
     this.loadLeagues();

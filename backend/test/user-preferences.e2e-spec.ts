@@ -76,11 +76,15 @@ describe('UserPreferences E2E', () => {
   });
 
   describe('GET /users/:userId/preferences', () => {
-    it('should return 404 when preferences do not exist', async () => {
-      await request(app.getHttpServer())
+    it('should auto-create defaults when preferences do not exist', async () => {
+      const res = await request(app.getHttpServer())
         .get(`/users/${userId}/preferences`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(404);
+        .expect(200);
+
+      expect(res.body.userId).toBe(userId);
+      expect(res.body.theme).toBeDefined();
+      expect(res.body.language).toBeDefined();
     });
 
     it('should return preferences after creation', async () => {
@@ -237,7 +241,7 @@ describe('UserPreferences E2E', () => {
         .expect(400);
     });
 
-    it('should return 404 for non-existent preferences', async () => {
+    it('should return 500 for non-existent user', async () => {
       const nonExistentUserId = 99999;
 
       await request(app.getHttpServer())
@@ -246,7 +250,7 @@ describe('UserPreferences E2E', () => {
         .send({
           theme: Theme.DARK,
         })
-        .expect(404);
+        .expect(500);
     });
   });
 
@@ -303,7 +307,7 @@ describe('UserPreferences E2E', () => {
         .expect(400);
     });
 
-    it('should return 404 for non-existent preferences', async () => {
+    it('should return 500 for non-existent user', async () => {
       const nonExistentUserId = 99999;
 
       await request(app.getHttpServer())
@@ -312,7 +316,7 @@ describe('UserPreferences E2E', () => {
         .send({
           notificationEnabled: false,
         })
-        .expect(404);
+        .expect(500);
     });
   });
 

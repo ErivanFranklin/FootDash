@@ -25,7 +25,11 @@ test.describe('Phase 7: User Profile', () => {
   let userId: number | null = null;
 
   test.beforeEach(async ({ page }) => {
-    const result = await loginTestUser(page, { prefix: 'profile' });
+    const result = await loginTestUser(page, {
+      email: 'erivanf10@gmail.com',
+      password: 'Password123!',
+      skipRegistration: true,
+    });
     userId = result.userId;
     if (page.url().includes('/login')) {
       test.skip(true, 'Auth session not restored');

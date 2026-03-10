@@ -30,7 +30,6 @@ import { ReportsController } from './controllers/reports.controller';
 import { AlertsController } from './controllers/alerts.controller';
 import { ChatController } from './controllers/chat.controller';
 
-
 // External dependencies
 import { UsersModule } from '../users/users.module';
 import { MatchesModule } from '../matches/matches.module';
@@ -45,7 +44,7 @@ import { WebsocketsModule } from '../websockets/websockets.module';
       UserActivity,
       Report,
       Alert,
-      ChatMsg, 
+      ChatMsg,
     ]),
     UsersModule,
     MatchesModule,

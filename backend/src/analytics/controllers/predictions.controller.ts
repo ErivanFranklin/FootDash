@@ -6,11 +6,7 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { MatchPredictionService } from '../services/match-prediction.service';
 import { PredictionStrategyService } from '../services/prediction-strategy.service';

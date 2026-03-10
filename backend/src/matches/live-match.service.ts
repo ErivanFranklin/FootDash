@@ -132,7 +132,10 @@ export class LiveMatchService implements OnModuleDestroy {
         this.logger.debug(`No changes for match ${matchId}`);
       }
     } catch (error) {
-      this.logger.error(`Error polling match ${matchId}:`, error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        `Error polling match ${matchId}:`,
+        error instanceof Error ? error.message : String(error),
+      );
 
       // If error persists, we might want to stop polling after X failures
       // For now, just log and continue

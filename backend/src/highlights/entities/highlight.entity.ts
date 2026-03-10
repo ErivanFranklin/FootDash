@@ -1,11 +1,17 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'highlights' })
 export class Highlight {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ name: 'match_id' })
   matchId!: number;
 
   @Column({ nullable: true })
@@ -14,36 +20,36 @@ export class Highlight {
   @Column({ nullable: true })
   description!: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'thumbnail_url', nullable: true })
   thumbnailUrl!: string;
 
-  @Column()
+  @Column({ name: 'video_url' })
   videoUrl!: string;
 
   @Column({ default: 'youtube' })
   source!: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'external_id', nullable: true })
   externalId!: string;
 
   @Column({ default: 0 })
   duration!: number; // seconds
 
-  @Column({ default: 0 })
+  @Column({ name: 'view_count', default: 0 })
   viewCount!: number;
 
-  @Column({ nullable: true })
+  @Column({ name: 'home_team', nullable: true })
   homeTeam!: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'away_team', nullable: true })
   awayTeam!: string;
 
-  @Column({ nullable: true, type: 'date' })
+  @Column({ name: 'match_date', nullable: true, type: 'date' })
   matchDate!: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 }

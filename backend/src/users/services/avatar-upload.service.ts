@@ -46,7 +46,10 @@ export class AvatarUploadService {
       // Log and rethrow as a generic internal server error
       // (_error is intentionally prefixed to avoid lint no-unused-vars)
       // eslint-disable-next-line no-console
-      console.error('Failed to save avatar:', _error instanceof Error ? _error.message : String(_error));
+      console.error(
+        'Failed to save avatar:',
+        _error instanceof Error ? _error.message : String(_error),
+      );
       throw new InternalServerErrorException('Failed to save avatar');
     }
   }
@@ -69,7 +72,9 @@ export class AvatarUploadService {
       await fs.unlink(filepath);
     } catch (error) {
       // Silently fail if file doesn't exist — log at debug level
-      this.logger.debug(`Failed to delete avatar: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.debug(
+        `Failed to delete avatar: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 }

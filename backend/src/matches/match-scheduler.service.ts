@@ -54,13 +54,13 @@ export class MatchSchedulerService implements OnModuleInit {
       // Get favorite teams (the ones seeded with externalIds)
       const favoriteTeams = await this.teamRepository.find({
         where: [
-          { externalId: 33 },  // Manchester United
-          { externalId: 40 },  // Liverpool
-          { externalId: 50 },  // Manchester City
+          { externalId: 33 }, // Manchester United
+          { externalId: 40 }, // Liverpool
+          { externalId: 50 }, // Manchester City
           { externalId: 529 }, // Barcelona
           { externalId: 541 }, // Real Madrid
           { externalId: 157 }, // Bayern Munich
-          { externalId: 85 },  // Paris Saint-Germain
+          { externalId: 85 }, // Paris Saint-Germain
           { externalId: 131 }, // Corinthians
         ],
       });
@@ -69,9 +69,8 @@ export class MatchSchedulerService implements OnModuleInit {
       // Before August, the current season started the previous year.
       // Free plan caps at 2024, so use min(computed, 2024).
       const now = new Date();
-      const computedSeason = now.getMonth() < 7
-        ? now.getFullYear() - 1
-        : now.getFullYear();
+      const computedSeason =
+        now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
       const season = Math.min(computedSeason, 2024);
 
       let synced = 0;
@@ -79,7 +78,9 @@ export class MatchSchedulerService implements OnModuleInit {
 
       for (const team of favoriteTeams) {
         try {
-          this.logger.debug(`Syncing fixtures for ${team.name} (ext=${team.externalId})`);
+          this.logger.debug(
+            `Syncing fixtures for ${team.name} (ext=${team.externalId})`,
+          );
 
           // Sync recent fixtures (last 10 matches)
           await this.matchesService.syncFixturesFromApi(team.externalId!, {
@@ -96,16 +97,18 @@ export class MatchSchedulerService implements OnModuleInit {
           });
 
           synced++;
-          
+
           // Rate limit: 2s between requests (free plan = 10 req/min max)
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
         } catch (err: any) {
           this.logger.error(`Failed to sync ${team.name}: ${err.message}`);
           errors++;
         }
       }
 
-      this.logger.log(`Daily sync complete: ${synced} teams synced, ${errors} errors (season ${season})`);
+      this.logger.log(
+        `Daily sync complete: ${synced} teams synced, ${errors} errors (season ${season})`,
+      );
     } catch (error: any) {
       this.logger.error('Daily fixture sync failed:', error.message);
     }
@@ -147,7 +150,10 @@ export class MatchSchedulerService implements OnModuleInit {
         `Live matches: ${liveMatchIds.length}, Currently polling: ${currentlyPolled.length}`,
       );
     } catch (error) {
-      this.logger.error('Error in scheduled live match check:', error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        'Error in scheduled live match check:',
+        error instanceof Error ? error.message : String(error),
+      );
     }
   }
 
@@ -198,7 +204,10 @@ export class MatchSchedulerService implements OnModuleInit {
 
       return liveMatches;
     } catch (error) {
-      this.logger.error('Error finding live matches:', error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        'Error finding live matches:',
+        error instanceof Error ? error.message : String(error),
+      );
       return [];
     }
   }
@@ -273,9 +282,8 @@ export class MatchSchedulerService implements OnModuleInit {
     // Before August, the current season started the previous year.
     // Free plan caps at 2024, so use min(computed, 2024).
     const now = new Date();
-    const computedSeason = now.getMonth() < 7
-      ? now.getFullYear() - 1
-      : now.getFullYear();
+    const computedSeason =
+      now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
     const season = Math.min(computedSeason, 2024);
 
     let successCount = 0;
@@ -283,7 +291,9 @@ export class MatchSchedulerService implements OnModuleInit {
 
     for (const team of syncableTeams) {
       try {
-        this.logger.debug(`Syncing fixtures for ${team.name} (ext=${team.externalId})`);
+        this.logger.debug(
+          `Syncing fixtures for ${team.name} (ext=${team.externalId})`,
+        );
 
         // Sync recent results + upcoming fixtures in one call
         await this.matchesService.syncFixturesFromApi(team.externalId!, {

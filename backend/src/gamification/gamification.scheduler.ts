@@ -33,7 +33,9 @@ export class GamificationScheduler {
       select: ['matchId'],
     });
 
-    const pendingMatchIds = [...new Set(pendingPredictions.map((p) => p.matchId))];
+    const pendingMatchIds = [
+      ...new Set(pendingPredictions.map((p) => p.matchId)),
+    ];
 
     const affectedUserIds = new Set<number>();
 
@@ -45,7 +47,9 @@ export class GamificationScheduler {
       );
 
       if (finishedMatches.length > 0) {
-        this.logger.log(`Found ${finishedMatches.length} finished matches to process.`);
+        this.logger.log(
+          `Found ${finishedMatches.length} finished matches to process.`,
+        );
 
         // 3. Process each match and check badges for affected users
         for (const match of finishedMatches) {
@@ -57,7 +61,11 @@ export class GamificationScheduler {
             });
             matchPredictions.forEach((p) => affectedUserIds.add(p.userId));
 
-            await this.gamificationService.processMatchResult(match.id, match.homeScore, match.awayScore);
+            await this.gamificationService.processMatchResult(
+              match.id,
+              match.homeScore,
+              match.awayScore,
+            );
             this.logger.log(`Processed results for match ${match.id}`);
           }
         }
@@ -69,19 +77,29 @@ export class GamificationScheduler {
       this.logger.log(`Checking badges for ${affectedUserIds.size} users...`);
       for (const userId of affectedUserIds) {
         try {
-          await this.badgeService.checkAndAward(userId, BadgeCriteriaType.PREDICTIONS_CORRECT);
+          await this.badgeService.checkAndAward(
+            userId,
+            BadgeCriteriaType.PREDICTIONS_CORRECT,
+          );
         } catch (err) {
-          this.logger.error(`Badge check failed for user ${userId}: ${(err as Error).message}`);
+          this.logger.error(
+            `Badge check failed for user ${userId}: ${(err as Error).message}`,
+          );
         }
       }
-
     }
 
     // 5. Keep leaderboard snapshots fresh every scheduler run
     try {
-      await this.gamificationService.rebuildLeaderboards(['weekly', 'monthly', 'all-time']);
+      await this.gamificationService.rebuildLeaderboards([
+        'weekly',
+        'monthly',
+        'all-time',
+      ]);
     } catch (err) {
-      this.logger.error(`Leaderboard rebuild failed: ${(err as Error).message}`);
+      this.logger.error(
+        `Leaderboard rebuild failed: ${(err as Error).message}`,
+      );
     }
   }
 }

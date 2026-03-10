@@ -139,7 +139,9 @@ export class MLPredictionService {
       // Transform ML response to FootDash format
       return this.transformMLResponse(response.data, request);
     } catch (error) {
-      this.logger.error(`ML prediction failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `ML prediction failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
 
       if (error instanceof HttpException) {
         throw error;
@@ -183,7 +185,9 @@ export class MLPredictionService {
       );
       return isHealthy;
     } catch (error) {
-      this.logger.warn(`ML service health check failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.warn(
+        `ML service health check failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
 
       this.healthCheckCache = {
         isHealthy: false,
@@ -207,7 +211,9 @@ export class MLPredictionService {
 
       return response.data;
     } catch (error) {
-      this.logger.error(`Failed to get ML service info: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Failed to get ML service info: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw new HttpException(
         'ML service info unavailable',
         HttpStatus.SERVICE_UNAVAILABLE,
@@ -334,7 +340,10 @@ export class MLPredictionService {
     try {
       const isHealthy = await this.checkMLServiceHealth();
       if (!isHealthy) {
-        throw new HttpException('ML prediction service is unavailable', HttpStatus.SERVICE_UNAVAILABLE);
+        throw new HttpException(
+          'ML prediction service is unavailable',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
       }
 
       const response = await firstValueFrom(
@@ -347,20 +356,30 @@ export class MLPredictionService {
 
       return response.data;
     } catch (error) {
-      this.logger.error(`BTTS prediction failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `BTTS prediction failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       if (error instanceof HttpException) throw error;
-      throw new HttpException('BTTS prediction service error', HttpStatus.SERVICE_UNAVAILABLE);
+      throw new HttpException(
+        'BTTS prediction service error',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
     }
   }
 
   /**
    * Generate Over/Under prediction
    */
-  async predictOverUnder(request: OverUnderRequest): Promise<OverUnderResponse> {
+  async predictOverUnder(
+    request: OverUnderRequest,
+  ): Promise<OverUnderResponse> {
     try {
       const isHealthy = await this.checkMLServiceHealth();
       if (!isHealthy) {
-        throw new HttpException('ML prediction service is unavailable', HttpStatus.SERVICE_UNAVAILABLE);
+        throw new HttpException(
+          'ML prediction service is unavailable',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
       }
 
       const response = await firstValueFrom(
@@ -373,9 +392,14 @@ export class MLPredictionService {
 
       return response.data;
     } catch (error) {
-      this.logger.error(`Over/Under prediction failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Over/Under prediction failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       if (error instanceof HttpException) throw error;
-      throw new HttpException('Over/Under prediction service error', HttpStatus.SERVICE_UNAVAILABLE);
+      throw new HttpException(
+        'Over/Under prediction service error',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
     }
   }
 
@@ -385,12 +409,19 @@ export class MLPredictionService {
   async getModelMetrics(): Promise<any> {
     try {
       const response = await firstValueFrom(
-        this.httpService.get(`${this.mlApiUrl}/model/metrics`, { timeout: this.timeout }),
+        this.httpService.get(`${this.mlApiUrl}/model/metrics`, {
+          timeout: this.timeout,
+        }),
       );
       return response.data;
     } catch (error) {
-      this.logger.error(`Failed to get model metrics: ${error instanceof Error ? error.message : String(error)}`);
-      throw new HttpException('Model metrics unavailable', HttpStatus.SERVICE_UNAVAILABLE);
+      this.logger.error(
+        `Failed to get model metrics: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      throw new HttpException(
+        'Model metrics unavailable',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
     }
   }
 

@@ -90,7 +90,9 @@ describe('PaymentsService', () => {
 
       const mockCustomer = { id: 'cus_new_123' };
       const customerCreate = jest.fn().mockResolvedValue(mockCustomer);
-      const sessionCreate = jest.fn().mockResolvedValue({ url: 'https://stripe.com/new' });
+      const sessionCreate = jest
+        .fn()
+        .mockResolvedValue({ url: 'https://stripe.com/new' });
       (service as any).stripe = {
         customers: { create: customerCreate },
         checkout: { sessions: { create: sessionCreate } },
@@ -133,7 +135,11 @@ describe('PaymentsService', () => {
 
   describe('getSubscriptionInfo', () => {
     it('returns free/none when user has no stripe customer', async () => {
-      userRepo.findOne.mockResolvedValue({ id: 1, isPro: false, stripeCustomerId: null });
+      userRepo.findOne.mockResolvedValue({
+        id: 1,
+        isPro: false,
+        stripeCustomerId: null,
+      });
 
       const result = await service.getSubscriptionInfo(1);
       expect(result.tier).toBe('free');
@@ -141,7 +147,11 @@ describe('PaymentsService', () => {
     });
 
     it('returns active subscription details when stripe subscription exists', async () => {
-      userRepo.findOne.mockResolvedValue({ id: 1, isPro: true, stripeCustomerId: 'cus_123' });
+      userRepo.findOne.mockResolvedValue({
+        id: 1,
+        isPro: true,
+        stripeCustomerId: 'cus_123',
+      });
       (service as any).stripe = {
         subscriptions: {
           list: jest.fn().mockResolvedValue({
@@ -174,7 +184,11 @@ describe('PaymentsService', () => {
 
   describe('verifyCheckoutSession', () => {
     it('rejects invalid session ID format', async () => {
-      userRepo.findOne.mockResolvedValue({ id: 1, stripeCustomerId: 'cus_1', isPro: false });
+      userRepo.findOne.mockResolvedValue({
+        id: 1,
+        stripeCustomerId: 'cus_1',
+        isPro: false,
+      });
 
       await expect(service.verifyCheckoutSession(1, 'bad')).rejects.toThrow(
         'Invalid Stripe session ID',
@@ -182,7 +196,11 @@ describe('PaymentsService', () => {
     });
 
     it('verifies owned completed paid session', async () => {
-      const mockUser = { id: 1, stripeCustomerId: 'cus_1', isPro: false } as any;
+      const mockUser = {
+        id: 1,
+        stripeCustomerId: 'cus_1',
+        isPro: false,
+      } as any;
       userRepo.findOne.mockResolvedValue(mockUser);
       userRepo.save.mockResolvedValue({ ...mockUser, isPro: true });
 

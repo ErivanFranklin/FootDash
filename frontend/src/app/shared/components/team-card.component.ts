@@ -19,7 +19,7 @@ import { FavoriteEntityType } from '../../services/favorites.service';
             </div>
           </div>
           <app-favorite-button
-            *ngIf="favoriteEntityType && favoriteEntityId != null"
+            *ngIf="favoriteEntityType && favoriteEntityId !== null"
             [entityType]="favoriteEntityType"
             [entityId]="favoriteEntityId">
           </app-favorite-button>

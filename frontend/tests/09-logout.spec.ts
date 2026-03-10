@@ -9,7 +9,7 @@ import {
  * Phase 9: Logout
  *
  * Tests the logout flow via desktop side menu.
- * Logout item: ion-item[color="danger"] in app-navigation-menu.
+ * Logout item is selected by visible logout text in app-navigation-menu.
  * Triggers window.location.reload() after a 100ms delay.
  */
 test.describe('Phase 9: Logout', () => {
@@ -27,7 +27,7 @@ test.describe('Phase 9: Logout', () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await navigateTo(page, '/teams');
 
-    const logoutItem = page.locator('app-navigation-menu ion-item[color="danger"]');
+    const logoutItem = page.locator('app-navigation-menu ion-item', { hasText: /logout/i }).first();
     await expect(logoutItem).toBeVisible({ timeout: 5_000 });
   });
 
@@ -60,7 +60,7 @@ test.describe('Phase 9: Logout', () => {
     // Wait for the side menu to render
     await page.waitForTimeout(1_000);
 
-    const logoutItem = page.locator('app-navigation-menu ion-item[color="danger"]');
+    const logoutItem = page.locator('app-navigation-menu ion-item', { hasText: /logout/i }).first();
     if (await logoutItem.isVisible({ timeout: 8_000 }).catch(() => false)) {
       const text = await logoutItem.textContent();
       expect(text?.toLowerCase()).toContain('logout');

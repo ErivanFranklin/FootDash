@@ -16,7 +16,9 @@ export class UserPreferencesService {
   ) {}
 
   private async getOrCreate(userId: number): Promise<UserPreferences> {
-    const existing = await this.preferencesRepository.findOne({ where: { userId } });
+    const existing = await this.preferencesRepository.findOne({
+      where: { userId },
+    });
     if (existing) {
       return existing;
     }

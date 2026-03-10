@@ -65,9 +65,15 @@ const isProd = process.env.NODE_ENV === 'production';
         FCM_CLIENT_EMAIL: Joi.string().optional(),
         FCM_PRIVATE_KEY: Joi.string().optional(),
         // Stripe payments
-        STRIPE_SECRET_KEY: isProd ? Joi.string().required() : Joi.string().optional(),
-        STRIPE_WEBHOOK_SECRET: isProd ? Joi.string().required() : Joi.string().optional(),
-        STRIPE_PRO_PRICE_ID: isProd ? Joi.string().required() : Joi.string().optional(),
+        STRIPE_SECRET_KEY: isProd
+          ? Joi.string().required()
+          : Joi.string().optional(),
+        STRIPE_WEBHOOK_SECRET: isProd
+          ? Joi.string().required()
+          : Joi.string().optional(),
+        STRIPE_PRO_PRICE_ID: isProd
+          ? Joi.string().required()
+          : Joi.string().optional(),
         FRONTEND_URL: Joi.string().uri().default('http://localhost:4200'),
         // SMTP / Mail
         SMTP_HOST: Joi.string().default('localhost'),
@@ -76,11 +82,13 @@ const isProd = process.env.NODE_ENV === 'production';
         SMTP_PASS: Joi.string().allow('').default(''),
         MAIL_FROM: Joi.string().default('"FootDash" <noreply@footdash.app>'),
         // ML Service
-        ML_SERVICE_URL: Joi.string().uri().when('$env', {
-          is: 'production',
-          then: Joi.required(),
-          otherwise: Joi.string().uri().default('http://localhost:8000'),
-        }),
+        ML_SERVICE_URL: Joi.string()
+          .uri()
+          .when('$env', {
+            is: 'production',
+            then: Joi.required(),
+            otherwise: Joi.string().uri().default('http://localhost:8000'),
+          }),
         // Phase 13 optional external API keys
         YOUTUBE_API_KEY: Joi.string().optional().allow(''),
         ODDS_API_KEY: Joi.string().optional().allow(''),
@@ -112,9 +120,6 @@ const isProd = process.env.NODE_ENV === 'production';
     PlayersModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-  ],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

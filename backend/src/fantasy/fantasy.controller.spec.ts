@@ -40,7 +40,10 @@ describe('FantasyController', () => {
   });
 
   it('falls back to req.user.id when sub is not present', async () => {
-    await controller.joinLeague({ user: { id: 44 } }, { inviteCode: 'ABCDEFGH' });
+    await controller.joinLeague(
+      { user: { id: 44 } },
+      { inviteCode: 'ABCDEFGH' },
+    );
 
     expect(fantasyService.joinLeague).toHaveBeenCalledWith(44, 'ABCDEFGH');
   });

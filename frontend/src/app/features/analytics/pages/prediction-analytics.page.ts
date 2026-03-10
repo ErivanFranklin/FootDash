@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, inject, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -108,7 +108,7 @@ Chart.register(...registerables);
           </ion-card>
 
           <!-- Confidence Distribution Chart -->
-          <ion-card>
+            <ion-card class="chart-card">
             <ion-card-header>
               <ion-card-title>Confidence Distribution</ion-card-title>
             </ion-card-header>
@@ -118,7 +118,7 @@ Chart.register(...registerables);
           </ion-card>
 
           <!-- Outcome Distribution Chart -->
-          <ion-card>
+            <ion-card class="chart-card">
             <ion-card-header>
               <ion-card-title>Predicted Outcomes</ion-card-title>
             </ion-card-header>
@@ -301,7 +301,22 @@ Chart.register(...registerables);
     </ion-content>
   `,
   styles: [`
-    .loading-container {
+        :host {
+          display: block;
+        }
+        .chart-card canvas {
+          width: 100% !important;
+          height: 260px !important;
+          max-height: 360px;
+          display: block;
+        }
+        @media (min-width: 1024px) {
+          .chart-card canvas {
+            height: 340px !important;
+          }
+        }
+        .prediction-card { cursor: pointer; }
+      .loading-container {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -604,7 +619,7 @@ Chart.register(...registerables);
     }
   `]
 })
-export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit {
+export class PredictionAnalyticsPage implements OnInit, OnDestroy {
   private analyticsService = inject(AnalyticsService);
   private router = inject(Router);
 
@@ -631,10 +646,6 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
 
   ngOnInit() {
     this.loadPredictions();
-  }
-
-  ngAfterViewInit() {
-    // Charts will be built after data loads
   }
 
   ngOnDestroy() {
@@ -864,7 +875,7 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: { position: 'bottom' }
           }
@@ -893,7 +904,7 @@ export class PredictionAnalyticsPage implements OnInit, OnDestroy, AfterViewInit
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: { display: false }
           },

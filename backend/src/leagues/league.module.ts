@@ -6,10 +6,7 @@ import { LeagueController } from './league.controller';
 import { FootballApiModule } from '../football-api/football-api.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([League]),
-    FootballApiModule,
-  ],
+  imports: [TypeOrmModule.forFeature([League]), FootballApiModule],
   controllers: [LeagueController],
   providers: [LeagueService],
   exports: [LeagueService],

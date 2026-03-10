@@ -52,6 +52,14 @@ const USERS = [
   { email: 'demo.user@footdash.com', password: 'Password123!', role: 'USER', isPro: false },
 ];
 
+const USER_CREATED_AT: Record<string, string> = {
+  'erivanf10@gmail.com': '2024-02-15T10:30:00.000Z',
+  'test01@test.com': '2024-06-10T14:15:00.000Z',
+  'local+test@example.com': '2024-09-01T09:00:00.000Z',
+  'demo.pro@footdash.com': '2025-01-20T18:45:00.000Z',
+  'demo.user@footdash.com': '2025-03-05T12:00:00.000Z',
+};
+
 const TEAMS = [
   { externalId: 33, name: 'Manchester United', shortCode: 'MUN' },
   { externalId: 40, name: 'Liverpool', shortCode: 'LIV' },
@@ -122,18 +130,20 @@ async function seed() {
     const userIds: Map<string, number> = new Map();
 
     for (const u of USERS) {
+      const email = u.email.toLowerCase();
+      const createdAt = USER_CREATED_AT[email] || new Date().toISOString();
       const existing = await ds.query('SELECT id FROM users WHERE email = $1', [u.email.toLowerCase()]);
       if (existing.length > 0) {
         // Update role, isPro, and password for existing users
         const hash = await bcrypt.hash(u.password, 10);
-        await ds.query('UPDATE users SET role = $1, is_pro = $2, password_hash = $3 WHERE id = $4', [u.role, u.isPro, hash, existing[0].id]);
+        await ds.query('UPDATE users SET role = $1, is_pro = $2, password_hash = $3, created_at = $4 WHERE id = $5', [u.role, u.isPro, hash, createdAt, existing[0].id]);
         userIds.set(u.email, existing[0].id);
         console.log(`  ✓ ${u.email} (id=${existing[0].id}) – updated`);
       } else {
         const hash = await bcrypt.hash(u.password, 10);
         const res = await ds.query(
-          'INSERT INTO users (email, password_hash, role, is_pro, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING id',
-          [u.email.toLowerCase(), hash, u.role, u.isPro],
+          'INSERT INTO users (email, password_hash, role, is_pro, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+          [email, hash, u.role, u.isPro, createdAt],
         );
         userIds.set(u.email, res[0].id);
         console.log(`  + ${u.email} (id=${res[0].id}) – created`);

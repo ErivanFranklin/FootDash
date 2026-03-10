@@ -61,7 +61,10 @@ export class GamificationService {
     }
   }
 
-  private getPeriodIdentifier(period: 'weekly' | 'monthly' | 'all-time', date = new Date()): string {
+  private getPeriodIdentifier(
+    period: 'weekly' | 'monthly' | 'all-time',
+    date = new Date(),
+  ): string {
     if (period === 'all-time') {
       return 'all-time';
     }
@@ -73,33 +76,62 @@ export class GamificationService {
     }
 
     // ISO week identifier: YYYY-Www
-    const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const target = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    );
     const dayNum = target.getUTCDay() || 7;
     target.setUTCDate(target.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil((((target.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+    const weekNo = Math.ceil(
+      ((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+    );
     return `${target.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
   }
 
-  private getPeriodStart(period: 'weekly' | 'monthly' | 'all-time', now = new Date()): Date | null {
+  private getPeriodStart(
+    period: 'weekly' | 'monthly' | 'all-time',
+    now = new Date(),
+  ): Date | null {
     if (period === 'all-time') return null;
 
     if (period === 'monthly') {
-      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+      return new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0),
+      );
     }
 
     // Weekly starts on Monday (ISO)
-    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+    const start = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
     const day = start.getUTCDay() || 7;
     start.setUTCDate(start.getUTCDate() - (day - 1));
     return start;
   }
 
-  async rebuildLeaderboards(periods: Array<'weekly' | 'monthly' | 'all-time'> = ['weekly', 'monthly', 'all-time']) {
+  async rebuildLeaderboards(
+    periods: Array<'weekly' | 'monthly' | 'all-time'> = [
+      'weekly',
+      'monthly',
+      'all-time',
+    ],
+  ) {
     await this.scorePendingPredictionsForFinishedMatches();
 
     const now = new Date();
-    const result: Array<{ period: 'weekly' | 'monthly' | 'all-time'; periodIdentifier: string; rows: number }> = [];
+    const result: Array<{
+      period: 'weekly' | 'monthly' | 'all-time';
+      periodIdentifier: string;
+      rows: number;
+    }> = [];
 
     for (const period of periods) {
       const periodIdentifier = this.getPeriodIdentifier(period, now);
@@ -118,7 +150,10 @@ export class GamificationService {
         qb.andWhere('p.createdAt >= :periodStart', { periodStart });
       }
 
-      const aggregates = await qb.getRawMany<{ userId: string; points: string }>();
+      const aggregates = await qb.getRawMany<{
+        userId: string;
+        points: string;
+      }>();
 
       await this.leaderboardRepository.delete({ period, periodIdentifier });
 
@@ -170,7 +205,10 @@ export class GamificationService {
       });
     }
 
-    const rows = await qb.orderBy('lb.rank', 'ASC').addOrderBy('lb.points', 'DESC').getRawMany();
+    const rows = await qb
+      .orderBy('lb.rank', 'ASC')
+      .addOrderBy('lb.points', 'DESC')
+      .getRawMany();
 
     return rows.map((row) => {
       const email = String(row.email ?? 'user@example.com');
@@ -187,12 +225,23 @@ export class GamificationService {
 
   @OnEvent('match.finished')
   async onMatchFinished(event: MatchFinishedEvent): Promise<void> {
-    this.logger.log(`[Event] match.finished → matchId=${event.matchId}, score=${event.homeScore}-${event.awayScore}`);
-    await this.processMatchResult(event.matchId, event.homeScore, event.awayScore);
+    this.logger.log(
+      `[Event] match.finished → matchId=${event.matchId}, score=${event.homeScore}-${event.awayScore}`,
+    );
+    await this.processMatchResult(
+      event.matchId,
+      event.homeScore,
+      event.awayScore,
+    );
     await this.rebuildLeaderboards(['weekly', 'monthly', 'all-time']);
   }
 
-  async submitPrediction(userId: number, matchId: number, homeScore: number, awayScore: number): Promise<UserPrediction> {
+  async submitPrediction(
+    userId: number,
+    matchId: number,
+    homeScore: number,
+    awayScore: number,
+  ): Promise<UserPrediction> {
     const prediction = this.predictionsRepository.create({
       userId,
       matchId,
@@ -202,7 +251,12 @@ export class GamificationService {
     return this.predictionsRepository.save(prediction);
   }
 
-  calculatePoints(userHome: number, userAway: number, actualHome: number, actualAway: number): number {
+  calculatePoints(
+    userHome: number,
+    userAway: number,
+    actualHome: number,
+    actualAway: number,
+  ): number {
     if (userHome === actualHome && userAway === actualAway) {
       return 3; // Exact score
     }
@@ -217,11 +271,22 @@ export class GamificationService {
     return 0; // Incorrect
   }
 
-  async processMatchResult(matchId: number, homeScore: number, awayScore: number): Promise<void> {
-    const predictions = await this.predictionsRepository.find({ where: { matchId } });
+  async processMatchResult(
+    matchId: number,
+    homeScore: number,
+    awayScore: number,
+  ): Promise<void> {
+    const predictions = await this.predictionsRepository.find({
+      where: { matchId },
+    });
 
     for (const pred of predictions) {
-      const points = this.calculatePoints(pred.homeScore, pred.awayScore, homeScore, awayScore);
+      const points = this.calculatePoints(
+        pred.homeScore,
+        pred.awayScore,
+        homeScore,
+        awayScore,
+      );
       pred.points = points;
       await this.predictionsRepository.save(pred);
     }

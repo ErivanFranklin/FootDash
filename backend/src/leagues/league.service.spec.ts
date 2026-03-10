@@ -51,9 +51,11 @@ describe('LeagueService', () => {
 
       const result = await service.findAll();
       expect(result).toHaveLength(2);
-      expect(leagueRepo.find).toHaveBeenCalledWith(expect.objectContaining({
-        order: { isFeatured: 'DESC', name: 'ASC' },
-      }));
+      expect(leagueRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          order: { isFeatured: 'DESC', name: 'ASC' },
+        }),
+      );
     });
   });
 
@@ -88,8 +90,14 @@ describe('LeagueService', () => {
 
   describe('getStandings', () => {
     it('calls footballApi.getLeagueStandings with correct externalId and season', async () => {
-      leagueRepo.findOne.mockResolvedValue({ id: 1, externalId: 39, season: '2025' });
-      footballApi.getLeagueStandings.mockResolvedValue([{ rank: 1, team: 'Arsenal' }]);
+      leagueRepo.findOne.mockResolvedValue({
+        id: 1,
+        externalId: 39,
+        season: '2025',
+      });
+      footballApi.getLeagueStandings.mockResolvedValue([
+        { rank: 1, team: 'Arsenal' },
+      ]);
 
       await service.getStandings(1);
       expect(footballApi.getLeagueStandings).toHaveBeenCalledWith(39, 2025);

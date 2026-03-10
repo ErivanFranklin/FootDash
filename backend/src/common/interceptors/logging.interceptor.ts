@@ -1,4 +1,10 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+  Logger,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -17,7 +23,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap({
-        next: (data) => {
+        next: () => {
           const responseTime = Date.now() - now;
           this.logger.log(`← [${method}] ${url} ${responseTime}ms`);
         },
@@ -36,9 +42,15 @@ export class LoggingInterceptor implements NestInterceptor {
     if (!body) return {};
 
     const sanitized = { ...body };
-    const sensitiveFields = ['password', 'token', 'accessToken', 'refreshToken', 'secret'];
+    const sensitiveFields = [
+      'password',
+      'token',
+      'accessToken',
+      'refreshToken',
+      'secret',
+    ];
 
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
         sanitized[field] = '***';
       }

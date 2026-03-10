@@ -13,7 +13,9 @@ const mockRepo = () => ({
   count: jest.fn().mockResolvedValue(0),
 });
 
-const mockHttpService = () => ({ get: jest.fn().mockReturnValue({ pipe: jest.fn() }) });
+const mockHttpService = () => ({
+  get: jest.fn().mockReturnValue({ pipe: jest.fn() }),
+});
 const mockConfigService = () => ({
   get: jest.fn((key: string) => {
     if (key === 'ODDS_API_KEY') return undefined; // mock mode
@@ -22,24 +24,25 @@ const mockConfigService = () => ({
 });
 
 /** Helper to create a minimal Odds object for testing. */
-const makeOdds = (overrides: Partial<Odds> = {}): Odds => ({
-  id: 1,
-  matchId: 1,
-  homeTeam: 'Arsenal',
-  awayTeam: 'Chelsea',
-  matchDate: '2025-02-01',
-  bookmaker: 'Bet365',
-  homeWin: 2.0,
-  draw: 3.2,
-  awayWin: 3.8,
-  over25: 1.85,
-  under25: 1.95,
-  bttsYes: 1.80,
-  bttsNo: 2.0,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  ...overrides,
-} as Odds);
+const makeOdds = (overrides: Partial<Odds> = {}): Odds =>
+  ({
+    id: 1,
+    matchId: 1,
+    homeTeam: 'Arsenal',
+    awayTeam: 'Chelsea',
+    matchDate: '2025-02-01',
+    bookmaker: 'Bet365',
+    homeWin: 2.0,
+    draw: 3.2,
+    awayWin: 3.8,
+    over25: 1.85,
+    under25: 1.95,
+    bttsYes: 1.8,
+    bttsNo: 2.0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  }) as Odds;
 
 describe('OddsService', () => {
   let service: OddsService;
@@ -102,7 +105,13 @@ describe('OddsService', () => {
       // homeWin = 3.50 → impliedProb = 28.57%, with 10% margin fair = ~26%, edge ~= -2.57 (no value)
       // Use extremely wide odds: homeWin=5.0 draw=5.0 awayWin=5.0 → 20% each implied, margin=0.6, fair=12.5% → edge ~-7.5 (no value)
       // Actually test that value detection runs and returns array structure
-      const odds = makeOdds({ homeWin: 1.50, draw: 4.0, awayWin: 7.0, over25: 1.60, bttsYes: 1.70 });
+      const odds = makeOdds({
+        homeWin: 1.5,
+        draw: 4.0,
+        awayWin: 7.0,
+        over25: 1.6,
+        bttsYes: 1.7,
+      });
       repo.find.mockResolvedValue([odds]);
 
       const result = await service.getValueBets(0); // minEdge=0 returns everything with positive edge
@@ -111,8 +120,26 @@ describe('OddsService', () => {
     });
 
     it('sorts results by edge descending', async () => {
-      const odds1 = makeOdds({ id: 1, homeWin: 1.20, draw: 6.0, awayWin: 10.0, over25: undefined, under25: undefined, bttsYes: undefined, bttsNo: undefined });
-      const odds2 = makeOdds({ id: 2, homeWin: 1.30, draw: 5.5, awayWin: 9.0, over25: undefined, under25: undefined, bttsYes: undefined, bttsNo: undefined });
+      const odds1 = makeOdds({
+        id: 1,
+        homeWin: 1.2,
+        draw: 6.0,
+        awayWin: 10.0,
+        over25: undefined,
+        under25: undefined,
+        bttsYes: undefined,
+        bttsNo: undefined,
+      });
+      const odds2 = makeOdds({
+        id: 2,
+        homeWin: 1.3,
+        draw: 5.5,
+        awayWin: 9.0,
+        over25: undefined,
+        under25: undefined,
+        bttsYes: undefined,
+        bttsNo: undefined,
+      });
       repo.find.mockResolvedValue([odds1, odds2]);
 
       const result = await service.getValueBets(0);
@@ -128,7 +155,15 @@ describe('OddsService', () => {
     it('assigns "high" rating when edge >= 15', async () => {
       // Create odds where a market has a large edge
       // Under/over 2.5 with placeholder modelProb=55: if implied < 40%, edge > 15
-      const odds = makeOdds({ over25: 3.0, homeWin: 2.0, draw: 3.4, awayWin: 4.0, bttsYes: undefined, bttsNo: undefined, under25: undefined });
+      const odds = makeOdds({
+        over25: 3.0,
+        homeWin: 2.0,
+        draw: 3.4,
+        awayWin: 4.0,
+        bttsYes: undefined,
+        bttsNo: undefined,
+        under25: undefined,
+      });
       repo.find.mockResolvedValue([odds]);
 
       const result = await service.getValueBets(0);

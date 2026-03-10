@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { ServiceUnavailableException } from '@nestjs/common';
@@ -31,7 +30,9 @@ describe('FootballApiService', () => {
     };
 
     configService = {
-      get: jest.fn((key: string, defaultVal?: any) => config[key] ?? defaultVal),
+      get: jest.fn(
+        (key: string, defaultVal?: any) => config[key] ?? defaultVal,
+      ),
     } as any;
 
     httpService = {
@@ -85,14 +86,21 @@ describe('FootballApiService', () => {
     });
 
     it('getTeamStats returns mock data', async () => {
-      const result = await service.getTeamStats({ leagueId: 39, season: 2024, teamId: 33 });
+      const result = await service.getTeamStats({
+        leagueId: 39,
+        season: 2024,
+        teamId: 33,
+      });
       expect(result).toBeDefined();
       expect((result as any).fixtures?.played?.total).toBe(20);
       expect(httpService.get).not.toHaveBeenCalled();
     });
 
     it('getTeamFixtures returns mock data', async () => {
-      const result = await service.getTeamFixtures({ teamId: 33, season: 2024 });
+      const result = await service.getTeamFixtures({
+        teamId: 33,
+        season: 2024,
+      });
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
       expect(httpService.get).not.toHaveBeenCalled();
@@ -115,11 +123,15 @@ describe('FootballApiService', () => {
     });
 
     it('getTeamInfo throws ServiceUnavailableException', async () => {
-      await expect(service.getTeamInfo(33)).rejects.toThrow(ServiceUnavailableException);
+      await expect(service.getTeamInfo(33)).rejects.toThrow(
+        ServiceUnavailableException,
+      );
     });
 
     it('getTeamFixtures throws ServiceUnavailableException', async () => {
-      await expect(service.getTeamFixtures({ teamId: 33 })).rejects.toThrow(ServiceUnavailableException);
+      await expect(service.getTeamFixtures({ teamId: 33 })).rejects.toThrow(
+        ServiceUnavailableException,
+      );
     });
   });
 
@@ -127,8 +139,12 @@ describe('FootballApiService', () => {
 
   describe('HTTP error handling', () => {
     it('throws ServiceUnavailableException on API failure', async () => {
-      httpService.get.mockReturnValue(throwError(() => ({ message: 'timeout', stack: '' })));
-      await expect(service.getTeamInfo(33)).rejects.toThrow(ServiceUnavailableException);
+      httpService.get.mockReturnValue(
+        throwError(() => ({ message: 'timeout', stack: '' })),
+      );
+      await expect(service.getTeamInfo(33)).rejects.toThrow(
+        ServiceUnavailableException,
+      );
     });
   });
 
@@ -145,10 +161,23 @@ describe('FootballApiService', () => {
       const successResponse = mockAxiosResponse({
         response: [
           {
-            fixture: { id: 1, date: '2025-01-01', status: { short: 'FT', long: 'Full Time' } },
-            teams: { home: { id: 33, name: 'Test' }, away: { id: 44, name: 'Rival' } },
+            fixture: {
+              id: 1,
+              date: '2025-01-01',
+              status: { short: 'FT', long: 'Full Time' },
+            },
+            teams: {
+              home: { id: 33, name: 'Test' },
+              away: { id: 44, name: 'Rival' },
+            },
             goals: { home: 2, away: 1 },
-            league: { id: 39, name: 'League', country: 'UK', logo: '', season: 2024 },
+            league: {
+              id: 39,
+              name: 'League',
+              country: 'UK',
+              logo: '',
+              season: 2024,
+            },
           },
         ],
       });
@@ -162,12 +191,18 @@ describe('FootballApiService', () => {
         })
         .mockReturnValueOnce(of(successResponse) as any);
 
-      const result = await service.getTeamFixtures({ teamId: 33, season: 2024, last: 5 });
+      await service.getTeamFixtures({
+        teamId: 33,
+        season: 2024,
+        last: 5,
+      });
 
       expect(httpService.get).toHaveBeenCalledTimes(2);
 
       // First call should have included 'last' param
-      expect(firstCallParamsSnapshot).toEqual(expect.objectContaining({ last: 5 }));
+      expect(firstCallParamsSnapshot).toEqual(
+        expect.objectContaining({ last: 5 }),
+      );
 
       // Second call (retry) should NOT include 'last' param
       const secondCallParams = httpService.get.mock.calls[1][1]?.params;
@@ -223,10 +258,23 @@ describe('FootballApiService', () => {
       const apiResponse = mockAxiosResponse({
         response: [
           {
-            fixture: { id: 555, date: '2025-02-25', status: { short: 'FT', long: 'Full Time' } },
-            teams: { home: { id: 33, name: 'Home' }, away: { id: 44, name: 'Away' } },
+            fixture: {
+              id: 555,
+              date: '2025-02-25',
+              status: { short: 'FT', long: 'Full Time' },
+            },
+            teams: {
+              home: { id: 33, name: 'Home' },
+              away: { id: 44, name: 'Away' },
+            },
             goals: { home: 1, away: 0 },
-            league: { id: 39, name: 'Test League', country: 'UK', logo: '', season: 2024 },
+            league: {
+              id: 39,
+              name: 'Test League',
+              country: 'UK',
+              logo: '',
+              season: 2024,
+            },
           },
         ],
       });
@@ -234,7 +282,9 @@ describe('FootballApiService', () => {
 
       const result = await service.getMatch(555);
       expect(result).toBeDefined();
-      expect(httpService.get).toHaveBeenCalledWith('fixtures', { params: { id: 555 } });
+      expect(httpService.get).toHaveBeenCalledWith('fixtures', {
+        params: { id: 555 },
+      });
     });
 
     it('returns null when no fixture found', async () => {
@@ -262,13 +312,15 @@ describe('FootballApiService', () => {
       });
 
       const params = httpService.get.mock.calls[0][1]?.params;
-      expect(params).toEqual(expect.objectContaining({
-        team: 33,
-        season: 2024,
-        status: 'FT',
-        from: '2025-01-01',
-        to: '2025-06-30',
-      }));
+      expect(params).toEqual(
+        expect.objectContaining({
+          team: 33,
+          season: 2024,
+          status: 'FT',
+          from: '2025-01-01',
+          to: '2025-06-30',
+        }),
+      );
     });
   });
 });

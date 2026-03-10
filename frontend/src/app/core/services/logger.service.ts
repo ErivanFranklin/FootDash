@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { ErrorLoggingService } from './error-logging.service';
 
@@ -14,8 +14,7 @@ import { ErrorLoggingService } from './error-logging.service';
 })
 export class LoggerService {
   private readonly isProd = environment.production;
-
-  constructor(private errorLogging: ErrorLoggingService) {}
+  private readonly errorLogging = inject(ErrorLoggingService);
 
   /** Verbose / trace-level – never shown in prod */
   debug(message: string, ...data: unknown[]): void {

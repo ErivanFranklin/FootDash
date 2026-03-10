@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { checkmarkCircle, personAdd } from 'ionicons/icons';
 import { FollowService } from '../../../services/social/follow.service';
 import { LoggerService } from '../../../core/services/logger.service';
 
@@ -26,6 +28,11 @@ export class FollowButtonComponent implements OnInit, OnChanges {
 
   private followService = inject(FollowService);
   private logger = inject(LoggerService);
+
+  constructor() {
+    // Register icons explicitly to avoid runtime URL resolution issues in some builds.
+    addIcons({ checkmarkCircle, personAdd });
+  }
 
   ngOnInit() {
     this.loadFollowStatus();
@@ -71,8 +78,6 @@ export class FollowButtonComponent implements OnInit, OnChanges {
 
     this.loading = true;
 
-    this.loading = true;
-
     if (this.isFollowing) {
       this.followService.unfollowUser(this.targetUserId).subscribe({
         next: () => {
@@ -85,6 +90,9 @@ export class FollowButtonComponent implements OnInit, OnChanges {
           });
         },
         error: (err: any) => {
+          if (err?.status === 404) {
+            this.logger.warn('Target user not found when trying to follow/unfollow:', this.targetUserId);
+          }
           this.logger.error('Error unfollowing user:', err);
           this.loading = false;
         }
@@ -101,6 +109,9 @@ export class FollowButtonComponent implements OnInit, OnChanges {
           });
         },
         error: (err: any) => {
+          if (err?.status === 404) {
+            this.logger.warn('Target user not found when trying to follow/unfollow:', this.targetUserId);
+          }
           this.logger.error('Error following user:', err);
           this.loading = false;
         }

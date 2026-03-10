@@ -114,9 +114,17 @@ export async function loginTestUser(
     await submitLogin();
     await page.waitForURL(authUrlPattern, { timeout: 15_000 }).catch(async () => {
       // Final fallback: authenticate via API to set session cookie in this context.
-      const loginResp = await page.request.post('/api/auth/login', {
+      let loginResp = await page.request.post('/api/auth/login', {
         data: { email, password },
+        timeout: 12_000,
       });
+      if (!loginResp.ok()) {
+        await page.waitForTimeout(1_000);
+        loginResp = await page.request.post('/api/auth/login', {
+          data: { email, password },
+          timeout: 12_000,
+        });
+      }
       if (!loginResp.ok()) {
         throw new Error(`Login failed for ${email}. Current URL: ${page.url()}`);
       }

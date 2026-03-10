@@ -44,7 +44,12 @@ export class FantasyLeague {
   @Column({ type: 'varchar', length: 10, default: '2025' })
   season: string;
 
-  @Column({ name: 'league_id', type: 'int', default: 39, comment: 'Football API league ID' })
+  @Column({
+    name: 'league_id',
+    type: 'int',
+    default: 39,
+    comment: 'Football API league ID',
+  })
   leagueId: number;
 
   @OneToMany(() => FantasyTeam, (t) => t.league)
@@ -82,7 +87,13 @@ export class FantasyTeam {
   @Column({ name: 'fantasy_league_id' })
   leagueId: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 100.0, comment: 'Budget in millions' })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 100.0,
+    comment: 'Budget in millions',
+  })
   budget: number;
 
   @Column({ name: 'total_points', type: 'int', default: 0 })
@@ -116,7 +127,11 @@ export class FantasyRoster {
   @Column({ name: 'fantasy_team_id' })
   fantasyTeamId: number;
 
-  @Column({ name: 'player_id', type: 'int', comment: 'References Player entity id' })
+  @Column({
+    name: 'player_id',
+    type: 'int',
+    comment: 'References Player entity id',
+  })
   playerId: number;
 
   @Column({ type: 'varchar', length: 5 })
@@ -128,10 +143,21 @@ export class FantasyRoster {
   @Column({ name: 'is_vice_captain', type: 'boolean', default: false })
   isViceCaptain: boolean;
 
-  @Column({ name: 'purchase_price', type: 'decimal', precision: 8, scale: 2, default: 0 })
+  @Column({
+    name: 'purchase_price',
+    type: 'decimal',
+    precision: 8,
+    scale: 2,
+    default: 0,
+  })
   purchasePrice: number;
 
-  @Column({ name: 'is_starter', type: 'boolean', default: true, comment: 'In starting XI vs bench' })
+  @Column({
+    name: 'is_starter',
+    type: 'boolean',
+    default: true,
+    comment: 'In starting XI vs bench',
+  })
   isStarter: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -185,7 +211,11 @@ export class FantasyPoints {
   @Column({ name: 'fantasy_team_id' })
   fantasyTeamId: number;
 
-  @Column({ name: 'player_id', type: 'int', comment: 'References Player entity id' })
+  @Column({
+    name: 'player_id',
+    type: 'int',
+    comment: 'References Player entity id',
+  })
   playerId: number;
 
   @ManyToOne(() => FantasyGameweek, (gw) => gw.points, { onDelete: 'CASCADE' })

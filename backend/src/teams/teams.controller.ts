@@ -20,9 +20,26 @@ export class TeamsController {
 
   @Get()
   @ApiOperation({ summary: 'Get teams from database (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: 'integer', example: 1, description: 'Page number (1-based)' })
-  @ApiQuery({ name: 'limit', required: false, type: 'integer', example: 20, description: 'Items per page' })
-  @ApiQuery({ name: 'search', required: false, type: 'string', description: 'Search by team name' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: 'integer',
+    example: 1,
+    description: 'Page number (1-based)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: 'integer',
+    example: 20,
+    description: 'Items per page',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: 'string',
+    description: 'Search by team name',
+  })
   @ApiResponse({
     status: 200,
     description: 'Paginated list of teams',
@@ -233,7 +250,10 @@ export class TeamsController {
     // Look up team to get externalId, then sync
     const team = await this.teamsService.findTeamById(params.teamId);
     if (!team || !team.externalId) {
-      return { message: 'Team not found or has no external ID', teamId: params.teamId };
+      return {
+        message: 'Team not found or has no external ID',
+        teamId: params.teamId,
+      };
     }
     const synced = await this.teamsService.syncTeamFromApi(team.externalId);
     return { message: 'Team synced successfully', team: synced };

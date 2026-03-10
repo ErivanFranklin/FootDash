@@ -348,33 +348,80 @@ export class PredictionStrategyService {
   ): Promise<any> {
     const query = this.performanceRepository
       .createQueryBuilder('performance')
-      .select([
-        'COUNT(*) as total_predictions',
-        'COUNT(CASE WHEN was_correct = true THEN 1 END) as correct_predictions',
-        'AVG(confidence_score) as avg_confidence',
-        'model_type',
-      ])
-      .where('evaluated_at IS NOT NULL')
-      .groupBy('model_type')
+      .where('performance.evaluatedAt IS NOT NULL')
+      .orderBy('performance.predictedAt', 'DESC')
       .limit(limit);
 
     if (strategy) {
-      query.andWhere('model_type = :strategy', { strategy });
+      query.andWhere('performance.modelType = :strategy', { strategy });
     }
 
-    const results = await query.getRawMany();
+    const rows = await query.getMany();
 
-    return results.map((result) => ({
-      model_type: result.model_type,
-      total_predictions: parseInt(result.total_predictions),
-      correct_predictions: parseInt(result.correct_predictions || 0),
-      accuracy:
-        result.total_predictions > 0
-          ? (parseInt(result.correct_predictions || 0) /
-              parseInt(result.total_predictions)) *
-            100
-          : 0,
-      avg_confidence: parseFloat(result.avg_confidence || 0),
-    }));
+    if (!rows.length) {
+      return {
+        totalPredictions: 0,
+        correct: 0,
+        incorrect: 0,
+        accuracy: 0,
+        byStrategy: [],
+        trend: [],
+      };
+    }
+
+    const totalPredictions = rows.length;
+    const correct = rows.filter((r) => !!r.wasCorrect).length;
+    const incorrect = totalPredictions - correct;
+    const accuracy =
+      totalPredictions > 0 ? (correct / totalPredictions) * 100 : 0;
+
+    const byStrategyMap = new Map<string, { total: number; correct: number }>();
+    for (const row of rows) {
+      const key = row.modelType || 'unknown';
+      const cur = byStrategyMap.get(key) || { total: 0, correct: 0 };
+      cur.total += 1;
+      if (row.wasCorrect) cur.correct += 1;
+      byStrategyMap.set(key, cur);
+    }
+
+    const byStrategy = Array.from(byStrategyMap.entries()).map(
+      ([name, data]) => ({
+        name,
+        total: data.total,
+        accuracy: data.total > 0 ? (data.correct / data.total) * 100 : 0,
+      }),
+    );
+
+    const trendBuckets = new Map<string, { total: number; correct: number }>();
+    for (const row of rows) {
+      const d = row.predictedAt ? new Date(row.predictedAt) : new Date();
+      const weekStart = new Date(d);
+      const day = weekStart.getDay();
+      const diff = (day + 6) % 7;
+      weekStart.setDate(weekStart.getDate() - diff);
+      weekStart.setHours(0, 0, 0, 0);
+      const key = weekStart.toISOString().slice(0, 10);
+      const cur = trendBuckets.get(key) || { total: 0, correct: 0 };
+      cur.total += 1;
+      if (row.wasCorrect) cur.correct += 1;
+      trendBuckets.set(key, cur);
+    }
+
+    const trend = Array.from(trendBuckets.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-8)
+      .map(([period, data]) => ({
+        period,
+        accuracy: data.total > 0 ? (data.correct / data.total) * 100 : 0,
+      }));
+
+    return {
+      totalPredictions,
+      correct,
+      incorrect,
+      accuracy,
+      byStrategy,
+      trend,
+    };
   }
 }

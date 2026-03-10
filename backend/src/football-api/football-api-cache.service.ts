@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
@@ -12,13 +17,13 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
 
   /** TTL presets (seconds) */
   static readonly TTL = {
-    TEAM_INFO: 86_400,       // 24 hours – team metadata rarely changes
-    TEAM_STATS: 3_600,       // 1 hour
-    FIXTURES_RECENT: 300,    // 5 minutes – scores may update
+    TEAM_INFO: 86_400, // 24 hours – team metadata rarely changes
+    TEAM_STATS: 3_600, // 1 hour
+    FIXTURES_RECENT: 300, // 5 minutes – scores may update
     FIXTURES_UPCOMING: 1_800, // 30 minutes
-    FIXTURES_ALL: 600,       // 10 minutes
-    MATCH_LIVE: 30,          // 30 seconds for live matches
-    MATCH_FINISHED: 86_400,  // 24 hours for finished matches
+    FIXTURES_ALL: 600, // 10 minutes
+    MATCH_LIVE: 30, // 30 seconds for live matches
+    MATCH_FINISHED: 86_400, // 24 hours for finished matches
   } as const;
 
   constructor(private readonly config: ConfigService) {
@@ -31,7 +36,8 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
         lazyConnect: true,
         connectTimeout: this.connectTimeoutMs,
         maxRetriesPerRequest: 2,
-        retryStrategy: (times) => (times > 3 ? null : Math.min(times * 200, 2000)),
+        retryStrategy: (times) =>
+          times > 3 ? null : Math.min(times * 200, 2000),
       });
     }
   }
@@ -47,7 +53,12 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
         this.redis.connect(),
         new Promise((_, reject) => {
           setTimeout(
-            () => reject(new Error(`Redis cache connect timeout after ${this.connectTimeoutMs}ms`)),
+            () =>
+              reject(
+                new Error(
+                  `Redis cache connect timeout after ${this.connectTimeoutMs}ms`,
+                ),
+              ),
             this.connectTimeoutMs,
           );
         }),
@@ -119,7 +130,9 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
       const keys = await this.redis.keys(`footdash:api:${pattern}`);
       if (keys.length > 0) {
         await this.redis.del(...keys);
-        this.logger.debug(`Cache invalidated ${keys.length} keys for pattern: ${pattern}`);
+        this.logger.debug(
+          `Cache invalidated ${keys.length} keys for pattern: ${pattern}`,
+        );
       }
       return keys.length;
     } catch (err: any) {
@@ -134,7 +147,11 @@ export class FootballApiCacheService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** Get cache stats for monitoring */
-  async getStats(): Promise<{ available: boolean; keys?: number; memory?: string }> {
+  async getStats(): Promise<{
+    available: boolean;
+    keys?: number;
+    memory?: string;
+  }> {
     if (!this.redis) return { available: false };
     try {
       const info = await this.redis.info('memory');

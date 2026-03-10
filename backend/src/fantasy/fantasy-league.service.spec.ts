@@ -60,13 +60,18 @@ describe('FantasyLeagueService', () => {
 
   describe('createLeague', () => {
     it('creates a league with an 8-char alphanumeric invite code', async () => {
-      const savedLeague = { id: 10, name: 'Test League', inviteCode: 'XXXXXXXX' };
+      const savedLeague = {
+        id: 10,
+        name: 'Test League',
+        inviteCode: 'XXXXXXXX',
+      };
       leagueRepo.save.mockResolvedValue(savedLeague);
       teamRepo.save.mockResolvedValue({ id: 1 });
       teamRepo.create.mockReturnValue({ id: 1 });
 
       const result = await service.createLeague(1, { name: 'Test League' });
-      const created = leagueRepo.create.mock.calls[0][0] as Partial<FantasyLeague>;
+      const created = leagueRepo.create.mock
+        .calls[0][0] as Partial<FantasyLeague>;
 
       expect(result).toBeDefined();
       expect(created.inviteCode).toMatch(/^[A-Z2-9]{8}$/);
@@ -78,7 +83,8 @@ describe('FantasyLeagueService', () => {
       teamRepo.create.mockReturnValue({});
 
       await service.createLeague(42, { name: 'My League' });
-      const created = leagueRepo.create.mock.calls[0][0] as Partial<FantasyLeague>;
+      const created = leagueRepo.create.mock
+        .calls[0][0] as Partial<FantasyLeague>;
 
       expect(created.ownerId).toBe(42);
     });
@@ -89,7 +95,8 @@ describe('FantasyLeagueService', () => {
       teamRepo.create.mockReturnValue({});
 
       await service.createLeague(1, { name: 'League' });
-      const created = leagueRepo.create.mock.calls[0][0] as Partial<FantasyLeague>;
+      const created = leagueRepo.create.mock
+        .calls[0][0] as Partial<FantasyLeague>;
 
       expect(created.maxMembers).toBe(20);
     });
@@ -100,7 +107,8 @@ describe('FantasyLeagueService', () => {
       teamRepo.create.mockReturnValue({});
 
       await service.createLeague(1, { name: 'Big League', maxMembers: 50 });
-      const created = leagueRepo.create.mock.calls[0][0] as Partial<FantasyLeague>;
+      const created = leagueRepo.create.mock
+        .calls[0][0] as Partial<FantasyLeague>;
 
       expect(created.maxMembers).toBe(50);
     });
@@ -126,30 +134,57 @@ describe('FantasyLeagueService', () => {
   describe('joinLeague', () => {
     it('throws NotFoundException when invite code does not exist', async () => {
       leagueRepo.findOne.mockResolvedValue(null);
-      await expect(service.joinLeague(2, 'BADCODE1')).rejects.toThrow(NotFoundException);
+      await expect(service.joinLeague(2, 'BADCODE1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('throws BadRequestException when league status is not draft', async () => {
-      leagueRepo.findOne.mockResolvedValue({ id: 1, status: 'active', teams: [], maxMembers: 20 });
-      await expect(service.joinLeague(2, 'ANYCODE1')).rejects.toThrow(BadRequestException);
+      leagueRepo.findOne.mockResolvedValue({
+        id: 1,
+        status: 'active',
+        teams: [],
+        maxMembers: 20,
+      });
+      await expect(service.joinLeague(2, 'ANYCODE1')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('throws BadRequestException when league is full', async () => {
-      const teams = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, userId: i + 1 }));
-      leagueRepo.findOne.mockResolvedValue({ id: 1, status: 'draft', teams, maxMembers: 20 });
-      await expect(service.joinLeague(99, 'FULLCODE')).rejects.toThrow(BadRequestException);
+      const teams = Array.from({ length: 20 }, (_, i) => ({
+        id: i + 1,
+        userId: i + 1,
+      }));
+      leagueRepo.findOne.mockResolvedValue({
+        id: 1,
+        status: 'draft',
+        teams,
+        maxMembers: 20,
+      });
+      await expect(service.joinLeague(99, 'FULLCODE')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('throws BadRequestException when user is already in the league', async () => {
       leagueRepo.findOne.mockResolvedValue({
-        id: 1, status: 'draft', teams: [{ id: 1, userId: 5 }], maxMembers: 20,
+        id: 1,
+        status: 'draft',
+        teams: [{ id: 1, userId: 5 }],
+        maxMembers: 20,
       });
-      await expect(service.joinLeague(5, 'DUPEUSER')).rejects.toThrow(BadRequestException);
+      await expect(service.joinLeague(5, 'DUPEUSER')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('creates a team for the joining user', async () => {
       leagueRepo.findOne.mockResolvedValue({
-        id: 1, status: 'draft', teams: [], maxMembers: 20,
+        id: 1,
+        status: 'draft',
+        teams: [],
+        maxMembers: 20,
       });
       teamRepo.create.mockReturnValue({ userId: 2, leagueId: 1 });
       teamRepo.save.mockResolvedValue({ id: 99, userId: 2, leagueId: 1 });
@@ -206,7 +241,8 @@ describe('FantasyLeagueService', () => {
   describe('entity mappings', () => {
     it('maps FantasyLeague.leagueId to league_id column', () => {
       const metadata = getMetadataArgsStorage().columns.find(
-        (col) => col.target === FantasyLeague && col.propertyName === 'leagueId',
+        (col) =>
+          col.target === FantasyLeague && col.propertyName === 'leagueId',
       );
 
       expect(metadata?.options?.name).toBe('league_id');
@@ -218,7 +254,9 @@ describe('FantasyLeagueService', () => {
   describe('makeTransfer', () => {
     it('throws NotFoundException when team does not exist', async () => {
       teamRepo.findOne.mockResolvedValue(null);
-      await expect(service.makeTransfer(1, 1, 5, 6, 8.5)).rejects.toThrow(NotFoundException);
+      await expect(service.makeTransfer(1, 1, 5, 6, 8.5)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('throws ForbiddenException when team does not belong to user', async () => {

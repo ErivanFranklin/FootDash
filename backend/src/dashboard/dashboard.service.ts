@@ -16,7 +16,8 @@ export class DashboardService {
   ) {}
 
   async getPersonalizedDashboard(userId: number) {
-    const favoriteTeamIds = await this.favoritesService.getFavoriteTeamIds(userId);
+    const favoriteTeamIds =
+      await this.favoritesService.getFavoriteTeamIds(userId);
 
     // Load favorite teams
     let favoriteTeams: Team[] = [];

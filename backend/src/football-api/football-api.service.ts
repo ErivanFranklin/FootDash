@@ -91,7 +91,11 @@ export class FootballApiService implements FootballApiAdapter {
       },
     );
     const result = normalizeTeamInfo(resp as ApiResponse<FootballTeamInfo[]>);
-    await this.cache.set(cacheKey, result, FootballApiCacheService.TTL.TEAM_INFO);
+    await this.cache.set(
+      cacheKey,
+      result,
+      FootballApiCacheService.TTL.TEAM_INFO,
+    );
     return result;
   }
 
@@ -109,7 +113,10 @@ export class FootballApiService implements FootballApiAdapter {
         lineups: [],
       } as any;
     }
-    const cacheKey = this.cache.buildKey('team-stats', params as unknown as Record<string, unknown>);
+    const cacheKey = this.cache.buildKey(
+      'team-stats',
+      params as unknown as Record<string, unknown>,
+    );
     const cached = await this.cache.get(cacheKey);
     if (cached) return cached;
 
@@ -122,7 +129,11 @@ export class FootballApiService implements FootballApiAdapter {
       },
     );
     const result = normalizeTeamStats(resp as ApiResponse<FootballTeamStats>);
-    await this.cache.set(cacheKey, result, FootballApiCacheService.TTL.TEAM_STATS);
+    await this.cache.set(
+      cacheKey,
+      result,
+      FootballApiCacheService.TTL.TEAM_STATS,
+    );
     return result;
   }
 
@@ -187,9 +198,7 @@ export class FootballApiService implements FootballApiAdapter {
     // Free plan does not support "last" / "next" params – retry without them
     const raw = resp as any;
     const hasPlanError =
-      raw?.errors &&
-      typeof raw.errors === 'object' &&
-      'plan' in raw.errors;
+      raw?.errors && typeof raw.errors === 'object' && 'plan' in raw.errors;
     if (hasPlanError && (params.last || params.next)) {
       this.logger.warn(
         'Free plan limitation detected – retrying without last/next params',
@@ -315,10 +324,16 @@ export class FootballApiService implements FootballApiAdapter {
         },
       }));
 
-      await this.cache.set(cacheKey, result, FootballApiCacheService.TTL.MATCH_FINISHED);
+      await this.cache.set(
+        cacheKey,
+        result,
+        FootballApiCacheService.TTL.MATCH_FINISHED,
+      );
       return result;
     } catch (error) {
-      this.logger.warn(`Failed to fetch lineups for fixture ${fixtureId}: ${(error as Error).message}`);
+      this.logger.warn(
+        `Failed to fetch lineups for fixture ${fixtureId}: ${(error as Error).message}`,
+      );
       return [];
     }
   }
@@ -391,12 +406,18 @@ export class FootballApiService implements FootballApiAdapter {
     if (cached) return cached;
 
     try {
-      const data = await this.makeRequest<ApiResponse<any>>('standings', { league: leagueId, season });
-      const standings = (data as any).response?.[0]?.league?.standings?.[0] ?? [];
+      const data = await this.makeRequest<ApiResponse<any>>('standings', {
+        league: leagueId,
+        season,
+      });
+      const standings =
+        (data as any).response?.[0]?.league?.standings?.[0] ?? [];
       await this.cache.set(cacheKey, standings, 3600); // 1h
       return standings;
     } catch (error) {
-      this.logger.warn(`Failed to fetch standings for league ${leagueId}: ${(error as Error).message}`);
+      this.logger.warn(
+        `Failed to fetch standings for league ${leagueId}: ${(error as Error).message}`,
+      );
       return this.getMockStandings(leagueId);
     }
   }
@@ -404,7 +425,11 @@ export class FootballApiService implements FootballApiAdapter {
   /**
    * Get fixtures for a specific league, season and optionally a round.
    */
-  async getLeagueFixtures(leagueId: number, season: number, round?: string): Promise<any[]> {
+  async getLeagueFixtures(
+    leagueId: number,
+    season: number,
+    round?: string,
+  ): Promise<any[]> {
     if (this.mock) return this.getMockLeagueFixtures(leagueId);
 
     const cacheKey = `league_fixtures:${leagueId}:${season}:${round ?? 'all'}`;
@@ -412,27 +437,54 @@ export class FootballApiService implements FootballApiAdapter {
     if (cached) return cached;
 
     try {
-      const params: Record<string, string | number> = { league: leagueId, season };
+      const params: Record<string, string | number> = {
+        league: leagueId,
+        season,
+      };
       if (round) params.round = round;
       const data = await this.makeRequest<ApiResponse<any>>('fixtures', params);
       const fixtures = (data as any).response ?? [];
       await this.cache.set(cacheKey, fixtures, 1800); // 30m
       return fixtures;
     } catch (error) {
-      this.logger.warn(`Failed to fetch league fixtures: ${(error as Error).message}`);
+      this.logger.warn(
+        `Failed to fetch league fixtures: ${(error as Error).message}`,
+      );
       return this.getMockLeagueFixtures(leagueId);
     }
   }
 
-  private getMockLeagues(_country?: string): any[] {
+  private getMockLeagues(country?: string): any[] {
+    void country;
     return [
-      { league: { id: 39, name: 'Premier League', type: 'League', logo: null }, country: { name: 'England', code: 'GB', flag: null } },
-      { league: { id: 140, name: 'La Liga', type: 'League', logo: null }, country: { name: 'Spain', code: 'ES', flag: null } },
-      { league: { id: 135, name: 'Serie A', type: 'League', logo: null }, country: { name: 'Italy', code: 'IT', flag: null } },
-      { league: { id: 78, name: 'Bundesliga', type: 'League', logo: null }, country: { name: 'Germany', code: 'DE', flag: null } },
-      { league: { id: 61, name: 'Ligue 1', type: 'League', logo: null }, country: { name: 'France', code: 'FR', flag: null } },
-      { league: { id: 2, name: 'Champions League', type: 'Cup', logo: null }, country: { name: 'World', code: null, flag: null } },
-      { league: { id: 3, name: 'Europa League', type: 'Cup', logo: null }, country: { name: 'World', code: null, flag: null } },
+      {
+        league: { id: 39, name: 'Premier League', type: 'League', logo: null },
+        country: { name: 'England', code: 'GB', flag: null },
+      },
+      {
+        league: { id: 140, name: 'La Liga', type: 'League', logo: null },
+        country: { name: 'Spain', code: 'ES', flag: null },
+      },
+      {
+        league: { id: 135, name: 'Serie A', type: 'League', logo: null },
+        country: { name: 'Italy', code: 'IT', flag: null },
+      },
+      {
+        league: { id: 78, name: 'Bundesliga', type: 'League', logo: null },
+        country: { name: 'Germany', code: 'DE', flag: null },
+      },
+      {
+        league: { id: 61, name: 'Ligue 1', type: 'League', logo: null },
+        country: { name: 'France', code: 'FR', flag: null },
+      },
+      {
+        league: { id: 2, name: 'Champions League', type: 'Cup', logo: null },
+        country: { name: 'World', code: null, flag: null },
+      },
+      {
+        league: { id: 3, name: 'Europa League', type: 'Cup', logo: null },
+        country: { name: 'World', code: null, flag: null },
+      },
     ];
   }
 
@@ -443,14 +495,27 @@ export class FootballApiService implements FootballApiAdapter {
       team: { id: leagueId * 100 + idx, name, logo: null },
       points: 30 - idx * 3,
       goalsDiff: 15 - idx * 4,
-      all: { played: 15, win: 10 - idx, draw: idx, lose: 5 - (4 - idx), goals: { for: 25 - idx * 2, against: 10 + idx * 2 } },
+      all: {
+        played: 15,
+        win: 10 - idx,
+        draw: idx,
+        lose: 5 - (4 - idx),
+        goals: { for: 25 - idx * 2, against: 10 + idx * 2 },
+      },
     }));
   }
 
   private getMockLeagueFixtures(leagueId: number): any[] {
     return Array.from({ length: 5 }, (_, i) => ({
-      fixture: { id: leagueId * 1000 + i, date: new Date().toISOString(), status: { short: 'NS' } },
-      teams: { home: { id: leagueId * 10 + i, name: `Home ${i + 1}` }, away: { id: leagueId * 10 + i + 5, name: `Away ${i + 1}` } },
+      fixture: {
+        id: leagueId * 1000 + i,
+        date: new Date().toISOString(),
+        status: { short: 'NS' },
+      },
+      teams: {
+        home: { id: leagueId * 10 + i, name: `Home ${i + 1}` },
+        away: { id: leagueId * 10 + i + 5, name: `Away ${i + 1}` },
+      },
       goals: { home: null, away: null },
     }));
   }

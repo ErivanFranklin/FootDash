@@ -26,7 +26,10 @@ export class PaymentsController {
     private readonly paymentsService: PaymentsService,
     private readonly configService: ConfigService,
   ) {
-    this.defaultPriceId = this.configService.get<string>('STRIPE_PRO_PRICE_ID', '');
+    this.defaultPriceId = this.configService.get<string>(
+      'STRIPE_PRO_PRICE_ID',
+      '',
+    );
   }
 
   @ApiBearerAuth('JWT-auth')

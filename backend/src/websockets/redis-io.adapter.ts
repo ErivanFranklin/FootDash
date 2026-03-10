@@ -34,7 +34,12 @@ export class RedisIoAdapter extends IoAdapter {
         operation,
         new Promise<T>((_, reject) => {
           setTimeout(
-            () => reject(new Error(`Redis connect timeout after ${this.connectTimeoutMs}ms`)),
+            () =>
+              reject(
+                new Error(
+                  `Redis connect timeout after ${this.connectTimeoutMs}ms`,
+                ),
+              ),
             this.connectTimeoutMs,
           );
         }),

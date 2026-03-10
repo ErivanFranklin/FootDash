@@ -58,7 +58,7 @@ export class MatchPredictionService {
     // Fetch the match
     const match = await this.matchRepository.findOne({
       where: { id: matchId },
-      relations: ['homeTeam', 'awayTeam', 'league'],
+      relations: ['homeTeam', 'awayTeam'],
     });
 
     if (!match) {
@@ -368,7 +368,7 @@ export class MatchPredictionService {
   async getMatchDataForPrediction(matchId: number) {
     const match = await this.matchRepository.findOne({
       where: { id: matchId },
-      relations: ['homeTeam', 'awayTeam', 'league'],
+      relations: ['homeTeam', 'awayTeam'],
     });
 
     if (!match) {

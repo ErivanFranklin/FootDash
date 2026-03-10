@@ -40,11 +40,9 @@ export class SearchService {
       ]);
 
       // Merge and sort by score
-      const merged = [
-        ...teams.items,
-        ...users.items,
-        ...matches.items,
-      ].sort((a, b) => b.score - a.score);
+      const merged = [...teams.items, ...users.items, ...matches.items].sort(
+        (a, b) => b.score - a.score,
+      );
 
       total = teams.total + users.total + matches.total;
       results = merged.slice(offset, offset + limit);
@@ -155,7 +153,7 @@ export class SearchService {
         const score =
           m.homeScore != null && m.awayScore != null
             ? `${m.homeScore} - ${m.awayScore}`
-            : m.status ?? 'Scheduled';
+            : (m.status ?? 'Scheduled');
         return {
           id: m.id,
           type: 'match' as const,

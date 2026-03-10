@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { FeedService } from './feed.service';
-import { UserActivity, ActivityTargetType } from '../entities/user-activity.entity';
+import {
+  UserActivity,
+  ActivityTargetType,
+} from '../entities/user-activity.entity';
 import { Follow } from '../entities/follow.entity';
 
 const createMockQB = (results: any[], total = results.length) => ({
@@ -35,7 +38,10 @@ describe('FeedService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FeedService,
-        { provide: getRepositoryToken(UserActivity), useFactory: mockActivityRepo },
+        {
+          provide: getRepositoryToken(UserActivity),
+          useFactory: mockActivityRepo,
+        },
         { provide: getRepositoryToken(Follow), useFactory: mockFollowRepo },
       ],
     }).compile();
@@ -69,7 +75,10 @@ describe('FeedService', () => {
       const mockQB = createMockQB([mockActivity], 1);
       activityRepo.createQueryBuilder.mockReturnValue(mockQB);
 
-      const result = await service.getUserFeed(1, { page: 1, limit: 20 } as any);
+      const result = await service.getUserFeed(1, {
+        page: 1,
+        limit: 20,
+      } as any);
 
       expect(followRepo.find).toHaveBeenCalledWith({
         where: { followerId: 1 },
@@ -85,7 +94,10 @@ describe('FeedService', () => {
       const mockQB = createMockQB([], 0);
       activityRepo.createQueryBuilder.mockReturnValue(mockQB);
 
-      const result = await service.getUserFeed(99, { page: 1, limit: 20 } as any);
+      const result = await service.getUserFeed(99, {
+        page: 1,
+        limit: 20,
+      } as any);
 
       expect(result.total).toBe(0);
       expect(result.activities).toHaveLength(0);
@@ -106,7 +118,10 @@ describe('FeedService', () => {
       const mockQB = createMockQB(items, 25); // 25 total, 10 returned
       activityRepo.createQueryBuilder.mockReturnValue(mockQB);
 
-      const result = await service.getUserFeed(1, { page: 1, limit: 10 } as any);
+      const result = await service.getUserFeed(1, {
+        page: 1,
+        limit: 10,
+      } as any);
 
       expect(result.hasMore).toBe(true);
       expect(result.total).toBe(25);

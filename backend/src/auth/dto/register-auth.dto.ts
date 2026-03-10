@@ -8,7 +8,11 @@ export class RegisterAuthDto {
     example: 'user@example.com',
     format: 'email',
   })
-  @Transform(({ value }) => String(value ?? '').trim().toLowerCase())
+  @Transform(({ value }) =>
+    String(value ?? '')
+      .trim()
+      .toLowerCase(),
+  )
   @IsEmail()
   email!: string;
 

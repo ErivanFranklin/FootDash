@@ -11,6 +11,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { LoggerService } from '../../../core/services/logger.service';
 import { TeamAnalyticsCardComponent } from '../../../components/team-analytics-card/team-analytics-card.component';
 import { AnalyticsService } from '../../../services/analytics.service';
+import { environment } from '../../../../environments/environment';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -82,6 +83,7 @@ export class MatchPredictionPage implements OnInit, AfterViewInit, OnDestroy {
   bttsNo = 0;
   over25 = 0;
   under25 = 0;
+  isFallbackMatch = false;
   private h2hChart: Chart | null = null;
   private viewReady = false;
 
@@ -101,10 +103,19 @@ export class MatchPredictionPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadPredictionProbabilities() {
+    if (this.shouldUseFallback(this.matchId)) {
+      this.bttsYes = 58;
+      this.bttsNo = 42;
+      this.over25 = 64;
+      this.under25 = 36;
+      this.probabilitiesLoading = false;
+      return;
+    }
+
     this.probabilitiesLoading = true;
     forkJoin({
-      btts: this.analyticsService.getBttsPrediction(this.matchId),
-      overUnder: this.analyticsService.getOverUnderPrediction(this.matchId),
+      btts: this.analyticsService.getBttsPrediction(this.matchId).pipe(catchError(() => of(null))),
+      overUnder: this.analyticsService.getOverUnderPrediction(this.matchId).pipe(catchError(() => of(null))),
     }).subscribe({
       next: (payload: any) => {
         this.bttsYes = this.asPercent(payload?.btts?.btts_yes_probability ?? 0);
@@ -126,8 +137,25 @@ export class MatchPredictionPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadMatch() {
+    if (this.shouldUseFallback(this.matchId)) {
+      const fallback = this.getFallbackMatch(this.matchId);
+      this.isFallbackMatch = true;
+      this.loading = false;
+      this.buildTimeline(fallback);
+      this.h2hMatches = [];
+      this.h2hHomeWins = 0;
+      this.h2hAwayWins = 0;
+      this.h2hDraws = 0;
+      this.match$ = of(fallback);
+      return;
+    }
+
     this.match$ = this.api.getMatch(this.matchId).pipe(
       map((match: any) => {
+        if (!match || !match.id) {
+          throw new Error('Match payload missing id');
+        }
+
         this.loading = false;
         const mappedMatch = {
           id: match.id,
@@ -153,9 +181,37 @@ export class MatchPredictionPage implements OnInit, AfterViewInit, OnDestroy {
       catchError((error) => {
         this.logger.error('Error loading match:', error);
         this.loading = false;
+        if (!environment.production) {
+          this.isFallbackMatch = true;
+          const fallback = this.getFallbackMatch(this.matchId);
+          this.buildTimeline(fallback);
+          this.h2hMatches = [];
+          this.h2hHomeWins = 0;
+          this.h2hAwayWins = 0;
+          this.h2hDraws = 0;
+          return of(fallback);
+        }
         return of(null);
       })
     );
+  }
+
+  private shouldUseFallback(matchId: number): boolean {
+    return !environment.production && Number(matchId) >= 900000;
+  }
+
+  private getFallbackMatch(matchId: number): Match {
+    const home = { id: 101, name: 'Lyon' };
+    const away = { id: 202, name: 'Marseille' };
+    return {
+      id: matchId,
+      homeTeam: home,
+      awayTeam: away,
+      kickOff: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      status: 'SCHEDULED',
+      homeScore: null,
+      awayScore: null,
+    };
   }
 
   private loadHeadToHead(homeTeamId: number, awayTeamId: number) {

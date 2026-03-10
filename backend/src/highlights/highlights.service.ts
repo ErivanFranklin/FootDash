@@ -27,7 +27,10 @@ export class HighlightsService {
 
   // ── Public API ───────────────────────────────────────────────────────────
 
-  async findAll(page = 1, limit = 20): Promise<{ data: Highlight[]; total: number }> {
+  async findAll(
+    page = 1,
+    limit = 20,
+  ): Promise<{ data: Highlight[]; total: number }> {
     const [data, total] = await this.repo.findAndCount({
       order: { matchDate: 'DESC', createdAt: 'DESC' },
       skip: (page - 1) * limit,
@@ -54,9 +57,12 @@ export class HighlightsService {
   async search(query: string): Promise<Highlight[]> {
     return this.repo
       .createQueryBuilder('h')
-      .where('LOWER(h.title) LIKE :q OR LOWER(h.homeTeam) LIKE :q OR LOWER(h.awayTeam) LIKE :q', {
-        q: `%${query.toLowerCase()}%`,
-      })
+      .where(
+        'LOWER(h.title) LIKE :q OR LOWER(h.homeTeam) LIKE :q OR LOWER(h.awayTeam) LIKE :q',
+        {
+          q: `%${query.toLowerCase()}%`,
+        },
+      )
       .orderBy('h.matchDate', 'DESC')
       .limit(30)
       .getMany();
@@ -75,7 +81,9 @@ export class HighlightsService {
       const videos = await this.fetchFromYouTube('football highlights');
       let imported = 0;
       for (const video of videos) {
-        const existing = await this.repo.findOneBy({ externalId: video.externalId });
+        const existing = await this.repo.findOneBy({
+          externalId: video.externalId,
+        });
         if (!existing) {
           await this.repo.save(this.repo.create(video));
           imported++;
@@ -105,7 +113,9 @@ export class HighlightsService {
       externalId: item.id.videoId,
       title: item.snippet.title,
       description: item.snippet.description,
-      thumbnailUrl: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url,
+      thumbnailUrl:
+        item.snippet.thumbnails?.high?.url ||
+        item.snippet.thumbnails?.default?.url,
       videoUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       source: 'youtube',
       matchId: 0,

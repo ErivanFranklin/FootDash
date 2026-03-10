@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import { User, UserRole } from '../users/user.entity';
@@ -77,10 +81,9 @@ export class AdminService {
         new Brackets((qb) => {
           qb.where('LOWER(user.email) LIKE :searchTerm', {
             searchTerm: `%${normalizedSearch}%`,
-          })
-            .orWhere('CAST(user.id AS TEXT) LIKE :idTerm', {
-              idTerm: `%${normalizedSearch}%`,
-            });
+          }).orWhere('CAST(user.id AS TEXT) LIKE :idTerm', {
+            idTerm: `%${normalizedSearch}%`,
+          });
         }),
       );
     }
@@ -97,7 +100,9 @@ export class AdminService {
 
     const isSuperAdmin = user.email.toLowerCase() === this.superAdminEmail;
     if (role === UserRole.ADMIN && !isSuperAdmin) {
-      throw new BadRequestException('Only the configured super admin email can have ADMIN role');
+      throw new BadRequestException(
+        'Only the configured super admin email can have ADMIN role',
+      );
     }
     if (isSuperAdmin && role !== UserRole.ADMIN) {
       throw new BadRequestException('Super admin role cannot be changed');

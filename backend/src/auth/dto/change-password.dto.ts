@@ -6,7 +6,11 @@ export class ChangePasswordDto {
   @IsString()
   currentPassword!: string;
 
-  @ApiProperty({ description: 'New password (min 8 characters)', example: 'NewStr0ng!Pass', minLength: 8 })
+  @ApiProperty({
+    description: 'New password (min 8 characters)',
+    example: 'NewStr0ng!Pass',
+    minLength: 8,
+  })
   @IsString()
   @MinLength(8)
   newPassword!: string;

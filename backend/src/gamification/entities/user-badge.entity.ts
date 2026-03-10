@@ -29,7 +29,10 @@ export class UserBadge {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Badge, (b) => b.userBadges, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Badge, (b) => b.userBadges, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'badge_id' })
   badge: Badge;
 }

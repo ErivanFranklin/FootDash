@@ -9,7 +9,7 @@ import { OfflineQueueService } from '../../core/services/offline-queue.service';
   standalone: true,
   imports: [CommonModule, IonIcon],
   template: `
-    @if (!(offlineService.isOnline$ | async)) {
+    @if ((offlineService.isOnline$ | async) === false) {
       <div class="offline-banner">
         <ion-icon name="cloud-offline-outline"></ion-icon>
         <span>You're offline</span>

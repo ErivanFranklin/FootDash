@@ -10,7 +10,11 @@ export class ChatService {
     private chatRepo: Repository<ChatMsg>,
   ) {}
 
-  async saveMessage(userId: number, matchId: number, content: string): Promise<ChatMsg> {
+  async saveMessage(
+    userId: number,
+    matchId: number,
+    content: string,
+  ): Promise<ChatMsg> {
     const msg = this.chatRepo.create({
       userId,
       matchId,

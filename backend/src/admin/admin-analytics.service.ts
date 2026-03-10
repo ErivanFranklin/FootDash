@@ -43,7 +43,11 @@ export class AdminAnalyticsService {
 
     const dataMap = new Map(rows.map((r) => [r.day, Number(r.count)]));
 
-    for (let d = new Date(start); d <= today; d = new Date(d.getTime() + dayMs)) {
+    for (
+      let d = new Date(start);
+      d <= today;
+      d = new Date(d.getTime() + dayMs)
+    ) {
       const key = d.toISOString().split('T')[0];
       result.push({ date: key, count: dataMap.get(key) ?? 0 });
     }
@@ -76,7 +80,11 @@ export class AdminAnalyticsService {
 
     const dataMap = new Map(rows.map((r) => [r.day, Number(r.count)]));
 
-    for (let d = new Date(start); d <= today; d = new Date(d.getTime() + dayMs)) {
+    for (
+      let d = new Date(start);
+      d <= today;
+      d = new Date(d.getTime() + dayMs)
+    ) {
       const key = d.toISOString().split('T')[0];
       result.push({ date: key, count: dataMap.get(key) ?? 0 });
     }
@@ -94,10 +102,7 @@ export class AdminAnalyticsService {
         .createQueryBuilder('pp')
         .select('pp.model_type', 'model_type')
         .addSelect('COUNT(*)', 'total')
-        .addSelect(
-          "COUNT(*) FILTER (WHERE pp.was_correct = true)",
-          'correct',
-        )
+        .addSelect('COUNT(*) FILTER (WHERE pp.was_correct = true)', 'correct')
         .where('pp.actual_outcome IS NOT NULL')
         .groupBy('pp.model_type')
         .getRawMany();
@@ -159,12 +164,17 @@ export class AdminAnalyticsService {
     ]);
 
     const calcChange = (curr: number, prev: number) =>
-      prev === 0 ? (curr > 0 ? 100 : 0) : Math.round(((curr - prev) / prev) * 100);
+      prev === 0
+        ? curr > 0
+          ? 100
+          : 0
+        : Math.round(((curr - prev) / prev) * 100);
 
     return {
       totalUsers,
       totalPro,
-      proRate: totalUsers > 0 ? Math.round((totalPro / totalUsers) * 10000) / 100 : 0,
+      proRate:
+        totalUsers > 0 ? Math.round((totalPro / totalUsers) * 10000) / 100 : 0,
       newUsers30d: newUsersCurrent,
       newUsersChange: calcChange(newUsersCurrent, newUsersPrevious),
       activeUsers30d: activeUsersCurrent,

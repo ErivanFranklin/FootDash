@@ -22,7 +22,9 @@ const mockRepo = () => ({
   })),
 });
 
-const mockHttpService = () => ({ get: jest.fn().mockReturnValue({ pipe: jest.fn() }) });
+const mockHttpService = () => ({
+  get: jest.fn().mockReturnValue({ pipe: jest.fn() }),
+});
 const mockConfigService = () => ({
   get: jest.fn((key: string) => {
     if (key === 'YOUTUBE_API_KEY') return undefined; // mock mode
@@ -99,7 +101,6 @@ describe('HighlightsService', () => {
 
   describe('search', () => {
     it('builds a query with LIKE filter on title, homeTeam, awayTeam', async () => {
-      const qb = repo.createQueryBuilder();
       repo.createQueryBuilder.mockReturnValue({
         where: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),

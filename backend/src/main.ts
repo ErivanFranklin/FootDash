@@ -21,7 +21,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-  
+
   app.setGlobalPrefix('api'); // Standardize all endpoints under /api/*
 
   app.use(cookieParser());
@@ -49,7 +49,10 @@ async function bootstrap() {
     await Promise.race([
       redisAdapter.connectToRedis(),
       new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Redis websocket adapter init timeout')), 3000);
+        setTimeout(
+          () => reject(new Error('Redis websocket adapter init timeout')),
+          3000,
+        );
       }),
     ]);
   } catch (error) {
@@ -132,7 +135,9 @@ async function bootstrap() {
   const port = Number(process.env.PORT) || 3000;
   console.log(`[STARTUP] Starting server on port ${port}...`);
   await app.listen(port);
-  console.log(`[STARTUP] ✅ Application is running on: http://localhost:${port}`);
+  console.log(
+    `[STARTUP] ✅ Application is running on: http://localhost:${port}`,
+  );
   console.log(
     `[STARTUP] ✅ Swagger documentation available at: http://localhost:${port}/api`,
   );

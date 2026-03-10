@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -167,10 +167,8 @@ export class LeagueStandingsPage implements OnInit, AfterViewInit, OnDestroy {
   private goalsChart: Chart | null = null;
   private viewReady = false;
 
-  constructor(
-    private route: ActivatedRoute,
-    private http: HttpClient,
-  ) {}
+  private readonly route = inject(ActivatedRoute);
+  private readonly http = inject(HttpClient);
 
   ngOnInit() {
     this.leagueId = Number(this.route.snapshot.paramMap.get('id'));

@@ -30,14 +30,14 @@
 
       <!-- Prediction Card -->
       <app-prediction-card
-        *ngIf="match"
+        *ngIf="match && !isFallbackMatch"
         [matchId]="match.id"
         [showDetails]="true"
       ></app-prediction-card>
 
       <!-- Team Comparison -->
       <app-team-comparison
-        *ngIf="match"
+        *ngIf="match && !isFallbackMatch"
         [homeTeamId]="match.homeTeam.id"
         [awayTeamId]="match.awayTeam.id"
       ></app-team-comparison>
@@ -127,7 +127,7 @@
       </ion-card>
 
       <!-- Detailed Team Analysis -->
-      <ion-accordion-group expand="inset" class="team-details-accordion">
+      <ion-accordion-group *ngIf="!isFallbackMatch" expand="inset" class="team-details-accordion">
         <ion-accordion value="home">
           <ion-item slot="header" color="light">
             <ion-label>{{ match.homeTeam.name }} - {{ 'ANALYTICS.ANALYSIS' | transloco }}</ion-label>

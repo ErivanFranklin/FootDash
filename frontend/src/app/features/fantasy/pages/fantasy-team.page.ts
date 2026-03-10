@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
@@ -288,10 +288,10 @@ export class FantasyTeamPage implements OnInit {
 
   private apiUrl = `${environment.apiBaseUrl}/fantasy`;
 
-  constructor(
-    private http: HttpClient,
-    private route: ActivatedRoute,
-  ) {
+  private readonly http = inject(HttpClient);
+  private readonly route = inject(ActivatedRoute);
+
+  constructor() {
     addIcons({ starOutline, star, swapHorizontalOutline, footballOutline });
   }
 

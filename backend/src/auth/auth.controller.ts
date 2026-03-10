@@ -52,7 +52,11 @@ function refreshCookieOptions(isProd: boolean) {
  * sends two cookies and the backend reads the stale one first.
  */
 function clearLegacyCookies(res: Response, isProd: boolean) {
-  const base = { httpOnly: true, secure: isProd, sameSite: isProd ? 'strict' as const : 'lax' as const };
+  const base = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? ('strict' as const) : ('lax' as const),
+  };
   // Previous path values that may still be stored in the browser
   res.clearCookie('refresh_token', { ...base, path: '/api/' });
   res.clearCookie('refresh_token', { ...base, path: '/api' });
@@ -60,15 +64,24 @@ function clearLegacyCookies(res: Response, isProd: boolean) {
 
 /** Helper to attach the refresh-token cookie and return only the access token. */
 function sendWithCookie(res: Response, result: AuthResult, isProd: boolean) {
-  res.cookie('refresh_token', result.tokens.refreshToken, refreshCookieOptions(isProd));
+  res.cookie(
+    'refresh_token',
+    result.tokens.refreshToken,
+    refreshCookieOptions(isProd),
+  );
   return res.json({
     user: result.user,
     tokens: { accessToken: result.tokens.accessToken },
   });
 }
 
-function getRequestContext(req: any): { ipAddress: string | null; userAgent: string | null } {
-  const ipAddress = (req.ip || req.headers?.['x-forwarded-for'] || null) as string | null;
+function getRequestContext(req: any): {
+  ipAddress: string | null;
+  userAgent: string | null;
+} {
+  const ipAddress = (req.ip || req.headers?.['x-forwarded-for'] || null) as
+    | string
+    | null;
   const userAgent = (req.headers?.['user-agent'] || null) as string | null;
   return { ipAddress, userAgent };
 }
@@ -173,22 +186,24 @@ export class AuthController {
     const rawHeader = (req.headers?.cookie as string) || '';
     const allRefreshValues = rawHeader
       .split(';')
-      .map(c => c.trim())
-      .filter(c => c.startsWith('refresh_token='))
-      .map(c => decodeURIComponent(c.substring('refresh_token='.length)));
+      .map((c) => c.trim())
+      .filter((c) => c.startsWith('refresh_token='))
+      .map((c) => decodeURIComponent(c.substring('refresh_token='.length)));
 
     // Use the LAST raw cookie value (from the shortest/root path) rather than
     // the cookie-parser value (which is the first = most-specific-path = stale).
     const token =
       (allRefreshValues.length > 1
         ? allRefreshValues[allRefreshValues.length - 1]
-        : req.cookies?.refresh_token) ||
-      dto?.refreshToken;
+        : req.cookies?.refresh_token) || dto?.refreshToken;
 
     console.log(
-      '[Auth/refresh] cookies count:', allRefreshValues.length,
-      '| using last-value strategy:', allRefreshValues.length > 1,
-      '| has token:', !!token,
+      '[Auth/refresh] cookies count:',
+      allRefreshValues.length,
+      '| using last-value strategy:',
+      allRefreshValues.length > 1,
+      '| has token:',
+      !!token,
     );
 
     const isProd = process.env.NODE_ENV === 'production';
@@ -202,7 +217,10 @@ export class AuthController {
     }
 
     try {
-      const result = await this.authService.refresh(token, getRequestContext(req));
+      const result = await this.authService.refresh(
+        token,
+        getRequestContext(req),
+      );
       return sendWithCookie(res, result, isProd);
     } catch (error) {
       if (error instanceof UnauthorizedException) {
@@ -254,7 +272,7 @@ export class AuthController {
   ): Promise<ProfileDto> {
     const userPayload: any = req.user || {};
     const userId = userPayload.id ?? userPayload.sub;
-    
+
     // Always fetch from DB to ensure fresh subscription status (isPro)
     return this.authService.getProfile(userId);
   }
@@ -267,40 +285,64 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Change password (authenticated user)' })
   @ApiResponse({ status: 200, description: 'Password changed.' })
-  @ApiResponse({ status: 400, description: 'Current password incorrect or new password invalid.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Current password incorrect or new password invalid.',
+  })
   async changePassword(
     @Request() req: any,
     @Body() dto: ChangePasswordDto,
   ): Promise<{ message: string }> {
     const userId = req.user?.id ?? req.user?.sub;
-    await this.authService.changePassword(userId, dto.currentPassword, dto.newPassword);
+    await this.authService.changePassword(
+      userId,
+      dto.currentPassword,
+      dto.newPassword,
+    );
     return { message: 'Password changed successfully.' };
   }
 
   @Post('forgot-password')
   @Throttle({ default: { ttl: 15 * 60_000, limit: 3 } })
   @ApiOperation({ summary: 'Request a password reset email' })
-  @ApiResponse({ status: 200, description: 'If the email exists, a reset link was sent.' })
-  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
+  @ApiResponse({
+    status: 200,
+    description: 'If the email exists, a reset link was sent.',
+  })
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
     await this.authService.forgotPassword(dto);
     // Always return the same message to prevent email enumeration
-    return { message: 'If an account with that email exists, a reset link has been sent.' };
+    return {
+      message:
+        'If an account with that email exists, a reset link has been sent.',
+    };
   }
 
   @Post('reset-password')
   @Throttle({ default: { ttl: 15 * 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Reset password using the emailed token' })
-  @ApiResponse({ status: 200, description: 'Password has been reset successfully.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password has been reset successfully.',
+  })
   @ApiResponse({ status: 400, description: 'Token invalid or expired.' })
-  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
     await this.authService.resetPassword(dto);
-    return { message: 'Password has been reset successfully. You can now log in.' };
+    return {
+      message: 'Password has been reset successfully. You can now log in.',
+    };
   }
 
   @Get('2fa/status')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  async twoFactorStatus(@Request() req: any): Promise<{ enabled: boolean; recoveryCodesRemaining: number }> {
+  async twoFactorStatus(
+    @Request() req: any,
+  ): Promise<{ enabled: boolean; recoveryCodesRemaining: number }> {
     const userId = req.user?.id ?? req.user?.sub;
     return this.authService.getTwoFactorStatus(userId);
   }

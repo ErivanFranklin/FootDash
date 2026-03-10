@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -50,7 +56,15 @@ export class FantasyLeagueService {
     private readonly playersRepo: Repository<Player>,
   ) {}
 
-  async createLeague(ownerId: number, dto: { name: string; maxMembers?: number; season?: string; leagueId?: number }): Promise<FantasyLeague> {
+  async createLeague(
+    ownerId: number,
+    dto: {
+      name: string;
+      maxMembers?: number;
+      season?: string;
+      leagueId?: number;
+    },
+  ): Promise<FantasyLeague> {
     const inviteCode = this.generateInviteCode();
     const league = this.leagueRepo.create({
       name: dto.name,
@@ -65,18 +79,32 @@ export class FantasyLeagueService {
     const saved = await this.leagueRepo.save(league);
 
     await this.createTeam(ownerId, saved.id, `${dto.name} FC`);
-    this.logger.log(`Fantasy league "${dto.name}" created by user ${ownerId} (code: ${inviteCode})`);
+    this.logger.log(
+      `Fantasy league "${dto.name}" created by user ${ownerId} (code: ${inviteCode})`,
+    );
     return saved;
   }
 
   async joinLeague(userId: number, inviteCode: string): Promise<FantasyTeam> {
-    const league = await this.leagueRepo.findOne({ where: { inviteCode }, relations: ['teams'] });
+    const league = await this.leagueRepo.findOne({
+      where: { inviteCode },
+      relations: ['teams'],
+    });
     if (!league) throw new NotFoundException('League not found');
-    if (league.status !== 'draft') throw new BadRequestException('League is no longer accepting new members');
-    if (league.teams.length >= league.maxMembers) throw new BadRequestException('League is full');
-    if (league.teams.some((t) => t.userId === userId)) throw new BadRequestException('Already in this league');
+    if (league.status !== 'draft')
+      throw new BadRequestException(
+        'League is no longer accepting new members',
+      );
+    if (league.teams.length >= league.maxMembers)
+      throw new BadRequestException('League is full');
+    if (league.teams.some((t) => t.userId === userId))
+      throw new BadRequestException('Already in this league');
 
-    return this.createTeam(userId, league.id, `Team ${league.teams.length + 1}`);
+    return this.createTeam(
+      userId,
+      league.id,
+      `Team ${league.teams.length + 1}`,
+    );
   }
 
   async getMyLeagues(userId: number): Promise<FantasyLeague[]> {
@@ -87,7 +115,10 @@ export class FantasyLeagueService {
   }
 
   async getLeague(id: number): Promise<FantasyLeague> {
-    const league = await this.leagueRepo.findOne({ where: { id }, relations: ['teams', 'teams.user', 'gameweeks'] });
+    const league = await this.leagueRepo.findOne({
+      where: { id },
+      relations: ['teams', 'teams.user', 'gameweeks'],
+    });
     if (!league) throw new NotFoundException('League not found');
     return league;
   }
@@ -100,13 +131,26 @@ export class FantasyLeagueService {
     });
   }
 
-  private async createTeam(userId: number, leagueId: number, name: string): Promise<FantasyTeam> {
-    const team = this.teamRepo.create({ userId, leagueId, name, budget: 100, totalPoints: 0 });
+  private async createTeam(
+    userId: number,
+    leagueId: number,
+    name: string,
+  ): Promise<FantasyTeam> {
+    const team = this.teamRepo.create({
+      userId,
+      leagueId,
+      name,
+      budget: 100,
+      totalPoints: 0,
+    });
     return this.teamRepo.save(team);
   }
 
   async getTeam(teamId: number, userId: number): Promise<FantasyTeam> {
-    const team = await this.teamRepo.findOne({ where: { id: teamId }, relations: ['roster'] });
+    const team = await this.teamRepo.findOne({
+      where: { id: teamId },
+      relations: ['roster'],
+    });
     if (!team) throw new NotFoundException('Team not found');
     if (team.userId !== userId) throw new ForbiddenException('Not your team');
     return team;
@@ -144,13 +188,27 @@ export class FantasyLeagueService {
     };
   }
 
-  async setSquad(teamId: number, userId: number, roster: { playerId: number; position: string; purchasePrice: number; isCaptain?: boolean; isViceCaptain?: boolean }[]): Promise<FantasyRoster[]> {
+  async setSquad(
+    teamId: number,
+    userId: number,
+    roster: {
+      playerId: number;
+      position: string;
+      purchasePrice: number;
+      isCaptain?: boolean;
+      isViceCaptain?: boolean;
+    }[],
+  ): Promise<FantasyRoster[]> {
     const team = await this.getTeam(teamId, userId);
 
     const totalCost = roster.reduce((sum, r) => sum + r.purchasePrice, 0);
-    if (totalCost > team.budget) throw new BadRequestException(`Total cost (${totalCost}M) exceeds budget (${team.budget}M)`);
+    if (totalCost > team.budget)
+      throw new BadRequestException(
+        `Total cost (${totalCost}M) exceeds budget (${team.budget}M)`,
+      );
 
-    if (roster.length > 15) throw new BadRequestException('Squad cannot exceed 15 players');
+    if (roster.length > 15)
+      throw new BadRequestException('Squad cannot exceed 15 players');
 
     await this.rosterRepo.delete({ fantasyTeamId: teamId });
 
@@ -168,7 +226,13 @@ export class FantasyLeagueService {
     return this.rosterRepo.save(entries);
   }
 
-  async makeTransfer(teamId: number, userId: number, outPlayerId: number, inPlayerId: number, inPrice: number): Promise<void> {
+  async makeTransfer(
+    teamId: number,
+    userId: number,
+    outPlayerId: number,
+    inPlayerId: number,
+    inPrice: number,
+  ): Promise<void> {
     const team = await this.getTeam(teamId, userId);
 
     if (team.freeTransfersRemaining <= 0) {
@@ -177,7 +241,9 @@ export class FantasyLeagueService {
       team.freeTransfersRemaining -= 1;
     }
 
-    const outRoster = await this.rosterRepo.findOne({ where: { fantasyTeamId: teamId, playerId: outPlayerId } });
+    const outRoster = await this.rosterRepo.findOne({
+      where: { fantasyTeamId: teamId, playerId: outPlayerId },
+    });
     if (!outRoster) throw new NotFoundException('Player not in squad');
 
     const refund = outRoster.purchasePrice;
@@ -217,7 +283,11 @@ export class FantasyLeagueService {
       const id = base + i + 1;
       if (excludedIds.has(id)) continue;
 
-      const price = Number(Math.max(4.0, Math.min(15.0, budget / 12 + templates[i].delta)).toFixed(1));
+      const price = Number(
+        Math.max(4.0, Math.min(15.0, budget / 12 + templates[i].delta)).toFixed(
+          1,
+        ),
+      );
       options.push({
         playerId: id,
         name: `${position}-${id} ${templates[i].name}`,
@@ -259,7 +329,12 @@ export class FantasyLeagueService {
         teamName: p.teamName,
         price: Number(p.price),
         form: p.form,
-        trend: p.form >= 78 ? ('up' as const) : p.form <= 64 ? ('down' as const) : ('flat' as const),
+        trend:
+          p.form >= 78
+            ? ('up' as const)
+            : p.form <= 64
+              ? ('down' as const)
+              : ('flat' as const),
       }));
 
     if (fromTable.length > 0) {
@@ -269,13 +344,33 @@ export class FantasyLeagueService {
     return this.buildMockMarketOptions(teamId, position, budget, excludedIds);
   }
 
-  async createGameweek(leagueId: number, weekNumber: number, startDate: Date, endDate: Date): Promise<FantasyGameweek> {
-    const gw = this.gameweekRepo.create({ leagueId, weekNumber, startDate, endDate, status: 'upcoming' });
+  async createGameweek(
+    leagueId: number,
+    weekNumber: number,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<FantasyGameweek> {
+    const gw = this.gameweekRepo.create({
+      leagueId,
+      weekNumber,
+      startDate,
+      endDate,
+      status: 'upcoming',
+    });
     return this.gameweekRepo.save(gw);
   }
 
-  async processGameweek(gameweekId: number, playerPointsMap: Map<number, { points: number; breakdown: Record<string, number> }>): Promise<void> {
-    const gameweek = await this.gameweekRepo.findOne({ where: { id: gameweekId }, relations: ['league', 'league.teams', 'league.teams.roster'] });
+  async processGameweek(
+    gameweekId: number,
+    playerPointsMap: Map<
+      number,
+      { points: number; breakdown: Record<string, number> }
+    >,
+  ): Promise<void> {
+    const gameweek = await this.gameweekRepo.findOne({
+      where: { id: gameweekId },
+      relations: ['league', 'league.teams', 'league.teams.roster'],
+    });
     if (!gameweek) throw new NotFoundException('Gameweek not found');
     if (gameweek.processed) return;
 
@@ -316,7 +411,9 @@ export class FantasyLeagueService {
       .where('fantasy_league_id = :lid', { lid: gameweek.leagueId })
       .execute();
 
-    this.logger.log(`Gameweek ${gameweekId} processed (league ${gameweek.leagueId})`);
+    this.logger.log(
+      `Gameweek ${gameweekId} processed (league ${gameweek.leagueId})`,
+    );
   }
 
   async getGameweekResults(gameweekId: number): Promise<FantasyPoints[]> {

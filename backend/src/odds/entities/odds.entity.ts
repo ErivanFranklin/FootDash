@@ -1,32 +1,38 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'odds' })
 export class Odds {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ name: 'match_id' })
   matchId!: number;
 
-  @Column({ nullable: true })
+  @Column({ name: 'home_team', nullable: true })
   homeTeam!: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'away_team', nullable: true })
   awayTeam!: string;
 
-  @Column({ nullable: true, type: 'date' })
+  @Column({ name: 'match_date', nullable: true, type: 'date' })
   matchDate!: string;
 
   @Column()
   bookmaker!: string;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ name: 'home_win', type: 'decimal', precision: 5, scale: 2 })
   homeWin!: number;
 
   @Column({ type: 'decimal', precision: 5, scale: 2 })
   draw!: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ name: 'away_win', type: 'decimal', precision: 5, scale: 2 })
   awayWin!: number;
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
@@ -35,15 +41,27 @@ export class Odds {
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   under25!: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  @Column({
+    name: 'btts_yes',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true,
+  })
   bttsYes!: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  @Column({
+    name: 'btts_no',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true,
+  })
   bttsNo!: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 }

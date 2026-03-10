@@ -45,6 +45,8 @@ describe('DashboardChartsComponent', () => {
   };
 
   beforeEach(waitForAsync(() => {
+    mockAnalyticsService.getPredictionStats.and.returnValue(of({ totalPredictions: 15, accuracy: 72 }));
+
     TestBed.configureTestingModule({
       imports: [IonicModule.forRoot(), DashboardChartsComponent, RouterTestingModule],
       providers: [

@@ -27,7 +27,7 @@ export class AdminGuard implements CanActivate {
         user.role?.toLowerCase() === 'admin' ||
         (Array.isArray(user.roles) &&
           (user.roles.includes(UserRole.ADMIN) ||
-            user.roles.map(r => r.toLowerCase()).includes('admin'))),
+            user.roles.map((r) => r.toLowerCase()).includes('admin'))),
     );
 
     const isSuperAdminEmail =

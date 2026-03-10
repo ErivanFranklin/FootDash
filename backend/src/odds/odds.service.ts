@@ -82,14 +82,23 @@ export class OddsService {
     return valueBets.sort((a, b) => b.edge - a.edge);
   }
 
-  private extractMarkets(odds: Odds): { market: string; odds: number; impliedProb: number; modelProb: number; edge: number }[] {
+  private extractMarkets(odds: Odds): {
+    market: string;
+    odds: number;
+    impliedProb: number;
+    modelProb: number;
+    edge: number;
+  }[] {
     const results: any[] = [];
-    const total1x2 = 1 / Number(odds.homeWin) + 1 / Number(odds.draw) + 1 / Number(odds.awayWin);
+    const total1x2 =
+      1 / Number(odds.homeWin) +
+      1 / Number(odds.draw) +
+      1 / Number(odds.awayWin);
     const margin = total1x2 - 1;
 
     // Home win value
     const homeImplied = (1 / Number(odds.homeWin)) * 100;
-    const homeFair = (homeImplied / (1 + margin)) ;
+    const homeFair = homeImplied / (1 + margin);
     results.push({
       market: 'Home Win',
       odds: Number(odds.homeWin),
@@ -100,7 +109,7 @@ export class OddsService {
 
     // Draw value
     const drawImplied = (1 / Number(odds.draw)) * 100;
-    const drawFair = (drawImplied / (1 + margin));
+    const drawFair = drawImplied / (1 + margin);
     results.push({
       market: 'Draw',
       odds: Number(odds.draw),
@@ -111,7 +120,7 @@ export class OddsService {
 
     // Away win value
     const awayImplied = (1 / Number(odds.awayWin)) * 100;
-    const awayFair = (awayImplied / (1 + margin));
+    const awayFair = awayImplied / (1 + margin);
     results.push({
       market: 'Away Win',
       odds: Number(odds.awayWin),
@@ -158,14 +167,17 @@ export class OddsService {
     this.logger.log('Syncing odds from The Odds API...');
     try {
       const { data } = await firstValueFrom(
-        this.http.get('https://api.the-odds-api.com/v4/sports/soccer_epl/odds', {
-          params: {
-            apiKey: this.apiKey,
-            regions: 'uk,eu',
-            markets: 'h2h,totals',
-            oddsFormat: 'decimal',
+        this.http.get(
+          'https://api.the-odds-api.com/v4/sports/soccer_epl/odds',
+          {
+            params: {
+              apiKey: this.apiKey,
+              regions: 'uk,eu',
+              markets: 'h2h,totals',
+              oddsFormat: 'decimal',
+            },
           },
-        }),
+        ),
       );
 
       let saved = 0;
@@ -208,11 +220,76 @@ export class OddsService {
     if (count > 0) return;
 
     const mocks: Partial<Odds>[] = [
-      { matchId: 1, homeTeam: 'Arsenal', awayTeam: 'Chelsea', matchDate: '2025-02-01', bookmaker: 'Bet365', homeWin: 1.90, draw: 3.40, awayWin: 4.20, over25: 1.80, under25: 2.00, bttsYes: 1.75, bttsNo: 2.05 },
-      { matchId: 1, homeTeam: 'Arsenal', awayTeam: 'Chelsea', matchDate: '2025-02-01', bookmaker: 'William Hill', homeWin: 1.85, draw: 3.50, awayWin: 4.33, over25: 1.83, under25: 1.97, bttsYes: 1.80, bttsNo: 2.00 },
-      { matchId: 2, homeTeam: 'Liverpool', awayTeam: 'Man City', matchDate: '2025-02-02', bookmaker: 'Bet365', homeWin: 2.10, draw: 3.30, awayWin: 3.50, over25: 1.60, under25: 2.30, bttsYes: 1.65, bttsNo: 2.20 },
-      { matchId: 3, homeTeam: 'Real Madrid', awayTeam: 'Barcelona', matchDate: '2025-02-05', bookmaker: 'Betfair', homeWin: 2.30, draw: 3.20, awayWin: 3.10, over25: 1.70, under25: 2.10, bttsYes: 1.70, bttsNo: 2.10 },
-      { matchId: 4, homeTeam: 'Bayern Munich', awayTeam: 'Dortmund', matchDate: '2025-02-08', bookmaker: 'Bet365', homeWin: 1.60, draw: 4.00, awayWin: 5.50, over25: 1.55, under25: 2.40, bttsYes: 1.72, bttsNo: 2.08 },
+      {
+        matchId: 1,
+        homeTeam: 'Arsenal',
+        awayTeam: 'Chelsea',
+        matchDate: '2025-02-01',
+        bookmaker: 'Bet365',
+        homeWin: 1.9,
+        draw: 3.4,
+        awayWin: 4.2,
+        over25: 1.8,
+        under25: 2.0,
+        bttsYes: 1.75,
+        bttsNo: 2.05,
+      },
+      {
+        matchId: 1,
+        homeTeam: 'Arsenal',
+        awayTeam: 'Chelsea',
+        matchDate: '2025-02-01',
+        bookmaker: 'William Hill',
+        homeWin: 1.85,
+        draw: 3.5,
+        awayWin: 4.33,
+        over25: 1.83,
+        under25: 1.97,
+        bttsYes: 1.8,
+        bttsNo: 2.0,
+      },
+      {
+        matchId: 2,
+        homeTeam: 'Liverpool',
+        awayTeam: 'Man City',
+        matchDate: '2025-02-02',
+        bookmaker: 'Bet365',
+        homeWin: 2.1,
+        draw: 3.3,
+        awayWin: 3.5,
+        over25: 1.6,
+        under25: 2.3,
+        bttsYes: 1.65,
+        bttsNo: 2.2,
+      },
+      {
+        matchId: 3,
+        homeTeam: 'Real Madrid',
+        awayTeam: 'Barcelona',
+        matchDate: '2025-02-05',
+        bookmaker: 'Betfair',
+        homeWin: 2.3,
+        draw: 3.2,
+        awayWin: 3.1,
+        over25: 1.7,
+        under25: 2.1,
+        bttsYes: 1.7,
+        bttsNo: 2.1,
+      },
+      {
+        matchId: 4,
+        homeTeam: 'Bayern Munich',
+        awayTeam: 'Dortmund',
+        matchDate: '2025-02-08',
+        bookmaker: 'Bet365',
+        homeWin: 1.6,
+        draw: 4.0,
+        awayWin: 5.5,
+        over25: 1.55,
+        under25: 2.4,
+        bttsYes: 1.72,
+        bttsNo: 2.08,
+      },
     ];
 
     for (const mock of mocks) {

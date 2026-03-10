@@ -32,7 +32,7 @@ export class TeamAnalyticsService {
     teamId: number,
     season?: string,
   ): Promise<TeamAnalyticsData> {
-    const resolvedSeason = season || await this.resolveSeasonForTeam(teamId);
+    const resolvedSeason = season || (await this.resolveSeasonForTeam(teamId));
 
     // Check for existing analytics
     const existing = await this.analyticsRepository.findOne({
@@ -310,9 +310,13 @@ export class TeamAnalyticsService {
     // Check if the default season has matches
     const countForDefault = await this.matchRepository
       .createQueryBuilder('match')
-      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', { teamId })
+      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', {
+        teamId,
+      })
       .andWhere('match.season = :season', { season: defaultSeason })
-      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .andWhere('match.status IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT'],
+      })
       .getCount();
 
     if (countForDefault > 0) {
@@ -323,8 +327,12 @@ export class TeamAnalyticsService {
     const latestSeason = await this.matchRepository
       .createQueryBuilder('match')
       .select('match.season', 'season')
-      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', { teamId })
-      .andWhere('match.status IN (:...statuses)', { statuses: ['FINISHED', 'FT'] })
+      .where('(match.homeTeam = :teamId OR match.awayTeam = :teamId)', {
+        teamId,
+      })
+      .andWhere('match.status IN (:...statuses)', {
+        statuses: ['FINISHED', 'FT'],
+      })
       .andWhere('match.season IS NOT NULL')
       .groupBy('match.season')
       .orderBy('match.season', 'DESC')

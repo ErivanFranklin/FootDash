@@ -81,19 +81,13 @@ describe('Auth e2e (Postgres)', () => {
 
     expect(reg.body?.tokens?.accessToken).toBeDefined();
 
-    const refreshed = await agent
-      .post('/auth/refresh')
-      .expect(201);
+    const refreshed = await agent.post('/auth/refresh').expect(201);
 
     expect(refreshed.body?.tokens?.accessToken).toBeDefined();
 
-    await agent
-      .post('/auth/revoke')
-      .expect(201);
+    await agent.post('/auth/revoke').expect(201);
 
     // now the same refresh should be rejected
-    await agent
-      .post('/auth/refresh')
-      .expect(401);
+    await agent.post('/auth/refresh').expect(401);
   }, 180000);
 });

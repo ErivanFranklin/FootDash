@@ -43,11 +43,19 @@ export class AdminController {
   ) {
     const parsedLimit = Number.isFinite(Number(limit)) ? Number(limit) : 50;
     const parsedOffset = Number.isFinite(Number(offset)) ? Number(offset) : 0;
-    const parsedRole = role && ['USER', 'ADMIN', 'MODERATOR'].includes(role.toUpperCase())
-      ? (role.toUpperCase() as 'USER' | 'ADMIN' | 'MODERATOR')
-      : undefined;
-    const parsedIsPro = isPro === 'true' ? true : isPro === 'false' ? false : undefined;
-    return this.adminService.listUsers(parsedLimit, parsedOffset, search, parsedRole, parsedIsPro);
+    const parsedRole =
+      role && ['USER', 'ADMIN', 'MODERATOR'].includes(role.toUpperCase())
+        ? (role.toUpperCase() as 'USER' | 'ADMIN' | 'MODERATOR')
+        : undefined;
+    const parsedIsPro =
+      isPro === 'true' ? true : isPro === 'false' ? false : undefined;
+    return this.adminService.listUsers(
+      parsedLimit,
+      parsedOffset,
+      search,
+      parsedRole,
+      parsedIsPro,
+    );
   }
 
   @Patch('users/role')
@@ -67,17 +75,13 @@ export class AdminController {
   }
 
   @Get('analytics/registrations')
-  async getRegistrationTrend(
-    @Query('days') days?: string,
-  ) {
+  async getRegistrationTrend(@Query('days') days?: string) {
     const parsedDays = Number.isFinite(Number(days)) ? Number(days) : 30;
     return this.analyticsService.getRegistrationTrend(parsedDays);
   }
 
   @Get('analytics/active-users')
-  async getActiveUsers(
-    @Query('days') days?: string,
-  ) {
+  async getActiveUsers(@Query('days') days?: string) {
     const parsedDays = Number.isFinite(Number(days)) ? Number(days) : 30;
     return this.analyticsService.getActiveUsers(parsedDays);
   }

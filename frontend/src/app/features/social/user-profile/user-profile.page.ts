@@ -50,6 +50,7 @@ export class UserProfilePage implements OnInit, AfterViewInit, OnDestroy {
   hasMore: boolean = false;
   currentPage: number = 1;
   pageSize: number = 20;
+  profileUnavailable: boolean = false;
 
   followerCount: number = 0;
   followingCount: number = 0;
@@ -80,8 +81,12 @@ export class UserProfilePage implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.userId = +params['id'];
+      this.user = null;
+      this.profileUnavailable = false;
+      this.activities = [];
+      this.currentPage = 1;
+      this.hasMore = false;
       this.loadUserProfile();
-      this.loadActivities();
       this.loadFavoriteTeamsIfCurrentUser();
     });
   }
@@ -99,20 +104,23 @@ export class UserProfilePage implements OnInit, AfterViewInit, OnDestroy {
   private loadUserProfile() {
     this.apiService.getUserProfile(this.userId).subscribe({
       next: (profile) => {
+        this.profileUnavailable = false;
         this.user = {
           id: this.userId,
           email: profile.email || '',
           username: profile.displayName || profile.username || `user${this.userId}`,
           avatar: profile.avatarUrl || profile.avatar,
-          createdAt: profile.createdAt || new Date(),
+          createdAt: profile.joinedAt || profile.createdAt || new Date(),
           isPro: profile.isPro ?? false
         };
         this.loadFollowStats();
         this.loadUserBadges();
+        this.loadActivities();
       },
       error: (error) => {
         this.logger.error('Error loading user profile:', error);
-        // Fallback to minimal data so the page still renders
+        this.profileUnavailable = error?.status === 404;
+        // Keep a minimal header identity but avoid follow/stats requests for missing users.
         this.user = {
           id: this.userId,
           email: '',
@@ -120,8 +128,12 @@ export class UserProfilePage implements OnInit, AfterViewInit, OnDestroy {
           createdAt: new Date(),
           isPro: false
         };
-        this.loadFollowStats();
-        this.loadUserBadges();
+
+        if (!this.profileUnavailable) {
+          this.loadFollowStats();
+          this.loadUserBadges();
+          this.loadActivities();
+        }
       }
     });
   }

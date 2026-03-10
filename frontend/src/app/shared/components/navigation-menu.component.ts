@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
@@ -110,7 +110,7 @@ import {
   `],
   imports: [CommonModule, IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption, TranslocoPipe, FormsModule],
 })
-export class NavigationMenuComponent implements OnInit {
+export class NavigationMenuComponent {
   private router = inject(Router);
   private languageService = inject(LanguageService);
   private translocoService = inject(TranslocoService);
@@ -131,8 +131,6 @@ export class NavigationMenuComponent implements OnInit {
       'log-out-outline': logOutOutline
     });
   }
-
-  ngOnInit() {}
 
   get currentLang(): string {
     return this.languageService.currentLang();

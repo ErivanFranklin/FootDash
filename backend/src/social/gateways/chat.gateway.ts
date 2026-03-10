@@ -23,7 +23,10 @@ export class ChatGateway implements OnGatewayDisconnect {
   private readonly logger = new Logger(ChatGateway.name);
 
   /** Maps socket.id → { userId, matchId } */
-  private connectedUsers = new Map<string, { userId: number; matchId: number }>();
+  private connectedUsers = new Map<
+    string,
+    { userId: number; matchId: number }
+  >();
 
   constructor(private chatService: ChatService) {}
 
@@ -83,7 +86,8 @@ export class ChatGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('typing')
   handleTyping(
-    @MessageBody() payload: { matchId: number; userId: number; username: string },
+    @MessageBody()
+    payload: { matchId: number; userId: number; username: string },
     @ConnectedSocket() client: Socket,
   ) {
     const room = `match-${payload.matchId}`;

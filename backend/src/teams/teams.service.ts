@@ -72,7 +72,11 @@ export class TeamsService {
   }
 
   // Persistence helpers
-  async findAllTeams(opts?: { page?: number; limit?: number; search?: string }) {
+  async findAllTeams(opts?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) {
     const page = opts?.page ?? 1;
     const limit = opts?.limit ?? 20;
     const skip = (page - 1) * limit;

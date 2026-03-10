@@ -8,20 +8,36 @@ import { loginTestUser, waitForIonicReady, navigateTo } from './helpers';
  */
 test.describe('Phase 14: Fantasy League', () => {
   let authToken: string;
+  const seededUser = {
+    email: 'test01@test.com',
+    password: 'Password123!',
+  } as const;
 
   test.beforeEach(async ({ page }) => {
-    const { email, password } = await loginTestUser(page, {
-      email: 'test01@test.com',
-      password: 'Password123!',
-      skipRegistration: true,
+    authToken = '';
+
+    // Prefer API login first for stability under full-suite load.
+    let loginResp = await page.request.post('/api/auth/login', {
+      data: seededUser,
+      timeout: 12_000,
     });
-    // Get token for API calls
-    const loginResp = await page.request.post('/api/auth/login', {
-      data: { email, password },
-    });
+
+    if (!loginResp.ok()) {
+      await loginTestUser(page, {
+        ...seededUser,
+        skipRegistration: true,
+      });
+      loginResp = await page.request.post('/api/auth/login', {
+        data: seededUser,
+        timeout: 12_000,
+      });
+    }
+
     if (loginResp.ok()) {
       const body = await loginResp.json();
       authToken = body?.tokens?.accessToken || body?.accessToken || '';
+      await page.goto('/home');
+      await waitForIonicReady(page);
     }
   });
 

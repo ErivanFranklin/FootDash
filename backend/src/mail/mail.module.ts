@@ -23,7 +23,10 @@ import { MailService } from './mail.service';
           }),
         },
         defaults: {
-          from: config.get<string>('MAIL_FROM', '"FootDash" <noreply@footdash.app>'),
+          from: config.get<string>(
+            'MAIL_FROM',
+            '"FootDash" <noreply@footdash.app>',
+          ),
         },
       }),
     }),

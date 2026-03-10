@@ -1,4 +1,11 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch()
@@ -58,7 +65,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return 'An error occurred';
   }
 
-  private logError(exception: unknown, request: Request, errorResponse: any): void {
+  private logError(
+    exception: unknown,
+    request: Request,
+    errorResponse: any,
+  ): void {
     const { method, url, body, query, params, headers } = request;
     const userAgent = headers['user-agent'] || 'Unknown';
     const ip = headers['x-forwarded-for'] || request.ip || 'Unknown';
@@ -93,9 +104,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (!body) return body;
 
     const sanitized = { ...body };
-    const sensitiveFields = ['password', 'token', 'accessToken', 'refreshToken', 'secret'];
+    const sensitiveFields = [
+      'password',
+      'token',
+      'accessToken',
+      'refreshToken',
+      'secret',
+    ];
 
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
         sanitized[field] = '***REDACTED***';
       }
