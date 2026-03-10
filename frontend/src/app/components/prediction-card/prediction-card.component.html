@@ -44,7 +44,7 @@
             <span *ngSwitchCase="'draw'">{{ 'PREDICTION.DRAW' | transloco }}</span>
           </ng-container>
         </p>
-        <p class="probability-text">{{ outcome.probability.toFixed(1) }}%</p>
+        <p class="probability-text">{{ formatPercent(outcome.probability) }}</p>
       </div>
 
       <!-- Detailed Probabilities -->
@@ -52,28 +52,28 @@
         <div class="probability-item">
           <span class="label">{{ prediction.homeTeam }} ({{ 'PREDICTION.WIN' | transloco }})</span>
           <ion-progress-bar
-            [value]="prediction.homeWinProbability / 100"
+            [value]="progressValue(prediction.homeWinProbability)"
             color="success"
           ></ion-progress-bar>
-          <span class="value">{{ prediction.homeWinProbability.toFixed(1) }}%</span>
+          <span class="value">{{ formatPercent(prediction.homeWinProbability) }}</span>
         </div>
 
         <div class="probability-item">
           <span class="label">{{ 'PREDICTION.DRAW' | transloco }}</span>
           <ion-progress-bar
-            [value]="prediction.drawProbability / 100"
+            [value]="progressValue(prediction.drawProbability)"
             color="warning"
           ></ion-progress-bar>
-          <span class="value">{{ prediction.drawProbability.toFixed(1) }}%</span>
+          <span class="value">{{ formatPercent(prediction.drawProbability) }}</span>
         </div>
 
         <div class="probability-item">
           <span class="label">{{ prediction.awayTeam }} ({{ 'PREDICTION.WIN' | transloco }})</span>
           <ion-progress-bar
-            [value]="prediction.awayWinProbability / 100"
+            [value]="progressValue(prediction.awayWinProbability)"
             color="danger"
           ></ion-progress-bar>
-          <span class="value">{{ prediction.awayWinProbability.toFixed(1) }}%</span>
+          <span class="value">{{ formatPercent(prediction.awayWinProbability) }}</span>
         </div>
       </div>
 
@@ -95,13 +95,13 @@
             <ion-col size="6" *ngIf="prediction.metadata.homeFormRating !== undefined">
               <div class="stat">
                 <div class="stat-label">{{ prediction.homeTeam }} Form</div>
-                <div class="stat-value">{{ prediction.metadata.homeFormRating.toFixed(0) }}/100</div>
+                <div class="stat-value">{{ formatWhole(prediction.metadata.homeFormRating) }}/100</div>
               </div>
             </ion-col>
             <ion-col size="6" *ngIf="prediction.metadata.awayFormRating !== undefined">
               <div class="stat">
                 <div class="stat-label">{{ prediction.awayTeam }} Form</div>
-                <div class="stat-value">{{ prediction.metadata.awayFormRating.toFixed(0) }}/100</div>
+                <div class="stat-value">{{ formatWhole(prediction.metadata.awayFormRating) }}/100</div>
               </div>
             </ion-col>
           </ion-row>

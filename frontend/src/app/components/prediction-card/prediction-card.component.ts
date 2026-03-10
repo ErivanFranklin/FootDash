@@ -11,6 +11,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonSpinner, IonIcon, IonButton, IonBadge, IonProgressBar, IonList, IonItem, IonLabel, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { addIcons } from 'ionicons';
+import { alertCircleOutline, bulbOutline, refreshOutline } from 'ionicons/icons';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { PredictionResult } from '../../models/analytics.model';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -38,6 +40,10 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
   private analyticsService = inject(AnalyticsService);
   private logger = inject(LoggerService);
 
+  constructor() {
+    addIcons({ refreshOutline, alertCircleOutline, bulbOutline });
+  }
+
   ngOnInit() {
     this.loadPrediction();
   }
@@ -60,7 +66,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.analyticsService.getMatchPrediction(this.matchId).subscribe({
       next: (data) => {
-        this.prediction = data;
+        this.prediction = this.normalizePrediction(data);
         this.loading = false;
         if (this.probabilityChartRef) {
           this.createChart();
@@ -80,7 +86,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.analyticsService.generatePrediction(this.matchId).subscribe({
       next: (data) => {
-        this.prediction = data;
+        this.prediction = this.normalizePrediction(data);
         this.loading = false;
         if (this.chart) {
           this.chart.destroy();
@@ -149,7 +155,7 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
             callbacks: {
               label: (context) => {
                 const label = context.label || '';
-                const value = context.parsed;
+                const value = this.toNumber(context.parsed);
                 return `${label}: ${value.toFixed(1)}%`;
               },
             },
@@ -163,7 +169,46 @@ export class PredictionCardComponent implements OnInit, AfterViewInit, OnDestroy
 
   getMostLikelyOutcome(): { type: 'home' | 'away' | 'draw'; probability: number } | null {
     if (!this.prediction) return null;
-    return this.analyticsService.getMostLikelyOutcome(this.prediction);
+    const outcome = this.analyticsService.getMostLikelyOutcome(this.prediction);
+    if (!outcome) return null;
+    return {
+      ...outcome,
+      probability: this.toNumber(outcome.probability),
+    };
+  }
+
+  formatPercent(value: unknown): string {
+    return `${this.toNumber(value).toFixed(1)}%`;
+  }
+
+  progressValue(value: unknown): number {
+    const n = this.toNumber(value);
+    return Math.max(0, Math.min(1, n / 100));
+  }
+
+  formatWhole(value: unknown): string {
+    return this.toNumber(value).toFixed(0);
+  }
+
+  private toNumber(value: unknown): number {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  private normalizePrediction(data: PredictionResult): PredictionResult {
+    const metadata = data?.metadata || {};
+    return {
+      ...data,
+      homeWinProbability: this.toNumber(data?.homeWinProbability),
+      drawProbability: this.toNumber(data?.drawProbability),
+      awayWinProbability: this.toNumber(data?.awayWinProbability),
+      confidence: data?.confidence,
+      metadata: {
+        ...metadata,
+        homeFormRating: metadata.homeFormRating == null ? metadata.homeFormRating : this.toNumber(metadata.homeFormRating),
+        awayFormRating: metadata.awayFormRating == null ? metadata.awayFormRating : this.toNumber(metadata.awayFormRating),
+      },
+    };
   }
 
   getConfidenceColor(): string {
