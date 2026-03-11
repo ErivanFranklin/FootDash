@@ -74,7 +74,11 @@ export class TeamComparisonComponent implements OnInit {
 
     const calcAttack = (stats: any) => Math.min(100, (safeRate(stats.goalsFor) / Math.max(1, safeRate(stats.played))) * 40); // 2.5 goals = 100
     const calcDefense = (rating: any) => Math.max(0, 100 - (safeRate(rating) * 30)); // 0 goals = 100, 3.33 goals = 0
-    const calcPoints = (stats: any) => (safeRate(stats.points) / (Math.max(1, safeRate(stats.played)) * 3)) * 100;
+    const calcPoints = (stats: any) => {
+      const p = safeRate(stats.points);
+      const played = Math.max(1, safeRate(stats.played));
+      return (p / (played * 3)) * 100;
+    };
 
     const homeStats = getStats(this.comparison.homeTeam);
     const awayStats = getStats(this.comparison.awayTeam);
@@ -89,11 +93,11 @@ export class TeamComparisonComponent implements OnInit {
       ],
       datasets: [
         {
-          label: this.comparison.homeTeam.teamName || 'Home',
+          label: this.comparison.homeTeam?.teamName || 'Home',
           data: [
             calcAttack(homeStats),
-            calcDefense(this.comparison.homeTeam.defensiveRating),
-            safeRate(this.comparison.homeTeam.formRating),
+            calcDefense(this.comparison.homeTeam?.defensiveRating),
+            safeRate(this.comparison.homeTeam?.formRating),
             safeRate(homeStats.winPercentage),
             calcPoints(homeStats)
           ],
@@ -106,11 +110,11 @@ export class TeamComparisonComponent implements OnInit {
           pointHoverBorderColor: 'rgba(52, 199, 89, 1)'
         },
         {
-          label: this.comparison.awayTeam.teamName || 'Away',
+          label: this.comparison.awayTeam?.teamName || 'Away',
           data: [
             calcAttack(awayStats),
-            calcDefense(this.comparison.awayTeam.defensiveRating),
-            safeRate(this.comparison.awayTeam.formRating),
+            calcDefense(this.comparison.awayTeam?.defensiveRating),
+            safeRate(this.comparison.awayTeam?.formRating),
             safeRate(awayStats.winPercentage),
             calcPoints(awayStats)
           ],
