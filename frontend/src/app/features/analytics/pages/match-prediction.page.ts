@@ -114,14 +114,18 @@ export class MatchPredictionPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.probabilitiesLoading = true;
     forkJoin({
-      btts: this.analyticsService.getBttsPrediction(this.matchId).pipe(catchError(() => of(null))),
-      overUnder: this.analyticsService.getOverUnderPrediction(this.matchId).pipe(catchError(() => of(null))),
+      btts: this.analyticsService.getBttsPrediction(this.matchId).pipe(
+        catchError(() => of({ btts_yes_probability: 0.5, btts_no_probability: 0.5 }))
+      ),
+      overUnder: this.analyticsService.getOverUnderPrediction(this.matchId).pipe(
+        catchError(() => of({ over_probability: 0.5, under_probability: 0.5 }))
+      ),
     }).subscribe({
       next: (payload: any) => {
-        this.bttsYes = this.asPercent(payload?.btts?.btts_yes_probability ?? 0);
-        this.bttsNo = this.asPercent(payload?.btts?.btts_no_probability ?? 0);
-        this.over25 = this.asPercent(payload?.overUnder?.over_probability ?? 0);
-        this.under25 = this.asPercent(payload?.overUnder?.under_probability ?? 0);
+        this.bttsYes = this.asPercent(payload?.btts?.btts_yes_probability ?? 0.5);
+        this.bttsNo = this.asPercent(payload?.btts?.btts_no_probability ?? 0.5);
+        this.over25 = this.asPercent(payload?.overUnder?.over_probability ?? 0.5);
+        this.under25 = this.asPercent(payload?.overUnder?.under_probability ?? 0.5);
         this.probabilitiesLoading = false;
       },
       error: (error) => {

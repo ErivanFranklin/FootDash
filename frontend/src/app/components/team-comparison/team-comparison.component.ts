@@ -66,9 +66,18 @@ export class TeamComparisonComponent implements OnInit {
     const t = (key: string) => this.translocoService.translate(`COMPARISON.${key}`);
 
     // Helper to calculate score (0-100)
-    const calcAttack = (stats: any) => Math.min(100, (stats.goalsFor / Math.max(1, stats.played)) * 40); // 2.5 goals = 100
-    const calcDefense = (rating: number) => Math.max(0, 100 - (rating * 30)); // 0 goals = 100, 3.33 goals = 0
-    const calcPoints = (stats: any) => (stats.points / (stats.played * 3)) * 100;
+    const safeRate = (val: any) => {
+      const n = Number(val);
+      return isFinite(n) ? n : 0;
+    };
+    const getStats = (team: any) => team?.overallStats || { goalsFor: 0, played: 0, points: 0, winPercentage: 0 };
+
+    const calcAttack = (stats: any) => Math.min(100, (safeRate(stats.goalsFor) / Math.max(1, safeRate(stats.played))) * 40); // 2.5 goals = 100
+    const calcDefense = (rating: any) => Math.max(0, 100 - (safeRate(rating) * 30)); // 0 goals = 100, 3.33 goals = 0
+    const calcPoints = (stats: any) => (safeRate(stats.points) / (Math.max(1, safeRate(stats.played)) * 3)) * 100;
+
+    const homeStats = getStats(this.comparison.homeTeam);
+    const awayStats = getStats(this.comparison.awayTeam);
 
     const data = {
       labels: [
@@ -80,13 +89,13 @@ export class TeamComparisonComponent implements OnInit {
       ],
       datasets: [
         {
-          label: this.comparison.homeTeam.teamName,
+          label: this.comparison.homeTeam.teamName || 'Home',
           data: [
-            calcAttack(this.comparison.homeTeam.overallStats),
+            calcAttack(homeStats),
             calcDefense(this.comparison.homeTeam.defensiveRating),
-            this.comparison.homeTeam.formRating,
-            this.comparison.homeTeam.overallStats.winPercentage,
-            calcPoints(this.comparison.homeTeam.overallStats)
+            safeRate(this.comparison.homeTeam.formRating),
+            safeRate(homeStats.winPercentage),
+            calcPoints(homeStats)
           ],
           fill: true,
           backgroundColor: 'rgba(52, 199, 89, 0.2)',
@@ -97,13 +106,13 @@ export class TeamComparisonComponent implements OnInit {
           pointHoverBorderColor: 'rgba(52, 199, 89, 1)'
         },
         {
-          label: this.comparison.awayTeam.teamName,
+          label: this.comparison.awayTeam.teamName || 'Away',
           data: [
-            calcAttack(this.comparison.awayTeam.overallStats),
+            calcAttack(awayStats),
             calcDefense(this.comparison.awayTeam.defensiveRating),
-            this.comparison.awayTeam.formRating,
-            this.comparison.awayTeam.overallStats.winPercentage,
-            calcPoints(this.comparison.awayTeam.overallStats)
+            safeRate(this.comparison.awayTeam.formRating),
+            safeRate(awayStats.winPercentage),
+            calcPoints(awayStats)
           ],
           fill: true,
           backgroundColor: 'rgba(255, 59, 48, 0.2)',
