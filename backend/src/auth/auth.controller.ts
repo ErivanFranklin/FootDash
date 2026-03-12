@@ -33,13 +33,24 @@ import { TwoFactorCodeDto } from './dto/two-factor-code.dto';
 /** Duration in milliseconds for the refresh-token cookie (7 days). */
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
+function resolveCookieSameSite(
+  isProd: boolean,
+): 'strict' | 'lax' | 'none' {
+  const configured = (process.env.AUTH_COOKIE_SAMESITE || '').toLowerCase();
+  if (configured === 'strict' || configured === 'lax' || configured === 'none') {
+    return configured;
+  }
+  return isProd ? 'strict' : 'lax';
+}
+
 /** Shared cookie options for the refresh token. */
 function refreshCookieOptions(isProd: boolean) {
-  const sameSite: 'strict' | 'lax' = isProd ? 'strict' : 'lax';
+  const sameSite = resolveCookieSameSite(isProd);
   return {
     httpOnly: true,
-    secure: isProd,
-    // Use lax in dev to allow localhost:4200 -> 3000 cross-port cookie
+    // SameSite=None requires secure cookies in modern browsers.
+    secure: sameSite === 'none' ? true : isProd,
+    // Default remains strict in production and lax in local dev.
     sameSite,
     path: '/',
     maxAge: REFRESH_COOKIE_MAX_AGE,
@@ -52,10 +63,11 @@ function refreshCookieOptions(isProd: boolean) {
  * sends two cookies and the backend reads the stale one first.
  */
 function clearLegacyCookies(res: Response, isProd: boolean) {
+  const sameSite = resolveCookieSameSite(isProd);
   const base = {
     httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? ('strict' as const) : ('lax' as const),
+    secure: sameSite === 'none' ? true : isProd,
+    sameSite,
   };
   // Previous path values that may still be stored in the browser
   res.clearCookie('refresh_token', { ...base, path: '/api/' });

@@ -75,6 +75,10 @@ const isProd = process.env.NODE_ENV === 'production';
           ? Joi.string().required()
           : Joi.string().optional(),
         FRONTEND_URL: Joi.string().uri().default('http://localhost:4200'),
+        CORS_ORIGINS: Joi.string().optional().allow(''),
+        AUTH_COOKIE_SAMESITE: Joi.string()
+          .valid('strict', 'lax', 'none', 'STRICT', 'LAX', 'NONE')
+          .optional(),
         // SMTP / Mail
         SMTP_HOST: Joi.string().default('localhost'),
         SMTP_PORT: Joi.number().default(587),

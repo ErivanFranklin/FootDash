@@ -25,8 +25,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api'); // Standardize all endpoints under /api/*
 
   app.use(cookieParser());
+  const configuredOrigins =
+    process.env.CORS_ORIGINS?.split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean) || [];
+  const corsOrigin = configuredOrigins.length > 0 ? configuredOrigins : true;
   app.enableCors({
-    origin: true,
+    origin: corsOrigin,
     credentials: true, // Allow cookies to be sent cross-origin
   });
   // Relax Helmet CSP in development to allow Swagger UI assets and inline scripts
