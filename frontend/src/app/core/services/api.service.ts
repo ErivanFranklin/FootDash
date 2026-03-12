@@ -6,7 +6,10 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
-  private base = (environment.apiBaseUrl || '').replace(/\/$/, '');
+
+  private get base(): string {
+    return (environment.apiBaseUrl || '').replace(/\/$/, '');
+  }
 
   // Basic ping of backend health endpoint
   ping(): Observable<any> {

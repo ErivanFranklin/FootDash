@@ -17,8 +17,11 @@ export interface Favorite {
   providedIn: 'root',
 })
 export class FavoritesService {
-  private apiUrl = `${environment.apiBaseUrl}/favorites`;
   private http = inject(HttpClient);
+
+  private get apiUrl(): string {
+    return `${environment.apiBaseUrl}/favorites`;
+  }
 
   private favoritesSubject = new BehaviorSubject<Favorite[]>([]);
   favorites$ = this.favoritesSubject.asObservable();

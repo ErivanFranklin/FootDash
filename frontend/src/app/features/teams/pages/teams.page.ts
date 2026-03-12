@@ -22,6 +22,7 @@ export class TeamsPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toast = inject(ToastController);
+  private actionCache = new Map<number, Array<{ label: string; handler: (team: any) => void; icon?: string; color?: string; loading?: boolean }>>();
 
   teams: any[] = [];
   favoriteTeams: any[] = [];
@@ -226,11 +227,28 @@ export class TeamsPage implements OnInit {
 
   getTeamActions(team: any) {
     const teamId = this.resolveTeamId(team);
-    return [
+
+    if (teamId == null) {
+      return [
+        { label: 'View Matches', handler: this.viewMatches.bind(this), icon: 'eye' },
+        { label: 'View Analytics', handler: this.viewAnalytics.bind(this), icon: 'stats-chart', color: 'secondary' },
+        { label: 'Sync Team', handler: this.syncTeam.bind(this), icon: 'sync', color: 'medium', loading: false },
+      ];
+    }
+
+    const cached = this.actionCache.get(teamId);
+    if (cached) {
+      cached[2].loading = this.syncingTeamIds.has(teamId);
+      return cached;
+    }
+
+    const actions = [
       { label: 'View Matches', handler: this.viewMatches.bind(this), icon: 'eye' },
       { label: 'View Analytics', handler: this.viewAnalytics.bind(this), icon: 'stats-chart', color: 'secondary' },
-      { label: 'Sync Team', handler: this.syncTeam.bind(this), icon: 'sync', color: 'medium', loading: teamId != null && this.syncingTeamIds.has(teamId) }
+      { label: 'Sync Team', handler: this.syncTeam.bind(this), icon: 'sync', color: 'medium', loading: this.syncingTeamIds.has(teamId) },
     ];
+    this.actionCache.set(teamId, actions);
+    return actions;
   }
 
   viewMatches(team: any) {

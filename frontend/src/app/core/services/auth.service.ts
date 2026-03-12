@@ -12,7 +12,10 @@ import { authLogoutSuccess, authSetToken } from '../../store/auth/auth.actions';
 })
 export class AuthService {
   private jwtHelper = new JwtHelperService();
-  private authUrl = buildAuthUrl();
+  // Compute auth URL on demand so runtime config overrides take effect after APP_INITIALIZER.
+  private get authUrl(): string {
+    return buildAuthUrl();
+  }
 
   /**
    * Access token is stored in memory only (not localStorage) to mitigate XSS.
