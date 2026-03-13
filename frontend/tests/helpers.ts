@@ -1,5 +1,16 @@
 import { Page, expect } from '@playwright/test';
 
+const PLAYWRIGHT_API_BASE_URL = (process.env['PLAYWRIGHT_API_BASE_URL'] || '').replace(/\/$/, '');
+
+function apiUrl(path: string): string {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  if (PLAYWRIGHT_API_BASE_URL) {
+    return `${PLAYWRIGHT_API_BASE_URL}${normalizedPath}`;
+  }
+  // Fallback to local dev proxy route used by ng serve.
+  return `/api${normalizedPath}`;
+}
+
 // ---------------------------------------------------------------------------
 // Auth helpers
 // ---------------------------------------------------------------------------
@@ -30,13 +41,13 @@ export async function loginTestUser(
   // Register via API (tolerant of 409 Conflict if user already exists)
   // Retries once on failure (e.g. 429 throttle) after a short delay.
   if (!opts.skipRegistration) {
-    let resp = await page.request.post('/api/auth/register', {
+    let resp = await page.request.post(apiUrl('/auth/register'), {
       data: { email, password },
     });
     if (!resp.ok() && resp.status() !== 409) {
       // Retry once after a brief wait (handles rate-limiting / transient errors)
       await page.waitForTimeout(2_000);
-      resp = await page.request.post('/api/auth/register', {
+      resp = await page.request.post(apiUrl('/auth/register'), {
         data: { email, password },
       });
     }
@@ -114,13 +125,13 @@ export async function loginTestUser(
     await submitLogin();
     await page.waitForURL(authUrlPattern, { timeout: 15_000 }).catch(async () => {
       // Final fallback: authenticate via API to set session cookie in this context.
-      let loginResp = await page.request.post('/api/auth/login', {
+      let loginResp = await page.request.post(apiUrl('/auth/login'), {
         data: { email, password },
         timeout: 12_000,
       });
       if (!loginResp.ok()) {
         await page.waitForTimeout(1_000);
-        loginResp = await page.request.post('/api/auth/login', {
+        loginResp = await page.request.post(apiUrl('/auth/login'), {
           data: { email, password },
           timeout: 12_000,
         });

@@ -26,7 +26,7 @@
         <div class="gauge-container">
           <canvas #formGaugeChart></canvas>
           <div class="gauge-center">
-            <span class="gauge-value">{{ (+analytics.formRating).toFixed(0) }}</span>
+            <span class="gauge-value">{{ (+(analytics.formRating ?? 0)).toFixed(0) }}</span>
             <span class="gauge-label">{{ getFormLabel() }}</span>
           </div>
         </div>
@@ -56,7 +56,7 @@
           </div>
           <div class="stat">
             <span class="label">Win Rate</span>
-            <span class="value">{{ analytics.overallStats.winPercentage.toFixed(0) }}%</span>
+            <span class="value">{{ (analytics.overallStats.winPercentage ?? 0).toFixed(0) }}%</span>
           </div>
         </div>
       </ion-card-content>
@@ -129,14 +129,14 @@
               <div class="location-stat home">
                 <span class="location-label">Home</span>
                 <span class="record">{{ analytics.homePerformance.won }}-{{ analytics.homePerformance.drawn }}-{{ analytics.homePerformance.lost }}</span>
-                <span class="win-rate">{{ analytics.homePerformance.winPercentage.toFixed(0) }}% wins</span>
+                <span class="win-rate">{{ (analytics.homePerformance.winPercentage ?? 0).toFixed(0) }}% wins</span>
               </div>
             </ion-col>
             <ion-col size="6">
               <div class="location-stat away">
                 <span class="location-label">Away</span>
                 <span class="record">{{ analytics.awayPerformance.won }}-{{ analytics.awayPerformance.drawn }}-{{ analytics.awayPerformance.lost }}</span>
-                <span class="win-rate">{{ analytics.awayPerformance.winPercentage.toFixed(0) }}% wins</span>
+                <span class="win-rate">{{ (analytics.awayPerformance.winPercentage ?? 0).toFixed(0) }}% wins</span>
               </div>
             </ion-col>
           </ion-row>

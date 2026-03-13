@@ -115,6 +115,7 @@
   },
   "ANALYTICS": {
     "TITLE": "Match Analysis",
+    "ANALYSIS": "Analysis",
     "LOADING": "Loading Match Data...",
     "STATUS": "Status:",
     "CHARTS": {
@@ -158,6 +159,8 @@
   },
   "COMPARISON": {
     "TITLE": "Team Stats Comparison",
+    "LOADING": "Loading Comparison...",
+    "RETRY": "Retry",
     "ATTACK": "Attack",
     "DEFENSE": "Defense",
     "FORM": "Form",

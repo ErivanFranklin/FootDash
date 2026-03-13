@@ -115,6 +115,7 @@
   },
   "ANALYTICS": {
     "TITLE": "Análisis del Partido",
+    "ANALYSIS": "Análisis",
     "LOADING": "Cargando Datos...",
     "STATUS": "Estado:",
     "CHARTS": {
@@ -158,6 +159,8 @@
   },
   "COMPARISON": {
     "TITLE": "Comparación de Estadísticas",
+    "LOADING": "Cargando Comparación...",
+    "RETRY": "Reintentar",
     "ATTACK": "Ataque",
     "DEFENSE": "Defensa",
     "FORM": "Forma",

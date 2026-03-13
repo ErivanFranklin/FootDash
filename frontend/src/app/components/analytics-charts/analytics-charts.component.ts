@@ -120,6 +120,24 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     this.destroyAllCharts();
   }
 
+  private isDarkMode(): boolean {
+    return document.body.classList.contains('dark');
+  }
+
+  private chartColors() {
+    const dark = this.isDarkMode();
+    return {
+      text: dark ? '#ffffff' : '#333333',
+      textMuted: dark ? '#888888' : '#666666',
+      grid: dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+      tooltipBg: dark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+      tooltipTitle: dark ? '#ffffff' : '#111111',
+      tooltipBody: dark ? '#cccccc' : '#444444',
+      tooltipBorder: dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+      gaugeTrack: dark ? 'rgba(50, 50, 50, 0.5)' : 'rgba(200, 200, 200, 0.5)',
+    };
+  }
+
   private loadAnalytics() {
     if (!this.teamId) return;
 
@@ -213,6 +231,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     if (!ctx) return;
 
     const { won, drawn, lost } = this.analytics.overallStats;
+    const colors = this.chartColors();
 
     const config: ChartConfiguration<'doughnut'> = {
       type: 'doughnut',
@@ -244,7 +263,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
           legend: {
             position: 'bottom',
             labels: {
-              color: '#ffffff',
+              color: colors.text,
               padding: 15,
               usePointStyle: true,
               pointStyle: 'circle',
@@ -255,9 +274,11 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
             },
           },
           tooltip: {
-            backgroundColor: 'rgba(30, 30, 30, 0.95)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
+            borderWidth: 1,
             padding: 12,
             cornerRadius: 8,
             callbacks: {
@@ -287,6 +308,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     const awayGoals = this.analytics.awayPerformance.goalsFor;
     const homeConc = this.analytics.homePerformance.goalsAgainst;
     const awayConc = this.analytics.awayPerformance.goalsAgainst;
+    const colors = this.chartColors();
 
     const config: ChartConfiguration<'bar'> = {
       type: 'bar',
@@ -321,9 +343,11 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
             display: false,
           },
           tooltip: {
-            backgroundColor: 'rgba(30, 30, 30, 0.95)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
+            borderWidth: 1,
             padding: 12,
             cornerRadius: 8,
           },
@@ -334,7 +358,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
               display: false,
             },
             ticks: {
-              color: '#888888',
+              color: colors.textMuted,
               font: {
                 size: 11,
               },
@@ -343,10 +367,10 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(255, 255, 255, 0.1)',
+              color: colors.grid,
             },
             ticks: {
-              color: '#888888',
+              color: colors.textMuted,
               stepSize: 10,
             },
           },
@@ -365,6 +389,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     if (!ctx) return;
 
     const { last5Matches, average } = this.analytics.scoringTrend;
+    const colors = this.chartColors();
 
     // Create gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 200);
@@ -410,7 +435,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
           legend: {
             position: 'bottom',
             labels: {
-              color: '#ffffff',
+              color: colors.text,
               padding: 15,
               usePointStyle: true,
               font: {
@@ -419,9 +444,11 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
             },
           },
           tooltip: {
-            backgroundColor: 'rgba(30, 30, 30, 0.95)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
+            borderWidth: 1,
             padding: 12,
             cornerRadius: 8,
           },
@@ -432,17 +459,17 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
               display: false,
             },
             ticks: {
-              color: '#888888',
+              color: colors.textMuted,
             },
           },
           y: {
             beginAtZero: true,
             max: Math.max(...last5Matches) + 2,
             grid: {
-              color: 'rgba(255, 255, 255, 0.1)',
+              color: colors.grid,
             },
             ticks: {
-              color: '#888888',
+              color: colors.textMuted,
               stepSize: 1,
             },
           },
@@ -461,6 +488,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     if (!ctx) return;
 
     const { homePerformance, awayPerformance } = this.analytics;
+    const colors = this.chartColors();
 
     const config: ChartConfiguration<'bar'> = {
       type: 'bar',
@@ -492,7 +520,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
           legend: {
             position: 'bottom',
             labels: {
-              color: '#ffffff',
+              color: colors.text,
               padding: 15,
               usePointStyle: true,
               pointStyle: 'rectRounded',
@@ -502,9 +530,11 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
             },
           },
           tooltip: {
-            backgroundColor: 'rgba(30, 30, 30, 0.95)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
+            borderWidth: 1,
             padding: 12,
             cornerRadius: 8,
           },
@@ -515,16 +545,16 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
               display: false,
             },
             ticks: {
-              color: '#888888',
+              color: colors.textMuted,
             },
           },
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(255, 255, 255, 0.1)',
+              color: colors.grid,
             },
             ticks: {
-              color: '#888888',
+              color: colors.textMuted,
               stepSize: 5,
             },
           },
@@ -544,6 +574,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
 
     const formRating = +this.analytics.formRating;
     const remaining = 100 - formRating;
+    const colors = this.chartColors();
 
     // Determine color based on rating
     let ratingColor: string;
@@ -562,7 +593,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
         datasets: [
           {
             data: [formRating, remaining],
-            backgroundColor: [ratingColor, 'rgba(50, 50, 50, 0.5)'],
+            backgroundColor: [ratingColor, colors.gaugeTrack],
             borderWidth: 0,
             circumference: 270,
             rotation: 225,
@@ -595,6 +626,7 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
     if (!ctx) return;
 
     const { homePerformance, awayPerformance, overallStats } = this.analytics;
+    const colors = this.chartColors();
 
     // Calculate metrics for radar chart
     const cleanSheetRate = Math.min(100, (1 - (overallStats.goalsAgainst / Math.max(1, overallStats.played))) * 50);
@@ -629,9 +661,11 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
             display: false,
           },
           tooltip: {
-            backgroundColor: 'rgba(30, 30, 30, 0.95)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
+            borderWidth: 1,
             padding: 12,
             cornerRadius: 8,
             callbacks: {
@@ -647,10 +681,10 @@ export class AnalyticsChartsComponent implements OnInit, OnChanges, OnDestroy {
               display: false,
             },
             grid: {
-              color: 'rgba(255, 255, 255, 0.1)',
+              color: colors.grid,
             },
             pointLabels: {
-              color: '#888888',
+              color: colors.textMuted,
               font: {
                 size: 11,
               },

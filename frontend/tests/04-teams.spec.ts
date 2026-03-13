@@ -13,9 +13,14 @@ import {
  */
 test.describe('Phase 4: Teams', () => {
   test.setTimeout(60_000);
+  const seededLogin = {
+    email: 'demo.user@footdash.com',
+    password: 'Password123!',
+    skipRegistration: true,
+  } as const;
 
   test.beforeEach(async ({ page }) => {
-    await loginTestUser(page, { prefix: 'teams' });
+    await loginTestUser(page, seededLogin);
     if (page.url().includes('/login')) {
       test.skip(true, 'Auth session not restored');
     }

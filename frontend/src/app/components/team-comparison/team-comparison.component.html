@@ -40,14 +40,14 @@
         <div class="comparison-bar">
           <div class="team-value home">
             <span class="team-name">{{ comparison.homeTeam.teamName }}</span>
-            <span class="value">{{ comparison.homeTeam.formRating.toFixed(0) }}</span>
+            <span class="value">{{ (+(comparison.homeTeam.formRating ?? 0)).toFixed(0) }}</span>
           </div>
           <div class="bar-container">
-            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.formRating, comparison.awayTeam.formRating, true)"></div>
-            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.formRating, comparison.awayTeam.formRating, false)"></div>
+            <div class="bar home" [style.width.%]="getBarPercentage(+(comparison.homeTeam.formRating ?? 0), +(comparison.awayTeam.formRating ?? 0), true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(+(comparison.homeTeam.formRating ?? 0), +(comparison.awayTeam.formRating ?? 0), false)"></div>
           </div>
           <div class="team-value away">
-            <span class="value">{{ comparison.awayTeam.formRating.toFixed(0) }}</span>
+            <span class="value">{{ (+(comparison.awayTeam.formRating ?? 0)).toFixed(0) }}</span>
             <span class="team-name">{{ comparison.awayTeam.teamName }}</span>
           </div>
         </div>
@@ -58,14 +58,14 @@
         <h3>Win Percentage</h3>
         <div class="comparison-bar">
           <div class="team-value home">
-            <span class="value">{{ comparison.homeTeam.overallStats.winPercentage.toFixed(0) }}%</span>
+            <span class="value">{{ (comparison.homeTeam.overallStats.winPercentage ?? 0).toFixed(0) }}%</span>
           </div>
           <div class="bar-container">
-            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.winPercentage, comparison.awayTeam.overallStats.winPercentage, true)"></div>
-            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.winPercentage, comparison.awayTeam.overallStats.winPercentage, false)"></div>
+            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.winPercentage ?? 0, comparison.awayTeam.overallStats.winPercentage ?? 0, true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.overallStats.winPercentage ?? 0, comparison.awayTeam.overallStats.winPercentage ?? 0, false)"></div>
           </div>
           <div class="team-value away">
-            <span class="value">{{ comparison.awayTeam.overallStats.winPercentage.toFixed(0) }}%</span>
+            <span class="value">{{ (comparison.awayTeam.overallStats.winPercentage ?? 0).toFixed(0) }}%</span>
           </div>
         </div>
       </div>
@@ -92,14 +92,14 @@
         <h3>Defensive Rating</h3>
         <div class="comparison-bar">
           <div class="team-value home">
-            <span class="value">{{ comparison.homeTeam.defensiveRating.toFixed(0) }}</span>
+            <span class="value">{{ (+(comparison.homeTeam.defensiveRating ?? 0)).toFixed(0) }}</span>
           </div>
           <div class="bar-container">
-            <div class="bar home" [style.width.%]="getBarPercentage(comparison.homeTeam.defensiveRating, comparison.awayTeam.defensiveRating, true)"></div>
-            <div class="bar away" [style.width.%]="getBarPercentage(comparison.homeTeam.defensiveRating, comparison.awayTeam.defensiveRating, false)"></div>
+            <div class="bar home" [style.width.%]="getBarPercentage(+(comparison.homeTeam.defensiveRating ?? 0), +(comparison.awayTeam.defensiveRating ?? 0), true)"></div>
+            <div class="bar away" [style.width.%]="getBarPercentage(+(comparison.homeTeam.defensiveRating ?? 0), +(comparison.awayTeam.defensiveRating ?? 0), false)"></div>
           </div>
           <div class="team-value away">
-            <span class="value">{{ comparison.awayTeam.defensiveRating.toFixed(0) }}</span>
+            <span class="value">{{ (+(comparison.awayTeam.defensiveRating ?? 0)).toFixed(0) }}</span>
           </div>
         </div>
       </div>

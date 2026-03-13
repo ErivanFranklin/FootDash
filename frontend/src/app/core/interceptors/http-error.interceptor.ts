@@ -36,12 +36,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   private shouldRetry(request: HttpRequest<any>, error: HttpErrorResponse): boolean {
     // Don't retry auth endpoints or non-GET requests
     const isAuthEndpoint = request.url.includes('/auth/');
+    const isPredictionEndpoint = request.url.includes('/prediction/');
     const isGetRequest = request.method === 'GET';
 
     // Retry only transient failures (network / 5xx), never retry 4xx like 401.
     const isTransientError = error.status === 0 || error.status >= 500;
 
-    return !isAuthEndpoint && isGetRequest && isTransientError;
+    return !isAuthEndpoint && !isPredictionEndpoint && isGetRequest && isTransientError;
   }
 
   private logError(error: HttpErrorResponse, request: HttpRequest<any>): void {

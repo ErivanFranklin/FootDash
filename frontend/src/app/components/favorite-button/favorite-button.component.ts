@@ -38,9 +38,15 @@ export class FavoriteButtonComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Start from in-memory cache to avoid an initial visual flicker.
+    this.isFavorite = this.favoritesService.isFavoriteLocal(this.entityType, this.entityId);
+
     this.favoritesService.isFavorite(this.entityType, this.entityId).subscribe({
       next: (res) => {
         this.isFavorite = res.isFavorite;
+      },
+      error: () => {
+        // Preserve the locally known state when older or unauthenticated backends reject the probe.
       },
     });
   }

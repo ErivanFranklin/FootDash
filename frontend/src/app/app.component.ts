@@ -64,7 +64,15 @@ import {
   /* badge icons */
   medalOutline,
   ribbonOutline,
-  diamondOutline
+  diamondOutline,
+  /* social / chat / trend icons */
+  heartOutline,
+  footballOutline,
+  chatbubbleOutline,
+  personAddOutline,
+  sparklesOutline,
+  send,
+  trendingUp,
 } from 'ionicons/icons';
 
 @Component({
@@ -139,6 +147,14 @@ export class AppComponent implements OnInit {
       medalOutline,
       ribbonOutline,
       diamondOutline,
+      /* social / chat / trend icons */
+      heartOutline,
+      footballOutline,
+      chatbubbleOutline,
+      personAddOutline,
+      sparklesOutline,
+      send,
+      trendingUp,
     });
   }
 

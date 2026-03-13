@@ -34,14 +34,40 @@ export class AppConfigService {
       const resp = await fetch('assets/config/app-config.json');
       if (resp.ok) {
         const json = await resp.json();
+        const isLocalhost = this.isLocalhostRuntime();
         // Only override values that are actually present and non-empty
-        if (json.apiBaseUrl) this.config.apiBaseUrl = json.apiBaseUrl;
-        if (json.wsUrl) this.config.wsUrl = json.wsUrl;
+        if (json.apiBaseUrl) {
+          if (!isLocalhost || !this.isRemoteAbsoluteUrl(json.apiBaseUrl)) {
+            this.config.apiBaseUrl = json.apiBaseUrl;
+          }
+        }
+        if (json.wsUrl) {
+          if (!isLocalhost || !this.isRemoteAbsoluteUrl(json.wsUrl)) {
+            this.config.wsUrl = json.wsUrl;
+          }
+        }
         if (json.authPath) this.config.authPath = json.authPath;
         if (json.pushPublicKey) this.config.pushPublicKey = json.pushPublicKey;
       }
     } catch {
       // Config file not found or invalid — use compile-time defaults
+    }
+  }
+
+  private isLocalhostRuntime(): boolean {
+    if (typeof window === 'undefined') return false;
+    const host = window.location.hostname;
+    return host === 'localhost' || host === '127.0.0.1';
+  }
+
+  private isRemoteAbsoluteUrl(value: string): boolean {
+    if (!/^https?:\/\//i.test(value)) return false;
+    try {
+      const parsed = new URL(value);
+      const host = parsed.hostname;
+      return host !== 'localhost' && host !== '127.0.0.1';
+    } catch {
+      return false;
     }
   }
 

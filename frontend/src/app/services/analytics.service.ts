@@ -95,7 +95,12 @@ export class AnalyticsService {
       .get<any>(`${this.apiUrl}/match/${matchId}/prediction/btts`, {
         headers: this.getHeaders(),
       })
-      .pipe(catchError(this.handleError('getBttsPrediction', null)));
+      .pipe(catchError(this.handleError('getBttsPrediction', {
+        btts_yes_probability: 0.5,
+        btts_no_probability: 0.5,
+        confidence: 'low',
+        model_version: 'fallback',
+      })));
   }
 
   getOverUnderPrediction(matchId: number, line = 2.5): Observable<any> {
@@ -104,7 +109,13 @@ export class AnalyticsService {
         headers: this.getHeaders(),
         params: { line: String(line) },
       })
-      .pipe(catchError(this.handleError('getOverUnderPrediction', null)));
+      .pipe(catchError(this.handleError('getOverUnderPrediction', {
+        over_probability: 0.5,
+        under_probability: 0.5,
+        line: 2.5,
+        confidence: 'low',
+        model_version: 'fallback',
+      })));
   }
 
   /**
@@ -123,6 +134,7 @@ export class AnalyticsService {
         headers: this.getHeaders(),
       })
       .pipe(
+        map((data) => this.normalizeTeamAnalytics(data)),
         tap((data) => this.saveToCache(cacheKey, data)),
         catchError(this.handleError<TeamAnalytics>('getTeamAnalytics'))
       );
@@ -162,6 +174,7 @@ export class AnalyticsService {
         },
       })
       .pipe(
+        map((data) => this.normalizeComparison(data)),
         tap((data) => this.saveToCache(cacheKey, data)),
         catchError(this.handleError<TeamComparison>('compareTeams'))
       );
@@ -289,6 +302,70 @@ export class AnalyticsService {
       }
       
       return throwError(() => error);
+    };
+  }
+
+  /** Safely coerce a value to number, defaulting to 0 */
+  private num(val: any): number {
+    const n = Number(val);
+    return isFinite(n) ? n : 0;
+  }
+
+  /** Normalize a PerformanceStats object from the API (handles missing + renamed fields) */
+  private normalizePerformanceStats(raw: any): any {
+    if (!raw || typeof raw !== 'object') {
+      return { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, winPercentage: 0 };
+    }
+    const played = this.num(raw.played ?? ((this.num(raw.wins ?? raw.won)) + (this.num(raw.draws ?? raw.drawn)) + (this.num(raw.losses ?? raw.lost))));
+    const won = this.num(raw.won ?? raw.wins);
+    const drawn = this.num(raw.drawn ?? raw.draws);
+    const lost = this.num(raw.lost ?? raw.losses);
+    const goalsFor = this.num(raw.goalsFor ?? raw.goalsScored);
+    const goalsAgainst = this.num(raw.goalsAgainst ?? raw.goalsConceded);
+    const goalDifference = this.num(raw.goalDifference ?? (goalsFor - goalsAgainst));
+    const points = this.num(raw.points ?? (won * 3 + drawn));
+    const winPercentage = this.num(raw.winPercentage || (played > 0 ? (won / played) * 100 : 0));
+    return { played, won, drawn, lost, goalsFor, goalsAgainst, goalDifference, points, winPercentage };
+  }
+
+  /** Normalize a TeamAnalytics object from the API */
+  private normalizeTeamAnalytics(raw: any): TeamAnalytics {
+    if (!raw) {
+      return raw;
+    }
+    const scoringTrend = raw.scoringTrend ? {
+      last5Matches: raw.scoringTrend.last5Matches ?? raw.scoringTrend.last5 ?? [],
+      average: this.num(raw.scoringTrend.average),
+      trend: raw.scoringTrend.trend ?? 'stable',
+    } : { last5Matches: [], average: 0, trend: 'stable' as const };
+
+    return {
+      ...raw,
+      formRating: this.num(raw.formRating),
+      defensiveRating: this.num(raw.defensiveRating),
+      overallStats: this.normalizePerformanceStats(raw.overallStats),
+      homePerformance: this.normalizePerformanceStats(raw.homePerformance),
+      awayPerformance: this.normalizePerformanceStats(raw.awayPerformance),
+      scoringTrend,
+    };
+  }
+
+  /** Normalize a TeamComparison object from the API */
+  private normalizeComparison(raw: any): TeamComparison {
+    if (!raw) return raw;
+    const h2h = raw.headToHead || {};
+    return {
+      ...raw,
+      homeTeam: this.normalizeTeamAnalytics(raw.homeTeam),
+      awayTeam: this.normalizeTeamAnalytics(raw.awayTeam),
+      headToHead: {
+        ...h2h,
+        homeWins: this.num(h2h.homeWins),
+        draws: this.num(h2h.draws),
+        awayWins: this.num(h2h.awayWins),
+        totalMeetings: this.num(h2h.totalMeetings ?? (this.num(h2h.homeWins) + this.num(h2h.draws) + this.num(h2h.awayWins))),
+        lastFiveMeetings: h2h.lastFiveMeetings ?? [],
+      },
     };
   }
 }

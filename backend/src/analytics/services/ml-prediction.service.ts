@@ -340,10 +340,8 @@ export class MLPredictionService {
     try {
       const isHealthy = await this.checkMLServiceHealth();
       if (!isHealthy) {
-        throw new HttpException(
-          'ML prediction service is unavailable',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        );
+        this.logger.warn('ML service unavailable, using statistical fallback for BTTS');
+        return this.computeBttsFallback(request);
       }
 
       const response = await firstValueFrom(
@@ -356,14 +354,10 @@ export class MLPredictionService {
 
       return response.data;
     } catch (error) {
-      this.logger.error(
-        `BTTS prediction failed: ${error instanceof Error ? error.message : String(error)}`,
+      this.logger.warn(
+        `BTTS ML prediction failed, using statistical fallback: ${error instanceof Error ? error.message : String(error)}`,
       );
-      if (error instanceof HttpException) throw error;
-      throw new HttpException(
-        'BTTS prediction service error',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+      return this.computeBttsFallback(request);
     }
   }
 
@@ -376,10 +370,8 @@ export class MLPredictionService {
     try {
       const isHealthy = await this.checkMLServiceHealth();
       if (!isHealthy) {
-        throw new HttpException(
-          'ML prediction service is unavailable',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        );
+        this.logger.warn('ML service unavailable, using statistical fallback for Over/Under');
+        return this.computeOverUnderFallback(request);
       }
 
       const response = await firstValueFrom(
@@ -392,15 +384,70 @@ export class MLPredictionService {
 
       return response.data;
     } catch (error) {
-      this.logger.error(
-        `Over/Under prediction failed: ${error instanceof Error ? error.message : String(error)}`,
+      this.logger.warn(
+        `Over/Under ML prediction failed, using statistical fallback: ${error instanceof Error ? error.message : String(error)}`,
       );
-      if (error instanceof HttpException) throw error;
-      throw new HttpException(
-        'Over/Under prediction service error',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+      return this.computeOverUnderFallback(request);
     }
+  }
+
+  /**
+   * Statistical fallback for BTTS when ML service is unavailable.
+   * Uses Poisson-based estimation from average goals scored/conceded.
+   */
+  private computeBttsFallback(request: BttsRequest): BttsResponse {
+    const homeExpected = (request.home_goals_avg + request.away_goals_conceded_avg) / 2;
+    const awayExpected = (request.away_goals_avg + request.home_goals_conceded_avg) / 2;
+
+    // P(team scores 0) ≈ e^(-expected)
+    const pHomeZero = Math.exp(-homeExpected);
+    const pAwayZero = Math.exp(-awayExpected);
+
+    // P(BTTS) = P(home>=1) * P(away>=1)
+    const bttsYes = (1 - pHomeZero) * (1 - pAwayZero);
+
+    return {
+      btts_yes_probability: Math.round(bttsYes * 100) / 100,
+      btts_no_probability: Math.round((1 - bttsYes) * 100) / 100,
+      confidence: 'low',
+      model_version: 'statistical-fallback-v1',
+    };
+  }
+
+  /**
+   * Statistical fallback for Over/Under when ML service is unavailable.
+   * Uses Poisson CDF to estimate probability of total goals exceeding the line.
+   */
+  private computeOverUnderFallback(request: OverUnderRequest): OverUnderResponse {
+    const line = request.line ?? 2.5;
+    const homeExpected = (request.home_goals_avg + request.away_goals_conceded_avg) / 2;
+    const awayExpected = (request.away_goals_avg + request.home_goals_conceded_avg) / 2;
+    const totalExpected = homeExpected + awayExpected;
+
+    // Poisson CDF: P(X <= k) = sum(e^-λ * λ^i / i!, i=0..k)
+    const k = Math.floor(line);
+    let cdf = 0;
+    for (let i = 0; i <= k; i++) {
+      cdf += (Math.exp(-totalExpected) * Math.pow(totalExpected, i)) / this.factorial(i);
+    }
+
+    const underProb = Math.min(0.95, Math.max(0.05, cdf));
+
+    return {
+      over_probability: Math.round((1 - underProb) * 100) / 100,
+      under_probability: Math.round(underProb * 100) / 100,
+      line,
+      expected_total_goals: Math.round(totalExpected * 100) / 100,
+      confidence: 'low',
+      model_version: 'statistical-fallback-v1',
+    };
+  }
+
+  private factorial(n: number): number {
+    if (n <= 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
   }
 
   /**

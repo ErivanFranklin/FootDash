@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonList, IonItem, IonIcon, IonLabel, IonItemDivider, IonSelect, IonSelectOption, NavController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LanguageService } from '../../core/services/language.service';
@@ -112,6 +112,7 @@ import {
 })
 export class NavigationMenuComponent {
   private router = inject(Router);
+  private navCtrl = inject(NavController);
   private languageService = inject(LanguageService);
   private translocoService = inject(TranslocoService);
   private authService = inject(AuthService);
@@ -141,15 +142,15 @@ export class NavigationMenuComponent {
   }
 
   navigateTo(path: string) {
-    this.router.navigate([path]);
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    this.navCtrl.navigateRoot(normalizedPath);
   }
 
   navigateToProfile() {
     const id = this.authService.getCurrentUserId();
     if (id) {
-       this.router.navigate(['/user-profile', id]);
+       this.navCtrl.navigateRoot(`/user-profile/${id}`);
     } else {
-       // fallback or ignored if not logged in
        this.navigateTo('/home'); 
     }
   }
