@@ -1,6 +1,6 @@
 {
-  "apiBaseUrl": "/api",
-  "wsUrl": "",
+  "apiBaseUrl": "https://app-footdash-dev-api-eus2.azurewebsites.net/api",
+  "wsUrl": "https://app-footdash-dev-api-eus2.azurewebsites.net",
   "authPath": "/auth",
   "pushPublicKey": ""
 }
