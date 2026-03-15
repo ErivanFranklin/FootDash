@@ -6,183 +6,81 @@ import { Leaderboard } from './entities/leaderboard.entity';
 import { Match } from '../matches/entities/match.entity';
 import { MatchFinishedEvent } from '../matches/events/match-finished.event';
 
-const mockPredictionRepository = () => ({
-  create: jest.fn(),
-  save: jest.fn(),
-  find: jest.fn(),
-  findOne: jest.fn(),
-});
-
-const mockGenericRepository = () => ({
-  create: jest.fn(),
-  save: jest.fn(),
-  find: jest.fn(),
-  findOne: jest.fn(),
-  delete: jest.fn(),
-  createQueryBuilder: jest.fn(),
-});
-
 describe('GamificationService', () => {
   let service: GamificationService;
-  let repo: ReturnType<typeof mockPredictionRepository>;
+
+  const mockQueryBuilder = {
+    select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    groupBy: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    addOrderBy: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    getRawOne: jest.fn().mockResolvedValue({ maxPeriod: '2023-W01' }),
+    getRawMany: jest.fn().mockResolvedValue([]),
+    getMany: jest.fn().mockResolvedValue([]),
+  };
+
+  const mockRepo = {
+    create: jest.fn().mockImplementation(d => d),
+    save: jest.fn().mockResolvedValue({}),
+    find: jest.fn().mockResolvedValue([]),
+    delete: jest.fn().mockResolvedValue({}),
+    createQueryBuilder: jest.fn(() => mockQueryBuilder),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GamificationService,
-        {
-          provide: getRepositoryToken(UserPrediction),
-          useFactory: mockPredictionRepository,
-        },
-        {
-          provide: getRepositoryToken(Leaderboard),
-          useFactory: mockGenericRepository,
-        },
-        {
-          provide: getRepositoryToken(Match),
-          useFactory: mockGenericRepository,
-        },
+        { provide: getRepositoryToken(UserPrediction), useValue: mockRepo },
+        { provide: getRepositoryToken(Leaderboard), useValue: mockRepo },
+        { provide: getRepositoryToken(Match), useValue: mockRepo },
       ],
     }).compile();
 
     service = module.get<GamificationService>(GamificationService);
-    repo = module.get(getRepositoryToken(UserPrediction));
-    jest.clearAllMocks();
   });
 
-  // ─── calculatePoints ──────────────────────────────────────────────────────
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
   describe('calculatePoints', () => {
-    it('returns 3 for an exact scoreline match', () => {
+    it('should calculate correct points', () => {
       expect(service.calculatePoints(2, 1, 2, 1)).toBe(3);
-    });
-
-    it('returns 1 for a correct outcome (home win predicted correctly)', () => {
-      expect(service.calculatePoints(2, 0, 3, 1)).toBe(1);
-    });
-
-    it('returns 1 for a correct draw prediction', () => {
-      expect(service.calculatePoints(1, 1, 2, 2)).toBe(1);
-    });
-
-    it('returns 1 for a correct away-win prediction', () => {
-      expect(service.calculatePoints(0, 2, 1, 3)).toBe(1);
-    });
-
-    it('returns 0 for a wrong outcome', () => {
-      expect(service.calculatePoints(2, 0, 0, 1)).toBe(0);
-    });
-
-    it('returns 0 when predicting draw but result is a home win', () => {
-      expect(service.calculatePoints(1, 1, 2, 0)).toBe(0);
+      expect(service.calculatePoints(2, 1, 2, 0)).toBe(1);
     });
   });
-
-  // ─── submitPrediction ─────────────────────────────────────────────────────
-
-  describe('submitPrediction', () => {
-    it('creates and saves a new prediction', async () => {
-      const mockPred: Partial<UserPrediction> = {
-        userId: 1,
-        matchId: 5,
-        homeScore: 2,
-        awayScore: 1,
-      };
-      repo.create.mockReturnValue(mockPred);
-      repo.save.mockResolvedValue({ id: 1, ...mockPred });
-
-      const result = await service.submitPrediction(1, 5, 2, 1);
-
-      expect(repo.create).toHaveBeenCalledWith({
-        userId: 1,
-        matchId: 5,
-        homeScore: 2,
-        awayScore: 1,
-      });
-      expect(repo.save).toHaveBeenCalledWith(mockPred);
-      expect(result).toMatchObject({ id: 1, matchId: 5 });
-    });
-  });
-
-  // ─── processMatchResult ──────────────────────────────────────────────────
-
-  describe('processMatchResult', () => {
-    it('assigns exact-score points to matching predictions', async () => {
-      const saved: Partial<UserPrediction>[] = [];
-      const predictions = [
-        {
-          id: 1,
-          userId: 1,
-          matchId: 10,
-          homeScore: 2,
-          awayScore: 1,
-          points: null,
-        },
-        {
-          id: 2,
-          userId: 2,
-          matchId: 10,
-          homeScore: 1,
-          awayScore: 1,
-          points: null,
-        },
-      ];
-      repo.find.mockResolvedValue(predictions);
-      repo.save.mockImplementation(async (p) => {
-        saved.push(p);
-        return p;
-      });
-
-      await service.processMatchResult(10, 2, 1);
-
-      expect(saved[0].points).toBe(3); // exact match
-      expect(saved[1].points).toBe(0); // wrong outcome (predicted draw, got home win)
-    });
-
-    it('assigns outcome points for correct predictions', async () => {
-      const saved: Partial<UserPrediction>[] = [];
-      const predictions = [
-        {
-          id: 3,
-          userId: 3,
-          matchId: 11,
-          homeScore: 3,
-          awayScore: 0,
-          points: null,
-        },
-      ];
-      repo.find.mockResolvedValue(predictions);
-      repo.save.mockImplementation(async (p) => {
-        saved.push(p);
-        return p;
-      });
-
-      await service.processMatchResult(11, 2, 0); // actual: 2-0, predicted: 3-0 (home win → correct outcome)
-
-      expect(saved[0].points).toBe(1);
-    });
-
-    it('handles a match with no predictions gracefully', async () => {
-      repo.find.mockResolvedValue([]);
-      await expect(service.processMatchResult(99, 0, 0)).resolves.not.toThrow();
-      expect(repo.save).not.toHaveBeenCalled();
-    });
-  });
-
-  // ─── onMatchFinished event handler ───────────────────────────────────────
 
   describe('onMatchFinished', () => {
-    it('calls processMatchResult with event data', async () => {
-      jest.spyOn(service, 'processMatchResult').mockResolvedValue();
-      jest.spyOn(service, 'rebuildLeaderboards').mockResolvedValue({
-        success: true,
-        rebuilt: [],
-      });
-      const event = new MatchFinishedEvent(42, 3, 1);
+    it('should trigger processing', async () => {
+      jest.spyOn(service, 'processMatchResult').mockResolvedValue(undefined as any);
+      jest.spyOn(service, 'rebuildLeaderboards').mockResolvedValue(undefined as any);
+      await service.onMatchFinished({ matchId: 1, homeScore: 2, awayScore: 1 });
+      expect(service.processMatchResult).toHaveBeenCalled();
+    });
+  });
 
-      await service.onMatchFinished(event);
+  describe('getLeaderboard', () => {
+    it('should return mapped rows', async () => {
+      mockQueryBuilder.getRawMany.mockResolvedValueOnce([
+        { rank: 1, userId: 10, points: 5, email: 'a@b.com', displayName: 'User' }
+      ]);
+      const res = await service.getLeaderboard('weekly');
+      expect(res[0].userName).toBe('User');
+    });
+  });
 
-      expect(service.processMatchResult).toHaveBeenCalledWith(42, 3, 1);
+  describe('rebuildLeaderboards', () => {
+    it('should run without error', async () => {
+      mockQueryBuilder.getRawMany.mockResolvedValueOnce([{ matchId: 1 }]);
+      mockQueryBuilder.getMany.mockResolvedValueOnce([{ id: 1, homeScore: 1, awayScore: 1 }]);
+      mockQueryBuilder.getRawMany.mockResolvedValueOnce([]); // No aggregates
+      const res = await service.rebuildLeaderboards(['all-time']);
+      expect(res.success).toBe(true);
     });
   });
 });

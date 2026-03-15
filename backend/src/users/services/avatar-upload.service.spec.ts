@@ -1,10 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AvatarUploadService } from './avatar-upload.service';
-import { BadRequestException } from '@nestjs/common';
-import * as fs from 'fs/promises';
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { promises as fs } from 'fs';
 import { Readable } from 'stream';
 
-jest.mock('fs/promises');
+jest.mock('fs', () => ({
+  promises: {
+    mkdir: jest.fn(),
+    writeFile: jest.fn(),
+    unlink: jest.fn(),
+    access: jest.fn(),
+  },
+}));
+
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'test-uuid-1234'),
 }));
@@ -33,10 +41,10 @@ describe('AvatarUploadService', () => {
     service = module.get<AvatarUploadService>(AvatarUploadService);
 
     jest.clearAllMocks();
-    (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
-    (fs.writeFile as jest.Mock).mockResolvedValue(undefined);
-    (fs.unlink as jest.Mock).mockResolvedValue(undefined);
-    (fs.access as jest.Mock).mockResolvedValue(undefined);
+    (fs.mkdir as any).mockResolvedValue(undefined);
+    (fs.writeFile as any).mockResolvedValue(undefined);
+    (fs.unlink as any).mockResolvedValue(undefined);
+    (fs.access as any).mockResolvedValue(undefined);
   });
 
   it('should be defined', () => {
@@ -147,6 +155,16 @@ describe('AvatarUploadService', () => {
 
       expect(result).toBe('/uploads/avatars/test-uuid-1234.jpg');
     });
+
+    it('should throw InternalServerErrorException if filesystem operation fails', async () => {
+      (fs.writeFile as any).mockRejectedValueOnce(new Error('Write error'));
+      await expect(service.saveAvatar(mockFile)).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should handle error as string in catch block', async () => {
+      (fs.writeFile as any).mockRejectedValueOnce('Some string error');
+      await expect(service.saveAvatar(mockFile)).rejects.toThrow(InternalServerErrorException);
+    });
   });
 
   describe('deleteAvatar', () => {
@@ -157,7 +175,7 @@ describe('AvatarUploadService', () => {
     });
 
     it('should not throw error when deleting non-existent file', async () => {
-      (fs.access as jest.Mock).mockRejectedValue(new Error('File not found'));
+      (fs.access as any).mockRejectedValue(new Error('File not found'));
 
       await expect(
         service.deleteAvatar('/uploads/avatars/non-existent.jpg'),
@@ -165,11 +183,32 @@ describe('AvatarUploadService', () => {
     });
 
     it('should handle avatarUrl without throwing for non-existent path', async () => {
-      (fs.access as jest.Mock).mockRejectedValue(new Error('File not found'));
+      (fs.access as any).mockRejectedValue(new Error('File not found'));
 
       await expect(
         service.deleteAvatar('/uploads/avatars/test.jpg'),
       ).resolves.not.toThrow();
+    });
+
+    it('should return early if avatarUrl is empty', async () => {
+      await service.deleteAvatar('');
+      expect(fs.access).not.toHaveBeenCalled();
+    });
+
+    it('should return early if filename extraction fails', async () => {
+      // With 'invalid-url-no-slash', .pop() returns 'invalid-url-no-slash'
+      // which is truthy, so filename exists and it proceeds.
+      // To fail filename check, we need .pop() to be falsy.
+      // .split('/') on empty string gives [''], .pop() gives '' (falsy)
+      // But we already have a test for empty string.
+      // Let's test special case like '/'
+      await service.deleteAvatar('/');
+      expect(fs.access).not.toHaveBeenCalled();
+    });
+
+    it('should handle non-Error rejection in deleteAvatar', async () => {
+      (fs.access as any).mockRejectedValueOnce('access-denied');
+      await expect(service.deleteAvatar('/uploads/avatars/test.jpg')).resolves.not.toThrow();
     });
   });
 });

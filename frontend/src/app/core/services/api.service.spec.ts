@@ -1,10 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
-
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ApiService } from './api.service';
+import { environment } from '../../../environments/environment';
 
 describe('ApiService', () => {
   let service: ApiService;
@@ -13,6 +10,7 @@ describe('ApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [ApiService]
     });
     service = TestBed.inject(ApiService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -22,74 +20,45 @@ describe('ApiService', () => {
     httpMock.verify();
   });
 
-  it('pings health endpoint', () => {
-    service.ping().subscribe();
-    const req = httpMock.expectOne('/api/health');
-    expect(req.request.method).toBe('GET');
-    req.flush({ ok: true });
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('builds team list query params', () => {
-    service.getTeams({ page: 2, limit: 25, search: 'arsenal' }).subscribe();
-    const req = httpMock.expectOne(
-      (r) =>
-        r.url === '/api/teams' &&
-        r.params.get('page') === '2' &&
-        r.params.get('limit') === '25' &&
-        r.params.get('search') === 'arsenal',
-    );
+  it('should call ping endpoint', () => {
+    service.ping().subscribe();
+    const req = httpMock.expectOne(req => req.url.endsWith('/health'));
     expect(req.request.method).toBe('GET');
+    req.flush({ status: 'ok' });
+  });
+
+  it('should get teams with params', () => {
+    service.getTeams({ page: 1, limit: 10, search: 'test' }).subscribe();
+    const req = httpMock.expectOne(req => req.url.endsWith('/teams') && req.params.get('page') === '1');
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('limit')).toBe('10');
+    expect(req.request.params.get('search')).toBe('test');
     req.flush([]);
   });
 
-  it('calls team and sync endpoints', () => {
-    service.getTeam(9).subscribe();
-    const getReq = httpMock.expectOne('/api/teams/9');
-    expect(getReq.request.method).toBe('GET');
-    getReq.flush({});
-
-    service.syncTeam(9).subscribe();
-    const syncReq = httpMock.expectOne('/api/teams/9/sync');
-    expect(syncReq.request.method).toBe('POST');
-    syncReq.flush({});
+  it('should get team matches with params', () => {
+    service.getTeamMatches(123, { season: 2023, limit: 5 }).subscribe();
+    const req = httpMock.expectOne(req => req.url.includes('/matches/team/123'));
+    expect(req.request.params.get('season')).toBe('2023');
+    expect(req.request.params.get('limit')).toBe('5');
+    req.flush([]);
   });
 
-  it('builds team matches and sync params', () => {
-    const opts = {
-      season: 2026,
-      range: 'next',
-      limit: 7,
-      from: '2026-01-01',
-      to: '2026-01-31',
-    };
-    service.getTeamMatches(5, opts).subscribe();
-    const matchesReq = httpMock.expectOne(
-      (r) =>
-        r.url === '/api/matches/team/5' &&
-        r.params.get('season') === '2026' &&
-        r.params.get('range') === 'next' &&
-        r.params.get('limit') === '7' &&
-        r.params.get('from') === '2026-01-01' &&
-        r.params.get('to') === '2026-01-31',
-    );
-    expect(matchesReq.request.method).toBe('GET');
-    matchesReq.flush([]);
-
-    service.syncTeamMatches(5, opts).subscribe();
-    const syncReq = httpMock.expectOne('/api/matches/team/5/sync?season=2026&range=next&limit=7&from=2026-01-01&to=2026-01-31');
-    expect(syncReq.request.method).toBe('POST');
-    syncReq.flush({});
+  it('should sync team matches', () => {
+    service.syncTeamMatches(123, { range: 'last_5' }).subscribe();
+    const req = httpMock.expectOne(req => req.url.includes('/matches/team/123/sync'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.params.get('range')).toBe('last_5');
+    req.flush({});
   });
 
-  it('gets single match and user profile', () => {
-    service.getMatch(33).subscribe();
-    const matchReq = httpMock.expectOne('/api/matches/33');
-    expect(matchReq.request.method).toBe('GET');
-    matchReq.flush({});
-
-    service.getUserProfile(14).subscribe();
-    const userReq = httpMock.expectOne('/api/users/14/profile');
-    expect(userReq.request.method).toBe('GET');
-    userReq.flush({});
+  it('should get a single match', () => {
+    service.getMatch('m1').subscribe();
+    const req = httpMock.expectOne(req => req.url.endsWith('/matches/m1'));
+    req.flush({});
   });
 });

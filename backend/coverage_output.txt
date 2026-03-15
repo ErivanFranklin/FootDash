@@ -1,0 +1,502 @@
+[31m[Nest] 11013  - [39m03/15/2026, 5:01:39 PM [31m  ERROR[39m [38;5;3m[FootballApiCacheService] [39m[31mRedis connection failed: Conn fail[39m
+PASS src/football-api/football-api-cache.service.spec.ts (7.744 s)
+PASS src/fantasy/fantasy-league.service.spec.ts (8.453 s)
+[31m[Nest] 11011  - [39m03/15/2026, 5:01:40 PM [31m  ERROR[39m [38;5;3m[PaymentsService] [39m[31mWebhook signature verification failed: Signature mismatch[39m
+PASS src/payments/payments.service.spec.ts (9.229 s)
+PASS src/notifications/notifications.controller.spec.ts
+PASS src/matches/matches.service.spec.ts
+PASS src/analytics/controllers/predictions.controller.spec.ts
+PASS src/payments/payments.controller.spec.ts
+PASS src/social/controllers/comments.controller.spec.ts
+PASS src/matches/matches.module.spec.ts
+PASS src/payments/payments.module.spec.ts
+[31m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [31m  ERROR[39m [38;5;3m[FootballApiService] [39m[31mFootball API request failed: timeout[39m
+[31m[Nest] 11010  - [39m03/15/2026, 5:01:42 PM [31m  ERROR[39m [38;5;3m[AuthService] [39m[31mFailed to deliver reset email for user 1 (a@b.com). Returning generic success response.[39m
+Error: SMTP failure
+    at Object.<anonymous> (/Users/erivan.silva/FootDash/backend/src/auth/auth.service.spec.ts:409:60)
+    at Promise.then.completed (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/erivan.silva/FootDash/backend/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/erivan.silva/FootDash/backend/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/erivan.silva/FootDash/backend/node_modules/jest-runner/build/testWorker.js:106:12)
+[33m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [33m   WARN[39m [38;5;3m[FootballApiService] [39m[33mFree plan limitation detected – retrying without last/next params[39m
+[33m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [33m   WARN[39m [38;5;3m[FootballApiService] [39m[33mFree plan limitation detected – retrying without last/next params[39m
+[31m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [31m  ERROR[39m [38;5;3m[FootballApiService] [39m[31mFootball API request failed: API Fail[39m
+Error: API Fail
+    at /Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.spec.ts:364:56
+    at Observable.init [as _subscribe] (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/observable/throwError.ts:123:68)
+    at Observable.Object.<anonymous>.Observable._trySubscribe (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/Observable.ts:235:19)
+    at /Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/Observable.ts:225:18
+    at Object.errorContext (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/util/errorContext.ts:29:5)
+    at Observable.Object.<anonymous>.Observable.subscribe (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/Observable.ts:211:5)
+    at /Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/firstValueFrom.ts:73:12
+    at new Promise (<anonymous>)
+    at firstValueFrom (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/firstValueFrom.ts:58:10)
+    at FootballApiService.makeRequest (/Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.ts:534:44)
+    at FootballApiService.makeRequest [as getLeagues] (/Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.ts:388:31)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at Object.<anonymous> (/Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.spec.ts:365:23)
+[31m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [31m  ERROR[39m [38;5;3m[FootballApiService] [39m[31mFootball API request failed: Lineup fail[39m
+Error: Lineup fail
+    at /Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.spec.ts:407:56
+    at Observable.init [as _subscribe] (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/observable/throwError.ts:123:68)
+    at Observable.Object.<anonymous>.Observable._trySubscribe (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/Observable.ts:235:19)
+    at /Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/Observable.ts:225:18
+    at Object.errorContext (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/util/errorContext.ts:29:5)
+    at Observable.Object.<anonymous>.Observable.subscribe (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/Observable.ts:211:5)
+    at /Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/firstValueFrom.ts:73:12
+    at new Promise (<anonymous>)
+    at firstValueFrom (/Users/erivan.silva/FootDash/backend/node_modules/rxjs/src/internal/firstValueFrom.ts:58:10)
+    at FootballApiService.makeRequest (/Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.ts:534:44)
+    at FootballApiService.makeRequest [as getFixtureLineups] (/Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.ts:295:31)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at Object.<anonymous> (/Users/erivan.silva/FootDash/backend/src/football-api/football-api.service.spec.ts:408:23)
+PASS src/football-api/football-api.service.spec.ts
+[33m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [33m   WARN[39m [38;5;3m[FootballApiService] [39m[33mFailed to fetch leagues: Failed to reach Football API[39m
+[33m[Nest] 11013  - [39m03/15/2026, 5:01:42 PM [33m   WARN[39m [38;5;3m[FootballApiService] [39m[33mFailed to fetch lineups for fixture 123: Failed to reach Football API[39m
+PASS src/auth/auth.service.spec.ts (11.144 s)
+PASS src/admin/admin.controller.spec.ts
+PASS src/social/controllers/alerts.controller.spec.ts
+PASS src/social/gateways/chat.gateway.spec.ts
+[32m[Nest] 11013  - [39m03/15/2026, 5:01:43 PM [32m    LOG[39m [38;5;3m[ChatGateway] [39m[32mClient s1 (user 2) joined room match-10[39m
+[32m[Nest] 11013  - [39m03/15/2026, 5:01:43 PM [32m    LOG[39m [38;5;3m[ChatGateway] [39m[32mClient s2 (user 3) joined room match-11[39m
+[32m[Nest] 11013  - [39m03/15/2026, 5:01:43 PM [32m    LOG[39m [38;5;3m[ChatGateway] [39m[32mClient s2 left room match-11[39m
+[32m[Nest] 11013  - [39m03/15/2026, 5:01:43 PM [32m    LOG[39m [38;5;3m[ChatGateway] [39m[32mClient s4 (user 5) joined room match-14[39m
+PASS src/export/export.controller.spec.ts
+PASS src/analytics/controllers/data-export.controller.spec.ts
+PASS src/social/controllers/feed.controller.spec.ts
+PASS src/notifications/notifications.module.spec.ts
+PASS src/users/users.module.spec.ts
+PASS src/users/services/avatar-upload.service.spec.ts
+PASS src/dashboard/dashboard.service.spec.ts
+PASS src/social/controllers/reports.controller.spec.ts
+PASS src/social/services/alerts.service.spec.ts
+PASS src/teams/teams.controller.spec.ts
+PASS src/admin/admin.module.spec.ts
+PASS src/teams/teams.service.spec.ts
+PASS src/players/players.controller.spec.ts
+PASS src/highlights/highlights.service.spec.ts
+PASS src/users/controllers/user-profile.controller.spec.ts
+PASS src/social/services/follow.service.spec.ts
+PASS src/notifications/notifications.service.spec.ts
+PASS src/gamification/gamification.controller.spec.ts
+PASS src/analytics/controllers/team-analytics.controller.spec.ts
+PASS src/social/controllers/follow.controller.spec.ts
+PASS src/search/search.controller.spec.ts
+PASS src/fantasy/fantasy.controller.spec.ts
+PASS src/leagues/league.service.spec.ts
+PASS src/social/services/reactions.service.spec.ts
+PASS src/matches/matches.controller.spec.ts
+PASS src/analytics/services/statistical-analysis.service.spec.ts
+[31m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [31m  ERROR[39m [38;5;3m[MatchSchedulerService] [39m[31mFailed to sync B: team B failed[39m
+[31m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [31m  ERROR[39m [38;5;3m[MatchSchedulerService] [39m[31mError in scheduled live match check:[39m
+find failed
+[31m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [31m  ERROR[39m [38;5;3m[MatchSchedulerService] [39m[31mError finding live matches:[39m
+db fail
+[31m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [31m  ERROR[39m [38;5;3m[MatchSchedulerService] [39m[31mFailed to sync fixtures for B: sync failed[39m
+PASS src/dashboard/dashboard.module.spec.ts
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mMatch scheduler initialized, running initial check[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mSkipping daily sync - API in mock mode[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mRunning daily fixture sync for favorite teams[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mSyncing fixtures for A (ext=33)[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mSyncing fixtures for B (ext=40)[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mDaily sync complete: 1 teams synced, 1 errors (season 2024)[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mRunning scheduled check for live matches[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mStarting polling for newly live match 1[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mMatch 9 is no longer in live window, stopping polling[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mLive matches: 2, Currently polling: 2[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mRunning scheduled check for live matches[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mManual check triggered[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mForce starting polling for match 55[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mForce stopping polling for match 55[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mSkipping daily sync – mock mode enabled[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mStarting daily fixture sync for all tracked teams[39m
+[33m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [33m   WARN[39m [38;5;3m[MatchSchedulerService] [39m[33mNo teams with externalId found – nothing to sync[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mStarting daily fixture sync for all tracked teams[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mSyncing fixtures for A (ext=77)[39m
+[95m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [95m  DEBUG[39m [38;5;3m[MatchSchedulerService] [39m[95mSyncing fixtures for B (ext=88)[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:48 PM [32m    LOG[39m [38;5;3m[MatchSchedulerService] [39m[32mDaily sync complete: 1 teams synced, 1 errors[39m
+PASS src/matches/match-scheduler.service.spec.ts
+[31m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [31m  ERROR[39m [38;5;3m[LiveMatchService] [39m[31mError polling match 3:[39m
+network failed
+PASS src/gamification/badge.service.spec.ts
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStarting live polling for match 10[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mMatch 10 data changed, broadcasting update[39m
+[95m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [95m  DEBUG[39m [38;5;3m[LiveMatchService] [39m[95mAlready polling match 10[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[95m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [95m  DEBUG[39m [38;5;3m[LiveMatchService] [39m[95mStopped polling match 10[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStarting live polling for match 7[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mMatch 7 data changed, broadcasting update[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping live polling for match 7[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[33m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [33m   WARN[39m [38;5;3m[LiveMatchService] [39m[33mMatch 22 not found[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mMatch 9 is FINISHED, stopping polling[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mMatch 5 data changed, broadcasting update[39m
+[95m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [95m  DEBUG[39m [38;5;3m[LiveMatchService] [39m[95mNo changes for match 5[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStarting live polling for match 1[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mMatch 1 data changed, broadcasting update[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStarting live polling for match 2[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mMatch 2 data changed, broadcasting update[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+[95m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [95m  DEBUG[39m [38;5;3m[LiveMatchService] [39m[95mStopped polling match 1[39m
+[95m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [95m  DEBUG[39m [38;5;3m[LiveMatchService] [39m[95mStopped polling match 2[39m
+[32m[Nest] 11012  - [39m03/15/2026, 5:01:49 PM [32m    LOG[39m [38;5;3m[LiveMatchService] [39m[32mStopping all live match polling[39m
+PASS src/matches/live-match.service.spec.ts
+PASS src/social/controllers/reactions.controller.spec.ts
+PASS src/analytics/services/match-prediction.service.spec.ts
+PASS src/health/health.module.spec.ts
+PASS src/admin/admin.service.spec.ts
+PASS src/odds/odds.service.spec.ts
+PASS src/social/controllers/chat.controller.spec.ts
+PASS src/users/services/user-preferences.service.spec.ts
+PASS src/auth/auth.service.integration.spec.ts
+PASS src/analytics/services/form-calculator.service.spec.ts
+PASS src/search/search.service.spec.ts
+PASS src/export/export.module.spec.ts
+PASS src/players/players.service.spec.ts
+PASS src/search/search.module.spec.ts
+[31m[Nest] 11013  - [39m03/15/2026, 5:01:52 PM [31m  ERROR[39m [38;5;3m[UserPreferencesController] [39m[31mUpload failed[39m
+[31m[Nest] 11013  - [39m03/15/2026, 5:01:52 PM [31m  ERROR[39m [38;5;3m[UserPreferencesController] [39mError: update failed
+    at Object.<anonymous> [90m(/Users/erivan.silva/FootDash/backend/[39msrc/users/controllers/user-preferences.controller.spec.ts:53:53[90m)[39m
+    at Promise.then.completed [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/utils.js:298:28[90m)[39m
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/utils.js:231:10[90m)[39m
+    at _callCircusTest [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/run.js:316:40[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at _runTest [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/run.js:252:3[90m)[39m
+    at _runTestsForDescribeBlock [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/run.js:126:9[90m)[39m
+    at _runTestsForDescribeBlock [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/run.js:121:9[90m)[39m
+    at run [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/run.js:71:3[90m)[39m
+    at runAndTransformResultsToJestFormat [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21[90m)[39m
+    at jestAdapter [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-circus[24m/build/legacy-code-todo-rewrite/jestAdapter.js:79:19[90m)[39m
+    at runTestInternal [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-runner[24m/build/runTest.js:367:16[90m)[39m
+    at runTest [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-runner[24m/build/runTest.js:444:34[90m)[39m
+    at Object.worker [90m(/Users/erivan.silva/FootDash/backend/[39mnode_modules/[4mjest-runner[24m/build/testWorker.js:106:12[90m)[39m
+PASS src/users/controllers/user-preferences.controller.spec.ts
+PASS src/app.controller.spec.ts
+PASS src/teams/teams.module.spec.ts
+PASS src/dashboard/dashboard.controller.spec.ts
+PASS src/auth/guards/admin.guard.spec.ts
+PASS src/social/services/profanity-filter.service.spec.ts
+PASS src/analytics/services/team-analytics.service.spec.ts
+PASS src/favorites/favorites.service.spec.ts
+PASS src/social/services/comments.service.spec.ts
+PASS src/favorites/favorites.module.spec.ts
+PASS src/health/health.controller.spec.ts
+PASS src/analytics/services/match-prediction.service.unit.spec.ts
+PASS src/analytics/services/insights-generator.service.spec.ts
+PASS src/export/export.service.spec.ts
+PASS src/users/services/user-profile.service.spec.ts
+PASS src/auth/guards/roles.guard.spec.ts
+PASS src/social/services/reports.service.spec.ts
+[31m[Nest] 11012  - [39m03/15/2026, 5:01:55 PM [31m  ERROR[39m [38;5;3m[MailService] [39m[31mFailed to send password reset email to a@b.com[39m
+Error: SMTP Error
+    at Object.<anonymous> (/Users/erivan.silva/FootDash/backend/src/mail/mail.service.spec.ts:54:46)
+    at Promise.then.completed (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/erivan.silva/FootDash/backend/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/erivan.silva/FootDash/backend/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/erivan.silva/FootDash/backend/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/erivan.silva/FootDash/backend/node_modules/jest-runner/build/testWorker.js:106:12)
+PASS src/mail/mail.service.spec.ts
+PASS src/favorites/favorites.controller.spec.ts
+PASS src/social/services/chat.service.spec.ts
+PASS src/social/services/feed.service.spec.ts
+PASS src/websockets/websockets.module.spec.ts
+PASS src/websockets/match.gateway.spec.ts
+PASS src/social/utils/mention-parser.spec.ts
+PASS src/gamification/gamification.service.spec.ts
+PASS src/search/dto/search-query.dto.spec.ts
+PASS src/websockets/social.gateway.spec.ts
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [32m    LOG[39m [38;5;3m[MatchGateway] [39m[32mClient c1 subscribed to match 123[39m
+[33m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [33m   WARN[39m [38;5;3m[MatchGateway] [39m[33mInvalid subscription request from c2[39m
+[33m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [33m   WARN[39m [38;5;3m[MatchGateway] [39m[33mInvalid subscription request from c2[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [32m    LOG[39m [38;5;3m[MatchGateway] [39m[32mClient c3 unsubscribed from match 123[39m
+[33m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [33m   WARN[39m [38;5;3m[MatchGateway] [39m[33mInvalid unsubscription request from c4[39m
+[33m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [33m   WARN[39m [38;5;3m[MatchGateway] [39m[33mInvalid unsubscription request from c4[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [32m    LOG[39m [38;5;3m[MatchGateway] [39m[32mBroadcasting update for match 55[39m
+[32m[Nest] 11010  - [39m03/15/2026, 5:01:55 PM [32m    LOG[39m [38;5;3m[MatchGateway] [39m[32mBroadcasting update for match 1[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mClient s1 subscribed to social room match-9[39m
+[33m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [33m   WARN[39m [38;5;3m[SocialGateway] [39m[33mInvalid social subscription request from s2[39m
+[33m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [33m   WARN[39m [38;5;3m[SocialGateway] [39m[33mInvalid social subscription request from s2[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mClient s3 unsubscribed from social room prediction-7[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mClient s4 subscribed to user room user-42[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mClient s4 unsubscribed from user room user-42[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mBroadcasting comment event to room match-10[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mEmitting new-alert to user room user-5[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mBroadcasting global follow event[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mBroadcasting reaction event to room match-1[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mEmitting x to user room user-1[39m
+[32m[Nest] 11011  - [39m03/15/2026, 5:01:56 PM [32m    LOG[39m [38;5;3m[SocialGateway] [39m[32mBroadcasting global comment event[39m
+-------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------
+File                                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                           
+-------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------
+All files                            |   74.41 |    56.31 |   65.03 |   74.77 |                                                                                             
+ src                                 |      26 |        0 |   66.66 |   20.45 |                                                                                             
+  app.controller.ts                  |     100 |      100 |     100 |     100 |                                                                                             
+  app.module.ts                      |       0 |        0 |     100 |       0 | 1-129                                                                                       
+  app.service.ts                     |      80 |      100 |       0 |   66.66 | 6                                                                                           
+ src/admin                           |   64.96 |     50.9 |   48.38 |   64.38 |                                                                                             
+  admin-analytics.service.ts         |   14.28 |        0 |       0 |   12.06 | 12-199                                                                                      
+  admin.controller.ts                |     100 |    81.25 |     100 |     100 | 51-85                                                                                       
+  admin.module.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+  admin.service.ts                   |   97.72 |      100 |   83.33 |   97.61 | 82                                                                                          
+ src/admin/dto                       |     100 |      100 |     100 |     100 |                                                                                             
+  update-user-pro.dto.ts             |     100 |      100 |     100 |     100 |                                                                                             
+  update-user-role.dto.ts            |     100 |      100 |     100 |     100 |                                                                                             
+ src/analytics                       |       0 |      100 |     100 |       0 |                                                                                             
+  analytics.module.ts                |       0 |      100 |     100 |       0 | 1-57                                                                                        
+ src/analytics/controllers           |   96.84 |    73.33 |   95.23 |   96.62 |                                                                                             
+  data-export.controller.ts          |   95.23 |    64.44 |     100 |      95 | 167,171                                                                                     
+  predictions.controller.ts          |   97.14 |    84.09 |   88.88 |   96.96 | 98                                                                                          
+  team-analytics.controller.ts       |     100 |        0 |     100 |     100 | 65                                                                                          
+ src/analytics/dto                   |     100 |      100 |     100 |     100 |                                                                                             
+  prediction-result.dto.ts           |     100 |      100 |     100 |     100 |                                                                                             
+  team-analytics.dto.ts              |     100 |      100 |     100 |     100 |                                                                                             
+ src/analytics/entities              |   96.36 |      100 |   33.33 |   95.91 |                                                                                             
+  match-prediction.entity.ts         |   95.23 |      100 |      50 |   94.73 | 29                                                                                          
+  prediction-performance.entity.ts   |     100 |      100 |     100 |     100 |                                                                                             
+  team-analytics.entity.ts           |   94.73 |      100 |       0 |   94.11 | 23                                                                                          
+ src/analytics/services              |   52.25 |    37.41 |   43.11 |   52.04 |                                                                                             
+  data-export.service.ts             |    8.33 |        0 |       0 |    6.95 | 66-510                                                                                      
+  form-calculator.service.ts         |   97.87 |     84.9 |     100 |    98.7 | 108                                                                                         
+  insights-generator.service.ts      |     100 |      100 |     100 |     100 |                                                                                             
+  match-prediction.service.ts        |   91.66 |    70.83 |     100 |    91.5 | 228-231,233-236,378                                                                         
+  ml-prediction.service.ts           |    5.83 |        0 |       0 |    4.38 | 95-516                                                                                      
+  prediction-strategy.service.ts     |      10 |     3.27 |    5.26 |    9.16 | 18-418                                                                                      
+  statistical-analysis.service.ts    |   62.24 |    63.04 |      60 |   67.05 | 123,171-238                                                                                 
+  team-analytics.service.ts          |   85.98 |     62.5 |   71.42 |   87.37 | 158,168-171,208-209,240-258,296,350,429                                                     
+ src/auth                            |   57.27 |    43.88 |   47.54 |   57.38 |                                                                                             
+  auth.controller.ts                 |       0 |        0 |       0 |       0 | 1-430                                                                                       
+  auth.module.ts                     |       0 |      100 |       0 |       0 | 1-37                                                                                        
+  auth.service.ts                    |   83.39 |    70.11 |   90.62 |   83.58 | 117-118,158-163,219,261,266,273-275,371-397,403,411-414,422,474,488,517,533,571-576,612-615 
+  jwt-auth.guard.ts                  |     100 |      100 |     100 |     100 |                                                                                             
+  jwt.strategy.ts                    |       0 |      100 |       0 |       0 | 1-18                                                                                        
+  refresh-token.entity.ts            |   86.66 |      100 |       0 |   91.66 | 18                                                                                          
+ src/auth/decorators                 |     100 |      100 |     100 |     100 |                                                                                             
+  roles.decorator.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+ src/auth/dto                        |       0 |        0 |       0 |       0 |                                                                                             
+  change-password.dto.ts             |       0 |      100 |     100 |       0 | 1-16                                                                                        
+  forgot-password.dto.ts             |       0 |      100 |     100 |       0 | 1-11                                                                                        
+  login-auth.dto.ts                  |       0 |        0 |       0 |       0 | 1-44                                                                                        
+  profile.dto.ts                     |       0 |      100 |     100 |       0 | 1-18                                                                                        
+  refresh-auth.dto.ts                |       0 |      100 |     100 |       0 | 1-11                                                                                        
+  register-auth.dto.ts               |       0 |        0 |       0 |       0 | 1-26                                                                                        
+  reset-password.dto.ts              |       0 |      100 |     100 |       0 | 1-21                                                                                        
+  revoke-auth.dto.ts                 |       0 |      100 |     100 |       0 | 1-11                                                                                        
+  two-factor-code.dto.ts             |       0 |      100 |     100 |       0 | 1-11                                                                                        
+ src/auth/entities                   |      92 |      100 |       0 |   90.47 |                                                                                             
+  login-audit.entity.ts              |   91.66 |      100 |       0 |      90 | 15                                                                                          
+  password-reset-token.entity.ts     |    92.3 |      100 |       0 |    90.9 | 19                                                                                          
+ src/auth/guards                     |     100 |    94.73 |     100 |     100 |                                                                                             
+  admin.guard.ts                     |     100 |     92.3 |     100 |     100 | 34                                                                                          
+  roles.guard.ts                     |     100 |      100 |     100 |     100 |                                                                                             
+ src/common/decorators               |   66.66 |      100 |      50 |      60 |                                                                                             
+  current-user.decorator.ts          |      50 |      100 |       0 |      50 | 14-15                                                                                       
+  index.ts                           |     100 |      100 |     100 |     100 |                                                                                             
+ src/common/filters                  |       0 |        0 |       0 |       0 |                                                                                             
+  all-exceptions.filter.ts           |       0 |        0 |       0 |       0 | 1-121                                                                                       
+  http-exception.filter.ts           |       0 |        0 |       0 |       0 | 1-62                                                                                        
+ src/common/interceptors             |       0 |        0 |       0 |       0 |                                                                                             
+  logging.interceptor.ts             |       0 |        0 |       0 |       0 | 1-59                                                                                        
+ src/dashboard                       |     100 |      100 |     100 |     100 |                                                                                             
+  dashboard.controller.ts            |     100 |      100 |     100 |     100 |                                                                                             
+  dashboard.module.ts                |     100 |      100 |     100 |     100 |                                                                                             
+  dashboard.service.ts               |     100 |      100 |     100 |     100 |                                                                                             
+ src/db                              |       0 |        0 |       0 |       0 |                                                                                             
+  database.module.ts                 |       0 |        0 |       0 |       0 | 1-35                                                                                        
+ src/export                          |   98.43 |    93.54 |     100 |     100 |                                                                                             
+  export.controller.ts               |     100 |    83.33 |     100 |     100 | 41                                                                                          
+  export.module.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+  export.service.ts                  |   96.42 |       96 |     100 |     100 | 68                                                                                          
+ src/fantasy                         |   84.79 |    79.54 |   67.56 |      86 |                                                                                             
+  fantasy-league.service.ts          |   93.93 |     82.5 |      84 |   95.65 | 118-123,168,420                                                                             
+  fantasy.controller.ts              |      70 |       50 |   33.33 |   67.85 | 61,67,73,81,93,116,130-137,145                                                              
+  fantasy.module.ts                  |       0 |      100 |     100 |       0 | 1-29                                                                                        
+ src/fantasy/entities                |   79.12 |      100 |       0 |   84.93 |                                                                                             
+  fantasy.entities.ts                |   79.12 |      100 |       0 |   84.93 | 24,55,58,76,83,108,123,172,198,207,221                                                      
+ src/favorites                       |     100 |      100 |     100 |     100 |                                                                                             
+  favorites.controller.ts            |     100 |      100 |     100 |     100 |                                                                                             
+  favorites.module.ts                |     100 |      100 |     100 |     100 |                                                                                             
+  favorites.service.ts               |     100 |      100 |     100 |     100 |                                                                                             
+ src/favorites/entities              |   93.75 |      100 |      50 |   92.85 |                                                                                             
+  favorite.entity.ts                 |   93.75 |      100 |      50 |   92.85 | 27                                                                                          
+ src/football-api                    |   86.36 |    60.71 |   75.55 |   90.74 |                                                                                             
+  football-api-cache.service.ts      |   90.41 |    66.66 |   93.33 |   95.45 | 40,139-140                                                                                  
+  football-api.adapter.ts            |   68.75 |    49.05 |      50 |   58.33 | 63-77,88                                                                                    
+  football-api.module.ts             |   88.88 |        0 |       0 |   85.71 | 12                                                                                          
+  football-api.service.ts            |   86.14 |     72.3 |   73.91 |   91.54 | 93-99,307-314,418-421,450-453,492-509                                                       
+ src/gamification                    |   60.68 |    47.72 |    82.6 |   60.07 |                                                                                             
+  badge.service.ts                   |   79.41 |    59.45 |      95 |   77.89 | 177,200,216,237-251,305-309,315-324                                                         
+  gamification.controller.ts         |     100 |        0 |     100 |     100 | 62                                                                                          
+  gamification.module.ts             |       0 |      100 |     100 |       0 | 1-37                                                                                        
+  gamification.scheduler.ts          |       0 |        0 |       0 |       0 | 1-100                                                                                       
+  gamification.service.ts            |   69.79 |    47.61 |   85.71 |   68.81 | 33,41,57,72-88,97-117,150,161-170,245-251,271,284-291                                       
+ src/gamification/entities           |   90.24 |      100 |      20 |   91.66 |                                                                                             
+  badge.entity.ts                    |   94.59 |      100 |      50 |   97.05 | 67                                                                                          
+  leaderboard.entity.ts              |    92.3 |      100 |       0 |    90.9 | 15                                                                                          
+  user-badge.entity.ts               |      80 |      100 |       0 |   83.33 | 28,32                                                                                       
+  user-prediction.entity.ts          |   88.23 |      100 |       0 |   86.66 | 17,24                                                                                       
+ src/health                          |     100 |      100 |     100 |     100 |                                                                                             
+  health.controller.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  health.module.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+ src/highlights                      |   51.25 |       25 |      50 |   52.77 |                                                                                             
+  highlights.controller.ts           |       0 |        0 |       0 |       0 | 1-63                                                                                        
+  highlights.module.ts               |       0 |      100 |     100 |       0 | 1-17                                                                                        
+  highlights.service.ts              |   80.39 |       30 |      80 |   80.85 | 50,82-92,112                                                                                
+ src/highlights/entities             |     100 |      100 |     100 |     100 |                                                                                             
+  highlight.entity.ts                |     100 |      100 |     100 |     100 |                                                                                             
+ src/leagues                         |   34.66 |     12.5 |   35.29 |   34.84 |                                                                                             
+  league.controller.ts               |       0 |        0 |       0 |       0 | 1-43                                                                                        
+  league.module.ts                   |       0 |      100 |       0 |       0 | 1-19                                                                                        
+  league.service.ts                  |   56.52 |    13.33 |   66.66 |   54.76 | 41,55-56,71-107                                                                             
+ src/leagues/entities                |     100 |      100 |     100 |     100 |                                                                                             
+  league.entity.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+ src/mail                            |   71.42 |       50 |   66.66 |      75 |                                                                                             
+  mail.module.ts                     |       0 |        0 |       0 |       0 | 1-37                                                                                        
+  mail.service.ts                    |     100 |       75 |     100 |     100 | 64                                                                                          
+ src/matches                         |    96.3 |     69.5 |   84.78 |   96.44 |                                                                                             
+  live-match.service.ts              |   98.38 |    82.75 |    90.9 |   98.33 | 52                                                                                          
+  match-scheduler.service.ts         |   96.55 |    77.77 |   84.21 |   97.27 | 33,113,329                                                                                  
+  matches.controller.ts              |   84.21 |      100 |      40 |   82.35 | 43,51,139                                                                                   
+  matches.module.ts                  |     100 |      100 |     100 |     100 |                                                                                             
+  matches.service.ts                 |   96.46 |    62.35 |     100 |   96.33 | 171,246-249                                                                                 
+ src/matches/dto                     |   85.71 |      100 |   33.33 |   85.71 |                                                                                             
+  matches-query.dto.ts               |   85.71 |      100 |   33.33 |   85.71 | 12,18                                                                                       
+ src/matches/entities                |   80.95 |      100 |       0 |   88.23 |                                                                                             
+  match.entity.ts                    |   80.95 |      100 |       0 |   88.23 | 12,15                                                                                       
+ src/matches/events                  |     100 |      100 |     100 |     100 |                                                                                             
+  match-finished.event.ts            |     100 |      100 |     100 |     100 |                                                                                             
+ src/notifications                   |   67.88 |       50 |   70.83 |   67.46 |                                                                                             
+  notification-token.entity.ts       |     100 |      100 |     100 |     100 |                                                                                             
+  notifications.controller.ts        |    90.9 |      100 |   66.66 |   88.88 | 11                                                                                          
+  notifications.e2e-spec.ts          |       0 |        0 |       0 |       0 | 1-32                                                                                        
+  notifications.module.ts            |     100 |      100 |     100 |     100 |                                                                                             
+  notifications.service.ts           |   73.33 |    51.28 |   88.23 |   74.41 | 36-37,51-53,107-110,115-116,136-143,153-165,189-205,214,235                                 
+ src/notifications/dto               |      75 |        0 |       0 |      75 |                                                                                             
+  register-notification-token.dto.ts |      75 |        0 |       0 |      75 | 6,15                                                                                        
+ src/odds                            |   54.62 |    34.78 |   43.75 |   59.57 |                                                                                             
+  odds.controller.ts                 |       0 |      100 |       0 |       0 | 1-49                                                                                        
+  odds.module.ts                     |       0 |      100 |     100 |       0 | 1-17                                                                                        
+  odds.service.ts                    |   70.23 |    34.78 |   58.33 |   75.67 | 167-212                                                                                     
+ src/odds/entities                   |     100 |      100 |     100 |     100 |                                                                                             
+  odds.entity.ts                     |     100 |      100 |     100 |     100 |                                                                                             
+ src/payments                        |   95.13 |    70.66 |   94.11 |   95.52 |                                                                                             
+  payments.controller.ts             |     100 |      100 |     100 |     100 |                                                                                             
+  payments.module.ts                 |    90.9 |      100 |       0 |   88.88 | 17                                                                                          
+  payments.service.ts                |   94.11 |    68.57 |     100 |   94.79 | 26,210,227-234                                                                              
+ src/players                         |   76.47 |      100 |     100 |   78.57 |                                                                                             
+  players.controller.ts              |     100 |      100 |     100 |     100 |                                                                                             
+  players.module.ts                  |       0 |      100 |     100 |       0 | 1-13                                                                                        
+  players.service.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+ src/players/entities                |     100 |      100 |     100 |     100 |                                                                                             
+  player.entity.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+ src/search                          |     100 |    97.22 |     100 |     100 |                                                                                             
+  search.controller.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  search.module.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+  search.service.ts                  |     100 |    97.22 |     100 |     100 | 85                                                                                          
+ src/search/dto                      |     100 |      100 |     100 |     100 |                                                                                             
+  search-query.dto.ts                |     100 |      100 |     100 |     100 |                                                                                             
+ src/social                          |       0 |      100 |     100 |       0 |                                                                                             
+  social.module.ts                   |       0 |      100 |     100 |       0 | 1-83                                                                                        
+ src/social/controllers              |     100 |    86.66 |     100 |     100 |                                                                                             
+  alerts.controller.ts               |     100 |    71.42 |     100 |     100 | 44-45                                                                                       
+  chat.controller.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+  comments.controller.ts             |     100 |      100 |     100 |     100 |                                                                                             
+  feed.controller.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+  follow.controller.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  reactions.controller.ts            |     100 |      100 |     100 |     100 |                                                                                             
+  reports.controller.ts              |     100 |      100 |     100 |     100 |                                                                                             
+ src/social/dto                      |   79.71 |      100 |    8.33 |   85.93 |                                                                                             
+  activity.dto.ts                    |   73.68 |      100 |      25 |    87.5 | 38,44                                                                                       
+  comment.dto.ts                     |   78.57 |      100 |       0 |   78.57 | 20,25,30                                                                                    
+  create-report.dto.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  follow.dto.ts                      |   88.88 |      100 |       0 |   88.88 | 6                                                                                           
+  pagination.dto.ts                  |   55.55 |      100 |       0 |   71.42 | 8,14                                                                                        
+  reaction.dto.ts                    |      90 |      100 |       0 |      90 | 11                                                                                          
+ src/social/entities                 |   89.87 |      100 |   30.43 |   90.14 |                                                                                             
+  alert.entity.ts                    |   92.59 |      100 |   33.33 |      92 | 30,52                                                                                       
+  chat-msg.entity.ts                 |   91.66 |      100 |       0 |      90 | 22                                                                                          
+  comment.entity.ts                  |   75.86 |      100 |       0 |      80 | 48,52,56,60,64                                                                              
+  follow.entity.ts                   |   84.61 |      100 |       0 |   81.81 | 30,34                                                                                       
+  reaction.entity.ts                 |   95.83 |      100 |   66.66 |   95.45 | 52                                                                                          
+  report.entity.ts                   |    93.1 |      100 |      50 |   92.59 | 65,69                                                                                       
+  user-activity.entity.ts            |   95.83 |      100 |   66.66 |   95.45 | 53                                                                                          
+ src/social/gateways                 |     100 |       70 |     100 |     100 |                                                                                             
+  chat.gateway.ts                    |     100 |       70 |     100 |     100 | 46-60                                                                                       
+ src/social/services                 |   94.95 |    78.72 |   89.47 |   94.59 |                                                                                             
+  alerts.service.ts                  |     100 |    66.66 |     100 |     100 | 111-117,207                                                                                 
+  chat.service.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+  comments.service.ts                |   89.74 |    69.69 |   84.61 |   89.47 | 127-140,200,204                                                                             
+  feed.service.ts                    |   96.29 |    86.36 |    92.3 |   96.07 | 126,151                                                                                     
+  follow.service.ts                  |   92.98 |    73.33 |   76.92 |   92.45 | 157-172                                                                                     
+  profanity-filter.service.ts        |     100 |      100 |     100 |     100 |                                                                                             
+  reactions.service.ts               |   94.28 |      100 |      80 |   93.93 | 92-104                                                                                      
+  reports.service.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+ src/social/utils                    |      84 |    33.33 |     100 |     100 |                                                                                             
+  mention-parser.ts                  |      84 |    33.33 |     100 |     100 | 2-15,29-31                                                                                  
+ src/teams                           |     100 |    74.41 |     100 |     100 |                                                                                             
+  teams.controller.ts                |     100 |     87.5 |     100 |     100 | 74                                                                                          
+  teams.module.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+  teams.service.ts                   |     100 |    71.42 |     100 |     100 | 31,39,80-81,116-117,126-131                                                                 
+ src/teams/dto                       |   79.31 |      100 |   14.28 |   79.31 |                                                                                             
+  create-team.dto.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+  team-id-param.dto.ts               |      80 |      100 |       0 |      80 | 5                                                                                           
+  team-matches-query.dto.ts          |   76.92 |      100 |      25 |   76.92 | 11,17,23                                                                                    
+  team-stats-query.dto.ts            |   71.42 |      100 |       0 |   71.42 | 6,12                                                                                        
+ src/teams/entities                  |   73.33 |      100 |       0 |   81.81 |                                                                                             
+  team.entity.ts                     |   73.33 |      100 |       0 |   81.81 | 18,21                                                                                       
+ src/users                           |     100 |      100 |     100 |     100 |                                                                                             
+  user.entity.ts                     |     100 |      100 |     100 |     100 |                                                                                             
+  users.module.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+ src/users/controllers               |   98.38 |      100 |     100 |   98.27 |                                                                                             
+  user-preferences.controller.ts     |     100 |      100 |     100 |     100 |                                                                                             
+  user-profile.controller.ts         |   97.29 |      100 |     100 |   97.14 | 77                                                                                          
+ src/users/dto                       |     100 |      100 |     100 |     100 |                                                                                             
+  create-profile.dto.ts              |     100 |      100 |     100 |     100 |                                                                                             
+  update-preferences.dto.ts          |     100 |      100 |     100 |     100 |                                                                                             
+  update-profile.dto.ts              |     100 |      100 |     100 |     100 |                                                                                             
+ src/users/entities                  |      95 |      100 |      50 |   94.44 |                                                                                             
+  user-preferences.entity.ts         |   96.15 |      100 |   66.66 |   95.83 | 32                                                                                          
+  user-profile.entity.ts             |   92.85 |      100 |       0 |   91.66 | 20                                                                                          
+ src/users/services                  |   95.45 |    68.42 |     100 |      95 |                                                                                             
+  avatar-upload.service.ts           |   88.23 |     37.5 |     100 |    87.5 | 49-53,59,66                                                                                 
+  user-preferences.service.ts        |   96.29 |       50 |     100 |      96 | 38                                                                                          
+  user-profile.service.ts            |     100 |      100 |     100 |     100 |                                                                                             
+ src/websockets                      |   89.02 |     87.5 |   70.58 |   90.54 |                                                                                             
+  match.gateway.ts                   |    92.3 |      100 |   66.66 |   91.66 | 23-27                                                                                       
+  social.gateway.ts                  |      86 |    82.35 |   72.72 |   89.13 | 34-42,77-80                                                                                 
+  websockets.module.ts               |     100 |      100 |     100 |     100 |                                                                                             
+-------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------
+Jest: "global" coverage threshold for statements (80%) not met: 74.41%
+Jest: "global" coverage threshold for branches (70%) not met: 56.31%
+Jest: "global" coverage threshold for lines (80%) not met: 74.77%
+Jest: "global" coverage threshold for functions (80%) not met: 65.03%
+
+Test Suites: 85 passed, 85 total
+Tests:       643 passed, 643 total
+Snapshots:   0 total
+Time:        32.839 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

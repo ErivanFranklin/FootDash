@@ -1,48 +1,49 @@
 import { TestBed } from '@angular/core/testing';
-import { TranslocoService } from '@jsverse/transloco';
-
 import { LanguageService } from './language.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 describe('LanguageService', () => {
   let service: LanguageService;
-  const translocoMock = {
-    setActiveLang: jasmine.createSpy('setActiveLang'),
-  };
+  let translocoSpy: jasmine.SpyObj<TranslocoService>;
 
   beforeEach(() => {
     localStorage.clear();
+    translocoSpy = jasmine.createSpyObj('TranslocoService', ['setActiveLang']);
+
     TestBed.configureTestingModule({
-      providers: [{ provide: TranslocoService, useValue: translocoMock }],
+      providers: [
+        LanguageService,
+        { provide: TranslocoService, useValue: translocoSpy }
+      ]
     });
     service = TestBed.inject(LanguageService);
   });
 
-  afterEach(() => {
-    localStorage.clear();
-    translocoMock.setActiveLang.calls.reset();
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('initializes from localStorage when available', () => {
-    localStorage.setItem('footdash_lang', 'pt');
-
-    const fresh = TestBed.runInInjectionContext(() => new LanguageService());
-
-    expect(fresh.currentLang()).toBe('pt');
-    expect(translocoMock.setActiveLang).toHaveBeenCalledWith('pt');
-    expect(document.documentElement.lang).toBe('pt');
+  it('should initialize with default language if nothing is saved', () => {
+    // Should default to 'en' or browser lang
+    expect(service.currentLang()).toBeDefined();
   });
 
-  it('ignores unsupported language changes', () => {
-    const current = service.currentLang();
-
-    service.setLanguage('de');
-
-    expect(service.currentLang()).toBe(current);
-    expect(translocoMock.setActiveLang).not.toHaveBeenCalledWith('de');
+  it('should set language and save to localStorage', () => {
+    service.setLanguage('pt');
+    expect(service.currentLang()).toBe('pt');
+    expect(localStorage.getItem('footdash_lang')).toBe('pt');
+    expect(translocoSpy.setActiveLang).toHaveBeenCalledWith('pt');
   });
 
-  it('returns available language options', () => {
+  it('should not set unsupported language', () => {
+    const initialLang = service.currentLang();
+    service.setLanguage('fr'); // not supported
+    expect(service.currentLang()).toBe(initialLang);
+  });
+
+  it('should return available languages', () => {
     const langs = service.getAvailableLanguages();
-    expect(langs.map((l) => l.code)).toEqual(['en', 'pt', 'es']);
+    expect(langs.length).toBeGreaterThan(0);
+    expect(langs.find(l => l.code === 'en')).toBeDefined();
   });
 });

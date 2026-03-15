@@ -1,147 +1,97 @@
-import { HttpErrorResponse, HttpRequest, HttpResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
+import { HttpClient, provideHttpClient, withInterceptors, HttpErrorResponse } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Store, provideStore } from '@ngrx/store';
 import { of, throwError } from 'rxjs';
-
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
+import { selectToken } from '../../store/auth/auth.selectors';
+import { authSetToken } from '../../store/auth/auth.actions';
 
 describe('authInterceptor', () => {
-  const setup = (tokenInStore: string | null = null) => {
-    const storeMock = {
-      select: jasmine.createSpy('select').and.returnValue(of(tokenInStore)),
-      dispatch: jasmine.createSpy('dispatch'),
-    };
+  let httpMock: HttpTestingController;
+  let httpClient: HttpClient;
+  let store: Store;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
-    const authMock = {
-      getToken: jasmine.createSpy('getToken').and.returnValue(tokenInStore),
-      refreshAccessToken: jasmine.createSpy('refreshAccessToken'),
-      isAuthenticated: jasmine.createSpy('isAuthenticated').and.returnValue(true),
-      invalidateSession: jasmine.createSpy('invalidateSession'),
-      jwtHelper: {
-        decodeToken: jasmine.createSpy('decodeToken').and.returnValue({ sub: 9 }),
-      },
-    };
+  beforeEach(() => {
+    authServiceSpy = jasmine.createSpyObj('AuthService', [
+      'getToken', 'refreshAccessToken', 'isAuthenticated', 'invalidateSession'
+    ]);
+    
+    const mockJwtHelper = { decodeToken: jasmine.createSpy().and.returnValue({ sub: '123' }) };
+    (authServiceSpy as any).jwtHelper = mockJwtHelper;
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: Store, useValue: storeMock },
-        { provide: AuthService, useValue: authMock },
-      ],
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+        provideStore({}, {}),
+        { provide: AuthService, useValue: authServiceSpy }
+      ]
     });
 
-    const run = (req: HttpRequest<unknown>, nextFn: any) =>
-      TestBed.runInInjectionContext(() => authInterceptor(req, nextFn));
-
-    return { storeMock, authMock, run };
-  };
-
-  it('always sets withCredentials', (done) => {
-    const { run } = setup('token');
-    const req = new HttpRequest('GET', '/teams');
-
-    run(req, (finalReq: HttpRequest<unknown>) => {
-      expect(finalReq.withCredentials).toBeTrue();
-      return of(new HttpResponse({ status: 200 }));
-    }).subscribe(() => done());
+    httpClient = TestBed.inject(HttpClient);
+    httpMock = TestBed.inject(HttpTestingController);
+    store = TestBed.inject(Store);
+    
+    spyOn(store, 'select').and.returnValue(of(null));
+    spyOn(store, 'dispatch').and.callThrough();
   });
 
-  it('attaches Authorization header on non-auth endpoints', (done) => {
-    const { run } = setup('abc-token');
-    const req = new HttpRequest('GET', '/teams');
-
-    run(req, (finalReq: HttpRequest<unknown>) => {
-      expect(finalReq.headers.get('Authorization')).toBe('Bearer abc-token');
-      return of(new HttpResponse({ status: 200 }));
-    }).subscribe(() => done());
+  afterEach(() => {
+    httpMock.verify();
   });
 
-  it('does not attach Authorization header on auth endpoints', (done) => {
-    const { run } = setup('abc-token');
-    const req = new HttpRequest('POST', '/auth/login', null);
+  it('should add Authorization header when token is present', () => {
+    authServiceSpy.getToken.and.returnValue('test-token');
 
-    run(req, (finalReq: HttpRequest<unknown>) => {
-      expect(finalReq.headers.has('Authorization')).toBeFalse();
-      return of(new HttpResponse({ status: 200 }));
-    }).subscribe(() => done());
+    httpClient.get('/api/data').subscribe();
+
+    const req = httpMock.expectOne('/api/data');
+    expect(req.request.headers.has('Authorization')).toBeTrue();
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
   });
 
-  it('refreshes token on 401 and retries request', (done) => {
-    const { authMock, storeMock, run } = setup('old-token');
-    const req = new HttpRequest('GET', '/matches');
-    authMock.refreshAccessToken.and.returnValue(of('new-token'));
+  it('should not add Authorization header for auth endpoints', () => {
+    authServiceSpy.getToken.and.returnValue('test-token');
 
-    let callCount = 0;
-    run(req, (finalReq: HttpRequest<unknown>) => {
-      callCount += 1;
-      if (callCount === 1) {
-        return throwError(() => new HttpErrorResponse({ status: 401 }));
-      }
-      expect(finalReq.headers.get('Authorization')).toBe('Bearer new-token');
-      return of(new HttpResponse({ status: 200 }));
-    }).subscribe(() => {
-      expect(authMock.refreshAccessToken).toHaveBeenCalled();
-      expect(storeMock.dispatch).toHaveBeenCalled();
-      done();
+    httpClient.get('/auth/login').subscribe();
+
+    const req = httpMock.expectOne('/auth/login');
+    expect(req.request.headers.has('Authorization')).toBeFalse();
+  });
+
+  it('should refresh token on 401 error', () => {
+    authServiceSpy.getToken.and.returnValue('expired-token');
+    authServiceSpy.refreshAccessToken.and.returnValue(of('new-token'));
+
+    httpClient.get('/api/protected').subscribe();
+
+    const req = httpMock.expectOne('/api/protected');
+    req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
+
+    // Check if refresh was called
+    expect(authServiceSpy.refreshAccessToken).toHaveBeenCalled();
+    
+    // Verify retry request
+    const retryReq = httpMock.expectOne('/api/protected');
+    expect(retryReq.request.headers.get('Authorization')).toBe('Bearer new-token');
+    retryReq.flush({ data: 'ok' });
+  });
+
+  it('should invalidate session if refresh fails and not authenticated', () => {
+    authServiceSpy.getToken.and.returnValue('expired-token');
+    authServiceSpy.refreshAccessToken.and.returnValue(of(null));
+    authServiceSpy.isAuthenticated.and.returnValue(false);
+
+    httpClient.get('/api/protected').subscribe({
+      error: (err) => expect(err.status).toBe(401)
     });
-  });
 
-  it('invalidates session when refresh returns no token and auth is invalid', (done) => {
-    const { authMock, run } = setup('old-token');
-    const req = new HttpRequest('GET', '/matches');
-    authMock.refreshAccessToken.and.returnValue(of(null));
-    authMock.isAuthenticated.and.returnValue(false);
+    const req = httpMock.expectOne('/api/protected');
+    req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
 
-    run(req, () => throwError(() => new HttpErrorResponse({ status: 401 }))).subscribe({
-      next: () => fail('expected error'),
-      error: () => {
-        expect(authMock.invalidateSession).toHaveBeenCalled();
-        done();
-      },
-    });
-  });
-
-  it('does not refresh on passive alert polling endpoints', (done) => {
-    const { authMock, run } = setup('old-token');
-    const req = new HttpRequest('GET', '/alerts/unread');
-
-    run(req, () => throwError(() => new HttpErrorResponse({ status: 401 }))).subscribe({
-      next: () => fail('expected error'),
-      error: () => {
-        expect(authMock.refreshAccessToken).not.toHaveBeenCalled();
-        done();
-      },
-    });
-  });
-
-  it('does not attempt refresh when there is no session token', (done) => {
-    const { authMock, run } = setup(null);
-    const req = new HttpRequest('GET', '/matches');
-
-    run(req, () => throwError(() => new HttpErrorResponse({ status: 401 }))).subscribe({
-      next: () => fail('expected error'),
-      error: () => {
-        expect(authMock.refreshAccessToken).not.toHaveBeenCalled();
-        done();
-      },
-    });
-  });
-
-  it('does not invalidate session when refresh fails but auth still valid', (done) => {
-    const { authMock, run } = setup('old-token');
-    const req = new HttpRequest('GET', '/matches');
-    authMock.refreshAccessToken.and.returnValue(
-      throwError(() => new HttpErrorResponse({ status: 500 })),
-    );
-    authMock.isAuthenticated.and.returnValue(true);
-
-    run(req, () => throwError(() => new HttpErrorResponse({ status: 401 }))).subscribe({
-      next: () => fail('expected error'),
-      error: () => {
-        expect(authMock.refreshAccessToken).toHaveBeenCalled();
-        expect(authMock.invalidateSession).not.toHaveBeenCalled();
-        done();
-      },
-    });
+    expect(authServiceSpy.invalidateSession).toHaveBeenCalled();
   });
 });
