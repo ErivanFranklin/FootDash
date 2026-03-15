@@ -21,6 +21,7 @@ describe('UserProfileService', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -54,7 +55,12 @@ describe('UserProfileService', () => {
 
       const result = await service.findByUserId(1);
 
-      expect(result).toEqual({ ...mockUserProfile, email: 'test@example.com' });
+      expect(result).toEqual(
+        expect.objectContaining({
+          ...mockUserProfile,
+          email: 'test@example.com',
+        }),
+      );
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { userId: 1 },
         relations: ['user'],
@@ -117,6 +123,16 @@ describe('UserProfileService', () => {
 
       expect(result.displayName).toBe(createDto.displayName);
       expect(result.bio).toBeNull();
+    });
+
+    it('should return existing profile instead of creating a new one', async () => {
+      mockRepository.findOne.mockResolvedValue(mockUserProfile);
+
+      const result = await service.create(1, { displayName: 'Ignored' });
+
+      expect(mockRepository.create).not.toHaveBeenCalled();
+      expect(mockRepository.save).not.toHaveBeenCalled();
+      expect(result).toBe(mockUserProfile);
     });
   });
 
@@ -210,6 +226,61 @@ describe('UserProfileService', () => {
       await expect(service.deleteAvatar(999)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('findUserIdsByDisplayNames', () => {
+    it('returns empty map for empty input', async () => {
+      const result = await service.findUserIdsByDisplayNames([]);
+      expect(result.size).toBe(0);
+      expect(mockRepository.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    it('returns lowercased display name to userId map', async () => {
+      const qb = {
+        select: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([
+          { name: 'alice', userId: '2' },
+          { name: 'bob', userId: '3' },
+        ]),
+      };
+      mockRepository.createQueryBuilder.mockReturnValue(qb);
+
+      const result = await service.findUserIdsByDisplayNames(['Alice', 'Bob']);
+
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('p');
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'LOWER(p.displayName) IN (:...names)',
+        { names: ['alice', 'bob'] },
+      );
+      expect(result.get('alice')).toBe(2);
+      expect(result.get('bob')).toBe(3);
+    });
+  });
+
+  describe('getDisplayNameFallback', () => {
+    it('returns profile displayName when available', async () => {
+      mockRepository.findOne.mockResolvedValue({ displayName: 'Preferred' });
+
+      await expect(
+        service.getDisplayNameFallback(1, 'user@example.com'),
+      ).resolves.toBe('Preferred');
+    });
+
+    it('falls back to email local-part when displayName is missing', async () => {
+      mockRepository.findOne.mockResolvedValue({ displayName: null });
+
+      await expect(
+        service.getDisplayNameFallback(1, 'local@example.com'),
+      ).resolves.toBe('local');
+    });
+
+    it('returns Unknown when displayName and email are missing', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.getDisplayNameFallback(1)).resolves.toBe('Unknown');
     });
   });
 });

@@ -11,9 +11,8 @@ export class MailService {
     private readonly mailer: MailerService,
     private readonly config: ConfigService,
   ) {
-    this.frontendUrl = this.config
-      .get<string>('FRONTEND_URL', 'http://localhost:4200')
-      .replace(/\/$/, '');
+    const rawUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:4200';
+    this.frontendUrl = rawUrl.replace(/\/$/, '');
   }
 
   /**

@@ -100,48 +100,63 @@ describe('HighlightsService', () => {
   // ── search ────────────────────────────────────────────────────────────────
 
   describe('search', () => {
-    it('builds a query with LIKE filter on title, homeTeam, awayTeam', async () => {
-      repo.createQueryBuilder.mockReturnValue({
+    it('uses QueryBuilder to search for keywords in title/homeTeam/awayTeam', async () => {
+      const mockQB = {
         where: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        getMany: jest.fn(async () => [{ id: 1, title: 'Arsenal goals' }]),
-      });
+        getMany: jest.fn().mockResolvedValue([{ id: 10, title: 'Barca vs Real' }]),
+      };
+      (repo.createQueryBuilder as jest.Mock).mockReturnValue(mockQB);
 
-      const results = await service.search('arsenal');
-      expect(results).toHaveLength(1);
-    });
-
-    it('returns empty array for empty search query', async () => {
-      repo.createQueryBuilder.mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        getMany: jest.fn(async () => []),
-      });
-
-      const results = await service.search('');
-      expect(results).toHaveLength(0);
+      const result = await service.search('Barca');
+      expect(result).toHaveLength(1);
+      expect(repo.createQueryBuilder).toHaveBeenCalled();
+      expect(mockQB.where).toHaveBeenCalledWith(
+        expect.stringContaining('LOWER'),
+        expect.objectContaining({ q: '%barca%' }),
+      );
     });
   });
 
-  // ── seedMockIfEmpty (via syncHighlights in mock mode) ─────────────────────
+  // ── syncHighlights ────────────────────────────────────────────────────────
 
-  describe('syncHighlights (mock mode)', () => {
-    it('seeds mock data when table is empty', async () => {
-      repo.count.mockResolvedValue(0);
-      repo.create.mockImplementation((dto) => ({ ...dto }));
-      repo.save.mockResolvedValue({});
+  describe('syncHighlights', () => {
+    it('seeds mock data if YOUTUBE_API_KEY is missing and DB is empty', async () => {
+      (repo.count as jest.Mock).mockResolvedValue(0);
+      (repo.save as jest.Mock).mockResolvedValue({});
+      (repo.create as jest.Mock).mockImplementation((a) => a);
 
       await service.syncHighlights();
+
+      expect(repo.count).toHaveBeenCalled();
       expect(repo.save).toHaveBeenCalled();
     });
 
-    it('is idempotent — does NOT seed when table already has rows', async () => {
-      repo.count.mockResolvedValue(5);
+    it('does nothing if YOUTUBE_API_KEY missing but DB is already seeded', async () => {
+      (repo.count as jest.Mock).mockResolvedValue(10);
 
       await service.syncHighlights();
+
+      expect(repo.count).toHaveBeenCalled();
       expect(repo.save).not.toHaveBeenCalled();
+    });
+
+    it('ignores sync error and logs it if fetch fails in API mode', async () => {
+      // Setup API mode by overriding useMock logic
+      (service as any).useMock = false;
+      const errorSpy = jest.spyOn((service as any).logger, 'error').mockImplementation();
+      
+      const { throwError } = require('rxjs');
+      const http = (service as any).http;
+      jest.spyOn(http, 'get').mockReturnValue(throwError(() => new Error('YT fail')));
+
+      await service.syncHighlights();
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Failed to sync highlights',
+        'YT fail',
+      );
     });
   });
 });

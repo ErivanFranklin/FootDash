@@ -323,4 +323,90 @@ describe('FootballApiService', () => {
       );
     });
   });
+
+  describe('Caching logic', () => {
+    it('returns cached data for getTeamInfo if available', async () => {
+      const cachedData = { id: 33, name: 'Cached' };
+      cacheService.get.mockResolvedValue(cachedData);
+      
+      const result = await service.getTeamInfo(33);
+      expect(result).toEqual(cachedData);
+      expect(httpService.get).not.toHaveBeenCalled();
+    });
+
+    it('caches new data for getTeamStats', async () => {
+      const apiResponse = mockAxiosResponse({ response: [{ statistics: {} }] });
+      httpService.get.mockReturnValue(of(apiResponse) as any);
+      
+      await service.getTeamStats({ leagueId: 1, season: 2024, teamId: 33 });
+      expect(cacheService.set).toHaveBeenCalled();
+    });
+  });
+
+  describe('League endpoints', () => {
+    it('getLeagues returns mock data when in mock mode', async () => {
+      createService({ FOOTBALL_API_MOCK: true });
+      const leagues = await service.getLeagues('England');
+      expect(leagues.length).toBeGreaterThan(0);
+      expect(leagues[0].league.name).toBe('Premier League');
+    });
+
+    it('getLeagues fetches from API when available', async () => {
+      const apiResponse = mockAxiosResponse({ response: [{ league: { id: 1 } }] });
+      httpService.get.mockReturnValue(of(apiResponse) as any);
+      
+      const leagues = await service.getLeagues('Italy');
+      expect(leagues[0].league.id).toBe(1);
+      expect(cacheService.set).toHaveBeenCalled();
+    });
+
+    it('getLeagues returns mocks on API failure', async () => {
+      httpService.get.mockReturnValue(throwError(() => new Error('API Fail')));
+      const leagues = await service.getLeagues();
+      expect(leagues.length).toBeGreaterThan(0);
+    });
+
+    it('getLeagueStandings returns data from API', async () => {
+      const apiResponse = mockAxiosResponse({ 
+        response: [{ league: { standings: [[{ rank: 1 }]] } }] 
+      });
+      httpService.get.mockReturnValue(of(apiResponse) as any);
+      
+      const standings = await service.getLeagueStandings(39, 2024);
+      expect(standings[0].rank).toBe(1);
+    });
+
+    it('getLeagueFixtures returns data from API', async () => {
+      const apiResponse = mockAxiosResponse({ response: [{ id: 101 }] });
+      httpService.get.mockReturnValue(of(apiResponse) as any);
+      
+      const fixtures = await service.getLeagueFixtures(39, 2024, 'Regular Season - 1');
+      expect(fixtures[0].id).toBe(101);
+    });
+  });
+
+  describe('Lineups', () => {
+    it('getFixtureLineups returns mock data in mock mode', async () => {
+      createService({ FOOTBALL_API_MOCK: true });
+      const lineups = await service.getFixtureLineups(1);
+      expect(lineups.length).toBe(2);
+      expect(lineups[0].formation).toBe('4-3-3');
+    });
+
+    it('getFixtureLineups returns data from API', async () => {
+      const apiResponse = mockAxiosResponse({ 
+        response: [{ team: { id: 1 }, startXI: [] }] 
+      });
+      httpService.get.mockReturnValue(of(apiResponse) as any);
+      
+      const lineups = await service.getFixtureLineups(123);
+      expect(lineups[0].team.id).toBe(1);
+    });
+
+    it('getFixtureLineups handles API failure', async () => {
+      httpService.get.mockReturnValue(throwError(() => new Error('Lineup fail')));
+      const lineups = await service.getFixtureLineups(123);
+      expect(lineups).toEqual([]);
+    });
+  });
 });

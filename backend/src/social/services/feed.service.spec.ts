@@ -126,6 +126,117 @@ describe('FeedService', () => {
       expect(result.hasMore).toBe(true);
       expect(result.total).toBe(25);
     });
+
+    it('applies an activity type filter when provided', async () => {
+      followRepo.find.mockResolvedValue([{ followingId: 2 }]);
+      const mockQB = createMockQB([], 0);
+      activityRepo.createQueryBuilder.mockReturnValue(mockQB);
+
+      await service.getUserFeed(1, {
+        activityType: 'COMMENT',
+      } as any);
+
+      expect(mockQB.where).toHaveBeenCalledWith(
+        'activity.userId IN (:...userIds)',
+        { userIds: [2, 1] },
+      );
+      expect(mockQB.andWhere).toHaveBeenCalledWith(
+        'activity.activityType = :activityType',
+        { activityType: 'COMMENT' },
+      );
+    });
+  });
+
+  describe('getGlobalFeed', () => {
+    it('returns paginated global activity results', async () => {
+      const mockQB = createMockQB(
+        [
+          {
+            id: 7,
+            userId: 2,
+            activityType: 'FOLLOW',
+            targetType: ActivityTargetType.USER,
+            targetId: 5,
+            metadata: { targetName: 'Someone' },
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            user: { email: 'global@example.com' },
+          },
+        ],
+        4,
+      );
+      activityRepo.createQueryBuilder.mockReturnValue(mockQB);
+
+      const result = await service.getGlobalFeed({ page: 1, limit: 1 } as any);
+
+      expect(mockQB.orderBy).toHaveBeenCalledWith('activity.createdAt', 'DESC');
+      expect(result.total).toBe(4);
+      expect(result.hasMore).toBe(true);
+      expect(result.activities[0].userName).toBe('global@example.com');
+    });
+
+    it('uses where when global feed is filtered by activity type', async () => {
+      const mockQB = createMockQB([], 0);
+      activityRepo.createQueryBuilder.mockReturnValue(mockQB);
+
+      await service.getGlobalFeed({ activityType: 'REACTION' } as any);
+
+      expect(mockQB.where).toHaveBeenCalledWith(
+        'activity.activityType = :activityType',
+        { activityType: 'REACTION' },
+      );
+    });
+  });
+
+  describe('getMatchFeed', () => {
+    it('filters by match target and optional activity type', async () => {
+      const mockQB = createMockQB([], 0);
+      activityRepo.createQueryBuilder.mockReturnValue(mockQB);
+
+      await service.getMatchFeed(12, { activityType: 'COMMENT' } as any);
+
+      expect(mockQB.where).toHaveBeenCalledWith(
+        'activity.targetType = :targetType',
+        { targetType: ActivityTargetType.MATCH },
+      );
+      expect(mockQB.andWhere).toHaveBeenCalledWith(
+        'activity.targetId = :matchId',
+        { matchId: 12 },
+      );
+      expect(mockQB.andWhere).toHaveBeenLastCalledWith(
+        'activity.activityType = :activityType',
+        { activityType: 'COMMENT' },
+      );
+    });
+  });
+
+  describe('getUserActivity', () => {
+    it('returns paginated activity for a specific user', async () => {
+      const mockQB = createMockQB(
+        [
+          {
+            id: 9,
+            userId: 4,
+            activityType: 'PREDICTION',
+            targetType: ActivityTargetType.MATCH,
+            targetId: 6,
+            metadata: { content: 'Hot take' },
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+            user: { email: 'user@example.com' },
+          },
+        ],
+        1,
+      );
+      activityRepo.createQueryBuilder.mockReturnValue(mockQB);
+
+      const result = await service.getUserActivity(4, { page: 2, limit: 5 } as any);
+
+      expect(mockQB.where).toHaveBeenCalledWith('activity.userId = :userId', {
+        userId: 4,
+      });
+      expect(result.page).toBe(2);
+      expect(result.limit).toBe(5);
+      expect(result.activities[0].content).toBe('Hot take');
+    });
   });
 
   describe('addActivity', () => {
@@ -196,6 +307,24 @@ describe('FeedService', () => {
       };
       const dto = service.toResponseDto(activity as UserActivity);
       expect(dto.userName).toBe('Unknown');
+    });
+
+    it('includes optional metadata fields when present', () => {
+      const activity: Partial<UserActivity> = {
+        id: 3,
+        userId: 6,
+        activityType: 'FOLLOW' as any,
+        targetType: ActivityTargetType.USER,
+        targetId: 2,
+        metadata: { targetName: 'Target User', content: 'followed' },
+        createdAt: new Date('2026-01-03T00:00:00.000Z'),
+        user: { email: 'meta@test.com' } as any,
+      };
+
+      const dto = service.toResponseDto(activity as UserActivity);
+
+      expect(dto.targetName).toBe('Target User');
+      expect(dto.content).toBe('followed');
     });
   });
 });

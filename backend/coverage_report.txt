@@ -1,0 +1,100 @@
+  notification-token.entity.ts       |     100 |      100 |     100 |     100 |                                                                                             
+  notifications.controller.ts        |    90.9 |      100 |   66.66 |   88.88 | 11                                                                                          
+  notifications.e2e-spec.ts          |       0 |        0 |       0 |       0 | 1-32                                                                                        
+  notifications.module.ts            |     100 |      100 |     100 |     100 |                                                                                             
+  notifications.service.ts           |   73.33 |    51.28 |   88.23 |   74.41 | 36-37,51-53,107-110,115-116,136-143,153-165,189-205,214,235                                 
+ src/notifications/dto               |      75 |        0 |       0 |      75 |                                                                                             
+  register-notification-token.dto.ts |      75 |        0 |       0 |      75 | 6,15                                                                                        
+ src/odds                            |   54.62 |    34.78 |   43.75 |   59.57 |                                                                                             
+  odds.controller.ts                 |       0 |      100 |       0 |       0 | 1-49                                                                                        
+  odds.module.ts                     |       0 |      100 |     100 |       0 | 1-17                                                                                        
+  odds.service.ts                    |   70.23 |    34.78 |   58.33 |   75.67 | 167-212                                                                                     
+ src/odds/entities                   |     100 |      100 |     100 |     100 |                                                                                             
+  odds.entity.ts                     |     100 |      100 |     100 |     100 |                                                                                             
+ src/payments                        |   95.13 |    70.66 |   94.11 |   95.52 |                                                                                             
+  payments.controller.ts             |     100 |      100 |     100 |     100 |                                                                                             
+  payments.module.ts                 |    90.9 |      100 |       0 |   88.88 | 17                                                                                          
+  payments.service.ts                |   94.11 |    68.57 |     100 |   94.79 | 26,210,227-234                                                                              
+ src/players                         |   76.47 |      100 |     100 |   78.57 |                                                                                             
+  players.controller.ts              |     100 |      100 |     100 |     100 |                                                                                             
+  players.module.ts                  |       0 |      100 |     100 |       0 | 1-13                                                                                        
+  players.service.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+ src/players/entities                |     100 |      100 |     100 |     100 |                                                                                             
+  player.entity.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+ src/search                          |     100 |    97.22 |     100 |     100 |                                                                                             
+  search.controller.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  search.module.ts                   |     100 |      100 |     100 |     100 |                                                                                             
+  search.service.ts                  |     100 |    97.22 |     100 |     100 | 85                                                                                          
+ src/search/dto                      |     100 |      100 |     100 |     100 |                                                                                             
+  search-query.dto.ts                |     100 |      100 |     100 |     100 |                                                                                             
+ src/social                          |       0 |      100 |     100 |       0 |                                                                                             
+  social.module.ts                   |       0 |      100 |     100 |       0 | 1-83                                                                                        
+ src/social/controllers              |     100 |    86.66 |     100 |     100 |                                                                                             
+  alerts.controller.ts               |     100 |    71.42 |     100 |     100 | 44-45                                                                                       
+  chat.controller.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+  comments.controller.ts             |     100 |      100 |     100 |     100 |                                                                                             
+  feed.controller.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+  follow.controller.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  reactions.controller.ts            |     100 |      100 |     100 |     100 |                                                                                             
+  reports.controller.ts              |     100 |      100 |     100 |     100 |                                                                                             
+ src/social/dto                      |   79.71 |      100 |    8.33 |   85.93 |                                                                                             
+  activity.dto.ts                    |   73.68 |      100 |      25 |    87.5 | 38,44                                                                                       
+  comment.dto.ts                     |   78.57 |      100 |       0 |   78.57 | 20,25,30                                                                                    
+  create-report.dto.ts               |     100 |      100 |     100 |     100 |                                                                                             
+  follow.dto.ts                      |   88.88 |      100 |       0 |   88.88 | 6                                                                                           
+  pagination.dto.ts                  |   55.55 |      100 |       0 |   71.42 | 8,14                                                                                        
+  reaction.dto.ts                    |      90 |      100 |       0 |      90 | 11                                                                                          
+ src/social/entities                 |   89.87 |      100 |   30.43 |   90.14 |                                                                                             
+  alert.entity.ts                    |   92.59 |      100 |   33.33 |      92 | 30,52                                                                                       
+  chat-msg.entity.ts                 |   91.66 |      100 |       0 |      90 | 22                                                                                          
+  comment.entity.ts                  |   75.86 |      100 |       0 |      80 | 48,52,56,60,64                                                                              
+  follow.entity.ts                   |   84.61 |      100 |       0 |   81.81 | 30,34                                                                                       
+  reaction.entity.ts                 |   95.83 |      100 |   66.66 |   95.45 | 52                                                                                          
+  report.entity.ts                   |    93.1 |      100 |      50 |   92.59 | 65,69                                                                                       
+  user-activity.entity.ts            |   95.83 |      100 |   66.66 |   95.45 | 53                                                                                          
+ src/social/gateways                 |     100 |       70 |     100 |     100 |                                                                                             
+  chat.gateway.ts                    |     100 |       70 |     100 |     100 | 46-60                                                                                       
+ src/social/services                 |   94.95 |    78.72 |   89.47 |   94.59 |                                                                                             
+  alerts.service.ts                  |     100 |    66.66 |     100 |     100 | 111-117,207                                                                                 
+  chat.service.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+  comments.service.ts                |   89.74 |    69.69 |   84.61 |   89.47 | 127-140,200,204                                                                             
+  feed.service.ts                    |   96.29 |    86.36 |    92.3 |   96.07 | 126,151                                                                                     
+  follow.service.ts                  |   92.98 |    73.33 |   76.92 |   92.45 | 157-172                                                                                     
+  profanity-filter.service.ts        |     100 |      100 |     100 |     100 |                                                                                             
+  reactions.service.ts               |   94.28 |      100 |      80 |   93.93 | 92-104                                                                                      
+  reports.service.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+ src/social/utils                    |      84 |    33.33 |     100 |     100 |                                                                                             
+  mention-parser.ts                  |      84 |    33.33 |     100 |     100 | 2-15,29-31                                                                                  
+ src/teams                           |     100 |    74.41 |     100 |     100 |                                                                                             
+  teams.controller.ts                |     100 |     87.5 |     100 |     100 | 74                                                                                          
+  teams.module.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+  teams.service.ts                   |     100 |    71.42 |     100 |     100 | 31,39,80-81,116-117,126-131                                                                 
+ src/teams/dto                       |   79.31 |      100 |   14.28 |   79.31 |                                                                                             
+  create-team.dto.ts                 |     100 |      100 |     100 |     100 |                                                                                             
+  team-id-param.dto.ts               |      80 |      100 |       0 |      80 | 5                                                                                           
+  team-matches-query.dto.ts          |   76.92 |      100 |      25 |   76.92 | 11,17,23                                                                                    
+  team-stats-query.dto.ts            |   71.42 |      100 |       0 |   71.42 | 6,12                                                                                        
+ src/teams/entities                  |   73.33 |      100 |       0 |   81.81 |                                                                                             
+  team.entity.ts                     |   73.33 |      100 |       0 |   81.81 | 18,21                                                                                       
+ src/users                           |     100 |      100 |     100 |     100 |                                                                                             
+  user.entity.ts                     |     100 |      100 |     100 |     100 |                                                                                             
+  users.module.ts                    |     100 |      100 |     100 |     100 |                                                                                             
+ src/users/controllers               |   98.38 |      100 |     100 |   98.27 |                                                                                             
+  user-preferences.controller.ts     |     100 |      100 |     100 |     100 |                                                                                             
+  user-profile.controller.ts         |   97.29 |      100 |     100 |   97.14 | 77                                                                                          
+ src/users/dto                       |     100 |      100 |     100 |     100 |                                                                                             
+  create-profile.dto.ts              |     100 |      100 |     100 |     100 |                                                                                             
+  update-preferences.dto.ts          |     100 |      100 |     100 |     100 |                                                                                             
+  update-profile.dto.ts              |     100 |      100 |     100 |     100 |                                                                                             
+ src/users/entities                  |      95 |      100 |      50 |   94.44 |                                                                                             
+  user-preferences.entity.ts         |   96.15 |      100 |   66.66 |   95.83 | 32                                                                                          
+  user-profile.entity.ts             |   92.85 |      100 |       0 |   91.66 | 20                                                                                          
+ src/users/services                  |   95.45 |    68.42 |     100 |      95 |                                                                                             
+  avatar-upload.service.ts           |   88.23 |     37.5 |     100 |    87.5 | 49-53,59,66                                                                                 
+  user-preferences.service.ts        |   96.29 |       50 |     100 |      96 | 38                                                                                          
+  user-profile.service.ts            |     100 |      100 |     100 |     100 |                                                                                             
+ src/websockets                      |   89.02 |     87.5 |   70.58 |   90.54 |                                                                                             
+  match.gateway.ts                   |    92.3 |      100 |   66.66 |   91.66 | 23-27                                                                                       
+  social.gateway.ts                  |      86 |    82.35 |   72.72 |   89.13 | 34-42,77-80                                                                                 
+  websockets.module.ts               |     100 |      100 |     100 |     100 |                                                                                             
+-------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------

@@ -212,25 +212,28 @@ export class MatchPredictionService {
       awayScore += h2hAwayPercent * 0.2;
     }
 
-    // Normalize to ensure sum is ~100
+    // Determine the space for win vs draw based on team balance
+    // Teams with very different ratings have higher win potential (low draw chance)
+    // Teams with similar ratings have higher draw potential
     const total = homeScore + awayScore;
-    const winProbabilitySpace = 75; // Reserve 25% for draw probability
+    const ratingsDifference = Math.abs(homeFormRating - awayFormRating);
+    const winProbabilitySpace = Math.min(85, 65 + ratingsDifference / 5);
 
     let homeWin = (homeScore / total) * winProbabilitySpace;
     let awayWin = (awayScore / total) * winProbabilitySpace;
     let draw = 100 - (homeWin + awayWin);
 
-    // Ensure draw probability is reasonable (15-30%)
+    // Ensure draw probability is reasonable (15-40%)
     if (draw < 15) {
       const adjustment = (15 - draw) / 2;
       homeWin -= adjustment;
       awayWin -= adjustment;
       draw = 15;
-    } else if (draw > 30) {
-      const adjustment = (draw - 30) / 2;
+    } else if (draw > 40) {
+      const adjustment = (draw - 40) / 2;
       homeWin += adjustment;
       awayWin += adjustment;
-      draw = 30;
+      draw = 40;
     }
 
     // Round to 2 decimal places
