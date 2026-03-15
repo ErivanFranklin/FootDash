@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { ToastController } from '@ionic/angular';
 import { NotificationCenterService } from '../../../core/services/notification-center.service';
@@ -104,4 +104,87 @@ describe('MatchesPage', () => {
     expect(component.allFixtures.length).toBeGreaterThan(0);
     expect(component.fixtures.length).toBeGreaterThan(0);
   });
+
+  it('handles loadMatches API error and resets loading flag', fakeAsync(() => {
+    apiSpy.getTeamMatches.and.returnValue(throwError(() => new Error('failed')));
+    component.teamId = 1;
+
+    component.loadMatches();
+    tick();
+
+    expect(component.loading).toBeFalse();
+  }));
+
+  it('paginates fixtures via infinite scroll until no more data', () => {
+    component.allFixtures = new Array(25).fill(null).map((_, i) => ({ id: i + 1 }));
+    component.fixtures = component.allFixtures.slice(0, 10);
+    component.hasMoreData = true;
+    component.currentPage = 0;
+
+    const event = { target: { complete: jasmine.createSpy('complete') } } as any;
+
+    component.loadMoreMatches(event);
+    expect(component.fixtures.length).toBe(20);
+    expect(component.hasMoreData).toBeTrue();
+
+    component.loadMoreMatches(event);
+    expect(component.fixtures.length).toBe(25);
+    expect(component.hasMoreData).toBeFalse();
+    expect(event.target.complete).toHaveBeenCalledTimes(2);
+  });
+
+  it('completes infinite scroll immediately when no more data', () => {
+    component.hasMoreData = false;
+    const event = { target: { complete: jasmine.createSpy('complete') } } as any;
+
+    component.loadMoreMatches(event);
+
+    expect(event.target.complete).toHaveBeenCalled();
+  });
+
+  it('applies live quick filter and sets today range', () => {
+    component.teamId = 1;
+    spyOn(component, 'loadMatches').and.stub();
+
+    const liveFilter = component.quickFilters.find((f) => f.value === 'live')!;
+    component.toggleQuickFilter(liveFilter);
+
+    expect(component.range).toBe('recent');
+    expect(component.from).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(component.to).toBe(component.from);
+    expect(component.loadMatches).toHaveBeenCalled();
+  });
+
+  it('syncFixtures success triggers refresh', fakeAsync(() => {
+    component.teamId = 1;
+    spyOn(component, 'loadMatches').and.stub();
+
+    component.syncFixtures();
+    tick();
+
+    expect(apiSpy.syncTeamMatches).toHaveBeenCalled();
+    expect(component.loadMatches).toHaveBeenCalled();
+    expect(component.loading).toBeFalse();
+  }));
+
+  it('syncFixtures error keeps page stable', fakeAsync(() => {
+    apiSpy.syncTeamMatches.and.returnValue(throwError(() => new Error('sync fail')));
+    component.teamId = 1;
+
+    component.syncFixtures();
+    tick();
+
+    expect(component.loading).toBeFalse();
+  }));
+
+  it('refresh handler completes refresher after timeout', fakeAsync(() => {
+    spyOn(component, 'loadMatches').and.stub();
+    const complete = jasmine.createSpy('complete');
+
+    component.handleRefresh({ target: { complete } } as any);
+    tick(1000);
+
+    expect(component.loadMatches).toHaveBeenCalled();
+    expect(complete).toHaveBeenCalled();
+  }));
 });

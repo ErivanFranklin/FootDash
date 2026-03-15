@@ -126,6 +126,7 @@ describe('OddsPage', () => {
       component.activeTab = 'value';
       component.onTabChange();
       httpMock.expectNone(`${API}/value-bets`);
+      expect(component.valueBets().length).toBe(1);
     });
   });
 });
