@@ -39,7 +39,7 @@ The FootDash project has been enhanced with comprehensive CI/CD workflows to aut
 - 4 parallel Jest workers for optimal performance
 - PostgreSQL 15 for testing
 - Chromium headless for frontend tests
-- Coverage thresholds enforced
+- Coverage thresholds enforced (backend + frontend): statements 80%, branches 70%, functions 80%, lines 80%
 
 ### 2. Production Deployment (`deploy-production.yml`)
 
@@ -186,6 +186,11 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxxxx
 - Code coverage reports uploaded automatically
 - Coverage trends tracked over time
 - Fails if coverage drops below threshold
+
+### Coverage Baseline (March 2026)
+- Repository coverage gates are set to: statements 80%, branches 70%, functions 80%, lines 80% for backend and frontend CI unit test jobs.
+- Baseline policy: use Codecov project and flag dashboards (`backend`, `frontend`) as the source of truth for trend monitoring.
+- PR requirement: investigate any negative trend larger than 2 percentage points in any metric versus the previous 30-day average.
 
 ### Slack Notifications
 - Deployment status alerts

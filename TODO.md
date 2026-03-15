@@ -206,8 +206,10 @@
 ### 🔼 Coverage Gates Roadmap
 - [x] Establish initial coverage thresholds (backend/frontend): statements 60%, branches 50%, functions 60%, lines 60%
 - [x] Add CI PR comment coverage summary (backend + frontend)
-- [ ] Raise thresholds to statements 70%, branches 60%, functions 70%, lines 70% after 3 consecutive green CI runs
-- [ ] Track coverage trend via Codecov dashboards; document baseline in `docs/ci-cd-pipeline.md`
+- [x] Raise thresholds to statements 70%, branches 60%, functions 70%, lines 70% after 3 consecutive green CI runs
+- [x] Track coverage trend via Codecov dashboards; document baseline in `docs/ci-cd-pipeline.md`
+- [x] Raise thresholds to statements 80%, branches 70%, functions 80%, lines 80%
+- [ ] Execute backend/frontend coverage uplift plan to meet 80/70/80/80 gates: `docs/testing-coverage-uplift-plan.md` (in progress: guard + users/social/teams/chat/websocket/players/module-dto/admin/analytics-controller/payments/favorites/dashboard/health/export/live-match/match-scheduler/matches-service backend hotspots + interceptor/admin/teams/feed/social-services/core-services/guard-edge/frontend websocket-favorites/social-pages/analytics-match-details/matches-page/service-analytics-chat branches completed; latest local baseline backend 61.11/45.18/51.51/60.86, frontend 64.94/52.79/61.73/67.02)
 
 ### ✅ CI Utility Workflows (COMPLETE)
 - [x] k6 Smoke Test Workflow (`.github/workflows/loadtest-k6.yml`) — manual dispatch with `base_url`
@@ -256,4 +258,28 @@
 - [x] Pro Page & Payment Success Page
 - [x] Update User Entity with isPro flag
 
-## Phase 7
+## Phase 7 - UI/UX Polish & Navigation Enhancements (COMPLETE) ✅
+**Status:** Complete
+
+### Authentication & Session Management
+- [x] Logout functionality in navigation/profile context
+- [x] Clear auth storage on logout and redirect to `/login`
+- [x] Hide tab bar and side menu on Login/Register pages
+- [x] Gate authenticated shell via `AuthService` state
+
+### Navigation Fixes
+- [x] Resolve `NG04002` routing issue (`tabs/feed`)
+- [x] Validate `ion-tabs` navigation behavior with app routes
+- [x] Add/verify back navigation on detail pages:
+  - [x] `MatchDetailsPage`
+  - [x] `UserProfilePage`
+  - [x] `MatchDiscussionPage`
+  - [x] `TeamAnalyticsPage`
+  - [x] `MatchPredictionPage`
+- [x] Add automated route/navigation spec coverage
+
+### UI/UX Enhancements
+- [x] Visual polish updates (spacing, consistency, loading states)
+- [x] Improved responsive behavior for mobile tabs and desktop menu layout
+
+Reference: `docs/phase-7-ui-ux-enhancements.md`

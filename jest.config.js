@@ -1,13 +1,13 @@
 module.exports = {
-  // Root-level coverage thresholds to avoid CI hard failures while we
-  // bring coverage up incrementally. These values match the latest
-  // measured coverage reported in CI.
+  // Root-level fallback coverage policy for Jest runs started from repo root.
+  // Main backend/frontend gates are configured in backend/package.json and
+  // frontend/karma.conf.js.
   coverageThreshold: {
     global: {
-      statements: 58,
-      branches: 14,
-      functions: 41,
-      lines: 56,
+      statements: 80,
+      branches: 70,
+      functions: 80,
+      lines: 80,
     },
   },
 };
