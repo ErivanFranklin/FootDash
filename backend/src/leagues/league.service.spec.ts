@@ -128,4 +128,60 @@ describe('LeagueService', () => {
       expect(syncSpy).not.toHaveBeenCalled();
     });
   });
+
+  // ── findByExternalId ──────────────────────────────────────────────────────
+
+  describe('findByExternalId', () => {
+    it('returns the league when it exists by external id', async () => {
+      const league = { id: 1, externalId: 39 };
+      leagueRepo.findOne.mockResolvedValue(league);
+      const result = await service.findByExternalId(39);
+      expect(result).toEqual(league);
+      expect(leagueRepo.findOne).toHaveBeenCalledWith({ where: { externalId: 39 } });
+    });
+  });
+
+  // ── getFixtures ──────────────────────────────────────────────────────────
+
+  describe('getFixtures', () => {
+    it('calls footballApi.getLeagueFixtures', async () => {
+      leagueRepo.findOne.mockResolvedValue({ id: 1, externalId: 39, season: '2023' });
+      await service.getFixtures(1, 'Regular Season - 1');
+      expect(footballApi.getLeagueFixtures).toHaveBeenCalledWith(39, 2023, 'Regular Season - 1');
+    });
+  });
+
+  // ── syncLeagues ───────────────────────────────────────────────────────────
+
+  describe('syncLeagues', () => {
+    it('handles successful league sync for new and existing leagues', async () => {
+      const apiLeagues = [
+        { league: { id: 39, name: 'Premier League', logo: 'logo1', type: 'League' }, country: { name: 'England' } },
+        { league: { id: 140, name: 'La Liga', logo: 'logo2', type: 'League' }, country: { name: 'Spain' } }
+      ];
+      footballApi.getLeagues.mockResolvedValue(apiLeagues);
+      
+      // First is existing, second is new
+      leagueRepo.findOne
+        .mockResolvedValueOnce({ id: 1, externalId: 39, name: 'Old PL' })
+        .mockResolvedValueOnce(null);
+      
+      leagueRepo.create.mockReturnValue({ externalId: 140, name: 'La Liga' });
+
+      await service.syncLeagues();
+
+      expect(footballApi.getLeagues).toHaveBeenCalled();
+      expect(leagueRepo.save).toHaveBeenCalledTimes(2);
+      expect(leagueRepo.create).toHaveBeenCalled();
+    });
+
+    it('handles errors during sync gracefully', async () => {
+      footballApi.getLeagues.mockRejectedValue(new Error('API Down'));
+      const loggerSpy = jest.spyOn((service as any).logger, 'error');
+      
+      await service.syncLeagues();
+      
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('League sync failed: API Down'));
+    });
+  });
 });
