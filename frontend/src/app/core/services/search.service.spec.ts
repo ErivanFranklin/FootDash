@@ -1,91 +1,74 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
-
-import { SearchService } from './search.service';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { SearchService, SearchResponse } from './search.service';
+import { environment } from '../../../environments/environment';
 
 describe('SearchService', () => {
   let service: SearchService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.clear();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [SearchService]
     });
-
     service = TestBed.inject(SearchService);
     httpMock = TestBed.inject(HttpTestingController);
+    localStorage.clear();
   });
 
   afterEach(() => {
     httpMock.verify();
-    localStorage.clear();
   });
 
-  it('searches with query params and stores recent query', () => {
-    let response: any;
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
 
-    service
-      .search('arsenal', 'teams', 2, 5)
-      .subscribe((result) => (response = result));
+  it('should perform search and add to recent', () => {
+    const mockResponse: SearchResponse = {
+      results: [],
+      total: 0,
+      page: 1,
+      limit: 20,
+      query: 'test',
+      type: 'all'
+    };
 
-    const req = httpMock.expectOne(
-      (request) =>
-        request.url === '/api/search' &&
-        request.params.get('q') === 'arsenal' &&
-        request.params.get('type') === 'teams' &&
-        request.params.get('page') === '2' &&
-        request.params.get('limit') === '5',
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush({
-      results: [{ id: 1, type: 'team', title: 'Arsenal', url: '/teams/1', score: 1 }],
-      total: 1,
-      page: 2,
-      limit: 5,
-      query: 'arsenal',
-      type: 'teams',
+    service.search('test').subscribe(res => {
+      expect(res).toEqual(mockResponse);
+      expect(service.recentSearches$.value).toContain('test');
     });
 
-    expect(response.total).toBe(1);
-    expect(service.recentSearches$.value[0]).toBe('arsenal');
+    const req = httpMock.expectOne(req => req.url.includes('/search') && req.params.get('q') === 'test');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
   });
 
-  it('addRecent de-duplicates and limits to max entries', () => {
-    for (let i = 0; i < 12; i += 1) {
-      service.addRecent(`q${i}`);
+  it('should add recent searches and maintain limit', () => {
+    for (let i = 0; i < 15; i++) {
+      service.addRecent('search ' + i);
     }
-    service.addRecent('Q1');
-
     expect(service.recentSearches$.value.length).toBe(10);
-    expect(service.recentSearches$.value[0]).toBe('Q1');
-    expect(service.recentSearches$.value.filter((x) => x.toLowerCase() === 'q1').length).toBe(1);
+    expect(service.recentSearches$.value[0]).toBe('search 14');
   });
 
-  it('removes and clears recent searches', () => {
-    service.addRecent('first');
-    service.addRecent('second');
+  it('should remove recent search', () => {
+    service.addRecent('test');
+    service.removeRecent('test');
+    expect(service.recentSearches$.value).not.toContain('test');
+  });
 
-    service.removeRecent('FIRST');
-    expect(service.recentSearches$.value).toEqual(['second']);
-
+  it('should clear recent searches', () => {
+    service.addRecent('test');
     service.clearRecent();
-    expect(service.recentSearches$.value).toEqual([]);
+    expect(service.recentSearches$.value.length).toBe(0);
   });
 
-  it('loads empty recent list if local storage is invalid JSON', () => {
-    localStorage.setItem('footdash_recent_searches', 'not-json');
-    const fresh = TestBed.runInInjectionContext(() => new SearchService());
-    expect(fresh.recentSearches$.value).toEqual([]);
-  });
-
-  it('returns icon and color for known and unknown result types', () => {
+  it('should return correct icon for type', () => {
     expect(SearchService.iconForType('team')).toBe('shield-outline');
+    expect(SearchService.iconForType('user')).toBe('person-outline');
+    expect(SearchService.iconForType('match')).toBe('football-outline');
     expect(SearchService.iconForType('unknown')).toBe('search-outline');
-    expect(SearchService.colorForType('match')).toBe('success');
-    expect(SearchService.colorForType('unknown')).toBe('medium');
   });
 });

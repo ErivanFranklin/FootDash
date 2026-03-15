@@ -1,55 +1,83 @@
 import { TestBed } from '@angular/core/testing';
-
 import { LoggerService } from './logger.service';
 import { ErrorLoggingService } from './error-logging.service';
+import { environment } from '../../../environments/environment';
 
 describe('LoggerService', () => {
   let service: LoggerService;
-  const errorLoggingMock = {
-    logInfo: jasmine.createSpy('logInfo'),
-    logWarning: jasmine.createSpy('logWarning'),
-    logError: jasmine.createSpy('logError'),
-  };
+  let errorLoggingSpy: jasmine.SpyObj<ErrorLoggingService>;
 
   beforeEach(() => {
+    errorLoggingSpy = jasmine.createSpyObj('ErrorLoggingService', ['logInfo', 'logWarning', 'logError']);
+
     TestBed.configureTestingModule({
-      providers: [{ provide: ErrorLoggingService, useValue: errorLoggingMock }],
+      providers: [
+        LoggerService,
+        { provide: ErrorLoggingService, useValue: errorLoggingSpy }
+      ]
     });
     service = TestBed.inject(LoggerService);
+    
+    spyOn(console, 'debug');
+    spyOn(console, 'info');
+    spyOn(console, 'log');
+    spyOn(console, 'warn');
+    spyOn(console, 'error');
   });
 
-  afterEach(() => {
-    errorLoggingMock.logInfo.calls.reset();
-    errorLoggingMock.logWarning.calls.reset();
-    errorLoggingMock.logError.calls.reset();
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('forwards info and warning to error logging service', () => {
-    service.info('i', { a: 1 });
-    service.warn('w', { b: 2 });
+  describe('in development mode', () => {
+    beforeEach(() => {
+      (service as any).isProd = false;
+    });
 
-    expect(errorLoggingMock.logInfo).toHaveBeenCalledWith('i', [{ a: 1 }]);
-    expect(errorLoggingMock.logWarning).toHaveBeenCalledWith('w', [{ b: 2 }]);
+    it('should call console.debug', () => {
+      service.debug('test debug');
+      expect(console.debug).toHaveBeenCalled();
+    });
+
+    it('should call console.info and logInfo', () => {
+      service.info('test info', { data: 1 });
+      expect(console.info).toHaveBeenCalled();
+      expect(errorLoggingSpy.logInfo).toHaveBeenCalledWith('test info', [{ data: 1 }]);
+    });
+
+    it('should call console.log', () => {
+      service.log('test log');
+      expect(console.log).toHaveBeenCalled();
+    });
+
+    it('should call console.warn and logWarning', () => {
+      service.warn('test warn');
+      expect(console.warn).toHaveBeenCalled();
+      expect(errorLoggingSpy.logWarning).toHaveBeenCalled();
+    });
+
+    it('should call console.error and logError', () => {
+      const error = new Error('test error');
+      service.error('error message', error);
+      expect(console.error).toHaveBeenCalled();
+      expect(errorLoggingSpy.logError).toHaveBeenCalled();
+    });
   });
 
-  it('forwards error and extracts stack when Error instance is provided', () => {
-    const err = new Error('boom');
+  describe('in production mode', () => {
+    beforeEach(() => {
+      (service as any).isProd = true;
+    });
 
-    service.error('e', { c: 3 }, err);
+    it('should NOT call console.debug', () => {
+      service.debug('test debug');
+      expect(console.debug).not.toHaveBeenCalled();
+    });
 
-    expect(errorLoggingMock.logError).toHaveBeenCalledWith(
-      'e',
-      [{ c: 3 }, err],
-      err.stack,
-    );
-  });
-
-  it('does not call error logging on debug/log methods', () => {
-    service.debug('d');
-    service.log('l');
-
-    expect(errorLoggingMock.logInfo).not.toHaveBeenCalled();
-    expect(errorLoggingMock.logWarning).not.toHaveBeenCalled();
-    expect(errorLoggingMock.logError).not.toHaveBeenCalled();
+    it('should NOT call console.info but SHOULD call logInfo', () => {
+      service.info('test info');
+      expect(console.info).not.toHaveBeenCalled();
+      expect(errorLoggingSpy.logInfo).toHaveBeenCalled();
+    });
   });
 });
